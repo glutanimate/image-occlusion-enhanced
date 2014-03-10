@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+    <file>icons/new_occlusion.png</file>
+    <file>icons/edit_occlusion.png</file>
+</qresource>
+</RCC>
