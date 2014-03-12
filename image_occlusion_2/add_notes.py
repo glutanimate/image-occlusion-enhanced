@@ -8,7 +8,7 @@ import copy
 import hashlib
 import time
 import shutil
-
+import string
 
 from PyQt4 import QtGui
 
@@ -147,7 +147,13 @@ def new_bnames(col, media_dir, original_fname):
         hash_bname = uniq_prefix + bname
         os.rename(os.path.join(media_dir, bname),
                   os.path.join(media_dir, hash_bname))
-        d[bname] = col.media.addFile(unicode(os.path.join(media_dir, hash_bname)))
+        
+        path = os.path.join(media_dir, hash_bname)
+
+        #  The KEY to the dictionary must be unicode, because we will
+        # write d[filename], where filename is encoded in unicode. 
+        d[unicode(bname, "UTF-8")] = col.media.addFile(unicode(path, "UTF-8"))
+
     return d
 
 def fname2img(fname):
@@ -180,6 +186,9 @@ def add_QA_notes(col, fnames_q, fnames_a, tags, media_dir, svg_fname,
                  fname_original, header, footer, did):
     d = new_bnames(col, media_dir, fname_original)
     nrOfNotes = 0
+    f = open("/home/tmbb/A.txt", 'w')
+    f.write(str(d))
+    f.close()
     for (q,a) in zip(fnames_q, fnames_a):
         add_QA_note(col,
                     d[os.path.basename(q)],

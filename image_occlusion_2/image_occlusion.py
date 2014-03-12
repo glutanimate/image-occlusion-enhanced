@@ -78,16 +78,26 @@ class ImageOcc_Add(QtCore.QObject):
             clip.image().save(image_path)
             self.mw.image_occlusion2_image_path = image_path
             clip.clear()
-            self.call_ImageOcc_Editor(image_path)
+            #  Simple hack to catch an error. I still don't know
+            # the cause of the error.
+            try:
+                self.call_ImageOcc_Editor(self.mw.image_occlusion2_image_path)
+            except:
+                image_path = QtGui.QFileDialog.getOpenFileName(None, # parent
+                                                      FILE_DIALOG_MESSAGE,
+                                                      os.path.expanduser('~'),
+                                                      FILE_DIALOG_FILTER)
         
         else:
             image_path = QtGui.QFileDialog.getOpenFileName(None, # parent
                                                        FILE_DIALOG_MESSAGE,
                                                        os.path.expanduser('~'),
                                                        FILE_DIALOG_FILTER)
-            if image_path:
-                self.mw.image_occlusion2_image_path = image_path
-                self.call_ImageOcc_Editor(self.mw.image_occlusion2_image_path)
+        
+        # The following code is common to both branches of the 'if'
+        if image_path:
+            self.mw.image_occlusion2_image_path = image_path
+            self.call_ImageOcc_Editor(self.mw.image_occlusion2_image_path)
             
     def call_ImageOcc_Editor(self, path):
         d = svgutils.image2svg(path)
