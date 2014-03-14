@@ -24,7 +24,7 @@ import notes_from_svg
 # import the icons
 from resources import *
 
-image_occlusion_help_link = "http://tmbb.github.com/ImageOcc2.0/"
+image_occlusion_help_link = "http://tmbb.bitbucket.org/image-occlusion-2.html"
 
 svg_edit_dir = os.path.join(addons_folder(),
                              'image_occlusion_2',
