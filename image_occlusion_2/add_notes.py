@@ -186,9 +186,6 @@ def add_QA_notes(col, fnames_q, fnames_a, tags, media_dir, svg_fname,
                  fname_original, header, footer, did):
     d = new_bnames(col, media_dir, fname_original)
     nrOfNotes = 0
-    f = open("/home/tmbb/A.txt", 'w')
-    f.write(str(d))
-    f.close()
     for (q,a) in zip(fnames_q, fnames_a):
         add_QA_note(col,
                     d[os.path.basename(q)],
