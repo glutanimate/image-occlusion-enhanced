@@ -37,7 +37,7 @@ TO-DOS
 		editor.tool_scale = 1; // Dependent on icon size, so any use to making configurable instead? Used by JQuerySpinBtn.js
 		editor.langChanged = false;
 		editor.showSaveWarning = false;
-		editor.storagePromptClosed = true; // For use with ext-storage.js
+		editor.storagePromptClosed = false; // For use with ext-storage.js
 
 		var svgCanvas, urldata,
 			Utils = svgedit.utilities,
@@ -95,8 +95,7 @@ TO-DOS
 				'ext-grid.js',
 				'ext-polygon.js',
 				'ext-star.js',
-				'ext-panning.js' //,
-				// 'ext-storage.js'
+				'ext-panning.js'
 			],
 			defaultConfig = {
 				// Todo: svgcanvas.js also sets and checks: show_outside_canvas, selectNew; add here?

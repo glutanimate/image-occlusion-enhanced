@@ -41,12 +41,12 @@ ImageQA_qfmt = """
 {{#%(src_img)s}}
 {{%(header)s}}
 <div style="position:relative; width:100%%">
-  <div style="position:absolute; top:0; width:100%%">
-    {{%(src_img)s}}
-  </div>
-  <div style="position:absolute; top:0; width:100%%">
+  <div style="position:absolute; top:0; width:100%%; z-index:2">
     {{%(que)s}}<br/>
     {{%(footer)s}}
+  </div>
+  <div style="position:absolute; top:0; width:100%%; z-index:1">
+    {{%(src_img)s}}
   </div>
 </div>
 {{%(footer)s}}
@@ -68,12 +68,12 @@ ImageQA_afmt = """
 {{#%(src_img)s}}
 {{%(header)s}}
 <div style="position:relative; width:100%%">
-  <div style="position:absolute; top:0; width:100%%">
-    {{%(src_img)s}}
-  </div>
-  <div style="position:absolute; top:0; width:100%%">
+  <div style="position:absolute; top:0; width:100%%; z-index:2">
     {{%(ans)s}}<br/>
     {{%(footer)s}}
+  </div>
+  <div style="position:absolute; top:0; width:100%%; z-index:1">
+    {{%(src_img)s}}
   </div>
 </div>
 <span style="display:none">{{%(svg)s}}</span>
@@ -89,6 +89,8 @@ ImageQA_afmt = """
   'src_img': ORIGINAL_IMAGE_FIELD_NAME,
   'header': HEADER_FIELD_NAME,
   'footer': FOOTER_FIELD_NAME}
+
+
 
 def add_image_QA_model(col):
     mm = col.models
@@ -209,7 +211,8 @@ def gui_add_QA_notes(fnames_q, fnames_a, media_dir, tags, svg_fname,
     m = mm.byName(IMAGE_QA_MODEL_NAME)
     
     # Upgrading from previous versions:
-    if m['tmpls'][0]['qfmt'] != ImageQA_qfmt: # still in version 2.0?
+    if m['tmpls'][0]['qfmt'] != ImageQA_qfmt or \
+       m['tmpls'][0]['afmt'] != ImageQA_afmt:
         update_qfmt_afmt(col)
     if len(m['flds']) == 4:
         update_fields(col)
