@@ -95,8 +95,8 @@ TO-DOS
 				'ext-grid.js',
 				'ext-polygon.js',
 				'ext-star.js',
-				'ext-panning.js',
-				'ext-storage.js'
+				'ext-panning.js' //,
+				// 'ext-storage.js'
 			],
 			defaultConfig = {
 				// Todo: svgcanvas.js also sets and checks: show_outside_canvas, selectNew; add here?
