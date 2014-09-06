@@ -37,7 +37,7 @@ TO-DOS
 		editor.tool_scale = 1; // Dependent on icon size, so any use to making configurable instead? Used by JQuerySpinBtn.js
 		editor.langChanged = false;
 		editor.showSaveWarning = false;
-		editor.storagePromptClosed = false; // For use with ext-storage.js
+		editor.storagePromptClosed = true; // For use with ext-storage.js
 
 		var svgCanvas, urldata,
 			Utils = svgedit.utilities,
