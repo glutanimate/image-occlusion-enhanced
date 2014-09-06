@@ -28,7 +28,7 @@ image_occlusion_help_link = "http://tmbb.bitbucket.org/image-occlusion-2.html"
 
 svg_edit_dir = os.path.join(addons_folder(),
                              'image_occlusion_2',
-                             'svg-edit-2.5.1')
+                             'svg-edit')
 
 ext_image_occlusion_js_path = os.path.join(svg_edit_dir,
                                            'extensions',
