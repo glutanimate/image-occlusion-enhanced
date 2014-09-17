@@ -1,0 +1,8 @@
+{
+  "target": "~/Anki/addons/",
+  "to-deploy": ["image_occlusion_2", "Image Occlusion 2.py"],
+  "package-name": "Image Occlusion 2.0.zip",
+  "ignore-patterns": ["*.pyo", "*.pyc", "*~", "*.nja"],
+  "url": "https://ankiweb.net/shared/info/282798835"
+}
+
