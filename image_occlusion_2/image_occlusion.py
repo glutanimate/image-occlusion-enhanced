@@ -237,6 +237,11 @@ class ImageOcc_Editor(QWidget):
         self.setLayout(vbox)
         self.setMinimumHeight(600)
 
+        #  Don't focus on the tags.
+        #  When the focus is on the tags an ugly autocomplete
+        # list appears, taking away screen real estate for no reason.
+        self.header_edit.setFocus()
+
         self.setWindowTitle('Image Occlusion Editor')
         self.show()
 
