@@ -331,8 +331,8 @@ class ImageOcc_Editor(QWidget):
         command = "var svg_contents = svgCanvas.svgCanvasToString(); pyObj.add_notes_overlapping(svg_contents);"
         self.svg_edit.eval(command) 
     def reset_all_fields(self):
-        self.header_edit.setPlainText("")
-        self.footer_edit.setPlainText("")
+        self.header_edit.setText("")
+        self.footer_edit.setText("")
 
 
 class ImageOcc_Options(QtGui.QWidget):
