@@ -248,6 +248,30 @@ class ImageOcc_Editor(QWidget):
         # CTRL+F - fit to canvas
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_F), self), 
             QtCore.SIGNAL('activated()'), self.fit_image_canvas)
+        # CTRL+1 - focus header field
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_1), self), 
+            QtCore.SIGNAL('activated()'), self.header_edit.setFocus)
+        # CTRL+2 - focus footer field
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_2), self), 
+            QtCore.SIGNAL('activated()'), self.footer_edit.setFocus)
+        # CTRL+I - focus SVG-Edit
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_I), self), 
+            QtCore.SIGNAL('activated()'), self.svg_edit.setFocus)
+        # CTRL+T - focus tags field
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_T), self), 
+            QtCore.SIGNAL('activated()'), self.tags_edit.setFocus)
+        # CTRL+R - reset all fields
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_R), self), 
+            QtCore.SIGNAL('activated()'), self.reset_all_fields)
+        # CTRL + O - add overlapping note
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_O), self), 
+            QtCore.SIGNAL('activated()'), self.add_overlapping)
+        # CTRL + N - add non-overlapping note
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_N), self), 
+            QtCore.SIGNAL('activated()'), self.add_nonoverlapping)
+        # Escape - Close Image Occlusion window
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.Key_Escape), self), 
+            QtCore.SIGNAL('activated()'), self.close)
 
         self.setWindowTitle('Image Occlusion Editor')
         self.show()
@@ -257,6 +281,15 @@ class ImageOcc_Editor(QWidget):
     def fit_image_canvas(self):
         command = "svgCanvas.zoomChanged('', 'canvas');"
         self.svg_edit.eval(command)
+    def add_nonoverlapping(self): 
+        command = "var svg_contents = svgCanvas.svgCanvasToString(); pyObj.add_notes_non_overlapping(svg_contents);"
+        self.svg_edit.eval(command)
+    def add_overlapping(self): 
+        command = "var svg_contents = svgCanvas.svgCanvasToString(); pyObj.add_notes_overlapping(svg_contents);"
+        self.svg_edit.eval(command) 
+    def reset_all_fields(self):
+        self.header_edit.setPlainText("")
+        self.footer_edit.setPlainText("")
 
 
 class ImageOcc_Options(QtGui.QWidget):
