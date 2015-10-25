@@ -105,8 +105,9 @@ class ImageOcc_Add(QtCore.QObject):
             select_rect_tool = "svgCanvas.setMode('rect'); "
             set_svg_content = 'svg_content = \'%s\'; ' % svg.replace('\n', '')
             set_canvas = 'svgCanvas.setSvgString(svg_content);'
+            set_zoom = "svgCanvas.zoomChanged('', 'canvas');"
 
-            command = select_rect_tool + set_svg_content + set_canvas
+            command = select_rect_tool + set_svg_content + set_canvas + set_zoom
 
             mw.ImageOcc_Editor.svg_edit.eval(command)
             mw.ImageOcc_Editor.show()
@@ -242,8 +243,20 @@ class ImageOcc_Editor(QWidget):
         # list appears, taking away screen real estate for no reason.
         self.header_edit.setFocus()
 
+        # define and connect key bindings
+
+        # CTRL+F - fit to canvas
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_F), self), 
+            QtCore.SIGNAL('activated()'), self.fit_image_canvas)
+
         self.setWindowTitle('Image Occlusion Editor')
         self.show()
+
+    # functions related to key-bindings
+
+    def fit_image_canvas(self):
+        command = "svgCanvas.zoomChanged('', 'canvas');"
+        self.svg_edit.eval(command)
 
 
 class ImageOcc_Options(QtGui.QWidget):
