@@ -163,8 +163,8 @@ def get_params_for_add_notes():
 def add_image_occlusion_button(ed):
     ed.image_occlusion = ImageOcc_Add(ed)
     ed._addButton("new_occlusion", ed.image_occlusion.add_notes,
-            key="Alt+o", size=False,  # text=_("Image Occlusion"),
-            native=True, canDisable=False)
+            _("Alt+o"), _("Image Occlusion (Alt+o)"),
+            canDisable=False)
 
 
 class ImageOcc_Editor(QWidget):
