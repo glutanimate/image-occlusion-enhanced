@@ -6,6 +6,7 @@ from aqt.qt import *
 from anki import hooks
 from aqt import deckchooser
 from aqt import tagedit
+from anki.utils import json
 
 import os
 import tempfile
@@ -19,6 +20,13 @@ from config import SVG_EDIT_VERSION
 from resources import *
 
 image_occlusion_help_link = "http://tmbb.bitbucket.org/image-occlusion-2.html"
+
+# set various paths
+os_home_dir = os.path.expanduser('~')
+
+addons_folder = mw.pm.addonFolder()
+
+prefs_path = os.path.join(addons_folder, "image_occlusion_2", ".image_occlusion_2_prefs")
 
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
                             'svg-edit',
@@ -55,17 +63,49 @@ FILE_DIALOG_FILTER = "Image Files (*.png *jpg *.jpeg *.gif)"
 default_conf = {'initFill[color]': 'FFFFFF',
                 'mask_fill_color': 'FF0000'}
 
+default_prefs = {"prev_image_dir": os_home_dir}
+
+
+def load_prefs(self):
+    # load local preferences
+    self.prefs = None
+    try:
+        with open(prefs_path, "r") as f:
+            self.prefs = json.load(f)
+    except:
+        # file does not exist or is corrupted: fall back to default
+        with open(prefs_path, "w") as f:
+            self.prefs = default_prefs
+            json.dump(self.prefs, f)
+
+def save_prefs(self):
+    # save local preferences to disk
+    with open(prefs_path, "w") as f:
+        json.dump(self.prefs, f)
+
 
 class ImageOcc_Add(QtCore.QObject):
     def __init__(self, ed):
         super(QtCore.QObject, self).__init__()
         self.ed = ed
         self.mw = mw
+
+        # check if config exists
         if not 'image_occlusion_conf' in mw.col.conf:
             # If addon has never been run
             self.mw.col.conf['image_occlusion_conf'] = default_conf
 
+        # load preferences
+        load_prefs(self)
+
     def add_notes(self):
+
+        # retrieve last used image directory
+        prev_image_dir = self.prefs["prev_image_dir"]
+        # if directory not valid or empty use system home directory
+        if not os.path.isdir(prev_image_dir):
+            prev_image_dir = os_home_dir   
+
         clip = QApplication.clipboard()
         if clip.mimeData().imageData():
             handle, image_path = tempfile.mkstemp(suffix='.png')
@@ -79,18 +119,21 @@ class ImageOcc_Add(QtCore.QObject):
             except:
                 image_path = QtGui.QFileDialog.getOpenFileName(None,  # parent
                                                       FILE_DIALOG_MESSAGE,
-                                                      os.path.expanduser('~'),
+                                                      prev_image_dir,
                                                       FILE_DIALOG_FILTER)
 
         else:
             image_path = QtGui.QFileDialog.getOpenFileName(None,  # parent
                                                        FILE_DIALOG_MESSAGE,
-                                                       os.path.expanduser('~'),
+                                                       prev_image_dir,
                                                        FILE_DIALOG_FILTER)
 
         # The following code is common to both branches of the 'if'
         if image_path:
             self.mw.image_occlusion2_image_path = image_path
+            # store image directory in local preferences
+            self.prefs["prev_image_dir"] = os.path.dirname( image_path )
+            save_prefs(self)
             self.call_ImageOcc_Editor(self.mw.image_occlusion2_image_path)
 
     def call_ImageOcc_Editor(self, path):
