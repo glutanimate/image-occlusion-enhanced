@@ -271,9 +271,8 @@ class ImageOcc_Editor(QWidget):
                                                    label=False)
 
         vbox = QVBoxLayout()
-        vbox.addStretch(1)
         vbox.addLayout(header_hbox)
-        vbox.addWidget(self.svg_edit)
+        vbox.addWidget(self.svg_edit, 1)
         vbox.addLayout(footer_hbox)
         vbox.addLayout(tags_hbox)
         vbox.addWidget(deck_container)
