@@ -5,6 +5,7 @@
  *
  * Copyright(c) 2010 Narendra Sisodya
  * Copyright(c) 2010 Alexis Deveria
+ * Copyright(c) 2016 Glutanimate
  *
  */
 
@@ -12,6 +13,11 @@
 // 1) jQuery
 // 2) svgcanvas.js
 // 3) svg-editor.js
+
+// Modifications by Glutanimate:
+// - remove console.log message about current locale
+//   which was causing a confusing Javascript error message
+//   in Anki's stdout
 
 var svgEditor = (function($, Editor) {
 
@@ -288,7 +294,7 @@ var svgEditor = (function($, Editor) {
 					return;
 			}
 			
-			console.log('Lang: ' + lang_param);
+			// console.log('Lang: ' + lang_param);
 			
 			// Set to English if language is not in list of good langs
 			if($.inArray(lang_param, good_langs) == -1 && lang_param !== 'test') {

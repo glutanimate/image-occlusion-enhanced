@@ -1,3 +1,17 @@
+# -*- coding: utf-8 -*-
+####################################################
+##                                                ##
+##         Image Occlusion 2.0 Enhanced           ##
+##                                                ##
+##        Copyright (c) Glutanimate 2016          ##
+##       (https://github.com/Glutanimate)         ##
+##                                                ##
+##     Original Image Occlusion 2.0 add-on is     ##
+##         Copyright (c) 2012-2015 tmbb           ##
+##           (https://github.com/tmbb)            ##
+##                                                ##
+####################################################
+
 import os
 import base64
 import urllib
@@ -12,6 +26,8 @@ shapes_layer_index = 1
 blank_svg_path = os.path.join(os.path.dirname(__file__),
                              "blank-svg.svg")
 
+# Make sure to use correct namespace
+etree.register_namespace("","http://www.w3.org/2000/svg")
 
 def strip_attributes(root, attrs):
     for elt in root.iter():
@@ -84,13 +100,22 @@ def formatStyle(a):
     return ";".join([att + ":" + str(val) for att, val in a.iteritems()])
 
 
-def nr_of_shapes(svg):
-    return len(svg[shapes_layer_index]) - 1  # subtract one because of <title>
+def nr_of_shapes(svg, curr_shapes_index):
+    return len(svg[curr_shapes_index]) - 1  # subtract one because of <title>
 
+# Find shapes layer index
+def get_shapes_layer_idx(svg):
+    for idx,svg_ele in enumerate(svg):
+        title = svg_ele.find('{http://www.w3.org/2000/svg}title').text
+        if title == "Shapes":
+            return idx
+            break
 
 def set_color(elt, color):
     elt.attrib["fill"] = "#" + color
 
+def set_id(elt, elmid):
+    elt.attrib["id"] = elmid
 
 #  Applies the change of color to the children of the
 # children and so on. Useful when we want to color shapes

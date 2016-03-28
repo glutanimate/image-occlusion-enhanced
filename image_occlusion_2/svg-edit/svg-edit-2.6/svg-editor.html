@@ -4,13 +4,19 @@
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="chrome=1"/>
-<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <link rel="icon" type="image/png" href="images/logo.png"/>
 <link rel="stylesheet" href="jgraduate/css/jPicker.css" type="text/css"/>
 <link rel="stylesheet" href="jgraduate/css/jgraduate.css" type="text/css"/>
 <link rel="stylesheet" href="svg-editor.css" type="text/css"/>
 <link rel="stylesheet" href="spinbtn/JQuerySpinBtn.css" type="text/css"/>
+
+<!-- 
+Modifications by Glutanimate:
+- load js files directly instead of compiled release in order to use modified svgcanvas.js 
+- various smaller edits to fix several error messages and warnings about meta information
+-->
 
 <!--{if jquery_release}>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
@@ -25,24 +31,25 @@
 <script type="text/javascript" src="spinbtn/JQuerySpinBtn.min.js"></script>
 <script type="text/javascript" src="touch.js"></script>
 
+<script type="text/javascript" src="contextmenu/jquery.contextMenu.js"></script>
+<script type="text/javascript" src="browser.js"></script>
+<script type="text/javascript" src="svgtransformlist.js"></script>
+<script type="text/javascript" src="math.js"></script>
+<script type="text/javascript" src="units.js"></script>
+<script type="text/javascript" src="svgutils.js"></script>
+<script type="text/javascript" src="sanitize.js"></script>
+<script type="text/javascript" src="history.js"></script>
+<script type="text/javascript" src="select.js"></script>
+<script type="text/javascript" src="draw.js"></script>
+<script type="text/javascript" src="path.js"></script>
+<script type="text/javascript" src="svgcanvas.js"></script>
+<script type="text/javascript" src="svg-editor.js"></script>
+<script type="text/javascript" src="locale/locale.js"></script>
+<script type="text/javascript" src="contextmenu.js"></script>
+
 <!--{if svg_edit_release}-->
-  <script type="text/javascript" src="svgedit.compiled.js"></script>
+	<!-- <script type="text/javascript" src="svgedit.compiled.js"></script> -->
 <!--{else}>
-  <script type="text/javascript" src="contextmenu/jquery.contextMenu.js"></script>
-  <script type="text/javascript" src="browser.js"></script>
-  <script type="text/javascript" src="svgtransformlist.js"></script>
-  <script type="text/javascript" src="math.js"></script>
-  <script type="text/javascript" src="units.js"></script>
-  <script type="text/javascript" src="svgutils.js"></script>
-  <script type="text/javascript" src="sanitize.js"></script>
-  <script type="text/javascript" src="history.js"></script>
-  <script type="text/javascript" src="select.js"></script>
-  <script type="text/javascript" src="draw.js"></script>
-  <script type="text/javascript" src="path.js"></script>
-  <script type="text/javascript" src="svgcanvas.js"></script>
-  <script type="text/javascript" src="svg-editor.js"></script>
-  <script type="text/javascript" src="locale/locale.js"></script>
-  <script type="text/javascript" src="contextmenu.js"></script>
 <!{endif}-->
 
 <!-- you can load extensions here -->

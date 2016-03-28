@@ -6,6 +6,7 @@
  * Copyright(c) 2010 Alexis Deveria
  * Copyright(c) 2010 Pavol Rusnak
  * Copyright(c) 2010 Jeff Schiller
+ * Copyright(c) 2016 Glutanimate
  *
  */
 
@@ -21,6 +22,12 @@
 // 9) select.js
 // 10) draw.js
 // 11) path.js
+
+// Modifications by Glutanimate:
+// - replace mousewheel zoom code with code in SVG-edit 2.7
+//		- this fixes a longstanding issue where mousewheel zoom wouldn't
+//		  work properly on the canvas
+// - change hotkey for mousewheel zoom to CTRL + Mousewheel
 
 if(!window.console) {
 	window.console = {};
@@ -3474,14 +3481,19 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 	// Added mouseup to the container here.
 	// TODO(codedread): Figure out why after the Closure compiler, the window mouseup is ignored.
 	$(container).mousedown(mouseDown).mousemove(mouseMove).click(handleLinkInCanvas).dblclick(dblClick).mouseup(mouseUp);
-//	$(window).mouseup(mouseUp);
+	//	$(window).mouseup(mouseUp);
 	
+	 //TODO(rafaelcastrocouto): User preference for shift key and zoom factor
 	$(container).bind("mousewheel DOMMouseScroll", function(e){
-		if(!e.shiftKey) return;
-		e.preventDefault();
 
-		root_sctm = svgcontent.getScreenCTM().inverse();
-		var pt = transformPoint( e.pageX, e.pageY, root_sctm );
+		if (!e.ctrlKey) {return;}
+		e.preventDefault();
+		var evt = e.originalEvent;
+
+
+		root_sctm = $('#svgcontent g')[0].getScreenCTM().inverse();
+		var pt = svgedit.math.transformPoint( evt.pageX, evt.pageY, root_sctm );
+
 		var bbox = {
 			'x': pt.x,
 			'y': pt.y,
@@ -3489,23 +3501,11 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			'height': 0
 		};
 
-		// Respond to mouse wheel in IE/Webkit/Opera.
-		// (It returns up/dn motion in multiples of 120)
-		if(e.wheelDelta) {
-			if (e.wheelDelta >= 120) {
-				bbox.factor = 2;
-			} else if (e.wheelDelta <= -120) {
-				bbox.factor = .5;
-			}
-		} else if(e.detail) {
-			if (e.detail > 0) {
-				bbox.factor = .5;
-			} else if (e.detail < 0) {
-				bbox.factor = 2;			
-			}				
-		}
-		
-		if(!bbox.factor) return;
+		var delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
+		if (!delta) {return;}
+
+		bbox.factor = Math.max(3/4, Math.min(4/3, (delta)));
+	
 		call("zoomed", bbox);
 	});
 	
