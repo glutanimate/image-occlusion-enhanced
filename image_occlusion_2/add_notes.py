@@ -87,11 +87,17 @@ ImageQA_afmt = """\
   {{#%(footer)s}}
     <div>{{%(footer)s}}</div>
   {{/%(footer)s}}
+    </hr>
   {{#%(remarks)s}}
-    <div>Notes: {{%(remarks)s}}</div>
+    <div>
+      <span class="io-field-descr">Remarks: </span>{{%(remarks)s}}
+    </div>
   {{/%(remarks)s}}
+    </br>
   {{#%(sources)s}}
-    <div>Sources: {{%(sources)s}}</div>
+    <div>
+      <span class="io-field-descr">Sources: </span>{{%(sources)s}}
+    </div>
   {{/%(sources)s}}
 </div>
 {{/%(src_img)s}}
@@ -116,8 +122,12 @@ ImageQA_css = """\
   background-color: white;
 }
 
+.io-field-descr{
+  font-weight: bold;
+}
+
 #io-title{
-  font-size: 1.05em;
+  font-size: 1.1em;
 }
 
 #io-wrapper {
