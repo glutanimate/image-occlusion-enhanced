@@ -7,11 +7,15 @@
 - [Overview](#overview)
 - [Screenshots](#screenshots)
 - [Changes compared to Image Occlusion 2](#changes-compared-to-image-occlusion-2)
+    - [Enhancements to the user interface](#enhancements-to-the-user-interface)
+    - [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on)
+    - [Smaller tweaks and bug fixes](#smaller-tweaks-and-bug-fixes)
+- [Installation](#installation)
 - [Customization](#customization)
     - [DOs and DO NOTs](#dos-and-do-nots)
 - [Tips](#tips)
     - [Making full use of SVG-Edit](#making-full-use-of-svg-edit)
-    - [A good way to use the available fields](#a-good-way-to-use-the-available-fields)
+    - [Using all available fields to their full extent](#using-all-available-fields-to-their-full-extent)
     - [Consistency across different note types](#consistency-across-different-note-types)
 - [Development status](#development-status)
 - [Credits](#credits)
@@ -36,9 +40,9 @@ Please note that this is a highly customized release and as such might contain m
 
 ## Changes compared to Image Occlusion 2
 
-This version of image occlusion comes with the following new features, some of which were already part of [my first fork](https://github.com/Glutanimate/image-occlusion-2):
+*Image Occlusion 2 Enhanced* comes with the following new features, some of which were already part of [my first fork](https://github.com/Glutanimate/image-occlusion-2):
 
-**Enhancements to the user interface**
+### Enhancements to the user interface
 
 - **Tabbed interface**
     - one tab for the SVG editor, the other for the remaining fields. Makes it easier to work with larger images.
@@ -68,7 +72,7 @@ This version of image occlusion comes with the following new features, some of w
 - **Updated toolbar button**
     - the icon is now more in line with rest of the toolbar and comes with a tooltip
 
-**Enhancements to the core functionality of the add-on**
+### Enhancements to the core functionality of the add-on
 
 - **New image occlusion note type**
     + the new note type comes with 5 additional fields, 2 out of which can be updated via the image occlusion dialog.
@@ -88,7 +92,7 @@ This version of image occlusion comes with the following new features, some of w
 - **Remember last used directory**
     + I/O will now try to set the file selection directory based on the last used directory
 
-**Smaller tweaks and bug fixes**:
+### Smaller tweaks and bug fixes
 
 - reduced add-on size by trimming down local version of PIL
 - removed SVG-edit 2.7 from the repository
@@ -108,6 +112,18 @@ This version of image occlusion comes with the following new features, some of w
     + any modifications to your I/O card templates will now be preserved across upgrades of the add-on
 - changed sort field of I/O notes to the header. This makes it easier to identify specific notes in the card browser.
 
+## Installation
+
+It will probably be a while before I publish this add-on to AnkiWeb. There's still a lot of testing to be done; but if you want to help out or feel particularly adventurous you can install *Image Occlusion 2 Enhanced* by following these steps:
+
+- Grab the latest release of the add-on from the [releases page](https://github.com/Glutanimate/image-occlusion-2-enhanced/releases)
+- Extract the zip file
+- Launch Anki and open the add-on directory by going to *Tools* → *Add-ons* → *Open add-on directory*
+- If Image Occlusion 2 is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
+- Having done that, proceed to copy `image_occlusion_2` and `Image Occlusion 2.py` from the extracted zip file into your add-on directory
+- Restart Anki
+- Image Occlusion 2.0 Enhanced should now be installed
+
 ## Customization
 
 Image Occlusion 2.0 Enhanced can be customized, but only to a certain degree
@@ -122,7 +138,7 @@ Image Occlusion 2.0 Enhanced can be customized, but only to a certain degree
 
 **What you can do**:
 
-- rename the following fields: Header, Footer, Remarks, Sources, TempField3, TempField4, TempField5
+- rename the following fields: *Header*, *Footer*, *Remarks*, *Sources*, *TempField3*, *TempField4*, *TempField5*
     + depending on whether you've already used I/O in your Anki session you might first have to restart Anki to see the changes in the Image Occlusion Editor
 - modify the card template and CSS
     + Be careful, though, as the right styling and layout is essential for layering the original image and SVG mask over each other
@@ -135,27 +151,30 @@ What follows are a few additional tips to help you get the most out of Image Occ
 
 ### Making full use of SVG-Edit
 
-- SVG-Edit ships with a lot of very useful **hotkeys**. Make sure to use them! E.G.:
-    + hold down <kbd>Shift</kbd> while clicking to select multiple shapes
-    + <kbd>G</kbd> to group items and mark them as one single mask
-    + <kbd>V</kbd> for the selection tool
-    + <kbd>R</kbd> for the rectangle tool
-    + <kbd>E</kbd> for the ellipse tool
-    + <kbd>T</kbd> for the text tool
-    + <kbd>C</kbd> to fit the image to the canvas
-- use the **layers dialog** to add labels to your images before occluding them. Here's how:
-    + click on the right-sided labels side pane in the svg editor; a panel with all active layers will appear
-    + click on the 'new layer' button on the top-left; name the layer however you want (e.g. *Labels*)
-    + select the new layer by left-clicking on it in the labels list
-    + in order to occlude items on this new layer you will have to move it below the shapes layer first. To do so go back to the layers side panel, select your *Labels* layer, and use the down arrow button to to move it below the *Shapes* layer (but still above the *Picture* layer)
-    + any shapes or texts you now draw while the layer is active will be part of the background
-    + when you want to draw the occlusion masks again, simply re-select the *Shapes* layer
+SVG-Edit ships with a lot of very useful **hotkeys**. Make sure to use them! E.g.:
 
-### A good way to use the available fields
+- hold down <kbd>Shift</kbd> while clicking to select multiple shapes
+- <kbd>G</kbd> to group items and mark them as one single mask
+- <kbd>V</kbd> for the selection tool
+- <kbd>R</kbd> for the rectangle tool
+- <kbd>E</kbd> for the ellipse tool
+- <kbd>T</kbd> for the text tool
+- <kbd>C</kbd> to fit the image to the canvas
+
+Use the **layers dialog** to add labels to your images before occluding them. Here's how:
+
+- click on the right-sided labels side pane in the svg editor; a panel with all active layers will appear
+- click on the 'new layer' button on the top-left; name the layer however you want (e.g. *Labels*)
+- select the new layer by left-clicking on it in the labels list
+- in order to occlude items on this new layer you will have to move it below the shapes layer first. To do so go back to the layers side panel, select your *Labels* layer, and use the down arrow button to to move it below the *Shapes* layer (but still above the *Picture* layer)
+- any shapes or texts you now draw while the layer is active will be part of the background
+- when you want to draw the occlusion masks again, simply re-select the *Shapes* layer
+
+### Using all available fields to their full extent
 
 This version of image occlusion comes with two new fields, *Remarks* and *Sources*. In total, you now have four different fields to choose from when adding additional information to your I/O notes (plus 3 more that are somewhat hidden, see above).
 
-So what to use these fields for? Well, you can customize and rename them however you please, but here are some suggestions:
+So what should you use these fields for? Well, you can customize and rename them however you please, but here are some suggestions:
 
 - *Header* field: appears both on the front and back of your cards. I would use this for short titles that put your image in the right context. Notes in the browser can be sorted by this field, so make sure to choose a descriptive title.
 - *Footer*: appears both on the front and back of your cards. You could use this for hints, mnemonics, recall prompts, etc.
@@ -164,7 +183,7 @@ So what to use these fields for? Well, you can customize and rename them however
 
 ### Consistency across different note types
 
-Consider supplementing your other note types with a *Remarks* and a *Sources* field. Not only does it make for a more consistent experience, it also enables Image Occlusion 2.0 Enhanced to sync your sources between the I/O Editor and Anki's note editor. See [Changes compared to Image Occlusion 2](#changes-compared-to-image-occlusion-2) for more information.
+Consider supplementing your other note types with a *Remarks* and a *Sources* field. Not only does it make for a more consistent experience, it also enables Image Occlusion 2.0 Enhanced to sync your sources between the I/O Editor and Anki's note editor. See [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on) for more information.
 
 ## Development status
 
@@ -188,9 +207,9 @@ Bug reports and suggestions are always welcome, but it might take me a while to 
 
 *Copyright © 2016 Glutanimate*
 
-Image Occlusion 2 Enhanced is licensed under the simplified BSD license.
+*Image Occlusion 2 Enhanced* is licensed under the simplified BSD license.
 
-Third-party open-source software shipped with Image Occlusion 2 Enhanced:
+Third-party open-source software shipped with *Image Occlusion 2 Enhanced*:
 
 - [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik Lundh. Licensed under the [PIL license](http://www.pythonware.com/products/pil/license.htm)
  
