@@ -1,0 +1,6 @@
+# used to remove files from deployment
+# git files
+.gitattributes export-ignore
+.gitignore export-ignore
+# screenshots
+/screenshots export-ignore
