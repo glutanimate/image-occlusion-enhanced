@@ -256,12 +256,13 @@ class ImageOcc_Add(QtCore.QObject):
                 mw.ImageOcc_Editor.header_edit.setPlainText(orig_header)
                 mw.ImageOcc_Editor.footer_edit.setPlainText(orig_footer)
                 mw.ImageOcc_Editor.remarks_edit.setPlainText(orig_remarks)
+            else:
+                mw.ImageOcc_Editor.reset_main_fields()
 
             # this redundant sequence of setFocus() calls prevents a bug where
             # SVG-Edit would stop working when the Editor window is closed
             # before adding I/O notes
             # TODO: find another solution
-            mw.ImageOcc_Editor.reset_main_fields()
             mw.ImageOcc_Editor.tab_widget.setCurrentIndex(0)
             mw.ImageOcc_Editor.svg_edit.setFocus()
             mw.ImageOcc_Editor.header_edit.setFocus()
