@@ -149,7 +149,7 @@ class ImageOcc_Add(QtCore.QObject):
         orig_tags = self.ed.tags.text()
         if model_name == IMAGE_QA_MODEL_NAME:
             valid_model = True
-            orig_image = self.ed.note.fields[3].replace('<br />', '\n')
+            orig_image = self.ed.note.fields[3]
             orig_header = self.ed.note.fields[4].replace('<br />', '\n')
             orig_footer = self.ed.note.fields[5].replace('<br />', '\n')
             orig_remarks = self.ed.note.fields[6].replace('<br />', '\n')
@@ -226,7 +226,7 @@ class ImageOcc_Add(QtCore.QObject):
         width = d['width']
 
         # existing instance of I/O Editor
-        # TODO: understand why we don't just launch a new instance each time I/O is invoked
+        ## TODO: understand why we don't just launch a new instance each time I/O is invoked
         try:
             mw.ImageOcc_Editor is not None
             select_rect_tool = "svgCanvas.setMode('rect'); "
@@ -238,9 +238,9 @@ class ImageOcc_Add(QtCore.QObject):
             mw.ImageOcc_Editor.svg_edit.eval(command)
 
             # update pyobj with new instance
-            # this is necessary for instance variables (e.g. self.reuse_note) to get 
-            # updated properly in the add_notes_* functions.
-            # TODO: understand what's going on and find a better solution
+            ## this is necessary for instance variables (e.g. self.reuse_note) to get 
+            ## updated properly in the add_notes_* functions.
+            ## TODO: understand what's going on and find a better solution
             mw.ImageOcc_Editor.svg_edit.\
                                page().\
                                mainFrame().\
@@ -251,7 +251,7 @@ class ImageOcc_Add(QtCore.QObject):
             # only copy sources field if not undefined
             if orig_sources is not None:
                 mw.ImageOcc_Editor.sources_edit.setPlainText(orig_sources)
-            # reuse all fields if started from existing i/o note
+            # reuse fields if started from existing i/o note
             if self.reuse_note:
                 mw.ImageOcc_Editor.header_edit.setPlainText(orig_header)
                 mw.ImageOcc_Editor.footer_edit.setPlainText(orig_footer)
@@ -259,14 +259,22 @@ class ImageOcc_Add(QtCore.QObject):
             else:
                 mw.ImageOcc_Editor.reset_main_fields()
 
-            # this redundant sequence of setFocus() calls prevents a bug where
-            # SVG-Edit would stop working when the Editor window is closed
-            # before adding I/O notes
-            # TODO: find another solution
+            # update labels
+            mw.ImageOcc_Editor.header_label.setText(header_field)
+            mw.ImageOcc_Editor.footer_label.setText(footer_field)
+            mw.ImageOcc_Editor.sources_label.setText(sources_field)
+            mw.ImageOcc_Editor.remarks_label.setText(remarks_field)
+            # set tab index
             mw.ImageOcc_Editor.tab_widget.setCurrentIndex(0)
+            # set widget focus
+            ## this redundant sequence of setFocus() calls prevents a bug where
+            ## SVG-Edit would stop working when the Editor window is closed
+            ## before adding I/O notes
+            ## TODO: find another solution
             mw.ImageOcc_Editor.svg_edit.setFocus()
             mw.ImageOcc_Editor.header_edit.setFocus()
             mw.ImageOcc_Editor.svg_edit.setFocus()
+
             mw.ImageOcc_Editor.show()
 
         # no existing instance of I/O Editor. Launch new one
@@ -387,41 +395,41 @@ class ImageOcc_Editor(QtGui.QWidget):
         # Header
         self.header_edit = QPlainTextEdit()
         self.header_edit.setTabChangesFocus(True)
-        header_label = QLabel(header_field)
-        header_label.setFixedWidth(70)
+        self.header_label = QLabel(header_field)
+        self.header_label.setFixedWidth(70)
 
         header_hbox = QHBoxLayout()
-        header_hbox.addWidget(header_label)
+        header_hbox.addWidget(self.header_label)
         header_hbox.addWidget(self.header_edit)
 
         # Footer
         self.footer_edit = QPlainTextEdit()
         self.footer_edit.setTabChangesFocus(True)
-        footer_label = QLabel(footer_field)
-        footer_label.setFixedWidth(70)
+        self.footer_label = QLabel(footer_field)
+        self.footer_label.setFixedWidth(70)
 
         footer_hbox = QHBoxLayout()
-        footer_hbox.addWidget(footer_label)
+        footer_hbox.addWidget(self.footer_label)
         footer_hbox.addWidget(self.footer_edit)
 
         # Remarks
         self.remarks_edit = QPlainTextEdit()
         self.remarks_edit.setTabChangesFocus(True)
-        remarks_label = QLabel(remarks_field)
-        remarks_label.setFixedWidth(70)
+        self.remarks_label = QLabel(remarks_field)
+        self.remarks_label.setFixedWidth(70)
 
         remarks_hbox = QHBoxLayout()
-        remarks_hbox.addWidget(remarks_label)
+        remarks_hbox.addWidget(self.remarks_label)
         remarks_hbox.addWidget(self.remarks_edit)
 
         # Sources
         self.sources_edit = QPlainTextEdit()
         self.sources_edit.setTabChangesFocus(True)
-        sources_label = QLabel(sources_field)
-        sources_label.setFixedWidth(70)
+        self.sources_label = QLabel(sources_field)
+        self.sources_label.setFixedWidth(70)
 
         sources_hbox = QHBoxLayout()
-        sources_hbox.addWidget(sources_label)
+        sources_hbox.addWidget(self.sources_label)
         sources_hbox.addWidget(self.sources_edit)
 
         # Tags

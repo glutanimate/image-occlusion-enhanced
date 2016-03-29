@@ -132,6 +132,8 @@ Image Occlusion 2.0 Enhanced can be customized, but only to a certain degree
 
 **What you really should not do**:
 
+- delete or rename the `Image Q/A - 2.0 Enhanced` note type
+    + deleting the note type should restore it to default next time I/O is launched, but doing so will remove all notes associated with it
 - re-order the fields of the note-type
 - add new fields or remove existing ones
 - rename the following fields: *Question*, *Answer*, *SVG*, *Original Image*
@@ -139,9 +141,8 @@ Image Occlusion 2.0 Enhanced can be customized, but only to a certain degree
 **What you can do**:
 
 - rename the following fields: *Header*, *Footer*, *Remarks*, *Sources*, *TempField3*, *TempField4*, *TempField5*
-    + depending on whether you've already used I/O in your Anki session you might first have to restart Anki to see the changes in the Image Occlusion Editor
 - modify the card template and CSS
-    + Be careful, though, as the right styling and layout is essential for layering the original image and SVG mask over each other
+    + be careful, though: the right styling and layout is essential for layering the original image and SVG mask over each other
 
 ## Tips
 
