@@ -32,7 +32,7 @@ Please note that this is a highly customized release and as such might contain m
 
 ## Screenshots
 
-![Screenshot of the SVG Editor](/screenshots/screenshot-io-editor-1.png?raw=true)
+![Screenshot of the Masks Editor](/screenshots/screenshot-io-editor-1.png?raw=true)
 
 ![Screenshot of the field entry tab](/screenshots/screenshot-io-editor-2.png?raw=true)
 
@@ -45,19 +45,19 @@ Please note that this is a highly customized release and as such might contain m
 ### Enhancements to the user interface
 
 - **Tabbed interface**
-    - one tab for the SVG editor, the other for the remaining fields. Makes it easier to work with larger images.
+    - one tab for the Masks Editor, the other for the remaining fields. Gives you more room to work with larger images.
 - **Multi-line entry fields**
     - entry fields now support multiple lines of plain text (no HTML preview)
 - **New buttons for adding notes**
-    - These replace the old controls which were placed inside the SVG Editor element
+    - These replace the old controls which were placed inside the SVG-Edit element
 * **Dynamic field labels**
     - Changes to field names now get propagated to the UI. If you rename the *Header* field, *Footer* field, etc. you will see the labels being updated.
 - **Enhanced keyboard navigation**
     + Added/Modified hotkeys:
         * <kbd>Alt</kbd> + <kbd>O</kbd>: Add overlapping notes
         * <kbd>Alt</kbd> + <kbd>N</kbd>: Add non-overlapping notes
-        * <kbd>Ctrl</kbd>+<kbd>F</kbd> (global) / <kbd>C</kbd> (when SVG Editor is active): Fit image to canvas
-        * <kbd>Alt</kbd> + <kbd>E</kbd>: Switch to SVG-Editor tab
+        * <kbd>Ctrl</kbd>+<kbd>F</kbd> (global) / <kbd>C</kbd> (when SVG-Edit is active): Fit image to canvas
+        * <kbd>Alt</kbd> + <kbd>E</kbd>: Switch to Masks Editor tab
         * <kbd>Alt</kbd> + <kbd>F</kbd>: Switch to entry fields tab
         * <kbd>Ctrl</kbd> + <kbd>Tab</kbd>: Switch between tabs
         * <kbd>Ctrl</kbd> + <kbd>1-4</kbd>: switch focus to field 1-4 (including switching tabs if SVG-Editor is active)
@@ -65,9 +65,9 @@ Please note that this is a highly customized release and as such might contain m
         * <kbd>Ctrl</kbd> + <kbd>SHIFT</kbd> + <kbd>R</kbd>: Reset all fields
         * <kbd>Ctrl</kbd> + <kbd>R</kbd>: Reset all fields aside from *Sources*, *Tags*, and *Deck*
         * <kbd>Alt</kbd> + <kbd>C</kbd>: Close window (replaces <kbd>Esc</kbd> which was too easy to hit by accident)
-- **Improvements to the SVG Editor**
+- **Improvements to the Masks Editor**
     + Images are now automatically fit to the canvas, making for a much better experience when working with larger images
-    + Additionally, the SVG Editor is now resized automatically to fit the window size (thanks to @jameskraus)
+    + Additionally, SVG-Edit is now resized automatically to fit the window size (thanks to @jameskraus)
     + You can now use <kbd>Ctrl</kbd> + <kbd>Mousewheel</kbd> to change the zoom on the canvas
 - **Updated toolbar button**
     - the icon is now more in line with rest of the toolbar and comes with a tooltip
@@ -94,7 +94,7 @@ Please note that this is a highly customized release and as such might contain m
 
 ### Smaller tweaks and bug fixes
 
-- reduced add-on size by trimming down local version of PIL
+- drastically reduced add-on size by trimming down local version of PIL
 - removed SVG-edit 2.7 from the repository
     + in my experience, SVG-Edit 2.7 was too slow and buggy to be used properly with I/O. I removed it to reduce development overhead and confusion. I might give more recent versions of SVG-Edit a try in the future, but for now 2.6 remains the most performant release for I/O.
 - fixed a few issues with SVG-edit 2.6
@@ -104,14 +104,15 @@ Please note that this is a highly customized release and as such might contain m
 - fix a bug that would create the wrong SVG masks when changing the z-index of added layers
     + this means that you can now create as many additional layers as you want and arrange them in whatever way you want
     + you could, for instance, create a new layer and use it to add new labels to an image. In order to occlude them you would then simply have to move the layer below the Shapes layer. The add-on will take care of using the right layer for the SVG masks automatically. See [Making full use of SVG-Edit](#making-full-use-of-svg-edit).
-- removed duplicate SVG-Editor hotkeys (1, 2)
-- assign `question-element` IDs to svg question shapes
+- removed duplicate SVG-Edit hotkeys (1, 2)
+- assign `question-element` IDs to SVG question shapes
     + at some point in the future this might make it possible to target the question shapes via javascript or CSS
 - added tooltips to most UI elements to make things easier for new users
 - disabled a note type upgrade check that would revert any changes applied via the card template editor
     + any modifications to your I/O card templates will now be preserved across upgrades of the add-on
 - changed sort field of I/O notes to the header. This makes it easier to identify specific notes in the card browser.
-- changed default shape colour from white to dark-turquoise to make recognition of occlusions on white backgrounds easier 
+- changed default shape colour from white to dark-turquoise to make recognition of occlusions on white backgrounds easier
+- remember size and position of editor window 
 
 ## Installation
 
@@ -165,7 +166,7 @@ SVG-Edit ships with a lot of very useful **hotkeys**. Make sure to use them! E.g
 
 Use the **layers dialog** to add labels to your images before occluding them. Here's how:
 
-- click on the right-sided labels side pane in the svg editor; a panel with all active layers will appear
+- click on the right-sided labels side pane in SVG-Edit; a panel with all active layers will appear
 - click on the 'new layer' button on the top-left; name the layer however you want (e.g. *Labels*)
 - select the new layer by left-clicking on it in the labels list
 - in order to occlude items on this new layer you will have to move it below the shapes layer first. To do so go back to the layers side panel, select your *Labels* layer, and use the down arrow button to to move it below the *Shapes* layer (but still above the *Picture* layer)

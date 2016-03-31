@@ -494,7 +494,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         self.tab_widget = QtGui.QTabWidget() 
 
         ## add Tabs to QTabWidget
-        self.tab_widget.addTab(tab1,"SVG &Editor")
+        self.tab_widget.addTab(tab1,"Masks &Editor")
         self.tab_widget.addTab(tab2,"&Fields")
 
         self.tab_widget.setTabToolTip(1, "Include additional information (optional)")
