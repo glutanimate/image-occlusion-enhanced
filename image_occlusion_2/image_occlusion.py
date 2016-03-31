@@ -391,7 +391,8 @@ class ImageOcc_Editor(QtGui.QWidget):
         utils.restoreGeom(self, "imageOccEditor")
 
     def closeEvent(self, event):
-        utils.saveGeom(self, "imageOccEditor")
+        if mw.pm.profile is not None:
+            utils.saveGeom(self, "imageOccEditor")
         QWidget.closeEvent(self, event)
 
     def initUI(self, tags):
