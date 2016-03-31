@@ -112,7 +112,10 @@ Please note that this is a highly customized release and as such might contain m
     + any modifications to your I/O card templates will now be preserved across upgrades of the add-on
 - changed sort field of I/O notes to the header. This makes it easier to identify specific notes in the card browser.
 - changed default shape colour from white to dark-turquoise to make recognition of occlusions on white backgrounds easier
-- remember size and position of editor window 
+- remember size and position of Editor window 
+- updated the Options window
+    + new colour previews
+    + fix a bug that would cause modified colour settings not to be saved
 
 ## Installation
 
