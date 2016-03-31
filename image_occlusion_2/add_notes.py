@@ -86,8 +86,8 @@ ImageQA_afmt = """\
 <div id="io-footer">
   {{#%(footer)s}}
     <div>{{%(footer)s}}</div>
-  {{/%(footer)s}}
     <hr>
+  {{/%(footer)s}}
   {{#%(remarks)s}}
     <div>
       <span class="io-field-descr">Remarks: </span>{{%(remarks)s}}
