@@ -13,7 +13,7 @@
 - [Installation](#installation)
 - [Customization](#customization)
     - [DOs and DO NOTs](#dos-and-do-nots)
-- [Tips](#tips)
+- [Usage and Tips](#usage-and-tips)
     - [Making full use of SVG-Edit](#making-full-use-of-svg-edit)
     - [Using all available fields to their full extent](#using-all-available-fields-to-their-full-extent)
     - [Consistency across different note types](#consistency-across-different-note-types)
@@ -146,7 +146,7 @@ It will probably be a while before I publish this add-on to AnkiWeb. There's sti
 - modify the card template and CSS
     + be careful, though: the right styling and layout is essential for layering the original image and SVG mask over each other
 
-## Tips
+## Usage and Tips
 
 Please check out tmbb's [comprehensive manual](http://tmbb.bitbucket.org/image-occlusion-2/) for a full tutorial on using image occlusion. Most of the instructions there still apply to this modified version of I/O.
 
