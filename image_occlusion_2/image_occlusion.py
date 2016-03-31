@@ -69,16 +69,26 @@ remarks_field = "Remarks"
 sources_field = "Sources"
 
 default_conf = {'initFill[color]': '00AA7F',
-                'mask_fill_color': 'FF0000'}
+                'mask_fill_color': 'FF0000',
+                'io-version': '2.0-enhanced'}
 
 default_prefs = {"prev_image_dir": os_home_dir}
 
 
 def load_prefs(self):
 
-    # load synced preferences
+    # check if synced configuration exists
     if not 'image_occlusion_conf' in mw.col.conf:
         self.mw.col.conf['image_occlusion_conf'] = default_conf
+
+    # upgrade from Image Occlusion 2.0
+    self.io_conf = mw.col.conf['image_occlusion_conf']
+    if not 'io-version' in self.io_conf:
+        # set io version
+        self.io_conf['io-version'] = default_conf['io-version']
+        # change default colour
+        if self.io_conf['initFill[color]'] == "FFFFFF":
+            self.io_conf['initFill[color]'] = default_conf['initFill[color]']
 
     # load local preferences
     self.prefs = None

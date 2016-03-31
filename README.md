@@ -111,6 +111,7 @@ Please note that this is a highly customized release and as such might contain m
 - disabled a note type upgrade check that would revert any changes applied via the card template editor
     + any modifications to your I/O card templates will now be preserved across upgrades of the add-on
 - changed sort field of I/O notes to the header. This makes it easier to identify specific notes in the card browser.
+- changed default shape colour from white to dark-turquoise to make recognition of occlusions on white backgrounds easier 
 
 ## Installation
 
