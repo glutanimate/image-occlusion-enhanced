@@ -633,11 +633,6 @@ class ImageOcc_Options(QtGui.QWidget):
         super(ImageOcc_Options, self).__init__()
         self.mw = mw
 
-    def closeEvent(self, event):
-        # save configuration before closing
-        self.mw.col.flush()
-        QWidget.closeEvent(self, event)
-
     def getNewMaskColor(self):
         # Remove the # sign from QColor.name():
         choose_color_dialog = QColorDialog()
@@ -645,6 +640,8 @@ class ImageOcc_Options(QtGui.QWidget):
         if color.isValid():
             color_ = color.name()[1:]
             self.mw.col.conf['image_occlusion_conf']['mask_fill_color'] = color_
+            # notify db of modification
+            self.mw.col.setMod()
             self.changeButtonColor(self.mask_color_button, color_)
 
     def getNewInitFillColor(self):
@@ -654,6 +651,8 @@ class ImageOcc_Options(QtGui.QWidget):
         if color.isValid():
             color_ = color.name()[1:]
             self.mw.col.conf['image_occlusion_conf']['initFill[color]'] = color_
+            # notify db of modification
+            self.mw.col.setMod()
             self.changeButtonColor(self.initFill_button, color_)
 
 
