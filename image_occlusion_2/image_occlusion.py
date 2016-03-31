@@ -498,7 +498,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         self.tab_widget.addTab(tab2,"&Fields")
 
         self.tab_widget.setTabToolTip(1, "Include additional information (optional)")
-        self.tab_widget.setTabToolTip(0, "Create image occlusion masks")
+        self.tab_widget.setTabToolTip(0, "Create image occlusion SVG masks (required)")
 
         # Create buttons
 
@@ -509,11 +509,11 @@ class ImageOcc_Editor(QtGui.QWidget):
         nonoverlapping_button = button_box.addButton("Add &nonoverlapping occlusions",
                 QDialogButtonBox.ActionRole)
         nonoverlapping_button.setToolTip(
-            "Generate cards that hide all labels and prompt for one")
+            "Generate cards that hide other labels when asking for one")
         overlapping_button = button_box.addButton("Add &overlapping occlusions",
                 QDialogButtonBox.ActionRole)
         overlapping_button.setToolTip(
-            "Generate cards that show all labels uncovered aside from one")
+            "Generate cards that don't hide other labels when asking for one")
         close_button = button_box.addButton("&Close",
                 QDialogButtonBox.ActionRole)
         close_button.setToolTip("Close Image Occlusion Editor without generating cards")
