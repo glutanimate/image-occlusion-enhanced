@@ -388,6 +388,11 @@ class ImageOcc_Editor(QtGui.QWidget):
     def __init__(self, tags):
         super(ImageOcc_Editor, self).__init__()
         self.initUI(tags)
+        utils.restoreGeom(self, "imageOccEditor")
+
+    def closeEvent(self, event):
+        utils.saveGeom(self, "imageOccEditor")
+        QWidget.closeEvent(self, event)
 
     def initUI(self, tags):
 
@@ -532,7 +537,7 @@ class ImageOcc_Editor(QtGui.QWidget):
 
         # Set basic window properties
 
-        self.setMinimumHeight(600)
+        # self.setMinimumHeight(600)
         self.setWindowTitle('Image Occlusion 2.0 Enhanced Editor')
 
         # Define and connect key bindings
@@ -674,7 +679,7 @@ class ImageOcc_Options(QtGui.QWidget):
 
         self.setLayout(grid)
 
-        self.setWindowTitle('Image Occlusion 2.0 (options)')
+        self.setWindowTitle('Image Occlusion (Options)')
         self.show()
 
 
@@ -683,8 +688,8 @@ def invoke_ImageOcc_help():
 
 mw.ImageOcc_Options = ImageOcc_Options(mw)
 
-options_action = QAction("Image Occlusion 2.0 (options)", mw)
-help_action = QAction("Image Occlusion 2.0 (help)", mw)
+options_action = QAction("Image Occlusion (Options)", mw)
+help_action = QAction("Image Occlusion (Help)", mw)
 
 mw.connect(options_action,
            SIGNAL("triggered()"),
