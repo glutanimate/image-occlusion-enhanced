@@ -31,7 +31,7 @@ from notes_from_svg import add_notes_non_overlapping, add_notes_overlapping
 # import the icons
 from resources import *
 
-image_occlusion_help_link = "http://tmbb.bitbucket.org/image-occlusion-2.html"
+image_occlusion_help_link = "https://glutanimate.github.io/image-occlusion-2-enhanced/#usage-and-tips"
 
 # set various paths
 os_home_dir = os.path.expanduser('~')
