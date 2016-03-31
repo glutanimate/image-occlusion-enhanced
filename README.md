@@ -62,13 +62,13 @@ Please note that this is a highly customized release and as such might contain m
         * <kbd>Ctrl</kbd> + <kbd>Tab</kbd>: Switch between tabs
         * <kbd>Ctrl</kbd> + <kbd>1-4</kbd>: switch focus to field 1-4 (including switching tabs if SVG-Editor is active)
         * <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd>: Focus tags field
-        * <kbd>Ctrl</kbd> + <kbd>SHIFT</kbd> + <kbd>R</kbd>: Reset all fields
+        * <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>: Reset all fields
         * <kbd>Ctrl</kbd> + <kbd>R</kbd>: Reset all fields aside from *Sources*, *Tags*, and *Deck*
         * <kbd>Alt</kbd> + <kbd>C</kbd>: Close window (replaces <kbd>Esc</kbd> which was too easy to hit by accident)
 - **Improvements to the Masks Editor**
     + Images are now automatically fit to the canvas, making for a much better experience when working with larger images
-    + Additionally, SVG-Edit is now resized automatically to fit the window size (thanks to @jameskraus)
-    + You can now use <kbd>Ctrl</kbd> + <kbd>Mousewheel</kbd> to change the zoom on the canvas
+    + Also, SVG-Edit is now resized automatically to fit the window size (thanks to [jameskraus](https://github.com/jameskraus))
+    + You can now use <kbd>Ctrl</kbd> + <kbd>Mousewheel</kbd> to zoom
 - **Updated toolbar button**
     - the icon is now more in line with rest of the toolbar and comes with a tooltip
 
