@@ -1,4 +1,4 @@
-# Image Occlusion 2 Enhanced
+# Image Occlusion 2.0 Enhanced
 
 ## Table of Contents
 
@@ -6,7 +6,7 @@
 
 - [Overview](#overview)
 - [Screenshots](#screenshots)
-- [Changes compared to Image Occlusion 2](#changes-compared-to-image-occlusion-2)
+- [Changes compared to Image Occlusion 2.0](#changes-compared-to-image-occlusion-20)
     - [Enhancements to the user interface](#enhancements-to-the-user-interface)
     - [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on)
     - [Smaller tweaks and bug fixes](#smaller-tweaks-and-bug-fixes)
@@ -26,7 +26,7 @@
 
 ## Overview
 
-This repository hosts a custom version of the [image occlusion 2](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a number of improvements and additions.
+This repository hosts a custom version of the [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a number of improvements and additions.
 
 Please note that this is a highly customized release and as such might contain modifications that are adapted to my note types and usage. The code in this repo is also much more experimental than my [other fork of image occlusion](https://github.com/Glutanimate/image-occlusion-2). You might want to check that one out instead if you're only looking for some smaller fixes and tweaks to I/O.
 
@@ -38,9 +38,9 @@ Please note that this is a highly customized release and as such might contain m
 
 ![Screenshot of the reviewer](/screenshots/screenshot-io-reviewer.png?raw=true)
 
-## Changes compared to Image Occlusion 2
+## Changes compared to Image Occlusion 2.0
 
-*Image Occlusion 2 Enhanced* comes with the following new features, some of which were already part of [my first fork](https://github.com/Glutanimate/image-occlusion-2):
+*Image Occlusion 2.0 Enhanced* comes with the following new features, some of which were already part of [my first fork](https://github.com/Glutanimate/image-occlusion-2):
 
 ### Enhancements to the user interface
 
@@ -114,19 +114,19 @@ Please note that this is a highly customized release and as such might contain m
 
 ## Installation
 
-It will probably be a while before I publish this add-on to AnkiWeb. There's still a lot of testing to be done; but if you want to help out or feel particularly adventurous you can install *Image Occlusion 2 Enhanced* by following these steps:
+It will probably be a while before I publish this add-on to AnkiWeb. There's still a lot of testing to be done; but if you want to help out or feel particularly adventurous you can install *Image Occlusion 2.0 Enhanced* by following these steps:
 
 - Grab the latest release of the add-on from the [releases page](https://github.com/Glutanimate/image-occlusion-2-enhanced/releases)
 - Extract the zip file
 - Launch Anki and open the add-on directory by going to *Tools* → *Add-ons* → *Open add-on directory*
-- If Image Occlusion 2 is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
+- If Image Occlusion 2.0 is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
 - Having done that, proceed to copy `image_occlusion_2` and `Image Occlusion 2.py` from the extracted zip file into your add-on directory
 - Restart Anki
-- Image Occlusion 2.0 Enhanced should now be installed
+- *Image Occlusion 2.0 Enhanced* should now be installed
 
 ## Customization
 
-Image Occlusion 2.0 Enhanced can be customized, but only to a certain degree
+*Image Occlusion 2.0 Enhanced* can be customized, but only to a certain degree
 
 ### DOs and DO NOTs
 
@@ -148,7 +148,7 @@ Image Occlusion 2.0 Enhanced can be customized, but only to a certain degree
 
 Please check out tmbb's [comprehensive manual](http://tmbb.bitbucket.org/image-occlusion-2/) for a full tutorial on using image occlusion. Most of the instructions there still apply to this modified version of I/O.
 
-What follows are a few additional tips to help you get the most out of Image Occlusion 2.0 Enhanced.
+What follows are a few additional tips to help you get the most out of *Image Occlusion 2.0 Enhanced*.
 
 ### Making full use of SVG-Edit
 
@@ -184,7 +184,7 @@ So what should you use these fields for? Well, you can customize and rename them
 
 ### Consistency across different note types
 
-Consider supplementing your other note types with a *Remarks* and a *Sources* field. Not only does it make for a more consistent experience, it also enables Image Occlusion 2.0 Enhanced to sync your sources between the I/O Editor and Anki's note editor. See [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on) for more information.
+Consider supplementing your other note types with a *Remarks* and a *Sources* field. Not only does it make for a more consistent experience, it also enables *Image Occlusion 2.0 Enhanced* to sync your sources between the I/O Editor and Anki's note editor. See [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on) for more information.
 
 ## Development status
 
@@ -208,9 +208,9 @@ Bug reports and suggestions are always welcome, but it might take me a while to 
 
 *Copyright © 2016 Glutanimate*
 
-*Image Occlusion 2 Enhanced* is licensed under the simplified BSD license.
+*Image Occlusion 2.0 Enhanced* is licensed under the simplified BSD license.
 
-Third-party open-source software shipped with *Image Occlusion 2 Enhanced*:
+Third-party open-source software shipped with *Image Occlusion 2.0 Enhanced*:
 
 - [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik Lundh. Licensed under the [PIL license](http://www.pythonware.com/products/pil/license.htm)
  
