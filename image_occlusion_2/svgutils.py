@@ -114,7 +114,10 @@ def nr_of_shapes(svg, curr_shapes_index):
 # Find shapes layer index
 def get_shapes_layer_idx(svg):
     for idx,svg_ele in enumerate(svg):
-        title = svg_ele.find(svg_namespace + 'title').text
+        try:
+            title = svg_ele.find(svg_namespace + 'title').text
+        except:
+            title = None
         if title == "Shapes":
             return idx
             break
