@@ -182,7 +182,7 @@ Use the **layers dialog** to add labels to your images before occluding them. He
 
 Other tricks:
 
-- add arrow heads to your lines: Draw a line using the line tool and select it. A drop-down box labeled "arrows" should appear in the top bar. Choose the arrow head you want or use the "markers" tool beside it for a larger variety of customization. 
+- add arrow heads to your lines: Draw a line using the line tool and select it. A drop-down box labeled "arrows" should appear in the top bar. Choose the arrow head you want or use the "markers" tool beside it for a larger variety of markers 
 
 ### Using all available fields to their full extent
 
@@ -214,8 +214,8 @@ Bug reports and suggestions are always welcome, but it might take me a while to 
 The following bugs still need to be fixed:
 
 - Colour previews in the Options dialog only work the first time the dialog is launched
-- If the Image Occlusion Editor has been run before in a session, colour settings aren't applied until the next ones
-- Various issues on OS X that have always plagued Image Occlusion (apparently. I don't have an OS X machine to confirm this)
+- If the Image Occlusion Editor has been run before in a session, colour settings aren't applied until the next one
+- Various issues on OS X that have always plagued Image Occlusion. Well, probably at least. I don't have an OS X machine to test this.
 
 ## Credits
 

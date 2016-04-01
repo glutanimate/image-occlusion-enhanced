@@ -3,7 +3,7 @@
 ##                                                ##
 ##         Image Occlusion 2.0 Enhanced           ##
 ##                                                ##
-##	      Copyright (c) Glutanimate 2016          ##
+##        Copyright (c) Glutanimate 2016          ##
 ##       (https://github.com/Glutanimate)         ##
 ##                                                ##
 ##     Original Image Occlusion 2.0 add-on is     ##
