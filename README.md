@@ -21,6 +21,7 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
     - [Using all available fields to their full extent](#using-all-available-fields-to-their-full-extent)
     - [Consistency across different note types](#consistency-across-different-note-types)
 - [Development status](#development-status)
+- [Known issues](#known-issues)
 - [Credits](#credits)
 - [License and Warranty](#license-and-warranty)
 
@@ -200,13 +201,21 @@ Consider supplementing your other note types with a *Remarks* and a *Sources* fi
 
 ## Development status
 
-This add-on is still very much in its early stages. It has not gone through the testing and cross-platform use that the original add-on has. So far it has only been tested on Linux. I have no clue if it will work properly on OS X, Windows, etc. In theory it should, but I/O has always suffered from issues on OS X.
+This add-on is still very much in its early stages. It has not gone through the testing and cross-platform use that the original add-on has. So far it has only been tested on Linux and Windows. I have no clue if it will work properly on OS X. In theory it should, but I/O has always suffered from issues on OS X.
 
 If you use this add-on do not be surprised if you run into bugs, weird behaviour or other issues. You probably should not deploy this add-on in a production environment if you do not know what you're doing. I am not responsible for any data loss or problems with your note collection you might encounter.
 
 With that said, I have been using this version of the add-on in my own studies for the past couple of months and it has not given me any kind of trouble. As always, your mileage might vary.
 
 Bug reports and suggestions are always welcome, but it might take me a while to get to them. If you know how to code please feel free to improve this project, file pull requests, etc. The code could definitely benefit from some refactoring as I am not very adept in Python.
+
+## Known issues
+
+The following bugs still need to be fixed:
+
+- Colour previews in the Options dialog only work the first time the dialog is launched
+- If the Image Occlusion Editor has been run before in a session, colour settings aren't applied until the next ones
+- Various issues on OS X that have always plagued Image Occlusion (apparently. I don't have an OS X machine to confirm this)
 
 ## Credits
 
