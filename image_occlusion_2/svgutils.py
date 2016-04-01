@@ -21,7 +21,8 @@ from Imaging.PIL import Image  # PIL.Image will only be used in 3 lines of code
 import etree.ElementTree as etree
 
 image_layer_index = 0
-shapes_layer_index = 1
+labels_layer_index = 1
+shapes_layer_index = 2
 
 blank_svg_path = os.path.join(os.path.dirname(__file__),
                              "blank-svg.svg")

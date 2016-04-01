@@ -65,8 +65,11 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
     + Images are now automatically fit to the canvas, making for a much better experience when working with larger images
     + Also, SVG-Edit is now resized automatically to fit the window size (thanks to [jameskraus](https://github.com/jameskraus))
     + You can now use <kbd>Ctrl</kbd> + <kbd>Mousewheel</kbd> to zoom
+    + The masks editor now comes with a *Labels* layer by default. You can use this to add labels or draw on your image before occluding it. See [Making full use of SVG-Edit](#making-full-use-of-svg-edit).
 - **Updated toolbar button**
     - the icon is now more in line with rest of the toolbar and comes with a tooltip
+- **Updated Options window**
+    + new colour previews
 
 ### Enhancements to the core functionality of the add-on
 
@@ -108,10 +111,8 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
     + any modifications to your I/O card templates will now be preserved across upgrades of the add-on
 - changed sort field of I/O notes to the header. This makes it easier to identify specific notes in the card browser.
 - changed default shape colour from white to dark-turquoise to make recognition of occlusions on white backgrounds easier
-- remember size and position of Editor window 
-- updated the Options window
-    + new colour previews
-    + fix a bug that would cause modified colour settings not to be saved
+- remember size and position of Editor window
+- fix a bug that would cause modified colour settings not to be saved
 
 ## Installation
 
@@ -157,6 +158,7 @@ SVG-Edit ships with a lot of very useful **hotkeys**. Make sure to use them! E.g
 
 - hold down <kbd>Shift</kbd> while clicking to select multiple shapes
 - <kbd>G</kbd> to group items and mark them as one single mask
+- <kbd>A</kbd> to select all items in the current layer
 - <kbd>V</kbd> for the selection tool
 - <kbd>R</kbd> for the rectangle tool
 - <kbd>E</kbd> for the ellipse tool
@@ -166,10 +168,8 @@ SVG-Edit ships with a lot of very useful **hotkeys**. Make sure to use them! E.g
 Use the **layers dialog** to add labels to your images before occluding them. Here's how:
 
 - click on the right-sided labels side pane in SVG-Edit; a panel with all active layers will appear
-- click on the 'new layer' button on the top-left; name the layer however you want (e.g. *Labels*)
-- select the new layer by left-clicking on it in the labels list
-- in order to occlude items on this new layer you will have to move it below the shapes layer first. To do so go back to the layers side panel, select your *Labels* layer, and use the down arrow button to to move it below the *Shapes* layer (but still above the *Picture* layer)
-- any shapes or texts you now draw while the layer is active will be part of the background
+- select the *Labels* layer by left-clicking on it in the labels list
+- any shapes or texts you draw while this layer is active will appear above your picture, but below the occluding shapes
 - when you want to draw the occlusion masks again, simply re-select the *Shapes* layer
 
 ### Using all available fields to their full extent
