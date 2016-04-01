@@ -164,6 +164,8 @@ SVG-Edit ships with a lot of very useful **hotkeys**. Make sure to use them! E.g
 - <kbd>E</kbd> for the ellipse tool
 - <kbd>T</kbd> for the text tool
 - <kbd>C</kbd> to fit the image to the canvas
+- <kbd>CTRL+Z/Y</kbd> to undo/redo
+- <kbd>X</kbd> to show the layers side panel
 
 Use the **layers dialog** to add labels to your images before occluding them. Here's how:
 

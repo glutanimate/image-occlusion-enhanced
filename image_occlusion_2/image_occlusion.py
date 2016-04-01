@@ -53,7 +53,8 @@ svg_edit_url = QtCore.QUrl.fromLocalFile(svg_edit_path)
 svg_edit_url_string = svg_edit_url.toString()
 
 #Add all configuration options we know at this point:
-svg_edit_url.setQueryItems([('initStroke[opacity]', '0'),
+svg_edit_url.setQueryItems([('initStroke[opacity]', '1'),
+                            ('initStroke[color]', '2D2D2D'),
                             ('initStroke[width]', '0'),
                             ('initTool', 'rect'),
                             ('extensions', 'ext-image-occlusion.js')])
