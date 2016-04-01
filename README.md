@@ -66,6 +66,10 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
     + Also, SVG-Edit is now resized automatically to fit the window size (thanks to [jameskraus](https://github.com/jameskraus))
     + You can now use <kbd>Ctrl</kbd> + <kbd>Mousewheel</kbd> to zoom
     + The masks editor now comes with a *Labels* layer by default. You can use this to add labels or draw on your image before occluding it. See [Making full use of SVG-Edit](#making-full-use-of-svg-edit).
+    + New tools available in the masks editor:
+        * eyedropper tool - Transfer colour and other properties from one element to another
+        * arrows / markers tool - Add arrow heads to your lines
+        * insert shapes tool - Palette of shapes that you can insert into you document
 - **Updated toolbar button**
     - the icon is now more in line with rest of the toolbar and comes with a tooltip
 - **Updated Options window**
@@ -112,7 +116,8 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
 - changed sort field of I/O notes to the header. This makes it easier to identify specific notes in the card browser.
 - changed default shape colour from white to dark-turquoise to make recognition of occlusions on white backgrounds easier
 - remember size and position of Editor window
-- fix a bug that would cause modified colour settings not to be saved
+- fixed a bug that would cause modified colour settings not to be saved
+- fixed handling of special characters in file names on Windows
 
 ## Installation
 
@@ -171,8 +176,12 @@ Use the **layers dialog** to add labels to your images before occluding them. He
 
 - click on the right-sided labels side pane in SVG-Edit; a panel with all active layers will appear
 - select the *Labels* layer by left-clicking on it in the labels list
-- any shapes or texts you draw while this layer is active will appear above your picture, but below the occluding shapes
+- anything you draw while this layer is active will appear above your picture, but below the occluding shapes
 - when you want to draw the occlusion masks again, simply re-select the *Shapes* layer
+
+Other tricks:
+
+- add arrow heads to your lines: Draw a line using the line tool and select it. A drop-down box labeled "arrows" should appear in the top bar. Choose the arrow head you want or use the "markers" tool beside it for a larger variety of customization. 
 
 ### Using all available fields to their full extent
 

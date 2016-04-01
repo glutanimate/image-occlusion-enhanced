@@ -16,6 +16,7 @@ from anki import notes
 from aqt import mw, utils
 
 import os
+import sys
 import hashlib
 import time
 import shutil
@@ -241,9 +242,11 @@ def new_bnames(col, media_dir, original_fname):
 
         path = os.path.join(media_dir, hash_bname)
 
-        #  The KEY to the dictionary must be unicode, because we will
-        # write d[filename], where filename is encoded in unicode.
-        d[unicode(bname, "UTF-8")] = col.media.addFile(unicode(path, "UTF-8"))
+        # The KEY to the dictionary must be in the default file system
+        # encoding, because we will write d[filename], where filename
+        # is encoded in the same encoding.
+        encoding = sys.getfilesystemencoding()
+        d[bname.decode(encoding)] = col.media.addFile(path.decode(encoding))
 
     return d
 
