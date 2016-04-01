@@ -1,10 +1,13 @@
 # Image Occlusion 2.0 Enhanced
 
+## Overview
+
+This repository hosts a custom version of the [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a number of improvements and additions.
+
 ## Table of Contents
 
 <!-- MarkdownTOC -->
 
-- [Overview](#overview)
 - [Screenshots](#screenshots)
 - [Changes compared to Image Occlusion 2.0](#changes-compared-to-image-occlusion-20)
     - [Enhancements to the user interface](#enhancements-to-the-user-interface)
@@ -22,13 +25,6 @@
 - [License and Warranty](#license-and-warranty)
 
 <!-- /MarkdownTOC -->
-
-
-## Overview
-
-This repository hosts a custom version of the [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a number of improvements and additions.
-
-Please note that this is a highly customized release and as such might contain modifications that are adapted to my note types and usage. The code in this repo is also much more experimental than my [other fork of image occlusion](https://github.com/Glutanimate/image-occlusion-2). You might want to check that one out instead if you're only looking for some smaller fixes and tweaks to I/O.
 
 ## Screenshots
 
@@ -88,7 +84,7 @@ Please note that this is a highly customized release and as such might contain m
 - **Synchronization between I/O Editor and Anki's editor window**
     + when creating a new I/O note, the add-on will now try to keep some fields synchronized with Anki's note editor. This makes it easier to alternate between I/O and other note types.
         * The following fields are currently synchronized: *Tags*, *Sources*
-        * In practice this means that if your regular note type (e.g. basic) has a *Sources* field, then I/O will copy the value of that field over and copy it back when new I/O notes have been generated
+        * In practice this means that if your regular note type (e.g. basic) has a *Sources* field, then I/O will copy the value of that field over when it's launched and copy it back when new I/O notes have been generated
 - **Remember last used directory**
     + I/O will now try to set the file selection directory based on the last used directory
 
