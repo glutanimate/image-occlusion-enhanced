@@ -34,19 +34,19 @@ etree.register_namespace("",svg_namespace)
 
 def strip_attributes(root, attrs):
     title = None
+    tag_ns = '{' + svg_namespace + '}'
     for elt in root.iter():
         try:
-            title = elt.find('{' + svg_namespace + '}' + 'title').text
+            title = elt.find(tag_ns + 'title').text
         except:
             pass
-        text_tag = '{' + svg_namespace + '}' + 'text'
         # only remove attributes for elements in shapes layer
         if title == "Shapes":
             for attr in attrs:
                 elt.attrib.pop(attr, None)
         # remove stroke for all text elements (fixes ugly rendering)
-        elif elt.find(text_tag) is not None:
-            for subelt in elt.findall(text_tag):
+        elif elt.find(tag_ns + 'text') is not None:
+            for subelt in elt.findall(tag_ns + 'text'):
                 subelt.attrib.pop("stroke", None)
 
 
