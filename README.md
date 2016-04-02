@@ -21,7 +21,7 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
     - [Using all available fields to their full extent](#using-all-available-fields-to-their-full-extent)
     - [Consistency across different note types](#consistency-across-different-note-types)
 - [Development status](#development-status)
-- [Known issues](#known-issues)
+- [Known issues and limitations](#known-issues-and-limitations)
 - [Credits](#credits)
 - [License and Warranty](#license-and-warranty)
 
@@ -119,6 +119,7 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
 - remember size and position of Editor window
 - fixed a bug that would cause modified colour settings not to be saved
 - fixed handling of special characters in file names on Windows
+    + this solves most of the character encoding-related issues on Windows, but not all (see [Known issues and limitations](#known-issues-and-limitations))
 
 ## Installation
 
@@ -209,13 +210,15 @@ With that said, I have been using this version of the add-on in my own studies f
 
 Bug reports and suggestions are always welcome, but it might take me a while to get to them. If you know how to code please feel free to improve this project, file pull requests, etc. The code could definitely benefit from some refactoring as I am not very adept in Python.
 
-## Known issues
+## Known issues and limitations
 
-The following bugs still need to be fixed:
+The following bugs still need to be addressed:
 
-- Colour previews in the Options dialog only work the first time the dialog is launched
-- If the Image Occlusion Editor has been run before in a session, colour settings aren't applied until the next one
-- Various issues on OS X that have always plagued Image Occlusion. Well, probably at least. I don't have an OS X machine to test this.
+- Colour previews in the Options dialog only work the first time the dialog is launched (#3)
+- If the Image Occlusion Editor has been run before in a session, colour settings aren't applied until the next session (#4)
+- Various issues on OS X that have always plagued Image Occlusion might still exist. Well, probably at least. I don't have an OS X machine to test this.
+- Errors when using exotic file names on Windows (#5)
+    + when invoking I/O on images with special characters in their names (Unicode smilies, arrows, etc.), Windows will sometimes produce an error message (`Error 123`). In these cases you'll simply have to rename your image file to something simpler (alphanumeric, preferably).
 
 ## Credits
 
