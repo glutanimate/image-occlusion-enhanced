@@ -27,7 +27,7 @@ shapes_layer_index = 2
 blank_svg_path = os.path.join(os.path.dirname(__file__),
                              "blank-svg.svg")
 
-svg_namespace = "{http://www.w3.org/2000/svg}"
+svg_namespace = "http://www.w3.org/2000/svg"
 
 # Make sure to use correct namespace
 etree.register_namespace("",svg_namespace)
@@ -36,7 +36,7 @@ def strip_attributes(root, attrs):
     title = None
     for elt in root.iter():
         try:
-            title = elt.find(svg_namespace + 'title').text
+            title = elt.find('{' + svg_namespace + '}' + 'title').text
         except:
             pass
         if title == "Shapes":
@@ -115,7 +115,7 @@ def nr_of_shapes(svg, curr_shapes_index):
 def get_shapes_layer_idx(svg):
     for idx,svg_ele in enumerate(svg):
         try:
-            title = svg_ele.find(svg_namespace + 'title').text
+            title = svg_ele.find('{' + svg_namespace + '}' + 'title').text
         except:
             title = None
         if title == "Shapes":

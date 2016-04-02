@@ -58,6 +58,7 @@ svg_edit_url.setQueryItems([('initStroke[opacity]', '1'),
                             ('initStroke[color]', '2D2D2D'),
                             ('initStroke[width]', '0'),
                             ('initTool', 'rect'),
+                            ('text[font_family]', 'sans-serif'),
                             ('extensions', svg_edit_extensions)])
 
 FILE_DIALOG_MESSAGE = "Choose Image"

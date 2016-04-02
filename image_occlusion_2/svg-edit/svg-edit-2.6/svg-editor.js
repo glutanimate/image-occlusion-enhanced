@@ -15,6 +15,9 @@
 // 2) browser.js
 // 3) svgcanvas.js
 
+// Modifications by Glutanimate:
+// - merge magnebra/add_text_config_options
+
 (function() {
 
 	document.addEventListener("touchstart", touchHandler, true);
@@ -51,6 +54,11 @@
 					width: 5,
 					color: '000000',  // solid black
 					opacity: 1
+				},
+				text: {
+					stroke_width: 0,
+					font_size: 24,
+					font_family: 'serif'
 				},
 				initOpacity: 1,
 				imgPath: 'images/',
