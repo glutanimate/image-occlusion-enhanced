@@ -7,6 +7,7 @@
  * Copyright(c) 2010 Pavol Rusnak
  * Copyright(c) 2010 Jeff Schiller
  * Copyright(c) 2010 Narendra Sisodiya
+ * Copyright(c) 2016 Glutanimate
  *
  */
 

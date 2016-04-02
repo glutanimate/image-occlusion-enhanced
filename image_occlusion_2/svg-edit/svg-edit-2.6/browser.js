@@ -5,10 +5,14 @@
  *
  * Copyright(c) 2010 Jeff Schiller
  * Copyright(c) 2010 Alexis Deveria
+ * Copyright(c) 2016 Glutanimate
  */
 
 // Dependencies:
 // 1) jQuery (for $.alert())
+
+// Modifications by Glutanimate:
+// - disabled touch detection (not working properly)
 
 var svgedit = svgedit || {};
 
@@ -38,7 +42,7 @@ var isIE_ = userAgent.indexOf('MSIE') >= 0;
 var isChrome_ = userAgent.indexOf('Chrome/') >= 0;
 var isWindows_ = userAgent.indexOf('Windows') >= 0;
 var isMac_ = userAgent.indexOf('Macintosh') >= 0;
-var isTouch_ = 'ontouchstart' in window;
+var isTouch_ = false;
 
 var supportsSelectors_ = (function() {
 	return !!svg.querySelector;
