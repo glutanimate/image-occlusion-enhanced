@@ -39,9 +39,16 @@ def strip_attributes(root, attrs):
             title = elt.find('{' + svg_namespace + '}' + 'title').text
         except:
             pass
+        text_tag = '{' + svg_namespace + '}' + 'text'
+        # only remove attributes for elements in shapes layer
         if title == "Shapes":
             for attr in attrs:
                 elt.attrib.pop(attr, None)
+        # remove stroke for all text elements (fixes ugly rendering)
+        elif elt.find(text_tag) is not None:
+            for subelt in elt.findall(text_tag):
+                subelt.attrib.pop("stroke", None)
+
 
 def image2svg(im_path, embed_image=True):
     ### Only part of the code that uses PIL ######
