@@ -123,12 +123,16 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
 
 ## Installation
 
-It will probably be a while before I publish this add-on to AnkiWeb. There's still a lot of testing to be done; but if you want to help out or feel particularly adventurous you can install *Image Occlusion 2.0 Enhanced* by following these steps:
+**Installation from AnkiWeb**
+
+Simply go to []() and install *Image Occlusion 2.0 Enhanced* like you would with any other add-on. It doesn't matter if Image Occlusion 2.0 has been installed previously, as the installation will automatically overwrite any existing files.
+
+**Manual installation**
 
 - Grab the latest release of the add-on from the [releases page](https://github.com/Glutanimate/image-occlusion-2-enhanced/releases)
 - Extract the zip file
 - Launch Anki and open the add-on directory by going to *Tools* → *Add-ons* → *Open add-on directory*
-- If Image Occlusion 2.0 is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
+- If an earlier version of Image Occlusion is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
 - Having done that, proceed to copy `image_occlusion_2` and `Image Occlusion 2.py` from the extracted zip file into your add-on directory
 - Restart Anki
 - *Image Occlusion 2.0 Enhanced* should now be installed
@@ -181,7 +185,7 @@ Use the **layers dialog** to add labels to your images before occluding them. He
 - anything you draw while this layer is active will appear above your picture, but below the occluding shapes
 - when you want to draw the occlusion masks again, simply re-select the *Shapes* layer
 
-Other tricks:
+**Other tricks**:
 
 - add arrow heads to your lines: Draw a line using the line tool and select it. A drop-down box labeled "arrows" should appear in the top bar. Choose the arrow head you want or use the "markers" tool beside it for a larger variety of markers 
 
@@ -202,11 +206,9 @@ Consider supplementing your other note types with a *Remarks* and a *Sources* fi
 
 ## Development status
 
-This add-on is still very much in its early stages. It has not gone through the testing and cross-platform use that the original add-on has. So far it has only been tested on Linux and Windows. I have no clue if it will work properly on OS X. In theory it should, but I/O has always suffered from issues on OS X.
+While this add-on has gone through some testing on Linux and Windows by now, it's still in its early stages. If you use this add-on do not be surprised if you run into bugs, weird behaviour or other issues - especially if you're on OS X.
 
-If you use this add-on do not be surprised if you run into bugs, weird behaviour or other issues. You probably should not deploy this add-on in a production environment if you do not know what you're doing. I am not responsible for any data loss or problems with your note collection you might encounter.
-
-With that said, I have been using this version of the add-on in my own studies for the past couple of months and it has not given me any kind of trouble. As always, your mileage might vary.
+As always: Use this add-on at your own risk.
 
 Bug reports and suggestions are always welcome, but it might take me a while to get to them. If you know how to code please feel free to improve this project, file pull requests, etc. The code could definitely benefit from some refactoring as I am not very adept in Python.
 
