@@ -125,7 +125,7 @@ This repository hosts a custom version of the [Image Occlusion 2.0](https://gith
 
 **Installation from AnkiWeb**
 
-Simply go to []() and install *Image Occlusion 2.0 Enhanced* like you would with any other add-on. It doesn't matter if Image Occlusion 2.0 has been installed previously, as the installation will automatically overwrite any existing files.
+Simply go to [https://ankiweb.net/shared/info/1111933094](https://ankiweb.net/shared/info/1111933094) and install *Image Occlusion 2.0 Enhanced* like you would with any other add-on. It doesn't matter if Image Occlusion 2.0 has been installed previously, as the installation will automatically overwrite any existing files.
 
 **Manual installation**
 

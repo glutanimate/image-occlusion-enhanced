@@ -1,4 +1,4 @@
-*Image Occlusion 2.0 Enhanced* is an updated version of the [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a large number of improvements and new features.
+*Image Occlusion 2.0 Enhanced* is an updated version of the [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a large number of new features and improvements.
 
 **Overview of the Changes**
 

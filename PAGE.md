@@ -1,4 +1,4 @@
-*Image Occlusion 2.0 Enhanced* is an updated version of the [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a number of improvements and new features.
+*Image Occlusion 2.0 Enhanced* is an updated version of the [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a large number of new features and improvements.
 
 ## Table of Contents
 
@@ -57,7 +57,7 @@ See [here](https://github.com/Glutanimate/image-occlusion-2-enhanced#known-issue
 
 ## Installation
 
-Simply go to []() and install *Image Occlusion 2.0 Enhanced* like you would with any other add-on. It doesn't matter if Image Occlusion 2.0 has been installed previously, as the installation will automatically overwrite any existing files.
+Simply go to [https://ankiweb.net/shared/info/1111933094](https://ankiweb.net/shared/info/1111933094) and install *Image Occlusion 2.0 Enhanced* like you would with any other add-on. It doesn't matter if Image Occlusion 2.0 has been installed previously, as the installation will automatically overwrite any existing files.
 
 ## Customization
 
