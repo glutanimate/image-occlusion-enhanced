@@ -34,12 +34,12 @@ from resources import *
 image_occlusion_help_link = "https://glutanimate.github.io/image-occlusion-2-enhanced/#usage-and-tips"
 
 # set various paths
-os_home_dir = os.path.expanduser('~')
+os_home_dir = os.path.expanduser('~').encode('utf-8')
 
-addons_folder = mw.pm.addonFolder()
+addons_folder = mw.pm.addonFolder().encode('utf-8')
 
 prefs_path = os.path.join(addons_folder, "image_occlusion_2", 
-                          ".image_occlusion_2_prefs")
+                          ".image_occlusion_2_prefs").decode('utf-8')
 
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
                             'svg-edit',
