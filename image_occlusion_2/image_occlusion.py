@@ -21,6 +21,7 @@ from aqt import tagedit
 from anki.utils import json
 
 import os
+import sys
 import re
 import tempfile
 
@@ -33,8 +34,11 @@ from resources import *
 
 image_occlusion_help_link = "https://glutanimate.github.io/image-occlusion-2-enhanced/#usage-and-tips"
 
+# get default file system encoding
+encoding = sys.getfilesystemencoding()
+
 # set various paths
-os_home_dir = os.path.expanduser('~').encode('utf-8')
+os_home_dir = os.path.expanduser('~').decode(encoding)
 
 addons_folder = mw.pm.addonFolder().encode('utf-8')
 
