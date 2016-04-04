@@ -55,7 +55,8 @@ You will also find lot of of video tutorials on Image Occlusion 2.0 on [YouTube]
 
 **Changes**
 
-2016-04-03: Initial release
+2016-04-04: v0.2.1 - fixes an encoding error on Windows
+2016-04-03: v0.2.0 - Initial release
 
 **Credits**
 
