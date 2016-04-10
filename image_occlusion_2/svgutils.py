@@ -50,7 +50,7 @@ def strip_attributes(root, attrs):
                 subelt.attrib.pop("stroke", None)
 
 
-def image2svg(im_path, embed_image=True):
+def image2svg(im_path, orig_svg_path, embed_image=True):
     ### Only part of the code that uses PIL ######
     im = Image.open(im_path)
     width, height = im.size
@@ -75,6 +75,7 @@ def image2svg(im_path, embed_image=True):
     svg.set('xmlns:xlink', "http://www.w3.org/1999/xlink")
     ### Use descriptive variables for the layers
     image_layer = svg[image_layer_index]
+    labels_layer = svg[labels_layer_index]
     shapes_layer = svg[shapes_layer_index]
     ### Create the 'image' element
     image = etree.SubElement(image_layer, 'image')
@@ -83,12 +84,20 @@ def image2svg(im_path, embed_image=True):
     image.set('height', str(height))
     image.set('width', str(width))
     image.set('xlink:href', im_href)  # encode base64
+    hack_head_string = ' xmlns="http://www.w3.org/2000/svg">'
+    if orig_svg_path is not None:
+        for layer in [labels_layer, shapes_layer]:
+            svg.remove(layer)
+        orig_svg = etree.parse(orig_svg_path).getroot()
+        for node in orig_svg:
+            svg.append(node)
+        hack_head_string = ' >'
     ###
     svg_content = etree.tostring(svg)  # remove
     #### Very Ugly Hack Ahead !!!
     hack_head, hack_body = svg_content.split('\n', 1)
     hack_head = hack_head[:-1]
-    hack_head = ''.join([hack_head, ' xmlns="http://www.w3.org/2000/svg">'])
+    hack_head = ''.join([hack_head, hack_head_string])
     svg_content = '\n'.join([hack_head, hack_body])
     #### END HACK
 

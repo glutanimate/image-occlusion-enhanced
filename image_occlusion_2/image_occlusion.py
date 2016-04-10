@@ -152,6 +152,8 @@ class ImageOcc_Add(QtCore.QObject):
 
         valid_model = False
         orig_tags = None
+        orig_svg = None
+        orig_svg_path = None
         orig_image = None
         orig_header = None
         orig_footer = None
@@ -166,6 +168,7 @@ class ImageOcc_Add(QtCore.QObject):
         orig_tags = self.ed.tags.text()
         if model_name == IMAGE_QA_MODEL_NAME:
             valid_model = True
+            orig_svg = self.ed.note.fields[2]
             orig_image = self.ed.note.fields[3]
             orig_header = self.ed.note.fields[4].replace('<br />', '\n')
             orig_footer = self.ed.note.fields[5].replace('<br />', '\n')
@@ -183,6 +186,12 @@ class ImageOcc_Add(QtCore.QObject):
                 imagename = m.group(2)
                 valid_ext = imagename.endswith((".jpg",".jpeg",".gif",".png"))
                 image_path = os.path.join(mw.col.media.dir(),m.group(2))
+            n = pattern.search(orig_svg)
+            if(n):
+                svgname = n.group(2)
+                valid_svg_ext = svgname.endswith(".svg")
+                if valid_svg_ext:
+                    orig_svg_path = os.path.join(mw.col.media.dir(),n.group(2))
         # otherwise only preserve sources field (if found)
         else:
             if sources_field in self.ed.note:
@@ -203,7 +212,8 @@ class ImageOcc_Add(QtCore.QObject):
             #  the cause of the error (tmbb).
             try:
                 self.call_ImageOcc_Editor(self.mw.image_occlusion2_image_path, orig_tags, 
-                                          orig_header, orig_footer, orig_remarks, orig_sources)
+                                          orig_header, orig_footer, orig_remarks, orig_sources, 
+                                          orig_svg_path)
             except:
                 image_path = QtGui.QFileDialog.getOpenFileName(None,  # parent
                                                       FILE_DIALOG_MESSAGE,
@@ -232,11 +242,12 @@ class ImageOcc_Add(QtCore.QObject):
                 save_prefs(self)
 
             self.call_ImageOcc_Editor(self.mw.image_occlusion2_image_path, orig_tags,
-                                      orig_header, orig_footer, orig_remarks, orig_sources)
+                                      orig_header, orig_footer, orig_remarks, orig_sources, 
+                                      orig_svg_path)
 
     def call_ImageOcc_Editor(self, path, orig_tags, orig_header, orig_footer, 
-                             orig_remarks, orig_sources):
-        d = svgutils.image2svg(path)
+                             orig_remarks, orig_sources, orig_svg_path):
+        d = svgutils.image2svg(path, orig_svg_path)
         svg = d['svg']
         svg_b64 = d['svg_b64']
         height = d['height']
