@@ -86,15 +86,17 @@ def image2svg(im_path, orig_svg_path, embed_image=True):
     image.set('xlink:href', im_href)  # encode base64
     hack_head_string = ' xmlns="http://www.w3.org/2000/svg">'
     if orig_svg_path is not None:
+        # remove empty labels and shapes layers in svg
         for layer in [labels_layer, shapes_layer]:
             svg.remove(layer)
         orig_svg = etree.parse(orig_svg_path).getroot()
+        # append all elements of original svg in their place
         for node in orig_svg:
             svg.append(node)
         hack_head_string = ' >'
-    ###
-    svg_content = etree.tostring(svg)  # remove
+    svg_content = etree.tostring(svg)
     #### Very Ugly Hack Ahead !!!
+    # TODO: find a more elegant solution
     hack_head, hack_body = svg_content.split('\n', 1)
     hack_head = hack_head[:-1]
     hack_head = ''.join([hack_head, hack_head_string])

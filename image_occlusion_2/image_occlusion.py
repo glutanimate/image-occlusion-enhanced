@@ -12,18 +12,17 @@
 ##                                                ##
 ####################################################
 
-from PyQt4 import QtCore, QtGui
-from aqt import mw, utils, webview
-from aqt.qt import *
-from anki import hooks
-from aqt import deckchooser
-from aqt import tagedit
-from anki.utils import json
-
 import os
 import sys
 import re
 import tempfile
+
+from PyQt4 import QtCore, QtGui
+
+from aqt import mw, utils, webview, deckchooser, tagedit
+from aqt.qt import *
+from anki import hooks
+from anki.utils import json
 
 import etree.ElementTree as etree
 
@@ -39,20 +38,15 @@ encoding = sys.getfilesystemencoding()
 
 # set various paths
 os_home_dir = os.path.expanduser('~').decode(encoding)
-
 addons_folder = mw.pm.addonFolder().encode('utf-8')
-
 prefs_path = os.path.join(addons_folder, "image_occlusion_2", 
                           ".image_occlusion_2_prefs").decode('utf-8')
 
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
                             'svg-edit',
                             'svg-edit-2.6')
-
 svg_edit_path = os.path.join(svg_edit_dir,
-                             'svg-editor.html')
-
-
+                            'svg-editor.html')
 svg_edit_url = QtCore.QUrl.fromLocalFile(svg_edit_path)
 svg_edit_url_string = svg_edit_url.toString()
 
@@ -150,7 +144,8 @@ class ImageOcc_Add(QtCore.QObject):
 
         clip = QApplication.clipboard()
 
-        valid_model = False
+        existing_image = False
+
         orig_tags = None
         orig_svg = None
         orig_svg_path = None
@@ -163,11 +158,14 @@ class ImageOcc_Add(QtCore.QObject):
         orig_tempfield4 = None
         orig_tempfield5 = None
 
-        # if current note is Image Occlusion note try to use existing data
-        model_name = self.ed.note.model()["name"]
+        # preserve tags and sources if available
         orig_tags = self.ed.tags.text()
+        if sources_field in self.ed.note:
+            orig_sources = self.ed.note[sources_field]
+
+        # if current note is Image Occlusion note try to copy all available fields
+        model_name = self.ed.note.model()["name"]
         if model_name == IMAGE_QA_MODEL_NAME:
-            valid_model = True
             orig_svg = self.ed.note.fields[2]
             orig_image = self.ed.note.fields[3]
             orig_header = self.ed.note.fields[4].replace('<br />', '\n')
@@ -180,29 +178,37 @@ class ImageOcc_Add(QtCore.QObject):
             patt = r"""<img.*?src=(["'])(.*?)\1"""
             pattern = re.compile(patt, flags=re.I|re.M|re.S)    
             m = pattern.search(orig_image)
-            valid_ext = False
-            imagename = ""
+            n = pattern.search(orig_svg)
+            image_path = None
+            svg_path = None
             if(m):
                 imagename = m.group(2)
                 valid_ext = imagename.endswith((".jpg",".jpeg",".gif",".png"))
-                image_path = os.path.join(mw.col.media.dir(),m.group(2))
-            n = pattern.search(orig_svg)
+                image_path_old = os.path.join(mw.col.media.dir(),m.group(2))
+                if valid_ext and os.path.isfile(image_path_old):
+                    image_path = image_path_old
             if(n):
                 svgname = n.group(2)
-                valid_svg_ext = svgname.endswith(".svg")
-                if valid_svg_ext:
-                    orig_svg_path = os.path.join(mw.col.media.dir(),n.group(2))
-        # otherwise only preserve sources field (if found)
-        else:
-            if sources_field in self.ed.note:
-                orig_sources = self.ed.note[sources_field]
-        
-        # reuse existing image for note
-        if(valid_model and valid_ext and os.path.isfile(image_path)):
-            self.reuse_note = True
+                valid_ext = svgname.endswith(".svg")
+                svg_path_old = os.path.join(mw.col.media.dir(),n.group(2))
+                if valid_ext and os.path.isfile(svg_path_old):
+                    orig_svg_path = svg_path_old
+
+            if image_path and orig_svg_path:
+               self.reuse_note = True
+
+
+        # Decide on what image source to use
+
+        # 1: create new IO note based on existing one
+        if self.reuse_note == True:
             pass
+
+        # 2: use first image found in note, regardless of note type
+        elif existing_image:
+            print "Yet to be implemented"
         
-        # use clipboard data for note
+        # 3: use clipboard data for note
         elif clip.mimeData().imageData():
             handle, image_path = tempfile.mkstemp(suffix='.png')
             clip.image().save(image_path)
@@ -220,7 +226,7 @@ class ImageOcc_Add(QtCore.QObject):
                                                       prev_image_dir,
                                                       FILE_DIALOG_FILTER)
 
-        # prompt user to select image
+        # 4: prompt user to select image
         else:
             image_path = QtGui.QFileDialog.getOpenFileName(None,  # parent
                                                        FILE_DIALOG_MESSAGE,
@@ -229,15 +235,12 @@ class ImageOcc_Add(QtCore.QObject):
        
 
 
-        # The following code is common to both branches of the 'if'
+        # Call Image Occlusion Editor on path
         if image_path:
             self.mw.image_occlusion2_image_path = image_path
-            # store image directory in local preferences
-            if  (
-                  os.path.dirname(image_path) != mw.col.media.dir() and 
-                  os.path.dirname(image_path) != tempfile.gettempdir()
-                ):
-                # only if image sourced outside of the media collection and temporary directories
+            # store image directory in local preferences,
+            # but only if image not in the media collection or temporary directory
+            if os.path.dirname(image_path) not in [mw.col.media.dir(), tempfile.gettempdir()]:
                 self.prefs["prev_image_dir"] = os.path.dirname( image_path )
                 save_prefs(self)
 
@@ -247,6 +250,7 @@ class ImageOcc_Add(QtCore.QObject):
 
     def call_ImageOcc_Editor(self, path, orig_tags, orig_header, orig_footer, 
                              orig_remarks, orig_sources, orig_svg_path):
+
         d = svgutils.image2svg(path, orig_svg_path)
         svg = d['svg']
         svg_b64 = d['svg_b64']
