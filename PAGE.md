@@ -1,39 +1,20 @@
-*Image Occlusion 2.0 Enhanced* is an updated version of the [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) add-on for Anki with a large number of new features and improvements.
-
 ## Table of Contents
 
 <!-- MarkdownTOC -->
 
 - [Screenshots](#screenshots)
-- [Installation](#installation)
+- [Changes compared to IO 2.0](#changes-compared-to-io-20)
+- [Installation and Updates](#installation-and-updates)
 - [Customization](#customization)
     - [DOs and DO NOTs](#dos-and-do-nots)
 - [Usage and Tips](#usage-and-tips)
     - [Making full use of SVG-Edit](#making-full-use-of-svg-edit)
     - [Using all available fields to their full extent](#using-all-available-fields-to-their-full-extent)
     - [Consistency across different note types](#consistency-across-different-note-types)
-- [Changes](#changes)
 - [Credits](#credits)
 - [License and Warranty](#license-and-warranty)
 
 <!-- /MarkdownTOC -->
-
-**Overview of the Changes**
-
-- new tabbed interface
-- multi-line entry fields
-- new buttons for adding notes
-- advanced keyboard controls
-- new "labels" layer for occluding custom labels
-- new note type with more fields
-- ability to customize field names
-- ability to reuse existing i/o notes
-- synchronization between image occlusion editor window and Anki's editor
-- remember last used directory
-
-...and many many other bug fixes and improvements. 
-
-As you can probably tell, there have been some significant changes to how Image Occlusion behaves. With that in mind, I'd advise you give the [README on my GitHub repository](https://github.com/Glutanimate/image-occlusion-2-enhanced) a full read, as it elaborates on each of these changes and how they will affect your workflow.
 
 ## Screenshots
 
@@ -43,21 +24,27 @@ As you can probably tell, there have been some significant changes to how Image 
 
 ![Screenshot of the reviewer](https://github.com/Glutanimate/image-occlusion-2-enhanced/blob/master/screenshots/screenshot-io-reviewer.png?raw=true)
 
-**Development status**
+## Changes compared to IO 2.0
 
-While this add-on has gone through some testing on Linux and Windows by now, it's still in its early stages. If you use this add-on do not be surprised if you run into bugs, weird behaviour or other issues - especially if you're on OS X.
+- new tabbed interface
+- ability to create new image occlusion notes based on old ones
+- new "labels" layer for occluding your own labels
+- advanced keyboard controls
+- multi-line entry fields
+- new buttons for adding notes
+- new note type with more fields
+- ability to customize field names
+- synchronization between image occlusion editor window and Anki's editor
+- remember last used directory
+- ...
 
-As always: Use this add-on at your own risk.
+Please consult the [README](https://github.com/Glutanimate/image-occlusion-2-enhanced) for a full list of all the changes since Image Occlusion 2.0.
 
-Bug reports and suggestions are always welcome, but it might take me a while to get to them. Please don't post them here, as I won't be able to help you or reply to them. Instead, either use the [Issues page](https://github.com/Glutanimate/image-occlusion-2-enhanced/issues) on GitHub or [this discussion](https://anki.tenderapp.com/discussions/add-ons/7049-revamped-version-of-image-occlusion-2-for-anki-beta-testers-wanted) on the Anki forums.
+## Installation and Updates
 
-If you know how to code please feel free to improve this project, file pull requests, etc. The code could definitely benefit from some refactoring as I am not very adept in Python.
+Please follow the installation instructions on [Ankiweb](https://ankiweb.net/shared/info/1111933094).
 
-See [here](https://github.com/Glutanimate/image-occlusion-2-enhanced#known-issues-and-limitations) for a list of known issues.
-
-## Installation
-
-Simply go to [https://ankiweb.net/shared/info/1111933094](https://ankiweb.net/shared/info/1111933094) and install *Image Occlusion 2.0 Enhanced* like you would with any other add-on. It doesn't matter if Image Occlusion 2.0 has been installed previously, as the installation will automatically overwrite any existing files.
+New versions and changelogs will be posted on the [Releases page](https://github.com/Glutanimate/image-occlusion-2-enhanced/releases).
 
 ## Customization
 
@@ -125,10 +112,6 @@ So what should you use these fields for? Well, you can customize and rename them
 ### Consistency across different note types
 
 Consider supplementing your other note types with a *Remarks* and a *Sources* field. Not only does it make for a more consistent experience, it also enables *Image Occlusion 2.0 Enhanced* to sync your sources between the I/O Editor and Anki's note editor. See [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on) for more information.
-
-## Changes
-
-New versions and changelogs will be posted on the [Releases page](https://github.com/Glutanimate/image-occlusion-2-enhanced/releases).
 
 ## Credits
 
