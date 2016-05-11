@@ -87,9 +87,10 @@ def load_prefs(self):
     if not 'io-version' in self.io_conf:
         # set io version
         self.io_conf['io-version'] = default_conf['io-version']
-        # change default colour
+        # change default colours
         if self.io_conf['initFill[color]'] == "FFFFFF":
             self.io_conf['initFill[color]'] = default_conf['initFill[color]']
+            self.io_conf['mask_fill_color'] = default_conf['mask_fill_color']
 
     # load local preferences
     self.prefs = None
