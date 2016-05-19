@@ -15,19 +15,20 @@
 
 ...and many many other bug fixes and improvements. 
 
-As you can probably tell there have been some significant changes to how Image Occlusion behaves. To get a full grasp of how these changes might affect your workflow, I'd advise you to give the [official README](https://github.com/Glutanimate/image-occlusion-2-enhanced) a careful read-through.
+To get a full grasp of how these changes might affect your workflow I'd advise you to give the [official README](https://github.com/Glutanimate/image-occlusion-2-enhanced) a careful read-through.
 
 **Changelog**
 
 This section will always be updated with the latest changes to *Image Occlusion 2.0 Enhanced*:
 
+2016-05-19: **v0.2.3** - Update mask fill colour when upgrading from Image Occlusion 2.0
 2016-04-16: **v0.2.2** - Occlusions and labels are now preserved when creating new notes based on old ones
 2016-04-04: **v0.2.1** - Fixes an encoding error on Windows
 2016-04-03: **v0.2.0** - Initial release
 
 **Screenshots**
 
-![Screenshot of the Masks Editor](https://github.com/Glutanimate/image-occlusion-2-enhanced/blob/master/screenshots/screenshot-io-editor-1.png?raw=true)
+![Screenshot of the masks editor](https://github.com/Glutanimate/image-occlusion-2-enhanced/blob/master/screenshots/screenshot-io-editor-1.png?raw=true)
 
 ![Screenshot of the field entry tab](https://github.com/Glutanimate/image-occlusion-2-enhanced/blob/master/screenshots/screenshot-io-editor-2.png?raw=true)
 
@@ -35,29 +36,29 @@ This section will always be updated with the latest changes to *Image Occlusion 
 
 **Installation**
 
-You can install this like you would with any other add-on. It doesn't matter if an earlier version of *Image Occlusion 2.0 Enhanced* or Image Occlusion 2.0 has been installed before.
+Whether you're upgrading from Image Occlusion 2.0 or starting from a fresh Anki installation, simply follow the generic download instructions listed below to download and install *Image Occlusion 2.0 Enhanced*.
 
 **Updating**
 
-Just repeat the installation steps to update *Image Occlusion 2.0 Enhanced* to the latest release.
+Repeat the installation to update to the latest release of the add-on.
 
 **Customization**
 
-*Image Occlusion 2.0 Enhanced* can be customized, but only to a certain degree. Please read [this](https://glutanimate.github.io/image-occlusion-2-enhanced/#customization) to learn which settings you can change and which you should keep your hands off.
+This add-on can be customized, but only to a certain degree. Please read [the corresponding section](https://glutanimate.github.io/image-occlusion-2-enhanced/#customization) of the documentation to learn which settings you can change and which you should stay away from.
 
 **Usage**
 
 The core functionality of Image Occlusion hasn't changed too much with this latest iteration of the add-on. You can still follow [tmbb's comprehensive manual](http://tmbb.bitbucket.org/image-occlusion-2/) for a general introduction into image occlusion.
 
-For a number of pointers specific to *Image Occlusion 2.0 Enhanced* check out the [Usage and Tips section](https://glutanimate.github.io/image-occlusion-2-enhanced/#usage-and-tips) of the README.
+For a number of pointers specific to *Image Occlusion 2.0 Enhanced* check out the [Usage and Tips section](https://glutanimate.github.io/image-occlusion-2-enhanced/#usage-and-tips) of the documentation.
 
-You will also find lot of of video tutorials on Image Occlusion 2.0 on [YouTube](https://www.youtube.com/results?search_query=anki+image+occlusion). While *Image Occlusion 2.0 Enhanced* looks and behaves slightly differently from I/O 2.0, these should still be helpful; and who knows, someone might take the time to create a tutorial on this specific version of I/O. If so, please contact me on the forums and I'll link it here.
+You will also find lot of of video tutorials on Image Occlusion 2.0 on [YouTube](https://www.youtube.com/results?search_query=anki+image+occlusion). While *Image Occlusion 2.0 Enhanced* looks and behaves slightly differently from I/O 2.0, these should still be helpful.
 
 **Development status**
 
-While this add-on has gone through some testing on Linux and Windows by now, it's still in its early stages. If you use this add-on do not be surprised if you run into bugs, weird behaviour or other issues - especially if you're on OS X.
+The add-on has gone through some testing by now, but it's still in its early stages. Don't be surprised if you run into bugs, weird behaviour, or other issues - especially if you're on OS X.
 
-As always: Use this add-on at your own risk.
+As always: Use the add-on at your own risk.
 
 Bug reports and suggestions are always welcome, but it might take me a while to get to them. Please don't post them here, as I won't be able to help you or reply. Instead, either use the [Issues page](https://github.com/Glutanimate/image-occlusion-2-enhanced/issues) on GitHub or [this discussion](https://anki.tenderapp.com/discussions/add-ons/7049-revamped-version-of-image-occlusion-2-for-anki-beta-testers-wanted) on the Anki forums.
 

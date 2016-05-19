@@ -206,9 +206,9 @@ Consider supplementing your other note types with a *Remarks* and a *Sources* fi
 
 ## Development status
 
-While this add-on has gone through some testing on Linux and Windows by now, it's still in its early stages. If you use this add-on do not be surprised if you run into bugs, weird behaviour or other issues - especially if you're on OS X.
+The add-on has gone through some testing by now, but it's still in its early stages. Don't be surprised if you run into bugs, weird behaviour, or other issues - especially if you're on OS X.
 
-As always: Use this add-on at your own risk.
+As always: Use the add-on at your own risk.
 
 Bug reports and suggestions are always welcome, but it might take me a while to get to them. If you know how to code please feel free to improve this project, file pull requests, etc. The code could definitely benefit from some refactoring as I am not very adept in Python.
 
