@@ -142,6 +142,9 @@ def get_shapes_layer_idx(svg):
 
 def set_color(elt, color):
     elt.attrib["fill"] = "#" + color
+    # set opacity to 1 as a precaution against bugs in SVG-Edit
+    elt.attrib["opacity"] = "1"
+    elt.attrib["fill-opacity"] = "1"
 
 def set_id(elt, elmid):
     elt.attrib["id"] = elmid
