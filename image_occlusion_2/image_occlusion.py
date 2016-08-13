@@ -64,11 +64,6 @@ FILE_DIALOG_FILTER = "Image Files (*.png *jpg *.jpeg *.gif)"
 
 IMAGE_QA_MODEL_NAME = "Image Q/A - 2.0 Enhanced"
 
-header_field = "Header"
-footer_field = "Footer"
-remarks_field = "Remarks"
-sources_field = "Sources"
-
 default_conf = {'initFill[color]': '00AA7F',
                 'mask_fill_color': 'FF0000',
                 'io-version': '2.0-enhanced'}
@@ -116,19 +111,10 @@ class ImageOcc_Add(QtCore.QObject):
         self.ed = ed
         self.mw = mw
 
-        # retrieve field names
-        nm = mw.col.models.byName(IMAGE_QA_MODEL_NAME)
-
-        if nm:
-            nm_fields = mw.col.models.fieldNames(nm)
-            global header_field
-            global footer_field
-            global remarks_field
-            global sources_field
-            header_field = nm_fields[4]
-            footer_field = nm_fields[5]
-            remarks_field = nm_fields[6]
-            sources_field = nm_fields[7]
+        global header_field
+        global footer_field
+        global remarks_field
+        global sources_field
 
         self.reuse_note = False
 
@@ -136,6 +122,32 @@ class ImageOcc_Add(QtCore.QObject):
         load_prefs(self)
 
     def add_notes(self):
+        # retrieve field names
+        global header_field
+        global footer_field
+        global remarks_field
+        global sources_field
+        nm = self.mw.col.models.byName(IMAGE_QA_MODEL_NAME)
+        if nm:
+            try:
+                nm_fields = self.mw.col.models.fieldNames(nm)
+                header_field = nm_fields[4]
+                footer_field = nm_fields[5]
+                remarks_field = nm_fields[6]
+                sources_field = nm_fields[7]
+            except IndexError:
+                utils.showWarning(\
+                    """Error: Image Occlusion note type not configured properly.\
+                    <br> Please make sure you did not delete or reposition any fields.\
+                    <br> See here for reference: \
+                    <a href="https://glutanimate.github.io/image-occlusion-2-enhanced/#customization">\
+                    IO: Customization</a>""")
+                return
+        else:
+            header_field = "Header"
+            footer_field = "Footer"
+            remarks_field = "Remarks"
+            sources_field = "Sources"
 
         # retrieve last used image directory
         prev_image_dir = self.prefs["prev_image_dir"]
