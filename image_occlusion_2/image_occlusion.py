@@ -701,6 +701,9 @@ class ImageOcc_Options(QtGui.QWidget):
 
     def setupUi(self):
 
+        # load preferences
+        load_prefs(self)
+
         ### shape color for questions:
         mask_color_label = QLabel('<b>Question</b> shape color')
 
