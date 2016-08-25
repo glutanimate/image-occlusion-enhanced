@@ -21,6 +21,7 @@ To get a full grasp of how these changes might affect your workflow I'd advise y
 
 This section will always be updated with the latest changes to *Image Occlusion 2.0 Enhanced*:
 
+2016-08-25: **v0.2.4** - Several bug fixes and improvements
 2016-05-19: **v0.2.3** - Update mask fill colour when upgrading from Image Occlusion 2.0
 2016-04-16: **v0.2.2** - Occlusions and labels are now preserved when creating new notes based on old ones
 2016-04-04: **v0.2.1** - Fixes an encoding error on Windows
