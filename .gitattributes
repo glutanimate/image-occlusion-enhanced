@@ -4,6 +4,7 @@
 .gitignore export-ignore
 # duplicate documentation
 ANKIWEB.md export-ignore
+ANKIWEB.HTML export-ignore
 PAGE.md export-ignore
 # build script
 build_zip.sh export-ignore
