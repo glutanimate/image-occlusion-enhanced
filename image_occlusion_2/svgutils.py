@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ####################################################
 ##                                                ##
-##         Image Occlusion 2.0 Enhanced           ##
+##           Image Occlusion Enhanced             ##
 ##                                                ##
 ##        Copyright (c) Glutanimate 2016          ##
 ##       (https://github.com/Glutanimate)         ##

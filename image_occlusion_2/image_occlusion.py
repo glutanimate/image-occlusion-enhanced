@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ####################################################
 ##                                                ##
-##         Image Occlusion 2.0 Enhanced           ##
+##           Image Occlusion Enhanced             ##
 ##                                                ##
 ##        Copyright (c) Glutanimate 2016          ##
 ##       (https://github.com/Glutanimate)         ##
@@ -31,7 +31,7 @@ from notes_from_svg import add_notes_non_overlapping, add_notes_overlapping
 # import the icons
 from resources import *
 
-image_occlusion_help_link = "https://glutanimate.github.io/image-occlusion-2-enhanced/#usage-and-tips"
+image_occlusion_help_link = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
 
 # get default file system encoding
 encoding = sys.getfilesystemencoding()
@@ -137,11 +137,11 @@ class ImageOcc_Add(QtCore.QObject):
                 sources_field = nm_fields[7]
             except IndexError:
                 utils.showWarning(\
-                    """Error: Image Occlusion note type not configured properly.\
+                    'Error: Image Occlusion note type not configured properly.\
                     <br> Please make sure you did not delete or reposition any fields.\
-                    <br> See here for reference: \
-                    <a href="https://glutanimate.github.io/image-occlusion-2-enhanced/#customization">\
-                    IO: Customization</a>""")
+                    <br> More information: \
+                    <a href="' + image_occlusion_help_link + '/Customization#fixing-a-broken-note-type-or-template">\
+                    Wiki - Note Type Customization</a>')
                 return
         else:
             header_field = "Header"
@@ -574,7 +574,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         # Set basic window properties
 
         # self.setMinimumHeight(600)
-        self.setWindowTitle('Image Occlusion 2.0 Enhanced Editor')
+        self.setWindowTitle('Image Occlusion Enhanced Editor')
 
         # Define and connect key bindings
 
