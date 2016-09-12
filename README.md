@@ -25,11 +25,11 @@ This repository hosts a forked version of the [original Image Occlusion](https:/
 
 ## Screenshots
 
-![Screenshot of the Masks Editor](/screenshots/screenshot-io-editor-1.png?raw=true)
-
-![Screenshot of the field entry tab](/screenshots/screenshot-io-editor-2.png?raw=true)
-
-![Screenshot of the reviewer](/screenshots/screenshot-io-reviewer.png?raw=true)
+<p align="center">
+    <img src="/screenshots/screenshot-io-editor-1.png?raw=true">
+    <img src="/screenshots/screenshot-io-editor-2.png?raw=true">
+    <img src="/screenshots/screenshot-io-reviewer.png?raw=true">
+</p>
 
 ## Changes compared to the original add-on
 
@@ -125,7 +125,7 @@ Please follow the installation instructions on [Ankiweb](https://ankiweb.net/sha
 
 **Manual installation**
 
-- Grab the latest release of the add-on from [Releases](https://github.com/Glutanimate/image-occlusion-2-enhanced/releases)
+- Grab the latest release of the add-on from [Releases](https://github.com/Glutanimate/image-occlusion-enhanced/releases)
 - Extract the zip file
 - Launch Anki and open the add-on directory by going to *Tools* → *Add-ons* → *Open add-on directory*
 - If an earlier version of Image Occlusion is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
@@ -135,7 +135,7 @@ Please follow the installation instructions on [Ankiweb](https://ankiweb.net/sha
 
 **Updates**
 
-New versions and changelogs will be posted on the [GitHub Releases page](https://github.com/Glutanimate/image-occlusion-2-enhanced/releases) and later uploaded to AnkiWeb.
+New versions and changelogs will be posted on the [GitHub Releases page](https://github.com/Glutanimate/image-occlusion-enhanced/releases) and later uploaded to AnkiWeb.
 
 ## Usage
 
@@ -143,13 +143,13 @@ See [here](https://glutanimate.github.io/image-occlusion-enhanced/).
 
 ## Development status
 
-A lot of the persistant issues with the Image Occlusion series of add-ons are still present in this fork. Please don't be surprised if you run into bugs, weird behaviour, or other issues. This is especially true if you are using the add-on on macOS, as the macOS version of Anki has always suffered from a number of compatibility issues with SVG Edit.
+A lot of the persistent issues with the Image Occlusion series of add-ons are still present in this fork. Please don't be surprised if you run into bugs, weird behaviour, or other issues. This is especially true if you are using the add-on on macOS, as the macOS version of Anki has always suffered from a number of compatibility issues with SVG Edit.
 
 For a list of known issues please check out the [issues page](https://github.com/Glutanimate/image-occlusion-enhanced/issues). Bug reports and suggestions are always welcome, but it might take me a while to get to them. If you know how to code please feel free to improve this project, file pull requests, etc.
 
 ## Credits
 
-Most of the credit for this add-on goes to [Tiago Barroso (tmbb)](https://github.com/tmbb) who developed the original Image Occlusion and Image Occlusion 2.0. *Image Occlusion Enhanced* would not exist without him.
+Most of the credit for this add-on goes to [Tiago Barroso (tmbb)](https://github.com/tmbb) who developed the original Image Occlusion and Image Occlusion 2.0 add-ons. *Image Occlusion Enhanced* would not exist without him.
 
 I would also like to thank the following contributors:
 
