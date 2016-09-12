@@ -1,9 +1,15 @@
+## Overview
+
+Image Occlusion is an add-on for the spaced repetition flashcard program Anki. With IO you can hide parts of an image and later test yourself on each hidden part.
+
+This is the official documentation for *Image Occlusion Enhanced*, an update version of the [original Image Occlusion add-on](https://github.com/tmbb/image-occlusion-2).
+
 ## Table of Contents
 
 <!-- MarkdownTOC -->
 
 - [Screenshots](#screenshots)
-- [Changes compared to IO 2.0](#changes-compared-to-io-20)
+- [Changes compared to the original add-on](#changes-compared-to-the-original-add-on)
 - [Installation and Updates](#installation-and-updates)
 - [Customization](#customization)
     - [DOs and DO NOTs](#dos-and-do-nots)
@@ -18,13 +24,13 @@
 
 ## Screenshots
 
-![Screenshot of the Masks Editor](https://github.com/Glutanimate/image-occlusion-2-enhanced/blob/master/screenshots/screenshot-io-editor-1.png?raw=true)
+![Screenshot of the Masks Editor](https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-1.png?raw=true)
 
-![Screenshot of the field entry tab](https://github.com/Glutanimate/image-occlusion-2-enhanced/blob/master/screenshots/screenshot-io-editor-2.png?raw=true)
+![Screenshot of the field entry tab](https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-2.png?raw=true)
 
-![Screenshot of the reviewer](https://github.com/Glutanimate/image-occlusion-2-enhanced/blob/master/screenshots/screenshot-io-reviewer.png?raw=true)
+![Screenshot of the reviewer](https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-reviewer.png?raw=true)
 
-## Changes compared to IO 2.0
+## Changes compared to the original add-on
 
 - new tabbed interface
 - ability to create new image occlusion notes based on old ones
@@ -38,17 +44,31 @@
 - remember last used directory
 - ...
 
-Please consult the [README](https://github.com/Glutanimate/image-occlusion-2-enhanced) for a full list of all the changes since Image Occlusion 2.0.
+Please consult the [README](https://github.com/Glutanimate/image-occlusion-enhanced) for a full list of all the changes since Image Occlusion 2.0.
 
 ## Installation and Updates
 
+**Installation from AnkiWeb**
+
 Please follow the installation instructions on [Ankiweb](https://ankiweb.net/shared/info/1111933094).
 
-New versions and changelogs will be posted on the [Releases page](https://github.com/Glutanimate/image-occlusion-2-enhanced/releases).
+**Manual installation**
+
+- Grab the latest release of the add-on from the [releases page](https://github.com/Glutanimate/image-occlusion-enhanced/releases)
+- Extract the zip file
+- Launch Anki and open the add-on directory by going to *Tools* → *Add-ons* → *Open add-on directory*
+- If an earlier version of Image Occlusion is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
+- Having done that, proceed to copy `image_occlusion_2` and `Image Occlusion 2.py` from the extracted zip file into your add-on directory
+- Restart Anki
+- *Image Occlusion Enhanced* should now be installed
+
+**Updates**
+
+New versions and changelogs will be posted on the [GitHub Releases page](https://github.com/Glutanimate/image-occlusion-enhanced/releases) and later uploaded to AnkiWeb.
 
 ## Customization
 
-*Image Occlusion 2.0 Enhanced* can be customized, but only to a certain degree
+*Image Occlusion Enhanced* can be customized, but only to a certain degree
 
 ### DOs and DO NOTs
 
@@ -70,7 +90,7 @@ New versions and changelogs will be posted on the [Releases page](https://github
 
 Please check out tmbb's [comprehensive manual](http://tmbb.bitbucket.org/image-occlusion-2/) for a full tutorial on using image occlusion. Most of the instructions there still apply to this modified version of I/O.
 
-What follows are a few additional tips to help you get the most out of *Image Occlusion 2.0 Enhanced*.
+What follows are a few additional tips to help you get the most out of *Image Occlusion Enhanced*.
 
 ### Making full use of SVG-Edit
 
@@ -111,12 +131,15 @@ So what should you use these fields for? Well, you can customize and rename them
 
 ### Consistency across different note types
 
-Consider supplementing your other note types with a *Remarks* and a *Sources* field. Not only does it make for a more consistent experience, it also enables *Image Occlusion 2.0 Enhanced* to sync your sources between the I/O Editor and Anki's note editor. See [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on) for more information.
+Consider supplementing your other note types with a *Remarks* and a *Sources* field. Not only does it make for a more consistent experience, it also enables *Image Occlusion Enhanced* to sync your sources between the I/O Editor and Anki's note editor. See [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on) for more information.
 
 ## Credits
 
-- [tmbb](https://github.com/tmbb) for creating Image Occlusion
-- [Abdolmadi Saravi, MD](https://bitbucket.org/amsaravi/) for patching Image Occlusion to reuse existing images in the media collection and on notes
+Most of the credit for this add-on goes to [Tiago Barroso (tmbb)](https://github.com/tmbb) who developed the original Image Occlusion and Image Occlusion 2.0. *Image Occlusion Enhanced* would not exist without him.
+
+I would also like to thank the following contributors:
+
+- [Abdolmadi Saravi](https://bitbucket.org/amsaravi/) for patching Image Occlusion to reuse existing images in the media collection and on notes
 - [Ank_U](https://bitbucket.org/Ank_U/) for patching Image Occlusion to support more fields
 
 ## License and Warranty
@@ -125,9 +148,9 @@ Consider supplementing your other note types with a *Remarks* and a *Sources* fi
 
 *Copyright © 2016 Glutanimate*
 
-*Image Occlusion 2.0 Enhanced* is licensed under the simplified BSD license.
+*Image Occlusion Enhanced* is licensed under the simplified BSD license.
 
-Third-party open-source software shipped with *Image Occlusion 2.0 Enhanced*:
+Third-party open-source software shipped with *Image Occlusion Enhanced*:
 
 - [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik Lundh. Licensed under the [PIL license](http://www.pythonware.com/products/pil/license.htm)
  
@@ -135,4 +158,4 @@ Third-party open-source software shipped with *Image Occlusion 2.0 Enhanced*:
 
 - Python [ElementTree toolkit](http://effbot.org/zone/element-index.htm). Copyright (c) 1999-2008 by Fredrik Lundh. See header in `ElementTree.py` for licensing information.
 
-All software in this repository is provided  "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. 
+All software in this repository is provided  "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. As usual: Use this add-on at your own risk.
