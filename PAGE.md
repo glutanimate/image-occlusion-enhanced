@@ -1,22 +1,17 @@
 ## Overview
 
-Image Occlusion is an add-on for the spaced repetition flashcard program Anki. With IO you can hide parts of an image and later test yourself on each hidden part.
+Image Occlusion is an add-on for the spaced repetition flashcard program [Anki](http://ankisrs.net/). It allows you to create flashcards that hide parts of an image and test your knowledge on the hidden information.
 
-This is the official documentation for *Image Occlusion Enhanced*, an update version of the [original Image Occlusion add-on](https://github.com/tmbb/image-occlusion-2).
+This is the landing page for *Image Occlusion Enhanced*, an updated version of the [original Image Occlusion add-on](https://github.com/tmbb/image-occlusion-2).
 
 ## Table of Contents
 
 <!-- MarkdownTOC -->
 
 - [Screenshots](#screenshots)
-- [Changes compared to the original add-on](#changes-compared-to-the-original-add-on)
-- [Installation and Updates](#installation-and-updates)
-- [Customization](#customization)
-    - [DOs and DO NOTs](#dos-and-do-nots)
-- [Usage and Tips](#usage-and-tips)
-    - [Making full use of SVG-Edit](#making-full-use-of-svg-edit)
-    - [Using all available fields to their full extent](#using-all-available-fields-to-their-full-extent)
-    - [Consistency across different note types](#consistency-across-different-note-types)
+- [Changes](#changes)
+- [Installation](#installation)
+- [Usage and Support](#usage-and-support)
 - [Credits](#credits)
 - [License and Warranty](#license-and-warranty)
 
@@ -24,17 +19,17 @@ This is the official documentation for *Image Occlusion Enhanced*, an update ver
 
 ## Screenshots
 
-![Screenshot of the Masks Editor](https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-1.png?raw=true)
+<p align="center">
+    <img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-1.png?raw=true">
+    <img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-2.png?raw=true">
+    <img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-reviewer.png?raw=true">
+</p>
 
-![Screenshot of the field entry tab](https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-2.png?raw=true)
-
-![Screenshot of the reviewer](https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-reviewer.png?raw=true)
-
-## Changes compared to the original add-on
+## Changes
 
 - new tabbed interface
-- ability to create new image occlusion notes based on old ones
-- new "labels" layer for occluding your own labels
+- ability to create image occlusion notes based on old notes
+- new "labels" layer for creating custom labels
 - advanced keyboard controls
 - multi-line entry fields
 - new buttons for adding notes
@@ -42,96 +37,18 @@ This is the official documentation for *Image Occlusion Enhanced*, an update ver
 - ability to customize field names
 - synchronization between image occlusion editor window and Anki's editor
 - remember last used directory
-- ...
 
-Please consult the [README](https://github.com/Glutanimate/image-occlusion-enhanced) for a full list of all the changes since Image Occlusion 2.0.
+...and many many other bug fixes and improvements. 
 
-## Installation and Updates
+For a detailed list of all the changes introduced with *Image Occlusion Enhanced* please see [here](https://github.com/Glutanimate/image-occlusion-enhanced#changes-compared-to-the-original-add-on).
 
-**Installation from AnkiWeb**
+## Installation
 
-Please follow the installation instructions on [Ankiweb](https://ankiweb.net/shared/info/1111933094).
+Please follow the instructions in the [README](https://github.com/Glutanimate/image-occlusion-enhanced#installation).
 
-**Manual installation**
+## Usage and Support
 
-- Grab the latest release of the add-on from the [releases page](https://github.com/Glutanimate/image-occlusion-enhanced/releases)
-- Extract the zip file
-- Launch Anki and open the add-on directory by going to *Tools* → *Add-ons* → *Open add-on directory*
-- If an earlier version of Image Occlusion is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
-- Having done that, proceed to copy `image_occlusion_2` and `Image Occlusion 2.py` from the extracted zip file into your add-on directory
-- Restart Anki
-- *Image Occlusion Enhanced* should now be installed
-
-**Updates**
-
-New versions and changelogs will be posted on the [GitHub Releases page](https://github.com/Glutanimate/image-occlusion-enhanced/releases) and later uploaded to AnkiWeb.
-
-## Customization
-
-*Image Occlusion Enhanced* can be customized, but only to a certain degree
-
-### DOs and DO NOTs
-
-**What you really should not do**:
-
-- delete or rename the `Image Q/A - 2.0 Enhanced` note type
-    + deleting the note type should restore it to default next time I/O is launched, but doing so will remove all notes associated with it
-- re-order the fields of the note-type
-- add new fields or remove existing ones
-- rename the following fields: *Question*, *Answer*, *SVG*, *Original Image*
-
-**What you can do**:
-
-- rename the following fields: *Header*, *Footer*, *Remarks*, *Sources*, *TempField3*, *TempField4*, *TempField5*
-- modify the card template and CSS
-    + be careful, though: the right styling and layout is essential for layering the original image and SVG mask over each other
-
-## Usage and Tips
-
-Please check out tmbb's [comprehensive manual](http://tmbb.bitbucket.org/image-occlusion-2/) for a full tutorial on using image occlusion. Most of the instructions there still apply to this modified version of I/O.
-
-What follows are a few additional tips to help you get the most out of *Image Occlusion Enhanced*.
-
-### Making full use of SVG-Edit
-
-SVG-Edit ships with a lot of very useful **hotkeys**. Make sure to use them! E.g.:
-
-- hold down <kbd>Shift</kbd> while clicking to select multiple shapes
-- <kbd>G</kbd> to group items and mark them as one single mask
-- <kbd>A</kbd> to select all items in the current layer
-- <kbd>V</kbd> for the selection tool
-- <kbd>R</kbd> for the rectangle tool
-- <kbd>E</kbd> for the ellipse tool
-- <kbd>T</kbd> for the text tool
-- <kbd>C</kbd> to fit the image to the canvas
-- <kbd>CTRL+Z/Y</kbd> to undo/redo
-- <kbd>X</kbd> to show the layers side panel
-
-Use the **layers dialog** to add labels to your images before occluding them. Here's how:
-
-- click on the right-sided labels side pane in SVG-Edit; a panel with all active layers will appear
-- select the *Labels* layer by left-clicking on it in the labels list
-- anything you draw while this layer is active will appear above your picture, but below the occluding shapes
-- when you want to draw the occlusion masks again, simply re-select the *Shapes* layer
-
-**Other tricks**:
-
-- add arrow heads to your lines: Draw a line using the line tool and select it. A drop-down box labeled "arrows" should appear in the top bar. Choose the arrow head you want or use the "markers" tool beside it for a larger variety of markers 
-
-### Using all available fields to their full extent
-
-This version of image occlusion comes with two new fields, *Remarks* and *Sources*. In total, you now have four different fields to choose from when adding additional information to your I/O notes (plus 3 more that are somewhat hidden, see above).
-
-So what should you use these fields for? Well, you can customize and rename them however you please, but here are some suggestions:
-
-- *Header* field: appears both on the front and back of your cards. I would use this for short titles that put your image in the right context. Notes in the browser can be sorted by this field, so make sure to choose a descriptive title.
-- *Footer*: appears both on the front and back of your cards. You could use this for hints, mnemonics, recall prompts, etc.
-- *Remarks* fields: Only appears on the back. Best suited for additional information, trivia, etc. Use this to nourish a big-picture understanding of the subject.
-- *Sources*: Only appears on the back. Self-explanatory name. The best place to put references, links to your sources, lecturers etc. Very important if you ever want to go back and read up on the topic at hand.
-
-### Consistency across different note types
-
-Consider supplementing your other note types with a *Remarks* and a *Sources* field. Not only does it make for a more consistent experience, it also enables *Image Occlusion Enhanced* to sync your sources between the I/O Editor and Anki's note editor. See [Enhancements to the core functionality of the add-on](#enhancements-to-the-core-functionality-of-the-add-on) for more information.
+For questions regarding the use of the add-on please check out the [official Wiki](https://github.com/Glutanimate/image-occlusion-enhanced/wiki).
 
 ## Credits
 
@@ -140,7 +57,7 @@ Most of the credit for this add-on goes to [Tiago Barroso (tmbb)](https://github
 I would also like to thank the following contributors:
 
 - [Abdolmadi Saravi](https://bitbucket.org/amsaravi/) for patching Image Occlusion to reuse existing images in the media collection and on notes
-- [Ank_U](https://bitbucket.org/Ank_U/) for patching Image Occlusion to support more fields
+- [Ank_U](https://bitbucket.org/Ank_U/) for modifying Image Occlusion to support more fields
 
 ## License and Warranty
 

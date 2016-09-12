@@ -2,7 +2,7 @@
 
 ## Overview
 
-Image Occlusion is an add-on for the spaced repetition flashcard program Anki. With IO you can hide parts of an image and later test yourself on each hidden part.
+Image Occlusion is an add-on for the spaced repetition flashcard program [Anki](http://ankisrs.net/). It allows you to create flashcards that hide parts of an image and test your knowledge on the hidden information.
 
 This repository hosts a forked version of the [original Image Occlusion](https://github.com/tmbb/image-occlusion-2) add-on with a number of new features.
 
@@ -139,7 +139,7 @@ New versions and changelogs will be posted on the [GitHub Releases page](https:/
 
 ## Usage
 
-See [here](https://glutanimate.github.io/image-occlusion-enhanced/).
+See [here](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Usage).
 
 ## Development status
 
@@ -154,7 +154,7 @@ Most of the credit for this add-on goes to [Tiago Barroso (tmbb)](https://github
 I would also like to thank the following contributors:
 
 - [Abdolmadi Saravi](https://bitbucket.org/amsaravi/) for patching Image Occlusion to reuse existing images in the media collection and on notes
-- [Ank_U](https://bitbucket.org/Ank_U/) for patching Image Occlusion to support more fields
+- [Ank_U](https://bitbucket.org/Ank_U/) for modifying Image Occlusion to support more fields
 
 ## License and Warranty
 
