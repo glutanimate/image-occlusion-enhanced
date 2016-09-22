@@ -23,12 +23,17 @@ To get a full grasp of how these changes might affect your workflow I'd advise y
 
 This section will always be updated with the latest changes to *Image Occlusion Enhanced*:
 
+2016-09-22: **v0.2.6** - Improved note type sanity checks
 2016-09-12: **v0.2.5** - Renamed *Image Occlusion 2.0 Enhanced* to *Image Occlusion Enhanced* (old name was getting too clunky)
 2016-08-25: **v0.2.4** - Several bug fixes and improvements
 2016-05-19: **v0.2.3** - Update mask fill colour when upgrading from Image Occlusion 2.0
 2016-04-16: **v0.2.2** - Occlusions and labels are now preserved when creating new notes based on old ones
 2016-04-04: **v0.2.1** - Fixes an encoding error on Windows
 2016-04-03: **v0.2.0** - Initial release
+
+Due to a number of recent support requests I have to stress the following: 
+
+*DO NOT TRY TO EDIT THE IMAGE OCCLUSION NOTE TYPE without reading the Wiki section on [Note Type Customization](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Customization#note-type-and-card-template) first!*
 
 **Screenshots**
 
@@ -56,10 +61,6 @@ Make sure to read the following sections:
 - [Usage](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Usage)
 - [Customization](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Customization)
 - [Tips](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Tips)
-
-Due to a number of recent support requests I have to stress the following: 
-
-**Do NOT try to edit the Image Occlusion note type without reading the Wiki section on [Note Type Customization](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Customization#note-type-and-card-template) first!**
 
 **Support**
 
