@@ -127,28 +127,26 @@ class ImageOcc_Add(QtCore.QObject):
         global footer_field
         global remarks_field
         global sources_field
+        header_field = "Header"
+        footer_field = "Footer"
+        remarks_field = "Remarks"
+        sources_field = "Sources"
         nm = self.mw.col.models.byName(IMAGE_QA_MODEL_NAME)
         if nm:
-            try:
-                nm_fields = self.mw.col.models.fieldNames(nm)
-                header_field = nm_fields[4]
-                footer_field = nm_fields[5]
-                remarks_field = nm_fields[6]
-                sources_field = nm_fields[7]
-            except IndexError:
+            nm_fields = self.mw.col.models.fieldNames(nm)
+            if len(nm_fields) != 11:
                 utils.showWarning(\
                     'Error: Image Occlusion note type not configured properly.\
                     <br> Please make sure you did not delete or reposition any fields.\
                     <br> More information: \
-                    <a href="' + image_occlusion_help_link + '/Customization#fixing-a-broken-note-type-or-template">\
+                    <a href="' + image_occlusion_help_link + '/Customization#a-note-of-warning">\
                     Wiki - Note Type Customization</a>')
                 return
-        else:
-            header_field = "Header"
-            footer_field = "Footer"
-            remarks_field = "Remarks"
-            sources_field = "Sources"
-
+            header_field = nm_fields[4]
+            footer_field = nm_fields[5]
+            remarks_field = nm_fields[6]
+            sources_field = nm_fields[7]
+                
         # retrieve last used image directory
         prev_image_dir = self.prefs["prev_image_dir"]
         # if directory not valid or empty use system home directory
