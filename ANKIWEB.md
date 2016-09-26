@@ -31,17 +31,23 @@ This section will always be updated with the latest changes to *Image Occlusion 
 2016-04-04: **v0.2.1** - Fixes an encoding error on Windows
 2016-04-03: **v0.2.0** - Initial release
 
+**News**
+
+*2016-09-26*
+
+A series of video tutorials on the add-on are now available on [YouTube](https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o). You might want to check these out if you are new to IO or switching over from IO 2.0.
+
+*2016-09-21*
+
 Due to a number of recent support requests I have to stress the following: 
 
-*DO NOT TRY TO EDIT THE IMAGE OCCLUSION NOTE TYPE without reading the Wiki section on [Note Type Customization](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Customization#note-type-and-card-template) first!*
+*PLEASE DON'T TRY TO EDIT THE IMAGE OCCLUSION NOTE TYPE WITHOUT READING THE WIKI SECTION ON [NOTE TYPE CUSTOMIZATION](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Customization#note-type-and-card-template) FIRST!*
 
 **Screenshots**
 
-<p align="center">
-    <img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-1.png?raw=true">
-    <img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-2.png?raw=true">
-    <img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-reviewer.png?raw=true">
-</p>
+<img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-1.png?raw=true">
+<img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-editor-2.png?raw=true">
+<img src="https://github.com/Glutanimate/image-occlusion-enhanced/blob/master/screenshots/screenshot-io-reviewer.png?raw=true">
 
 **Installation**
 
@@ -51,11 +57,13 @@ Whether you're upgrading from Image Occlusion 2.0 or starting from a fresh Anki 
 
 Repeat the installation to update to the latest release of the add-on.
 
-**Documentation**
+**Usage**
 
-Documentation and further info is now available on the [*Image Occlusion Enhanced* Wiki](https://github.com/Glutanimate/image-occlusion-enhanced/wiki).
+A video tutorial on *Image Occlusion Enhanced* is now available on [YouTube](https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o).
 
-Make sure to read the following sections:
+Documentation and further info can also be found on the [*Image Occlusion Enhanced* Wiki](https://github.com/Glutanimate/image-occlusion-enhanced/wiki).
+
+Please make sure read the following sections:
 
 - [Frequently Asked Questions](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/FAQ)
 - [Usage](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Usage)
