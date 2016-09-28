@@ -21,21 +21,22 @@ To get a full grasp of how these changes might affect your workflow I'd advise y
 
 **Changelog**
 
-This section will always be updated with the latest changes to *Image Occlusion Enhanced*:
+This section will always be updated with the latest changes to *Image Occlusion Enhanced*. For more details on each entry please make sure to check out the [Releases tab on GitHub](https://github.com/Glutanimate/image-occlusion-enhanced/releases).
 
-2016-09-22: **v0.2.6** - Improved note type sanity checks
-2016-09-12: **v0.2.5** - Renamed *Image Occlusion 2.0 Enhanced* to *Image Occlusion Enhanced* (old name was getting too clunky)
-2016-08-25: **v0.2.4** - Several bug fixes and improvements
-2016-05-19: **v0.2.3** - Update mask fill colour when upgrading from Image Occlusion 2.0
-2016-04-16: **v0.2.2** - Occlusions and labels are now preserved when creating new notes based on old ones
-2016-04-04: **v0.2.1** - Fixes an encoding error on Windows
-2016-04-03: **v0.2.0** - Initial release
+2016-09-28: **v0.3.0** - A large number of improvements to the Masks Editor
+2016-09-22: *v0.2.6* - Improved note type sanity checks
+2016-09-12: *v0.2.5* - Renamed *Image Occlusion 2.0 Enhanced* to *Image Occlusion Enhanced*
+2016-08-25: *v0.2.4* - Several bug fixes and improvements
+2016-05-19: *v0.2.3* - Update mask fill colour when upgrading from Image Occlusion 2.0
+2016-04-16: *v0.2.2* - Occlusions and labels are now preserved when creating new notes based on old ones
+2016-04-04: *v0.2.1* - Fixes an encoding error on Windows
+2016-04-03: **v0.2.0** - Initial public release
 
 **News**
 
 *2016-09-26*
 
-A series of video tutorials on the add-on are now available on [YouTube](https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o). You might want to check these out if you are new to IO or switching over from IO 2.0.
+A video tutorial series on the add-on is now available on [YouTube](https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o).
 
 *2016-09-21*
 
