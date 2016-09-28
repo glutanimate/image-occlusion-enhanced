@@ -4009,7 +4009,7 @@
 				var tool_buttons = [
 					{sel:'#tool_select', fn: clickSelect, evt: 'click', key: ['S', true]},
 					{sel:'#tool_fhpath', fn: clickFHPath, evt: 'click', key: ['L', true]},
-					{sel:'#tool_line', fn: clickLine, evt: 'click', key: ['Q', true]},
+					{sel:'#tool_line', fn: clickLine, evt: 'click', key: ['V', true]},
 					{sel:'#tool_rect', fn: clickRect, evt: 'mouseup', key: ['R', true], parent: '#tools_rect', icon: 'rect'},
 					{sel:'#tool_square', fn: clickSquare, evt: 'mouseup', parent: '#tools_rect', icon: 'square'},
 					{sel:'#tool_fhrect', fn: clickFHRect, evt: 'mouseup', parent: '#tools_rect', icon: 'fh_rect'},
@@ -4019,7 +4019,7 @@
 					{sel:'#tool_path', fn: clickPath, evt: 'click', key: ['P', true]},
 					{sel:'#tool_text', fn: clickText, evt: 'click', key: ['T', true]},
 					{sel:'#tool_image', fn: clickImage, evt: 'mouseup'},
-					{sel:'#tool_zoom', fn: clickZoom, evt: 'mouseup', key: ['Z', true]},
+					{sel:'#tool_zoom', fn: clickZoom, evt: 'mouseup', key: ['', true]},
 					{sel:'#tool_clear', fn: clickClear, evt: 'mouseup', key: ['', true]},
 					{sel:'#tool_save', fn: function() { editingsource?saveSourceEditor():clickSave()}, evt: 'mouseup', key: ['', true]},
 					{sel:'#tool_export', fn: clickExport, evt: 'mouseup'},
