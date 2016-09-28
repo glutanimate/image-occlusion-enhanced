@@ -2617,7 +2617,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				break;
 			case "line":
 				started = true;
-				var stroke_w = cur_shape.stroke_width == 0?1:cur_shape.stroke_width;
+				var stroke_w = cur_shape.stroke_width == 0?2:cur_shape.stroke_width;
 				addSvgElementFromJson({
 					"element": "line",
 					"curStyles": true,
