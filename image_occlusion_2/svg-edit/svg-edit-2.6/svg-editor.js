@@ -4009,7 +4009,7 @@
 				var tool_buttons = [
 					{sel:'#tool_select', fn: clickSelect, evt: 'click', key: ['S', true]},
 					{sel:'#tool_fhpath', fn: clickFHPath, evt: 'click', key: ['L', true]},
-					{sel:'#tool_line', fn: clickLine, evt: 'click', key: ['V', true]},
+					{sel:'#tool_line', fn: clickLine, evt: 'click', key: ['Q', true]},
 					{sel:'#tool_rect', fn: clickRect, evt: 'mouseup', key: ['R', true], parent: '#tools_rect', icon: 'rect'},
 					{sel:'#tool_square', fn: clickSquare, evt: 'mouseup', parent: '#tools_rect', icon: 'square'},
 					{sel:'#tool_fhrect', fn: clickFHRect, evt: 'mouseup', parent: '#tools_rect', icon: 'fh_rect'},
@@ -4091,10 +4091,12 @@
 
 					// Standard shortcuts
 					{key: modKey + 'shift+z', fn: clickRedo},
-
 					{key: modKey+'x', fn: cutSelected},
 					{key: modKey+'c', fn: copySelected},
-					{key: modKey+'v', fn: pasteInCenter}
+					{key: modKey+'v', fn: pasteInCenter},
+
+					// Additional shortcuts
+					{key: ['esc', true, true], fn: svgCanvas.clearSelection}
 
 
 				];
