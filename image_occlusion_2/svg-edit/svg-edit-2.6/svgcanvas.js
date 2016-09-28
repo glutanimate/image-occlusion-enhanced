@@ -279,7 +279,7 @@ var addSvgElementFromJson = this.addSvgElementFromJson = function(data) {
 			"stroke-linecap": cur_shape.stroke_linecap,
 			"stroke-opacity": cur_shape.stroke_opacity,
 			"fill-opacity": cur_shape.fill_opacity,
-			"opacity": cur_shape.opacity / 2,
+			"opacity": cur_shape.opacity,
 			"style": "pointer-events:inherit"
 		}, 100);
 	}
@@ -2565,7 +2565,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"points": d_attr,
 						"id": getNextId(),
 						"fill": "none",
-						"opacity": cur_shape.opacity / 2,
+						"opacity": cur_shape.opacity,
 						"stroke-linecap": "round",
 						"style": "pointer-events:none"
 					}
@@ -2585,7 +2585,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"width": 0,
 						"height": 0,
 						"id": getNextId(),
-						"opacity": cur_shape.opacity / 2,
+						"opacity": cur_shape.opacity,
 						"style": "pointer-events:inherit"
 					}
 				});
@@ -2608,7 +2608,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"width": 0,
 						"height": 0,
 						"id": getNextId(),
-						"opacity": cur_shape.opacity / 2
+						"opacity": cur_shape.opacity
 					}
 				});
 				break;
@@ -2631,7 +2631,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"stroke-linecap": cur_shape.stroke_linecap,
 						"stroke-opacity": cur_shape.stroke_opacity,
 						"fill": "none",
-						"opacity": cur_shape.opacity / 2,
+						"opacity": cur_shape.opacity,
 						"style": "pointer-events:none"
 					}
 				});
@@ -2646,7 +2646,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"cy": y,
 						"r": 0,
 						"id": getNextId(),
-						"opacity": cur_shape.opacity / 2
+						"opacity": cur_shape.opacity
 					}
 				});
 				break;
@@ -2661,7 +2661,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"rx": 0,
 						"ry": 0,
 						"id": getNextId(),
-						"opacity": cur_shape.opacity / 2
+						"opacity": cur_shape.opacity
 					}
 				});
 				break;
@@ -4086,7 +4086,7 @@ var pathActions = canvas.pathActions = function() {
 						"attr": {
 							"d": d_attr,
 							"id": getNextId(),
-							"opacity": cur_shape.opacity / 2
+							"opacity": cur_shape.opacity
 						}
 					});
 					// set stretchy line to first point
