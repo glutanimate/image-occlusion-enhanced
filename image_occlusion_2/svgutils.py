@@ -44,10 +44,6 @@ def strip_attributes(root, attrs):
         if title == "Shapes":
             for attr in attrs:
                 elt.attrib.pop(attr, None)
-        # remove stroke for all text elements (fixes ugly rendering)
-        elif elt.find(tag_ns + 'text') is not None:
-            for subelt in elt.findall(tag_ns + 'text'):
-                subelt.attrib.pop("stroke", None)
 
 
 def image2svg(im_path, orig_svg_path, embed_image=True):
