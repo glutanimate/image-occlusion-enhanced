@@ -4007,9 +4007,9 @@
 			var Actions = function() {
 				// sel:'selector', fn:function, evt:'event', key:[key, preventDefault, NoDisableInInput]
 				var tool_buttons = [
-					{sel:'#tool_select', fn: clickSelect, evt: 'click', key: ['V', true]},
-					{sel:'#tool_fhpath', fn: clickFHPath, evt: 'click', key: ['Q', true]},
-					{sel:'#tool_line', fn: clickLine, evt: 'click', key: ['L', true]},
+					{sel:'#tool_select', fn: clickSelect, evt: 'click', key: ['S', true]},
+					{sel:'#tool_fhpath', fn: clickFHPath, evt: 'click', key: ['L', true]},
+					{sel:'#tool_line', fn: clickLine, evt: 'click', key: ['V', true]},
 					{sel:'#tool_rect', fn: clickRect, evt: 'mouseup', key: ['R', true], parent: '#tools_rect', icon: 'rect'},
 					{sel:'#tool_square', fn: clickSquare, evt: 'mouseup', parent: '#tools_rect', icon: 'square'},
 					{sel:'#tool_fhrect', fn: clickFHRect, evt: 'mouseup', parent: '#tools_rect', icon: 'fh_rect'},
@@ -4020,13 +4020,13 @@
 					{sel:'#tool_text', fn: clickText, evt: 'click', key: ['T', true]},
 					{sel:'#tool_image', fn: clickImage, evt: 'mouseup'},
 					{sel:'#tool_zoom', fn: clickZoom, evt: 'mouseup', key: ['Z', true]},
-					{sel:'#tool_clear', fn: clickClear, evt: 'mouseup', key: ['N', true]},
-					{sel:'#tool_save', fn: function() { editingsource?saveSourceEditor():clickSave()}, evt: 'mouseup', key: ['S', true]},
+					{sel:'#tool_clear', fn: clickClear, evt: 'mouseup', key: ['', true]},
+					{sel:'#tool_save', fn: function() { editingsource?saveSourceEditor():clickSave()}, evt: 'mouseup', key: ['', true]},
 					{sel:'#tool_export', fn: clickExport, evt: 'mouseup'},
 					{sel:'#tool_open', fn: clickOpen, evt: 'mouseup', key: ['O', true]},
 					{sel:'#tool_import', fn: clickImport, evt: 'mouseup'},
 					{sel:'#tool_source', fn: showSourceEditor, evt: 'click', key: ['U', true]},
-					{sel:'#tool_wireframe', fn: clickWireframe, evt: 'click', key: ['F', true]},
+					{sel:'#tool_wireframe', fn: clickWireframe, evt: 'click', key: ['W', true]},
 					{sel:'#tool_source_cancel,#svg_source_overlay,#tool_docprops_cancel,#tool_prefs_cancel', fn: cancelOverlays, evt: 'click', key: ['esc', false, false], hidekey: true},
 					{sel:'#tool_source_save', fn: saveSourceEditor, evt: 'click'},
 					{sel:'#tool_docprops_save', fn: saveDocProperties, evt: 'click'},
@@ -4044,8 +4044,8 @@
 					{sel:'#tool_move_bottom', fn: moveToBottomSelected, evt: 'click', key: 'ctrl+shift+['},
 					{sel:'#tool_topath', fn: convertToPath, evt: 'click'},
 					{sel:'#tool_make_link,#tool_make_link_multi', fn: makeHyperlink, evt: 'click'},
-					{sel:'#tool_undo', fn: clickUndo, evt: 'click', key: ['Z', true]},
-					{sel:'#tool_redo', fn: clickRedo, evt: 'click', key: ['Y', true]},
+					{sel:'#tool_undo', fn: clickUndo, evt: 'click', key: [modKey+'z', true]},
+					{sel:'#tool_redo', fn: clickRedo, evt: 'click', key: [modKey+'y', true]},
 					{sel:'#tool_clone,#tool_clone_multi', fn: clickClone, evt: 'click', key: ['D', true]},
 					{sel:'#tool_group', fn: clickGroup, evt: 'click', key: ['G', true]},
 					{sel:'#tool_ungroup', fn: clickGroup, evt: 'click'},
@@ -4090,9 +4090,7 @@
 					{key: 'A', fn: function(){svgCanvas.selectAllInCurrentLayer();}},
 
 					// Standard shortcuts
-					{key: modKey+'z', fn: clickUndo},
 					{key: modKey + 'shift+z', fn: clickRedo},
-					{key: modKey + 'y', fn: clickRedo},
 
 					{key: modKey+'x', fn: cutSelected},
 					{key: modKey+'c', fn: copySelected},
