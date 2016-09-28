@@ -136,9 +136,9 @@ class ImageOcc_Add(QtCore.QObject):
             nm_fields = self.mw.col.models.fieldNames(nm)
             if len(nm_fields) != 11:
                 utils.showWarning(\
-                    'Error: Image Occlusion note type not configured properly.\
-                    <br> Please make sure you did not delete or reposition any fields.\
-                    <br> More information: \
+                    '<b>Error:</b><br><br>Image Occlusion note type not configured properly.\
+                    Please make sure you did not add, delete, or reposition any fields.\
+                    <br><br>You can find more information on this error message here: \
                     <a href="' + image_occlusion_help_link + '/Customization#a-note-of-warning">\
                     Wiki - Note Type Customization</a>')
                 return
