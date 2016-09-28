@@ -503,7 +503,7 @@
 
 			Editor.canvas = svgCanvas = new $.SvgCanvas(document.getElementById("svgcanvas"), curConfig);
 			Editor.show_save_warning = false;
-			var palette = ["#000000", "#3f3f3f", "#7f7f7f", "#bfbfbf", "#ffffff",
+			var palette = [ "#" + curConfig.initFill["color"], "#000000", "#3f3f3f", "#7f7f7f", "#bfbfbf", "#ffffff",
 			           "#ff0000", "#ff7f00", "#ffff00", "#7fff00",
 			           "#00ff00", "#00ff7f", "#00ffff", "#007fff",
 			           "#0000ff", "#7f00ff", "#ff00ff", "#ff007f",
