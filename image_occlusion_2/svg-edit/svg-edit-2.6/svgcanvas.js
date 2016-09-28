@@ -2630,7 +2630,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"stroke-linejoin": cur_shape.stroke_linejoin,
 						"stroke-linecap": cur_shape.stroke_linecap,
 						"stroke-opacity": cur_shape.stroke_opacity,
-						"fill": "none",
+						"fill": cur_shape.fill,
 						"opacity": cur_shape.opacity,
 						"style": "pointer-events:none"
 					}
