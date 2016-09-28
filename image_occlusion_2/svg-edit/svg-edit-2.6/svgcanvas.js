@@ -23,12 +23,17 @@
 // 10) draw.js
 // 11) path.js
 
-// Modifications by Glutanimate:
+// This version of svg-edit has been adapted to work with Image Occlusion Enhanced
+
+// Modifications not specifically documented in commits:
 // - replace mousewheel zoom code with code in SVG-edit 2.7
 //		- this fixes a longstanding issue where mousewheel zoom wouldn't
 //		  work properly on the canvas
 // - change hotkey for mousewheel zoom to CTRL + Mousewheel
 // - merge magnebra/add_text_config_options
+// 
+// Please consult the commit log for all other changes to this file
+
 
 if(!window.console) {
 	window.console = {};

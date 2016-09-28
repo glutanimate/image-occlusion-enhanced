@@ -16,8 +16,12 @@
 // 2) browser.js
 // 3) svgcanvas.js
 
-// Modifications by Glutanimate:
+// This version of svg-edit has been adapted to work with Image Occlusion Enhanced
+
+// Modifications not specifically documented in commits:
 // - merge magnebra/add_text_config_options
+// 
+// Please consult the commit log for all other changes to this file
 
 (function() {
 
@@ -3406,21 +3410,21 @@
 				var bNoStroke = (svgCanvas.getColor('stroke') == 'none');
 				var buttonsNeedingStroke = [ '#tool_fhpath', '#tool_line' ];
 				var buttonsNeedingFillAndStroke = [ '#tools_rect .tool_button', '#tools_ellipse .tool_button', '#tool_text', '#tool_path'];
-				if (bNoStroke) {
-					for (var index in buttonsNeedingStroke) {
-						var button = buttonsNeedingStroke[index];
-						if ($(button).hasClass('tool_button_current')) {
-							clickSelect();
-						}
-						$(button).addClass('disabled');
-					}
-				}
-				else {
-					for (var index in buttonsNeedingStroke) {
-						var button = buttonsNeedingStroke[index];
-						$(button).removeClass('disabled');
-					}
-				}
+				// if (bNoStroke) {
+				// 	for (var index in buttonsNeedingStroke) {
+				// 		var button = buttonsNeedingStroke[index];
+				// 		if ($(button).hasClass('tool_button_current')) {
+				// 			clickSelect();
+				// 		}
+				// 		$(button).addClass('disabled');
+				// 	}
+				// }
+				// else {
+				// 	for (var index in buttonsNeedingStroke) {
+				// 		var button = buttonsNeedingStroke[index];
+				// 		$(button).removeClass('disabled');
+				// 	}
+				// }
 
 				if (bNoStroke && bNoFill) {
 					for (var index in buttonsNeedingFillAndStroke) {
