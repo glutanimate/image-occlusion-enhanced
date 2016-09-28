@@ -20,11 +20,14 @@ from svgutils import *
 import add_notes
 
 
-useless_attribs = ['stroke-dasharray',
+# attributes that are useless in the shapes layer
+# (stroke and opacity settings)
+useless_attribs = ['opacity',
+                   'stroke-opacity',
+                   'fill-opacity',
+                   'stroke-dasharray',
                    'stroke-linecap',
                    'stroke-linejoin',
-                   # If stroke-opacity=0, these are irrelevant:
-                   'stroke-opacity',
                    'stroke']
 
 
