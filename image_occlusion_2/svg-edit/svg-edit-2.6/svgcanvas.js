@@ -2608,7 +2608,10 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"width": 0,
 						"height": 0,
 						"id": getNextId(),
-						"opacity": cur_shape.opacity
+						"opacity": cur_shape.opacity,
+						"stroke": "#2D2D2D",
+						"stroke-width": 0,
+						"stroke-opacity": 1
 					}
 				});
 				break;
@@ -2646,7 +2649,10 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"cy": y,
 						"r": 0,
 						"id": getNextId(),
-						"opacity": cur_shape.opacity
+						"opacity": cur_shape.opacity,
+						"stroke": "#2D2D2D",
+						"stroke-width": 0,
+						"stroke-opacity": 1
 					}
 				});
 				break;
@@ -2661,7 +2667,10 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"rx": 0,
 						"ry": 0,
 						"id": getNextId(),
-						"opacity": cur_shape.opacity
+						"opacity": cur_shape.opacity,
+						"stroke": "#2D2D2D",
+						"stroke-width": 0,
+						"stroke-opacity": 1
 					}
 				});
 				break;
