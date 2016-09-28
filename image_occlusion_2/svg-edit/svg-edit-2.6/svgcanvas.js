@@ -2428,6 +2428,20 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		
 		start_transform = mouse_target.getAttribute("transform");
 		var tlist = getTransformList(mouse_target);
+		// handle undesired attribute changes when switching from one tool to another
+		if(typeof last_mode == 'undefined') {
+		    last_mode = "";
+		}
+		if (last_mode == "text") {
+			// using the text tool would normally change the fill and stroke
+			cur_shape.fill = "#" + curConfig.initFill.color
+			cur_shape.stroke = "#2D2D2D"
+			last_mode = ""
+		} else if (last_mode == "fhpath") {
+			// using the pencil tool would normally change the fill
+			cur_shape.fill = "#" + curConfig.initFill.color
+			last_mode = ""
+		};;
 		switch (current_mode) {
 			case "select":
 				started = true;
@@ -2556,6 +2570,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			case "fhrect":
 			case "fhpath":
 				started = true;
+				last_mode = "fhpath";
 				d_attr = real_x + "," + real_y + " ";
 				var stroke_w = cur_shape.stroke_width == 0?1:cur_shape.stroke_width;
 				addSvgElementFromJson({
@@ -2676,6 +2691,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				break;
 			case "text":
 				started = true;
+				last_mode = "text";
 				var newText = addSvgElementFromJson({
 					"element": "text",
 					"curStyles": true,
@@ -2704,6 +2720,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				started = true;
 				break;
 			case "textedit":
+				last_mode = "text"
 				start_x *= current_zoom;
 				start_y *= current_zoom;
 				textActions.mouseDown(evt, mouse_target, start_x, start_y);
