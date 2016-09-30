@@ -34,9 +34,9 @@ This section will always be updated with the latest changes to *Image Occlusion 
 
 **News**
 
-*2016-09-26*
+*2016-09-26 – 2016-09-30*
 
-A video tutorial series on the add-on is now available on [YouTube](https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o).
+A video tutorial series is now available on <a href="https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o" rel="nofollow">YouTube</a>. It covers the add-on in great detail, from the installation right up its advanced use.
 
 *2016-09-21*
 
