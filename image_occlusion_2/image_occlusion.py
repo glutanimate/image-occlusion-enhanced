@@ -413,7 +413,7 @@ def get_params_for_add_notes():
 def add_image_occlusion_button(ed):
     ed.image_occlusion = ImageOcc_Add(ed)
     ed._addButton("new_occlusion", ed.image_occlusion.add_notes,
-            _("Alt+o"), _("Image Occlusion (Alt+o)"),
+            _("Alt+o"), _("Image Occlusion Enhanced (Alt+O)"),
             canDisable=False)
 
 
@@ -532,7 +532,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         self.tab_widget.addTab(tab2,"&Fields")
 
         self.tab_widget.setTabToolTip(1, "Include additional information (optional)")
-        self.tab_widget.setTabToolTip(0, "Create image occlusion SVG masks (required)")
+        self.tab_widget.setTabToolTip(0, "Create image occlusion masks (required)")
 
         # Create buttons
 
@@ -543,11 +543,11 @@ class ImageOcc_Editor(QtGui.QWidget):
         nonoverlapping_button = button_box.addButton("Add &nonoverlapping occlusions",
                 QDialogButtonBox.ActionRole)
         nonoverlapping_button.setToolTip(
-            "Generate cards that hide other labels when asking for one")
+            "Generate cards where all labels are hidden on each card")
         overlapping_button = button_box.addButton("Add &overlapping occlusions",
                 QDialogButtonBox.ActionRole)
         overlapping_button.setToolTip(
-            "Generate cards that don't hide other labels when asking for one")
+            "Generate cards where only one label is hidden per card")
         close_button = button_box.addButton("&Close",
                 QDialogButtonBox.ActionRole)
         close_button.setToolTip("Close Image Occlusion Editor without generating cards")
@@ -702,6 +702,8 @@ class ImageOcc_Options(QtGui.QWidget):
         # load preferences
         load_prefs(self)
 
+        note_label = QLabel('You might have to restart Anki to apply your changes')
+
         ### shape color for questions:
         mask_color_label = QLabel('<b>Question</b> shape color')
 
@@ -735,11 +737,13 @@ class ImageOcc_Options(QtGui.QWidget):
         # 2nd row:
         grid.addWidget(initFill_label, 1, 0)
         grid.addWidget(self.initFill_button, 1, 1)
+        # 3rd row:
+        grid.addWidget(note_label, 2, 0, 1, 2)
 
         self.setLayout(grid)
 
         self.setMinimumWidth(400)
-        self.setWindowTitle('Image Occlusion (Options)')
+        self.setWindowTitle('Image Occlusion Enhanced Options')
         self.show()
 
 def invoke_ImageOcc_help():
@@ -747,8 +751,8 @@ def invoke_ImageOcc_help():
 
 mw.ImageOcc_Options = ImageOcc_Options(mw)
 
-options_action = QAction("Image Occlusion (Options)", mw)
-help_action = QAction("Image Occlusion (Help)", mw)
+options_action = QAction("Image &Occlusion Enhanced Options...", mw)
+help_action = QAction("Image &Occlusion Enhanced Wiki...", mw)
 
 mw.connect(options_action,
            SIGNAL("triggered()"),
