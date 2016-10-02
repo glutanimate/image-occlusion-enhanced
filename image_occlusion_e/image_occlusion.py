@@ -39,8 +39,8 @@ encoding = sys.getfilesystemencoding()
 # set various paths
 os_home_dir = os.path.expanduser('~').decode(encoding)
 addons_folder = mw.pm.addonFolder().encode('utf-8')
-prefs_path = os.path.join(addons_folder, "image_occlusion_2", 
-                          ".image_occlusion_2_prefs").decode('utf-8')
+prefs_path = os.path.join(addons_folder, "image_occlusion_e", 
+                          ".image_occlusion_e_prefs").decode('utf-8')
 
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
                             'svg-edit',
