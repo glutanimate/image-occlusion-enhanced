@@ -169,11 +169,11 @@ class ImageOcc_Add(QtCore.QObject):
 
         # Decide on what image source to use
 
-        # 1: Edit existing note if note type is set to IO
+        # Existing note editable?
         if note.model()["name"] == IO_MODEL_NAME:
-            self.editing = True
             imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
             imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
+            invalfile = False
             for i in onote.keys():
                 if i == "tags":
                     continue
@@ -182,17 +182,23 @@ class ImageOcc_Add(QtCore.QObject):
                     onote[i] = note[fld]
                 elif i in ["image", "fmask"]:
                     html = note[fld]
-                    fname = imgregex.search(html).group(2)
-                    fpath = os.path.join(mw.col.media.dir(),fname)
-                    if not os.path.isfile(fpath):
-                        print "Not a valid %s field file. Exiting."
-                        return
-                    onote[i] = fpath
+                    fname = imgregex.search(html)
+                    if fname:
+                        fpath = os.path.join(mw.col.media.dir(),fname.group(2))
+                        if os.path.isfile(fpath):
+                            onote[i] = fpath
+                        else:
+                            invalfile = True
                 else:
                     onote[i] = note[fld].replace('<br />', '\n')
 
-            self.mw.io_image_path = onote["image"]
-               
+            if not invalfile and onote["uuid"]:
+                self.editing = True
+            
+
+        # 1: Edit existing note if note type is set to IO and note valid
+        if self.editing:
+            image_path = onote["image"]
 
         # 2: use first image found in note, regardless of note type
         elif existing_image:
@@ -202,7 +208,6 @@ class ImageOcc_Add(QtCore.QObject):
         elif clip.mimeData().imageData():
             handle, image_path = tempfile.mkstemp(suffix='.png')
             clip.image().save(image_path)
-            self.mw.io_image_path = image_path
             clip.clear()
 
         # 4: prompt user to select image
@@ -211,11 +216,12 @@ class ImageOcc_Add(QtCore.QObject):
                                                        FILE_DIALOG_MESSAGE,
                                                        prev_image_dir,
                                                        FILE_DIALOG_FILTER)
-            self.mw.io_image_path = image_path
+
 
 
         # Call Image Occlusion Editor on path
         if image_path:
+            self.mw.io_image_path = image_path
             self.call_ImageOcc_Editor()
             # store image directory in local preferences,
             # but only if image not in the media collection or temporary directory
@@ -577,9 +583,9 @@ class ImageOcc_Editor(QtGui.QWidget):
         target_field.setFocus()
 
     def reset_main_fields(self):
-        self.header_edit.setPlainText("")
-        self.footer_edit.setPlainText("")
-        self.remarks_edit.setPlainText("")
+        for i in [self.header_edit, self.footer_edit, self.remarks_edit, 
+          self.extra1_edit, self.extra2_edit]:
+            i.setPlainText("")
 
     def reset_all_fields(self):
         self.reset_main_fields()
