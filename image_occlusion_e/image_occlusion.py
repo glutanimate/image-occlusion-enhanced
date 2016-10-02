@@ -20,7 +20,7 @@ import tempfile
 from PyQt4 import QtCore, QtGui
 
 from aqt import mw, utils, webview, deckchooser, tagedit
-from aqt.fields import FieldDialog
+from aqt.editor import Editor
 from aqt.qt import *
 from anki import hooks
 from anki.utils import json
@@ -72,7 +72,7 @@ default_conf = {'initFill[color]': '00AA7F',
 default_prefs = {"prev_image_dir": os_home_dir}
 
 IO_FLDS = {
-    'uuid': "UUID (DO NOT EDIT)",
+    'uuid': "ID (hidden)",
     'header': "Header",
     'image': "Image",
     'footer': "Footer",
@@ -719,9 +719,14 @@ class ImageOcc_Options(QtGui.QWidget):
 def invoke_ImageOcc_help():
     utils.openLink(image_occlusion_help_link)
 
-# def overrideMinFont(self):
-#     print("asdf")
-#     self.form.fontSize.setMinimum(0)
+def hideIdField(self):
+    # simple hack to hide the ID field on IO notes
+    if self.note.model()["name"] == IO_MODEL_NAME:
+        self.web.eval("focusField(1);")
+        self.web.eval("""
+                $("#f0").remove();
+                $('td:contains("%s")').remove()
+            """ % IO_FLDS["uuid"] )
 
 
 mw.ImageOcc_Options = ImageOcc_Options(mw)
@@ -741,5 +746,4 @@ mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
 hooks.addHook('setupEditorButtons', add_image_occlusion_button)
-
-# FieldDialog.setupSignals = hooks.wrap(FieldDialog.setupSignals, overrideMinFont, "after")
+Editor.loadNote = hooks.wrap(Editor.loadNote, hideIdField, "after")

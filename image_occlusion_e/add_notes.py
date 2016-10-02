@@ -43,7 +43,7 @@ def rm_media_dir(media_dir):
 
 
 IO_FLDS = {
-    'uuid': "UUID (DO NOT EDIT)",
+    'uuid': "ID (hidden)",
     'header': "Header",
     'image': "Image",
     'footer': "Footer",
