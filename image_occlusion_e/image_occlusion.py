@@ -22,7 +22,7 @@ from PyQt4 import QtCore, QtGui
 from aqt import mw, utils, webview, deckchooser, tagedit
 from aqt.editor import Editor
 from aqt.qt import *
-from anki import hooks
+from anki.hooks import wrap, addHook
 from anki.utils import json
 
 import etree.ElementTree as etree
@@ -685,14 +685,12 @@ def invoke_ImageOcc_help():
     utils.openLink(image_occlusion_help_link)
 
 def hideIdField(self):
-    # simple hack to hide the ID field on IO notes
+    # simple hack that hides the ID field on IO notes
     if self.note.model()["name"] == IO_MODEL_NAME:
-        self.web.eval("focusField(1);")
         self.web.eval("""
-                $("#f0").remove();
-                $('td:contains("%s")').remove()
-            """ % IO_FLDS["uuid"] )
-
+                var idField = document.getElementById('f0');
+                idField.style.display = 'none';
+            """ )
 
 mw.ImageOcc_Options = ImageOcc_Options(mw)
 
@@ -710,5 +708,5 @@ mw.connect(help_action,
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
-hooks.addHook('setupEditorButtons', add_image_occlusion_button)
-Editor.loadNote = hooks.wrap(Editor.loadNote, hideIdField, "after")
+addHook('setupEditorButtons', add_image_occlusion_button)
+Editor.loadNote = wrap(Editor.loadNote, hideIdField, "after")
