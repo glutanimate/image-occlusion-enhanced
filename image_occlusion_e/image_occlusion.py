@@ -24,7 +24,7 @@ from aqt.qt import *
 from anki import hooks
 from anki.utils import json
 
-import etree.ElementTree as etree
+import lxml.etree
 
 import svgutils
 from notes_from_svg import add_notes_non_overlapping, add_notes_overlapping
