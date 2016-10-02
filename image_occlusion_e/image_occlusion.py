@@ -17,7 +17,7 @@ import sys
 import re
 import tempfile
 
-from PyQt4 import QtCore, QtGui
+#from PyQt4 import QtCore, QtGui
 
 from aqt import mw, utils, webview, deckchooser, tagedit
 from aqt.qt import *
