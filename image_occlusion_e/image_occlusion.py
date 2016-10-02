@@ -16,6 +16,7 @@ import os
 import sys
 import re
 import tempfile
+import copy
 
 from PyQt4 import QtCore, QtGui
 
@@ -237,91 +238,30 @@ class ImageOcc_Add(QtCore.QObject):
         height = d['height']
         width = d['width']
 
-        # existing instance of I/O Editor
-        ## TODO: understand why we don't just launch a new instance each time I/O is invoked
-        try:
-            mw.ImageOcc_Editor is not None
-            select_rect_tool = "svgCanvas.setMode('rect'); "
-            set_svg_content = 'svg_content = \'%s\'; ' % svg.replace('\n', '')
-            set_canvas = 'svgCanvas.setSvgString(svg_content);'
-            set_zoom = "svgCanvas.zoomChanged('', 'canvas');"
+        initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
+        url = QtCore.QUrl.fromLocalFile(svg_edit_path)
+        url.addQueryItem('initFill[color]', initFill_color)
+        url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
+        url.addQueryItem('source', svg_b64)
 
-            command = select_rect_tool + set_svg_content + set_canvas + set_zoom
-            mw.ImageOcc_Editor.svg_edit.eval(command)
+        tags = self.ed.note.tags
+        mw.ImageOcc_Editor = ImageOcc_Editor(self, tags)
+        mw.ImageOcc_Editor.svg_edit.load(url)
 
-            # update pyobj with new instance
-            ## this is necessary for instance variables (e.g. self.editing) to get 
-            ## updated properly in the add_notes_* functions.
-            ## TODO: understand what's going on and find a better solution
-            mw.ImageOcc_Editor.svg_edit.\
-                               page().\
-                               mainFrame().\
-                               addToJavaScriptWindowObject("pyObj", self)
+        # always copy tags over
+        mw.ImageOcc_Editor.tags_edit.setText(self.onote["tags"])
+        # only copy sources field if not undefined
+        if self.onote["sources"] is not None:
+            mw.ImageOcc_Editor.sources_edit.setPlainText(self.onote["sources"])
+        # reuse fields if started from existing i/o note
+        if self.editing:
+            mw.ImageOcc_Editor.header_edit.setPlainText(self.onote["header"])
+            mw.ImageOcc_Editor.footer_edit.setPlainText(self.onote["footer"])
+            mw.ImageOcc_Editor.remarks_edit.setPlainText(self.onote["remarks"])
+            mw.ImageOcc_Editor.extra1_edit.setPlainText(self.onote["extra1"])
+            mw.ImageOcc_Editor.extra2_edit.setPlainText(self.onote["extra2"])
 
-            # always copy tags over
-            mw.ImageOcc_Editor.tags_edit.setText(self.onote["tags"])
-            # only copy sources field if not undefined
-            if self.onote["sources"] is not None:
-                mw.ImageOcc_Editor.sources_edit.setPlainText(self.onote["sources"])
-            # reuse fields if started from existing i/o note
-            if self.editing:
-                mw.ImageOcc_Editor.header_edit.setPlainText(self.onote["header"])
-                mw.ImageOcc_Editor.footer_edit.setPlainText(self.onote["footer"])
-                mw.ImageOcc_Editor.remarks_edit.setPlainText(self.onote["remarks"])
-                mw.ImageOcc_Editor.extra1_edit.setPlainText(self.onote["extra1"])
-                mw.ImageOcc_Editor.extra2_edit.setPlainText(self.onote["extra2"])
-            else:
-                mw.ImageOcc_Editor.reset_main_fields()
-
-            # update labels
-            mw.ImageOcc_Editor.header_label.setText(IO_FLDS["header"])
-            mw.ImageOcc_Editor.footer_label.setText(IO_FLDS["footer"])
-            mw.ImageOcc_Editor.sources_label.setText(IO_FLDS["sources"])
-            mw.ImageOcc_Editor.remarks_label.setText(IO_FLDS["remarks"])
-            # set tab index
-            mw.ImageOcc_Editor.tab_widget.setCurrentIndex(0)
-            # set widget focus
-            ## this redundant sequence of setFocus() calls prevents a bug where
-            ## SVG-Edit would stop working when the Editor window is closed
-            ## before adding I/O notes
-            ## TODO: find another solution
-            mw.ImageOcc_Editor.svg_edit.setFocus()
-            mw.ImageOcc_Editor.header_edit.setFocus()
-            mw.ImageOcc_Editor.svg_edit.setFocus()
-
-            mw.ImageOcc_Editor.show()
-
-        # no existing instance of I/O Editor. Launch new one
-        except:
-            initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
-            url = svg_edit_url
-            url.addQueryItem('initFill[color]', initFill_color)
-            url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-            url.addQueryItem('source', svg_b64)
-
-            tags = self.ed.note.tags
-            mw.ImageOcc_Editor = ImageOcc_Editor(self, tags)
-
-            mw.ImageOcc_Editor.svg_edit.\
-                               page().\
-                               mainFrame().\
-                               addToJavaScriptWindowObject("pyObj", self)
-            mw.ImageOcc_Editor.svg_edit.load(url)
-
-            # always copy tags over
-            mw.ImageOcc_Editor.tags_edit.setText(self.onote["tags"])
-            # only copy sources field if not undefined
-            if self.onote["sources"] is not None:
-                mw.ImageOcc_Editor.sources_edit.setPlainText(self.onote["sources"])
-            # reuse fields if started from existing i/o note
-            if self.editing:
-                mw.ImageOcc_Editor.header_edit.setPlainText(self.onote["header"])
-                mw.ImageOcc_Editor.footer_edit.setPlainText(self.onote["footer"])
-                mw.ImageOcc_Editor.remarks_edit.setPlainText(self.onote["remarks"])
-                mw.ImageOcc_Editor.extra1_edit.setPlainText(self.onote["extra1"])
-                mw.ImageOcc_Editor.extra2_edit.setPlainText(self.onote["extra2"])
-
-            mw.ImageOcc_Editor.show()
+        mw.ImageOcc_Editor.show()
         
 
     def onAddNotesButton(self, IoEd, mode):
@@ -387,6 +327,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         if mw.pm.profile is not None:
             utils.saveGeom(self, "imageOccEditor")
         QWidget.closeEvent(self, event)
+        del self
 
     def initUI(self, tags):
 
