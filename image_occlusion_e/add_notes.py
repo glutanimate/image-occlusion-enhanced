@@ -17,8 +17,8 @@ from aqt import mw, utils
 
 import os
 import sys
-import hashlib
-import time
+import uuid
+
 import shutil
 
 
@@ -41,22 +41,28 @@ def rm_media_dir(media_dir):
     except:
         pass
 
-IMAGE_QA_MODEL_NAME = "Image Q/A - 2.0 Enhanced"
-QUESTION_FIELD_NAME = "Question"
-ANSWER_FIELD_NAME = "Answer"
-SVG_FIELD_NAME = "SVG"
-ORIGINAL_IMAGE_FIELD_NAME = "Original Image"
-HEADER_FIELD_NAME = "Header"
-FOOTER_FIELD_NAME = "Footer"
-REMARKS_FIELD_NAME = "Remarks"
-SOURCES_FIELD_NAME = "Sources"
-TEMPFIELD3_FIELD_NAME = "TempField3"
-TEMPFIELD4_FIELD_NAME = "TempField4"
-TEMPFIELD5_FIELD_NAME = "TempField5"
 
-HEADER_FIELD_IDX = 4  # index starts at zero
+IO_FLDS = {
+    'uuid': "UUID (DO NOT EDIT)",
+    'header': "Header",
+    'image': "Image",
+    'footer': "Footer",
+    'remarks': "Anmerkungen",
+    'sources': "Quellen",
+    'extra1': "Extra 1",
+    'extra2': "Extra 2",
+    'qmask': "Question Mask",
+    'amask': "Answer Mask",
+    'fmask': "Full Mask"
+}
 
-ImageQA_qfmt = """\
+IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
+                "extra1", "extra2", "qmask", "amask", "fmask"]
+
+IO_MODEL_NAME = "Image Occlusion Enhanced"
+IO_CARD_NAME = "IO Card"
+
+iocard_front = """\
 {{#%(src_img)s}}
 <div id="io-title">{{%(header)s}}</div>
 <div id="io-wrapper">
@@ -66,18 +72,18 @@ ImageQA_qfmt = """\
 <div id="io-footer">{{%(footer)s}}</div>
 {{/%(src_img)s}}
 """ % \
- {'que': QUESTION_FIELD_NAME,
-  'svg': SVG_FIELD_NAME,
-  'src_img': ORIGINAL_IMAGE_FIELD_NAME,
-  'header': HEADER_FIELD_NAME,
-  'footer': FOOTER_FIELD_NAME,
-  'remarks': REMARKS_FIELD_NAME,
-  'sources': SOURCES_FIELD_NAME,
-  'tempfield3': TEMPFIELD3_FIELD_NAME,
-  'tempfield4': TEMPFIELD4_FIELD_NAME,
-  'tempfield5': TEMPFIELD5_FIELD_NAME}
+ {'que': IO_FLDS['qmask'],
+  'ans': IO_FLDS['amask'],
+  'svg': IO_FLDS['fmask'],
+  'src_img': IO_FLDS['image'],
+  'header': IO_FLDS['header'],
+  'footer': IO_FLDS['footer'],
+  'remarks': IO_FLDS['remarks'],
+  'sources': IO_FLDS['sources'],
+  'extra1': IO_FLDS['extra1'],
+  'extra2': IO_FLDS['extra2']}
 
-ImageQA_afmt = """\
+iocard_back = """\
 {{#%(src_img)s}}
 <div id="io-title">{{%(header)s}}</div>
 <div id="io-wrapper">
@@ -103,18 +109,18 @@ ImageQA_afmt = """\
 </div>
 {{/%(src_img)s}}
 """ % \
- {'ans': ANSWER_FIELD_NAME,
-  'svg': SVG_FIELD_NAME,
-  'src_img': ORIGINAL_IMAGE_FIELD_NAME,
-  'header': HEADER_FIELD_NAME,
-  'footer': FOOTER_FIELD_NAME,
-  'remarks': REMARKS_FIELD_NAME,
-  'sources': SOURCES_FIELD_NAME,
-  'tempfield3': TEMPFIELD3_FIELD_NAME,
-  'tempfield4': TEMPFIELD4_FIELD_NAME,
-  'tempfield5': TEMPFIELD5_FIELD_NAME}
+ {'que': IO_FLDS['qmask'],
+  'ans': IO_FLDS['amask'],
+  'svg': IO_FLDS['fmask'],
+  'src_img': IO_FLDS['image'],
+  'header': IO_FLDS['header'],
+  'footer': IO_FLDS['footer'],
+  'remarks': IO_FLDS['remarks'],
+  'sources': IO_FLDS['sources'],
+  'extra1': IO_FLDS['extra1'],
+  'extra2': IO_FLDS['extra2']}
 
-ImageQA_css = """\
+iocard_css = """\
 .card {
   font-family: "Helvetica LT Std", Helvetica, Arial, Sans;
   font-size: 150%;
@@ -163,60 +169,40 @@ ImageQA_css = """\
 """
 
 def add_image_QA_model(col):
-    mm = col.models
-    m = mm.new(IMAGE_QA_MODEL_NAME)
-    # Add core fields:
-    question_field = mm.newField(QUESTION_FIELD_NAME)
-    answer_field = mm.newField(ANSWER_FIELD_NAME)
-    svg_field = mm.newField(SVG_FIELD_NAME)
-    original_image_field = mm.newField(ORIGINAL_IMAGE_FIELD_NAME)
-    mm.addField(m, question_field)
-    mm.addField(m, answer_field)
-    mm.addField(m, svg_field)
-    mm.addField(m, original_image_field)
-    # Add other fields
-    header_field = mm.newField(HEADER_FIELD_NAME)
-    footer_field = mm.newField(FOOTER_FIELD_NAME)
-    remarks_field = mm.newField(REMARKS_FIELD_NAME)
-    sources_field = mm.newField(SOURCES_FIELD_NAME)
-    tempfield3_field = mm.newField(TEMPFIELD3_FIELD_NAME)
-    tempfield4_field = mm.newField(TEMPFIELD4_FIELD_NAME)
-    tempfield5_field = mm.newField(TEMPFIELD5_FIELD_NAME)
-    mm.addField(m, header_field)
-    mm.addField(m, footer_field)
-    mm.addField(m, remarks_field)
-    mm.addField(m, sources_field)
-    mm.addField(m, tempfield3_field)
-    mm.addField(m, tempfield4_field)
-    mm.addField(m, tempfield5_field)
-    mm.setSortIdx(m, HEADER_FIELD_IDX)
+    models = col.models
+    iomodel = models.new(IO_MODEL_NAME)
+    # Add fields:
+    for i in IO_FLDORDER:
+      fld = models.newField(IO_FLDS[i])
+      if i == "uuid":
+        fld['size'] = 0
+      models.addField(iomodel, fld)
     # Add template
-    t = mm.newTemplate("Image Q/A")
-    t['qfmt'] = ImageQA_qfmt
-    t['afmt'] = ImageQA_afmt
-    m['css'] = ImageQA_css
-    # set sortfield to header
-    m['sortf'] = 4
-    mm.addTemplate(m, t)
-    mm.add(m)
-    return m
+    template = models.newTemplate(IO_CARD_NAME)
+    template['qfmt'] = iocard_front
+    template['afmt'] = iocard_back
+    iomodel['css'] = iocard_css
+    iomodel['sortf'] = 1 # set sortfield to header
+    models.addTemplate(iomodel, template)
+    models.add(iomodel)
+    return iomodel
 
 
 def update_qfmt_afmt(col):
-    m = col.models.byName(IMAGE_QA_MODEL_NAME)
+    iomodel = col.models.byName(IO_MODEL_NAME)
     # We are assuming that the template list contains only one element.
     # This will be true as long as no one has been trampling the model.
-    t = m['tmpls'][0]
-    t['qfmt'] = ImageQA_qfmt
-    t['afmt'] = ImageQA_afmt
-    t['css'] = ImageQA_css
-    return m
+    template = iomodel['tmpls'][0]
+    template['qfmt'] = iocard_front
+    template['afmt'] = iocard_back
+    template['css'] = iocard_css
+    return iomodel
 
 ###############################################################
 
 
 def gen_uniq():
-    uniq = hashlib.sha1(str(time.clock())).hexdigest()
+    uniq = str(uuid.uuid4()).replace("-","")
     return uniq
 
 def new_bnames(col, media_dir, original_fname):
@@ -232,11 +218,12 @@ def new_bnames(col, media_dir, original_fname):
     else:
         d[original_file_base_name]=original_file_base_name
 
-    uniq_prefix = gen_uniq() + "_"
+    iouuid = gen_uniq()
+    d['uuid'] = iouuid
 
     bnames = os.listdir(media_dir)
     for bname in bnames:
-        hash_bname = uniq_prefix + bname
+        hash_bname = iouuid + '_' + bname
         os.rename(os.path.join(media_dir, bname),
                   os.path.join(media_dir, hash_bname))
 
@@ -255,40 +242,56 @@ def fname2img(fname):
     return '<img src="' + fname + '" />'
 
 
-def add_QA_note(col, fname_q, fname_a, tags, fname_svg,
+def add_QA_note(col, uuid, fname_q, fname_a, tags, fname_svg,
                 fname_original, header, footer, remarks, sources, 
-                tempfield3, tempfield4, tempfield5, did):
+                extra1, extra2, did):
 
-    m = col.models.byName(IMAGE_QA_MODEL_NAME)
-    m['did'] = did
-    n = notes.Note(col, model=m)
-    n.fields = [fname2img(fname_q),
-                fname2img(fname_a),
-                fname2img(fname_svg),
-                fname2img(fname_original),
+    model = col.models.byName(IO_MODEL_NAME)
+    model['did'] = did
+    nnote = notes.Note(col, model=model)
+
+
+
+    # for i in IO_FLDS.keys():
+    #     fld = IO_FLDS[i]
+    #     nnote[fld] = 
+
+    # IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
+    #                 "extra1", "extra2", "qmask", "amask", "fmask"]
+
+
+    # static order, this is temporary
+    nnote.fields = [
+                uuid,
                 header,
+                fname2img(fname_original),
                 footer,
                 remarks,
                 sources,
-                tempfield3,
-                tempfield4,
-                tempfield5]
+                extra1,
+                extra2,
+                fname2img(fname_q),
+                fname2img(fname_a),
+                fname2img(fname_svg)
+                ]
 
     for tag in tags:
-        n.addTag(tag)
+        nnote.addTag(tag)
 
-    col.addNote(n)
+    col.addNote(nnote)
 
-    return n
+    return nnote
 
 
 def add_QA_notes(col, fnames_q, fnames_a, tags, media_dir, svg_fname,
                  fname_original, header, footer, remarks, sources, 
-                 tempfield3, tempfield4, tempfield5, did):
+                 extra1, extra2, did):
     d = new_bnames(col, media_dir, fname_original)
     nrOfNotes = 0
     for (q, a) in zip(fnames_q, fnames_a):
+        uuid = d['uuid'] + '-' + str(nrOfNotes+1)
         add_QA_note(col,
+                    uuid,
                     d[os.path.basename(q)],
                     d[os.path.basename(a)],
                     tags,
@@ -298,9 +301,8 @@ def add_QA_notes(col, fnames_q, fnames_a, tags, media_dir, svg_fname,
                     footer,
                     remarks,
                     sources,
-                    tempfield3,
-                    tempfield4,
-                    tempfield5,
+                    extra1,
+                    extra2,
                     did)
         nrOfNotes += 1
     return nrOfNotes
@@ -309,17 +311,17 @@ def add_QA_notes(col, fnames_q, fnames_a, tags, media_dir, svg_fname,
 # Updates the GUI and shows a tooltip
 def gui_add_QA_notes(fnames_q, fnames_a, media_dir, tags, svg_fname,
                      fname_original, header, footer, remarks, sources, 
-                     tempfield3, tempfield4, tempfield5, did):
+                     extra1, extra2, did):
     col = mw.col
     mm = col.models
-    if not mm.byName(IMAGE_QA_MODEL_NAME):  # first time addon is run
+    if not mm.byName(IO_MODEL_NAME):  # first time addon is run
         add_image_QA_model(col)
-    m = mm.byName(IMAGE_QA_MODEL_NAME)
+    m = mm.byName(IO_MODEL_NAME)
 
     nrOfNotes = add_QA_notes(col, fnames_q, fnames_a,
                              tags, media_dir, svg_fname,
                              fname_original, header, footer, remarks, sources, 
-                             tempfield3, tempfield4, tempfield5, did)
+                             extra1, extra2, did)
     rm_media_dir(media_dir)  # removes the media and the directory
 
     #  We must update the GUI so that the user knows that cards have

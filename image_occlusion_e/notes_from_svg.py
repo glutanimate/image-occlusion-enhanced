@@ -33,7 +33,7 @@ useless_attribs = ['opacity',
 
 def add_notes_non_overlapping(svg, q_color, tags, fname_original,
                               header, footer, remarks, sources, 
-                              tempfield3, tempfield4, tempfield5, did):
+                              extra1, extra2, did):
     svg = copy.deepcopy(svg)
 
     # The index of the shapes layer
@@ -82,14 +82,14 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
     add_notes.gui_add_QA_notes(fnames_q_svg, fnames_a_svg,
                                media_dir, tags, svg_fname, fname_original,
                                header, footer, remarks, sources, 
-                               tempfield3, tempfield4, tempfield5, did)
+                               extra1, extra2, did)
 
     return media_dir
 
 
 def add_notes_overlapping(svg, q_color, tags, fname_original,
                           header, footer, remarks, sources, 
-                          tempfield3, tempfield4, tempfield5, did):
+                          extra1, extra2, did):
     
     svg = copy.deepcopy(svg)
 
@@ -148,6 +148,6 @@ def add_notes_overlapping(svg, q_color, tags, fname_original,
     add_notes.gui_add_QA_notes(fnames_q_svg, [fname_a_svg]*nr_of_cards,
                                media_dir, tags, svg_fname, fname_original,
                                header, footer, remarks, sources, 
-                               tempfield3, tempfield4, tempfield5, did)
+                               extra1, extra2, did)
 
     return media_dir

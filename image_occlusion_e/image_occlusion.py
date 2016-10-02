@@ -17,9 +17,10 @@ import sys
 import re
 import tempfile
 
-#from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui
 
 from aqt import mw, utils, webview, deckchooser, tagedit
+from aqt.fields import FieldDialog
 from aqt.qt import *
 from anki import hooks
 from anki.utils import json
@@ -60,16 +61,29 @@ svg_edit_url.setQueryItems([('initStroke[opacity]', '1'),
                             ('extensions', svg_edit_extensions)])
 
 FILE_DIALOG_MESSAGE = "Choose Image"
-FILE_DIALOG_FILTER = "Image Files (*.png *jpg *.jpeg *.gif)"
+FILE_DIALOG_FILTER = "Image Files (*.png *jpg *.jpeg)"
 
-IMAGE_QA_MODEL_NAME = "Image Q/A - 2.0 Enhanced"
+IO_MODEL_NAME = "Image Occlusion Enhanced"
 
 default_conf = {'initFill[color]': '00AA7F',
                 'mask_fill_color': 'FF0000',
-                'io-version': '2.0-enhanced'}
+                'io-version': 'enhanced-0.5'}
 
 default_prefs = {"prev_image_dir": os_home_dir}
 
+IO_FLDS = {
+    'uuid': "UUID (DO NOT EDIT)",
+    'header': "Header",
+    'image': "Image",
+    'footer': "Footer",
+    'remarks': "Anmerkungen",
+    'sources': "Quellen",
+    'extra1': "Extra 1",
+    'extra2': "Extra 2",
+    'qmask': "Question Mask",
+    'amask': "Answer Mask",
+    'fmask': "Full Mask"
+}
 
 def load_prefs(self):
 
@@ -110,42 +124,26 @@ class ImageOcc_Add(QtCore.QObject):
         super(QtCore.QObject, self).__init__()
         self.ed = ed
         self.mw = mw
-
-        global header_field
-        global footer_field
-        global remarks_field
-        global sources_field
-
-        self.reuse_note = False
+        self.editing = False
+        self.onote = {}
 
         # load preferences
         load_prefs(self)
 
     def add_notes(self):
         # retrieve field names
-        global header_field
-        global footer_field
-        global remarks_field
-        global sources_field
-        header_field = "Header"
-        footer_field = "Footer"
-        remarks_field = "Remarks"
-        sources_field = "Sources"
-        nm = self.mw.col.models.byName(IMAGE_QA_MODEL_NAME)
+        nm = self.mw.col.models.byName(IO_MODEL_NAME)
         if nm:
             nm_fields = self.mw.col.models.fieldNames(nm)
-            if len(nm_fields) != 11:
+            # check if all fields in nm_fields
+            if not all(x in nm_fields for x in IO_FLDS.values()):
                 utils.showWarning(\
                     '<b>Error:</b><br><br>Image Occlusion note type not configured properly.\
-                    Please make sure you did not add, delete, or reposition any fields.\
+                    Please make sure you did not delete or rename any of the essential fields.\
                     <br><br>You can find more information on this error message here: \
                     <a href="' + image_occlusion_help_link + '/Customization#a-note-of-warning">\
                     Wiki - Note Type Customization</a>')
                 return
-            header_field = nm_fields[4]
-            footer_field = nm_fields[5]
-            remarks_field = nm_fields[6]
-            sources_field = nm_fields[7]
                 
         # retrieve last used image directory
         prev_image_dir = self.prefs["prev_image_dir"]
@@ -157,63 +155,44 @@ class ImageOcc_Add(QtCore.QObject):
 
         existing_image = False
 
-        orig_tags = None
-        orig_svg = None
-        orig_svg_path = None
-        orig_image = None
-        orig_header = None
-        orig_footer = None
-        orig_remarks = None
-        orig_sources = None
-        orig_tempfield3 = None
-        orig_tempfield4 = None
-        orig_tempfield5 = None
+        onote = self.onote
+
+        for i in IO_FLDS.keys():
+            onote[i] = None
+
+        note = self.ed.note
 
         # preserve tags and sources if available
-        orig_tags = self.ed.tags.text()
-        if sources_field in self.ed.note:
-            orig_sources = self.ed.note[sources_field]
-
-        # if current note is Image Occlusion note try to copy all available fields
-        model_name = self.ed.note.model()["name"]
-        if model_name == IMAGE_QA_MODEL_NAME:
-            orig_svg = self.ed.note.fields[2]
-            orig_image = self.ed.note.fields[3]
-            orig_header = self.ed.note.fields[4].replace('<br />', '\n')
-            orig_footer = self.ed.note.fields[5].replace('<br />', '\n')
-            orig_remarks = self.ed.note.fields[6].replace('<br />', '\n')
-            orig_sources = self.ed.note.fields[7].replace('<br />', '\n')
-            orig_tempfield3 = self.ed.note.fields[8].replace('<br />', '\n')
-            orig_tempfield4 = self.ed.note.fields[9].replace('<br />', '\n')
-            orig_tempfield5 = self.ed.note.fields[10].replace('<br />', '\n')
-            patt = r"""<img.*?src=(["'])(.*?)\1"""
-            pattern = re.compile(patt, flags=re.I|re.M|re.S)    
-            m = pattern.search(orig_image)
-            n = pattern.search(orig_svg)
-            image_path = None
-            svg_path = None
-            if(m):
-                imagename = m.group(2)
-                valid_ext = imagename.endswith((".jpg",".jpeg",".gif",".png"))
-                image_path_old = os.path.join(mw.col.media.dir(),m.group(2))
-                if valid_ext and os.path.isfile(image_path_old):
-                    image_path = image_path_old
-            if(n):
-                svgname = n.group(2)
-                valid_ext = svgname.endswith(".svg")
-                svg_path_old = os.path.join(mw.col.media.dir(),n.group(2))
-                if valid_ext and os.path.isfile(svg_path_old):
-                    orig_svg_path = svg_path_old
-
-            if image_path and orig_svg_path:
-               self.reuse_note = True
-
+        onote["tags"] = self.ed.tags.text()
+        if IO_FLDS["sources"] in note:
+            onote["sources"] = note[IO_FLDS["sources"]]
 
         # Decide on what image source to use
 
-        # 1: create new IO note based on existing one
-        if self.reuse_note == True:
-            pass
+        # 1: Edit existing note if note type is set to IO
+        if note.model()["name"] == IO_MODEL_NAME:
+            self.editing = True
+            imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
+            imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
+            for i in onote.keys():
+                if i == "tags":
+                    continue
+                fld = IO_FLDS[i]
+                if i in ["uuid", "qmask", "amask"]:
+                    onote[i] = note[fld]
+                elif i in ["image", "fmask"]:
+                    html = note[fld]
+                    fname = imgregex.search(html).group(2)
+                    fpath = os.path.join(mw.col.media.dir(),fname)
+                    if not os.path.isfile(fpath):
+                        print "Not a valid %s field file. Exiting."
+                        return
+                    onote[i] = fpath
+                else:
+                    onote[i] = note[fld].replace('<br />', '\n')
+
+            self.mw.io_image_path = onote["image"]
+               
 
         # 2: use first image found in note, regardless of note type
         elif existing_image:
@@ -223,19 +202,8 @@ class ImageOcc_Add(QtCore.QObject):
         elif clip.mimeData().imageData():
             handle, image_path = tempfile.mkstemp(suffix='.png')
             clip.image().save(image_path)
-            self.mw.image_occlusion2_image_path = image_path
+            self.mw.io_image_path = image_path
             clip.clear()
-            #  Simple hack to catch an error. I still don't know
-            #  the cause of the error (tmbb).
-            try:
-                self.call_ImageOcc_Editor(self.mw.image_occlusion2_image_path, orig_tags, 
-                                          orig_header, orig_footer, orig_remarks, orig_sources, 
-                                          orig_svg_path)
-            except:
-                image_path = QtGui.QFileDialog.getOpenFileName(None,  # parent
-                                                      FILE_DIALOG_MESSAGE,
-                                                      prev_image_dir,
-                                                      FILE_DIALOG_FILTER)
 
         # 4: prompt user to select image
         else:
@@ -243,26 +211,21 @@ class ImageOcc_Add(QtCore.QObject):
                                                        FILE_DIALOG_MESSAGE,
                                                        prev_image_dir,
                                                        FILE_DIALOG_FILTER)
-       
+            self.mw.io_image_path = image_path
 
 
         # Call Image Occlusion Editor on path
         if image_path:
-            self.mw.image_occlusion2_image_path = image_path
+            self.call_ImageOcc_Editor()
             # store image directory in local preferences,
             # but only if image not in the media collection or temporary directory
             if os.path.dirname(image_path) not in [mw.col.media.dir(), tempfile.gettempdir()]:
                 self.prefs["prev_image_dir"] = os.path.dirname( image_path )
                 save_prefs(self)
 
-            self.call_ImageOcc_Editor(self.mw.image_occlusion2_image_path, orig_tags,
-                                      orig_header, orig_footer, orig_remarks, orig_sources, 
-                                      orig_svg_path)
+    def call_ImageOcc_Editor(self):
 
-    def call_ImageOcc_Editor(self, path, orig_tags, orig_header, orig_footer, 
-                             orig_remarks, orig_sources, orig_svg_path):
-
-        d = svgutils.image2svg(path, orig_svg_path)
+        d = svgutils.image2svg(self.mw.io_image_path, self.onote["fmask"])
         svg = d['svg']
         svg_b64 = d['svg_b64']
         height = d['height']
@@ -281,7 +244,7 @@ class ImageOcc_Add(QtCore.QObject):
             mw.ImageOcc_Editor.svg_edit.eval(command)
 
             # update pyobj with new instance
-            ## this is necessary for instance variables (e.g. self.reuse_note) to get 
+            ## this is necessary for instance variables (e.g. self.editing) to get 
             ## updated properly in the add_notes_* functions.
             ## TODO: understand what's going on and find a better solution
             mw.ImageOcc_Editor.svg_edit.\
@@ -290,23 +253,25 @@ class ImageOcc_Add(QtCore.QObject):
                                addToJavaScriptWindowObject("pyObj", self)
 
             # always copy tags over
-            mw.ImageOcc_Editor.tags_edit.setText(orig_tags)
+            mw.ImageOcc_Editor.tags_edit.setText(self.onote["tags"])
             # only copy sources field if not undefined
-            if orig_sources is not None:
-                mw.ImageOcc_Editor.sources_edit.setPlainText(orig_sources)
+            if self.onote["sources"] is not None:
+                mw.ImageOcc_Editor.sources_edit.setPlainText(self.onote["sources"])
             # reuse fields if started from existing i/o note
-            if self.reuse_note:
-                mw.ImageOcc_Editor.header_edit.setPlainText(orig_header)
-                mw.ImageOcc_Editor.footer_edit.setPlainText(orig_footer)
-                mw.ImageOcc_Editor.remarks_edit.setPlainText(orig_remarks)
+            if self.editing:
+                mw.ImageOcc_Editor.header_edit.setPlainText(self.onote["header"])
+                mw.ImageOcc_Editor.footer_edit.setPlainText(self.onote["footer"])
+                mw.ImageOcc_Editor.remarks_edit.setPlainText(self.onote["remarks"])
+                mw.ImageOcc_Editor.extra1_edit.setPlainText(self.onote["extra1"])
+                mw.ImageOcc_Editor.extra2_edit.setPlainText(self.onote["extra2"])
             else:
                 mw.ImageOcc_Editor.reset_main_fields()
 
             # update labels
-            mw.ImageOcc_Editor.header_label.setText(header_field)
-            mw.ImageOcc_Editor.footer_label.setText(footer_field)
-            mw.ImageOcc_Editor.sources_label.setText(sources_field)
-            mw.ImageOcc_Editor.remarks_label.setText(remarks_field)
+            mw.ImageOcc_Editor.header_label.setText(IO_FLDS["header"])
+            mw.ImageOcc_Editor.footer_label.setText(IO_FLDS["footer"])
+            mw.ImageOcc_Editor.sources_label.setText(IO_FLDS["sources"])
+            mw.ImageOcc_Editor.remarks_label.setText(IO_FLDS["remarks"])
             # set tab index
             mw.ImageOcc_Editor.tab_widget.setCurrentIndex(0)
             # set widget focus
@@ -338,56 +303,45 @@ class ImageOcc_Add(QtCore.QObject):
             mw.ImageOcc_Editor.svg_edit.load(url)
 
             # always copy tags over
-            mw.ImageOcc_Editor.tags_edit.setText(orig_tags)
+            mw.ImageOcc_Editor.tags_edit.setText(self.onote["tags"])
             # only copy sources field if not undefined
-            if orig_sources is not None:
-                mw.ImageOcc_Editor.sources_edit.setPlainText(orig_sources)
-            # reuse all fields if started from existing i/o note
-            if self.reuse_note:
-                mw.ImageOcc_Editor.header_edit.setPlainText(orig_header)
-                mw.ImageOcc_Editor.footer_edit.setPlainText(orig_footer)
-                mw.ImageOcc_Editor.remarks_edit.setPlainText(orig_remarks)
+            if self.onote["sources"] is not None:
+                mw.ImageOcc_Editor.sources_edit.setPlainText(self.onote["sources"])
+            # reuse fields if started from existing i/o note
+            if self.editing:
+                mw.ImageOcc_Editor.header_edit.setPlainText(self.onote["header"])
+                mw.ImageOcc_Editor.footer_edit.setPlainText(self.onote["footer"])
+                mw.ImageOcc_Editor.remarks_edit.setPlainText(self.onote["remarks"])
+                mw.ImageOcc_Editor.extra1_edit.setPlainText(self.onote["extra1"])
+                mw.ImageOcc_Editor.extra2_edit.setPlainText(self.onote["extra2"])
 
             mw.ImageOcc_Editor.show()
         
 
     @QtCore.pyqtSlot(str)
-    def add_notes_non_overlapping(self, svg_contents):
+    def onAddNotesButton(self, svg_contents):
         svg = etree.fromstring(svg_contents.encode('utf-8'))
         (mask_fill_color, did, tags, header, footer, remarks, sources, 
-            tempfield3, tempfield4, tempfield5) = get_params_for_add_notes()
+            extra1, extra2) = get_params_for_add_notes()
         # Add notes to the current deck of the collection:
-        add_notes_non_overlapping(svg, mask_fill_color,
-                                  tags, self.mw.image_occlusion2_image_path,
+        mode = None
+        if mode == "nonoverlapping":
+            add_notes_non_overlapping(svg, mask_fill_color,
+                                      tags, self.mw.io_image_path,
+                                      header, footer, remarks, sources, 
+                                      extra1, extra2, did)
+        else:
+            add_notes_overlapping(svg, mask_fill_color,
+                                  tags, self.mw.io_image_path,
                                   header, footer, remarks, sources, 
-                                  tempfield3, tempfield4, tempfield5, did)
+                                  extra1, extra2, did)
         
-        if self.ed.note and not self.reuse_note:
+        if self.ed.note and not self.editing:
             # Update Editor with modified tags and sources field
             self.ed.tags.setText(" ".join(tags))
             self.ed.saveTags()
-            if sources_field in self.ed.note:
-                self.ed.note[sources_field] = sources
-                self.ed.loadNote()
-        self.mw.reset()
-
-    @QtCore.pyqtSlot(str)
-    def add_notes_overlapping(self, svg_contents):
-        svg = etree.fromstring(svg_contents.encode('utf-8'))
-        (mask_fill_color, did, tags, header, footer, remarks, sources, 
-            tempfield3, tempfield4, tempfield5) = get_params_for_add_notes()
-        # Add notes to the current deck of the collection:
-        add_notes_overlapping(svg, mask_fill_color,
-                              tags, self.mw.image_occlusion2_image_path,
-                              header, footer, remarks, sources, 
-                              tempfield3, tempfield4, tempfield5, did)
-
-        if self.ed.note and not self.reuse_note:
-            # Update Editor with modified tags and sources field
-            self.ed.tags.setText(" ".join(tags))
-            self.ed.saveTags()
-            if sources_field in self.ed.note:
-                self.ed.note[sources_field] = sources
+            if IO_FLDS["sources"] in self.ed.note:
+                self.ed.note[IO_FLDS["sources"]] = sources
                 self.ed.loadNote()
         self.mw.reset()
 
@@ -399,15 +353,14 @@ def get_params_for_add_notes():
     footer = mw.ImageOcc_Editor.footer_edit.toPlainText().replace('\n', '<br />')
     remarks = mw.ImageOcc_Editor.remarks_edit.toPlainText().replace('\n', '<br />')
     sources = mw.ImageOcc_Editor.sources_edit.toPlainText().replace('\n', '<br />')
-    tempfield3 = ""
-    tempfield4 = ""
-    tempfield5 = ""
+    extra1 = mw.ImageOcc_Editor.extra1_edit.toPlainText().replace('\n', '<br />')
+    extra2 = mw.ImageOcc_Editor.extra2_edit.toPlainText().replace('\n', '<br />')
 	
     # Get deck id:
     did = mw.ImageOcc_Editor.deckChooser.selectedId()
     tags = mw.ImageOcc_Editor.tags_edit.text().split()
     return (mask_fill_color, did, tags, header, footer, remarks, sources, 
-      tempfield3, tempfield4, tempfield5)
+      extra1, extra2)
 
 
 def add_image_occlusion_button(ed):
@@ -444,7 +397,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         # Header
         self.header_edit = QPlainTextEdit()
         self.header_edit.setTabChangesFocus(True)
-        self.header_label = QLabel(header_field)
+        self.header_label = QLabel(IO_FLDS["header"])
         self.header_label.setFixedWidth(70)
 
         header_hbox = QHBoxLayout()
@@ -454,7 +407,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         # Footer
         self.footer_edit = QPlainTextEdit()
         self.footer_edit.setTabChangesFocus(True)
-        self.footer_label = QLabel(footer_field)
+        self.footer_label = QLabel(IO_FLDS["footer"])
         self.footer_label.setFixedWidth(70)
 
         footer_hbox = QHBoxLayout()
@@ -464,7 +417,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         # Remarks
         self.remarks_edit = QPlainTextEdit()
         self.remarks_edit.setTabChangesFocus(True)
-        self.remarks_label = QLabel(remarks_field)
+        self.remarks_label = QLabel(IO_FLDS["remarks"])
         self.remarks_label.setFixedWidth(70)
 
         remarks_hbox = QHBoxLayout()
@@ -474,12 +427,34 @@ class ImageOcc_Editor(QtGui.QWidget):
         # Sources
         self.sources_edit = QPlainTextEdit()
         self.sources_edit.setTabChangesFocus(True)
-        self.sources_label = QLabel(sources_field)
+        self.sources_label = QLabel(IO_FLDS["sources"])
         self.sources_label.setFixedWidth(70)
 
         sources_hbox = QHBoxLayout()
         sources_hbox.addWidget(self.sources_label)
         sources_hbox.addWidget(self.sources_edit)
+
+        # Extra 1
+
+        self.extra1_edit = QPlainTextEdit()
+        self.extra1_edit.setTabChangesFocus(True)
+        self.extra1_label = QLabel(IO_FLDS["extra1"])
+        self.extra1_label.setFixedWidth(70)
+
+        extra1_hbox = QHBoxLayout()
+        extra1_hbox.addWidget(self.extra1_label)
+        extra1_hbox.addWidget(self.extra1_edit)
+
+        # Extra 2
+
+        self.extra2_edit = QPlainTextEdit()
+        self.extra2_edit.setTabChangesFocus(True)
+        self.extra2_label = QLabel(IO_FLDS["extra2"])
+        self.extra2_label.setFixedWidth(70)
+
+        extra2_hbox = QHBoxLayout()
+        extra2_hbox.addWidget(self.extra2_label)
+        extra2_hbox.addWidget(self.extra2_edit)
 
         # Tags
         self.tags_edit = tagedit.TagEdit(self)
@@ -511,6 +486,8 @@ class ImageOcc_Editor(QtGui.QWidget):
         vbox2.addLayout(footer_hbox)
         vbox2.addLayout(remarks_hbox)
         vbox2.addLayout(sources_hbox)
+        vbox2.addLayout(extra1_hbox)
+        vbox2.addLayout(extra2_hbox)
         vbox2.addLayout(tags_hbox)
         vbox2.addWidget(deck_container)
 
@@ -575,37 +552,30 @@ class ImageOcc_Editor(QtGui.QWidget):
         self.setWindowTitle('Image Occlusion Enhanced Editor')
 
         # Define and connect key bindings
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_Tab), self), 
             QtCore.SIGNAL('activated()'), self.switch_tabs)
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_R), self), 
             QtCore.SIGNAL('activated()'), self.reset_main_fields)
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_R), self), 
             QtCore.SIGNAL('activated()'), self.reset_all_fields)
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_1), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.header_edit))
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_2), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.footer_edit))
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_3), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.remarks_edit))
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_4), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.sources_edit))
-
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_5), self), 
+            QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.extra1_edit))
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_6), self), 
+            QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.extra2_edit))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_D), self), 
             QtCore.SIGNAL('activated()'), deck_container.setFocus)
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_T), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.tags_edit))
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_I), self), 
             QtCore.SIGNAL('activated()'), self.svg_edit.setFocus)
-
         self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_F), self), 
             QtCore.SIGNAL('activated()'), self.fit_image_canvas)
 
@@ -645,14 +615,14 @@ class ImageOcc_Editor(QtGui.QWidget):
     def add_nonoverlapping(self): 
         command = """
           var svg_contents = svgCanvas.svgCanvasToString();
-          pyObj.add_notes_non_overlapping(svg_contents);
+          pyObj.onAddNotesButton(svg_contents, "nonoverlapping");
         """
         self.svg_edit.eval(command)
 
     def add_overlapping(self): 
         command = """
           var svg_contents = svgCanvas.svgCanvasToString();
-          pyObj.add_notes_overlapping(svg_contents);
+          pyObj.onAddNotesButton(svg_contents, "overlapping");
         """
         self.svg_edit.eval(command)
 
@@ -749,6 +719,11 @@ class ImageOcc_Options(QtGui.QWidget):
 def invoke_ImageOcc_help():
     utils.openLink(image_occlusion_help_link)
 
+# def overrideMinFont(self):
+#     print("asdf")
+#     self.form.fontSize.setMinimum(0)
+
+
 mw.ImageOcc_Options = ImageOcc_Options(mw)
 
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
@@ -766,3 +741,5 @@ mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
 hooks.addHook('setupEditorButtons', add_image_occlusion_button)
+
+# FieldDialog.setupSignals = hooks.wrap(FieldDialog.setupSignals, overrideMinFont, "after")
