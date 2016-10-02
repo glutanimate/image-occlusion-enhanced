@@ -18,7 +18,7 @@ import urllib
 
 
 from Imaging.PIL import Image  # PIL.Image will only be used in 3 lines of code
-from lxml import etree
+import etree.ElementTree as etree
 
 image_layer_index = 0
 labels_layer_index = 1
