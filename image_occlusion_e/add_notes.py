@@ -18,15 +18,14 @@ from aqt import mw, utils
 import os
 import sys
 import uuid
-
 import shutil
 
 
 def notes_added_message(nrOfNotes):
     if nrOfNotes == 1:
-        msg = "<b>1 note</b> was added to your collection"
+        msg = "<b>1 note</b> has been added to your collection"
     else:
-        msg = "<b>{0} notes</b> were added to your collection".format(nrOfNotes)
+        msg = "<b>{0} notes</b> have been added to your collection".format(nrOfNotes)
     return msg
 
 

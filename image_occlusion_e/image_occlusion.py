@@ -294,7 +294,7 @@ class ImageOcc_Add(QtCore.QObject):
             url.addQueryItem('source', svg_b64)
 
             tags = self.ed.note.tags
-            mw.ImageOcc_Editor = ImageOcc_Editor(tags)
+            mw.ImageOcc_Editor = ImageOcc_Editor(self, tags)
 
             mw.ImageOcc_Editor.svg_edit.\
                                page().\
@@ -318,13 +318,13 @@ class ImageOcc_Add(QtCore.QObject):
             mw.ImageOcc_Editor.show()
         
 
-    @QtCore.pyqtSlot(str)
-    def onAddNotesButton(self, svg_contents):
+    def onAddNotesButton(self, IoEd, mode):
+        svg_edit = IoEd.svg_edit
+        svg_contents = svg_edit.page().mainFrame().evaluateJavaScript("svgCanvas.svgCanvasToString()")
         svg = etree.fromstring(svg_contents.encode('utf-8'))
         (mask_fill_color, did, tags, header, footer, remarks, sources, 
             extra1, extra2) = get_params_for_add_notes()
         # Add notes to the current deck of the collection:
-        mode = None
         if mode == "nonoverlapping":
             add_notes_non_overlapping(svg, mask_fill_color,
                                       tags, self.mw.io_image_path,
@@ -371,8 +371,9 @@ def add_image_occlusion_button(ed):
 
 
 class ImageOcc_Editor(QtGui.QWidget):
-    def __init__(self, tags):
+    def __init__(self, IoAdd, tags):
         super(ImageOcc_Editor, self).__init__()
+        self.IoAdd = IoAdd
         self.initUI(tags)
         utils.restoreGeom(self, "imageOccEditor")
 
@@ -385,92 +386,64 @@ class ImageOcc_Editor(QtGui.QWidget):
 
         # Define UI elements
 
-        ## First tab
-
-        # svg-edit
         self.svg_edit = webview.AnkiWebView()
-        self.svg_edit.setCanFocus(True)
-        # focus is necessary for hotkeys to work
+        self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
 
-        ## Second Tab
-
-        # Header
         self.header_edit = QPlainTextEdit()
-        self.header_edit.setTabChangesFocus(True)
         self.header_label = QLabel(IO_FLDS["header"])
-        self.header_label.setFixedWidth(70)
-
         header_hbox = QHBoxLayout()
         header_hbox.addWidget(self.header_label)
         header_hbox.addWidget(self.header_edit)
 
-        # Footer
         self.footer_edit = QPlainTextEdit()
-        self.footer_edit.setTabChangesFocus(True)
         self.footer_label = QLabel(IO_FLDS["footer"])
-        self.footer_label.setFixedWidth(70)
-
         footer_hbox = QHBoxLayout()
         footer_hbox.addWidget(self.footer_label)
         footer_hbox.addWidget(self.footer_edit)
 
-        # Remarks
         self.remarks_edit = QPlainTextEdit()
-        self.remarks_edit.setTabChangesFocus(True)
         self.remarks_label = QLabel(IO_FLDS["remarks"])
-        self.remarks_label.setFixedWidth(70)
-
         remarks_hbox = QHBoxLayout()
         remarks_hbox.addWidget(self.remarks_label)
         remarks_hbox.addWidget(self.remarks_edit)
 
-        # Sources
         self.sources_edit = QPlainTextEdit()
-        self.sources_edit.setTabChangesFocus(True)
         self.sources_label = QLabel(IO_FLDS["sources"])
-        self.sources_label.setFixedWidth(70)
-
         sources_hbox = QHBoxLayout()
         sources_hbox.addWidget(self.sources_label)
         sources_hbox.addWidget(self.sources_edit)
 
-        # Extra 1
-
         self.extra1_edit = QPlainTextEdit()
-        self.extra1_edit.setTabChangesFocus(True)
         self.extra1_label = QLabel(IO_FLDS["extra1"])
-        self.extra1_label.setFixedWidth(70)
-
         extra1_hbox = QHBoxLayout()
         extra1_hbox.addWidget(self.extra1_label)
         extra1_hbox.addWidget(self.extra1_edit)
 
-        # Extra 2
-
         self.extra2_edit = QPlainTextEdit()
-        self.extra2_edit.setTabChangesFocus(True)
         self.extra2_label = QLabel(IO_FLDS["extra2"])
-        self.extra2_label.setFixedWidth(70)
-
         extra2_hbox = QHBoxLayout()
         extra2_hbox.addWidget(self.extra2_label)
         extra2_hbox.addWidget(self.extra2_edit)
 
-        # Tags
         self.tags_edit = tagedit.TagEdit(self)
         self.tags_edit.setText(" ".join(tags))
         self.tags_edit.setCol(mw.col)
-        tags_label = QLabel("Tags")
-        tags_label.setFixedWidth(70)
-
+        self.tags_label = QLabel("Tags")
         tags_hbox = QHBoxLayout()
-        tags_hbox.addWidget(tags_label)
+        tags_hbox.addWidget(self.tags_label)
         tags_hbox.addWidget(self.tags_edit)
 
-        # Deck chooser
         deck_container = QGroupBox()
         self.deckChooser = deckchooser.DeckChooser(mw, deck_container,
-                                                   label=True)       
+                                                   label=True) 
+
+        for i in [self.header_edit, self.footer_edit, self.remarks_edit, 
+            self.sources_edit, self.extra1_edit, self.extra2_edit]:
+            i.setTabChangesFocus(True)
+
+        for i in [self.header_label, self.footer_label, self.remarks_label, 
+            self.sources_label, self.extra1_label, self.extra2_label, self.tags_label]:
+            i.setFixedWidth(70)        
 
         # Set layout up
 
@@ -613,18 +586,10 @@ class ImageOcc_Editor(QtGui.QWidget):
         self.sources_edit.setPlainText("")
 
     def add_nonoverlapping(self): 
-        command = """
-          var svg_contents = svgCanvas.svgCanvasToString();
-          pyObj.onAddNotesButton(svg_contents, "nonoverlapping");
-        """
-        self.svg_edit.eval(command)
+        ImageOcc_Add.onAddNotesButton(self.IoAdd, self, "nonoverlapping")
 
     def add_overlapping(self): 
-        command = """
-          var svg_contents = svgCanvas.svgCanvasToString();
-          pyObj.onAddNotesButton(svg_contents, "overlapping");
-        """
-        self.svg_edit.eval(command)
+        ImageOcc_Add.onAddNotesButton(self.IoAdd, self, "overlapping")
 
     def fit_image_canvas(self):
         command = "svgCanvas.zoomChanged('', 'canvas');"
