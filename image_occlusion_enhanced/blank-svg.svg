@@ -1,12 +1,8 @@
-
-<svg>
- <g>
-  <title>Picture</title>
- </g>
+<svg xmlns="http://www.w3.org/2000/svg">
  <g>
   <title>Labels</title>
  </g>
  <g>
-  <title>Shapes</title>
+  <title>Masks</title>
  </g>
 </svg>

@@ -20,9 +20,8 @@ import urllib
 from Imaging.PIL import Image  # PIL.Image will only be used in 3 lines of code
 import etree.ElementTree as etree
 
-image_layer_index = 0
-labels_layer_index = 1
-shapes_layer_index = 2
+labels_layer_index = 0
+shapes_layer_index = 1
 
 blank_svg_path = os.path.join(os.path.dirname(__file__),
                              "blank-svg.svg")
@@ -41,66 +40,28 @@ def strip_attributes(root, attrs):
         except:
             pass
         # only remove attributes for elements in shapes layer
-        if title == "Shapes":
+        if title == "Masks":
             for attr in attrs:
                 elt.attrib.pop(attr, None)
 
 
-def image2svg(im_path, orig_svg_path, embed_image=True):
-    ### Only part of the code that uses PIL ######
-    im = Image.open(im_path)
-    width, height = im.size
-    fmt = im.format.lower()
-    ### End of PIL ###############################
+def imageProp(image_path):
+    image = Image.open(image_path)
+    width, height = image.size
+    return width, height
 
-    if embed_image:
-        f = open(im_path, 'rb')
-        im_contents = f.read()
-        f.close()
-        b64 = base64.b64encode(im_contents)
-        #im_href = "data:image/" + fmt + ";base64," + base64.b64encode(im_contents)
-        im_href = "data:image/{0};base64,{1}".format(fmt, b64)
+def image2svg(im_path, orig_svg_path=None):
+    width, height = imageProp(im_path)
+    if orig_svg_path:
+        doc = etree.parse(orig_svg_path)
+        svg = doc.getroot()
     else:
-        im_href = "file:" + urllib.pathname2url(im_path)
-
-    ### SVG ###
-    doc = etree.parse(blank_svg_path)
-    svg = doc.getroot()
-    svg.set('width', str(width))
-    svg.set('height', str(height))
-    svg.set('xmlns:xlink', "http://www.w3.org/1999/xlink")
-    ### Use descriptive variables for the layers
-    image_layer = svg[image_layer_index]
-    labels_layer = svg[labels_layer_index]
-    shapes_layer = svg[shapes_layer_index]
-    ### Create the 'image' element
-    image = etree.SubElement(image_layer, 'image')
-    image.set('x', '0')
-    image.set('y', '0')
-    image.set('height', str(height))
-    image.set('width', str(width))
-    image.set('xlink:href', im_href)  # encode base64
-    hack_head_string = ' xmlns="http://www.w3.org/2000/svg">'
-    if orig_svg_path is not None:
-        # remove empty labels and shapes layers in svg
-        for layer in [labels_layer, shapes_layer]:
-            svg.remove(layer)
-        orig_svg = etree.parse(orig_svg_path).getroot()
-        # append all elements of original svg in their place
-        for node in orig_svg:
-            svg.append(node)
-        hack_head_string = ' >'
+        doc = etree.parse(blank_svg_path)
+        svg = doc.getroot()
+        svg.set('width', str(width))
+        svg.set('height', str(height))
     svg_content = etree.tostring(svg)
-    #### Very Ugly Hack Ahead !!!
-    # TODO: find a more elegant solution
-    hack_head, hack_body = svg_content.split('\n', 1)
-    hack_head = hack_head[:-1]
-    hack_head = ''.join([hack_head, hack_head_string])
-    svg_content = '\n'.join([hack_head, hack_body])
-    #### END HACK
-
     svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
-
     return {'svg': svg_content,
             'svg_b64': svg_b64,
             'height': height,
@@ -132,7 +93,7 @@ def get_shapes_layer_idx(svg):
             title = svg_ele.find('{' + svg_namespace + '}' + 'title').text
         except:
             title = None
-        if title == "Shapes":
+        if title == "Masks":
             return idx
             break
 

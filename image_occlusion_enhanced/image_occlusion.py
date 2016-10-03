@@ -233,8 +233,13 @@ class ImageOcc_Add(QtCore.QObject):
         d = svgutils.image2svg(self.mw.io_image_path, self.onote["fmask"])
         svg = d['svg']
         svg_b64 = d['svg_b64']
-        height = d['height']
-        width = d['width']
+        print svg
+        print svg_b64
+
+        width, height = svgutils.imageProp(self.mw.io_image_path)
+
+        blank_svg_path = os.path.join(os.path.dirname(__file__),
+                                     "blank-svg.svg")
 
         initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
         url = QtCore.QUrl.fromLocalFile(svg_edit_path)
@@ -242,11 +247,11 @@ class ImageOcc_Add(QtCore.QObject):
         url.addQueryItem('initFill[color]', initFill_color)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', QtCore.QUrl.fromLocalFile(self.mw.io_image_path).toString())
-        #url.addQueryItem('source', svg_b64)
+        url.addQueryItem('source', svg_b64)
 
         tags = self.ed.note.tags
         mw.ImageOcc_Editor = ImageOcc_Editor(self, tags)
-        mw.ImageOcc_Editor.svg_edit.load(url)
+        mw.ImageOcc_Editor.svg_edit.load(url)   
 
         # always copy tags over
         mw.ImageOcc_Editor.tags_edit.setText(self.onote["tags"])

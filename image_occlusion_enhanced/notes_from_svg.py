@@ -36,6 +36,8 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
                               extra1, extra2, did):
     svg = copy.deepcopy(svg)
 
+    print etree.tostring(svg)
+
     # The index of the shapes layer
     curr_shapes_index = get_shapes_layer_idx(svg)
 
@@ -45,12 +47,11 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
     # Get a temporary directory to store the images
     media_dir = tempfile.mkdtemp(prefix="media-for-anki")
 
-    svg_no_pic = copy.deepcopy(svg)
-    svg_no_pic.remove(svg_no_pic[0])
-    strip_attributes(svg_no_pic, useless_attribs)
-    svg_fname = os.path.join(media_dir, "source_svg.svg")
+
+    strip_attributes(svg, useless_attribs)
+    svg_fname = os.path.join(media_dir, "fmask.svg")
     f = open(svg_fname, 'w')
-    f.write(etree.tostring(svg_no_pic))
+    f.write(etree.tostring(svg))
     f.close()
 
     fnames_q_svg = gen_fnames_q(media_dir, nr_of_cards, 'svg')
@@ -102,12 +103,10 @@ def add_notes_overlapping(svg, q_color, tags, fname_original,
     # Get a temporary directory to store the images
     media_dir = tempfile.mkdtemp(prefix="media-for-anki")
 
-    svg_no_pic = copy.deepcopy(svg)
-    svg_no_pic.remove(svg_no_pic[0])
-    strip_attributes(svg_no_pic, useless_attribs)
+    strip_attributes(svg, useless_attribs)
     svg_fname = os.path.join(media_dir, "source_svg.svg")
     f = open(svg_fname, 'w')
-    f.write(etree.tostring(svg_no_pic))
+    f.write(etree.tostring(svg))
     f.close()
 
     fnames_q_svg = gen_fnames_q(media_dir, nr_of_cards, 'svg')
