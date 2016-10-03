@@ -65,8 +65,6 @@ I would also like to thank the following contributors:
 
 *Copyright © 2016 Glutanimate*
 
-*Image Occlusion Enhanced* is licensed under the simplified BSD license.
-
 Third-party open-source software shipped with *Image Occlusion Enhanced*:
 
 - [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik Lundh. Licensed under the [PIL license](http://www.pythonware.com/products/pil/license.htm)
@@ -75,4 +73,6 @@ Third-party open-source software shipped with *Image Occlusion Enhanced*:
 
 - Python [ElementTree toolkit](http://effbot.org/zone/element-index.htm). Copyright (c) 1999-2008 by Fredrik Lundh. See header in `ElementTree.py` for licensing information.
 
-All software in this repository is provided  "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. As usual: Use this add-on at your own risk.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. 
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. As usual: Use this add-on at your own risk.

@@ -86,13 +86,11 @@ I would also like to thank the following contributors:
 - [Abdolmadi Saravi](https://bitbucket.org/amsaravi/) for patching Image Occlusion to reuse existing images in the media collection and on notes
 - [Ank_U](https://bitbucket.org/Ank_U/) for modifying Image Occlusion to support more fields
 
-**License and Warranty**
+## License and Warranty
 
 *Copyright © 2012-2015 tmbb*
 
 *Copyright © 2016 Glutanimate*
-
-*Image Occlusion Enhanced* is licensed under the simplified BSD license.
 
 Third-party open-source software shipped with *Image Occlusion Enhanced*:
 
@@ -102,4 +100,6 @@ Third-party open-source software shipped with *Image Occlusion Enhanced*:
 
 - Python [ElementTree toolkit](http://effbot.org/zone/element-index.htm). Copyright (c) 1999-2008 by Fredrik Lundh. See header in `ElementTree.py` for licensing information.
 
-All software in this repository is provided  "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. As usual: Use this add-on at your own risk.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. 
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. As usual: Use this add-on at your own risk.
