@@ -631,12 +631,14 @@ class ImageOcc_Options(QtGui.QWidget):
 def invoke_ImageOcc_help():
     utils.openLink(image_occlusion_help_link)
 
-def hideIdField(self):
+def hideIdField(self, node, hide=True, focus=False):
     # simple hack that hides the ID field on IO notes
-    if self.note.model()["name"] == IO_MODEL_NAME:
+    if self.note and self.note.model()["name"] == IO_MODEL_NAME:
         self.web.eval("""
                 var idField = document.getElementById('f0');
                 idField.style.display = 'none';
+                var snowFlake = document.getElementById('i0');
+                if (snowFlake) {snowFlake.style.display = 'none';};
             """ )
 
 mw.ImageOcc_Options = ImageOcc_Options(mw)
@@ -656,4 +658,4 @@ mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
 addHook('setupEditorButtons', add_image_occlusion_button)
-Editor.loadNote = wrap(Editor.loadNote, hideIdField, "after")
+Editor.setNote = wrap(Editor.setNote, hideIdField, "after")
