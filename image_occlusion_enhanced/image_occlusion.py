@@ -125,7 +125,7 @@ class ImageOcc_Add(QtCore.QObject):
         # load preferences
         load_prefs(self)
 
-    def add_notes(self):
+    def onEditorButton(self):
         # retrieve field names
         nm = self.mw.col.models.byName(IO_MODEL_NAME)
         if nm:
@@ -147,14 +147,10 @@ class ImageOcc_Add(QtCore.QObject):
             prev_image_dir = os_home_dir     
 
         clip = QApplication.clipboard()
-
         existing_image = False
-
         onote = self.onote
-
         for i in IO_FLDS.keys():
             onote[i] = None
-
         note = self.ed.note
 
         # preserve tags and sources if available
@@ -297,12 +293,10 @@ def get_params_for_add_notes():
       extra1, extra2)
 
 
-def add_image_occlusion_button(ed):
-    ed.image_occlusion = ImageOcc_Add(ed)
-    ed._addButton("new_occlusion", ed.image_occlusion.add_notes,
-            _("Alt+o"), _("Image Occlusion Enhanced (Alt+O)"),
-            canDisable=False)
-
+def onSetupEditorButtons(self):
+    self.image_occlusion = ImageOcc_Add(self)
+    self._addButton("new_occlusion", self.image_occlusion.onEditorButton,
+            _("Alt+o"), _("Image Occlusion Enhanced (Alt+O)"), canDisable=False)
 
 class ImageOcc_Editor(QtGui.QWidget):
     def __init__(self, IoAdd, tags):
@@ -645,16 +639,14 @@ mw.ImageOcc_Options = ImageOcc_Options(mw)
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced Wiki...", mw)
 
-mw.connect(options_action,
-           SIGNAL("triggered()"),
-           mw.ImageOcc_Options.setupUi)
+mw.connect(options_action, SIGNAL("triggered()"), 
+            mw.ImageOcc_Options.setupUi)
 
-mw.connect(help_action,
-           SIGNAL("triggered()"),
-           invoke_ImageOcc_help)
+mw.connect(help_action, SIGNAL("triggered()"),
+            invoke_ImageOcc_help)
 
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
-addHook('setupEditorButtons', add_image_occlusion_button)
+addHook('setupEditorButtons', onSetupEditorButtons)
 Editor.setNote = wrap(Editor.setNote, hideIdField, "after")

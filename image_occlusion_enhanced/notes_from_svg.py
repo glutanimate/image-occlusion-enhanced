@@ -63,7 +63,6 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
         shapes_layer = svg_i[curr_shapes_index]
         set_color_recursive(shapes_layer[i+1], q_color)  # <title>
         set_id(shapes_layer[i+1], 'question-element')
-        svg_i.remove(svg_i[0])
         strip_attributes(svg_i, useless_attribs)
         f = open(fnames_q_svg[i], 'w')
         f.write(etree.tostring(svg_i))
@@ -74,7 +73,6 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
         svg_i = copy.deepcopy(svg)
         shapes_layer = svg_i[curr_shapes_index]
         shapes_layer.remove(shapes_layer[i+1])
-        svg_i.remove(svg_i[0])
         strip_attributes(svg_i, useless_attribs)
         f = open(fnames_a_svg[i], 'w')
         f.write(etree.tostring(svg_i))
@@ -128,7 +126,6 @@ def add_notes_overlapping(svg, q_color, tags, fname_original,
             else:
                 shapes_layer.remove(shape)
             j = j + 1
-        svg_i.remove(svg_i[0])  # remove 'Picture' layer
         strip_attributes(svg_i, useless_attribs)
 
         f = open(fnames_q_svg[i], 'w')
