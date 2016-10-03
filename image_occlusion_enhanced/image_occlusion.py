@@ -229,23 +229,24 @@ class ImageOcc_Add(QtCore.QObject):
             url.addQueryItem('source', svg_b64)
 
         tags = self.ed.note.tags
-        mw.ImageOcc_Editor = ImageOcc_Editor(self, tags)
-        mw.ImageOcc_Editor.svg_edit.load(url)   
+        dialog = ImageOcc_Editor(self, mw, tags)
+        dialog.svg_edit.load(url)   
 
         # always copy tags over
-        mw.ImageOcc_Editor.tags_edit.setText(self.onote["tags"])
+        dialog.tags_edit.setText(self.onote["tags"])
         # only copy sources field if not undefined
         if self.onote["sources"] is not None:
-            mw.ImageOcc_Editor.sources_edit.setPlainText(self.onote["sources"])
+            dialog.sources_edit.setPlainText(self.onote["sources"])
         # reuse fields if started from existing i/o note
         if self.editing:
-            mw.ImageOcc_Editor.header_edit.setPlainText(self.onote["header"])
-            mw.ImageOcc_Editor.footer_edit.setPlainText(self.onote["footer"])
-            mw.ImageOcc_Editor.remarks_edit.setPlainText(self.onote["remarks"])
-            mw.ImageOcc_Editor.extra1_edit.setPlainText(self.onote["extra1"])
-            mw.ImageOcc_Editor.extra2_edit.setPlainText(self.onote["extra2"])
+            dialog.header_edit.setPlainText(self.onote["header"])
+            dialog.footer_edit.setPlainText(self.onote["footer"])
+            dialog.remarks_edit.setPlainText(self.onote["remarks"])
+            dialog.extra1_edit.setPlainText(self.onote["extra1"])
+            dialog.extra2_edit.setPlainText(self.onote["extra2"])
 
-        mw.ImageOcc_Editor.show()
+        dialog.show()
+        dialog.exec_()
         
 
     def onAddNotesButton(self, IoEd, mode):
@@ -298,13 +299,15 @@ def onSetupEditorButtons(self):
     self._addButton("new_occlusion", self.image_occlusion.onEditorButton,
             _("Alt+o"), _("Image Occlusion Enhanced (Alt+O)"), canDisable=False)
 
-class ImageOcc_Editor(QtGui.QWidget):
-    def __init__(self, IoAdd, tags):
-        super(ImageOcc_Editor, self).__init__()
+class ImageOcc_Editor(QDialog):
+    def __init__(self, IoAdd, mw, tags):
+        QDialog.__init__(self, parent=mw)
+        self.mw = mw
         self.IoAdd = IoAdd
         self.editing = self.IoAdd.editing
-        self.initUI(tags)
+        self.setupUi(tags)
         utils.restoreGeom(self, "imageOccEditor")
+
 
     def closeEvent(self, event):
         if mw.pm.profile is not None:
@@ -312,7 +315,7 @@ class ImageOcc_Editor(QtGui.QWidget):
         QWidget.closeEvent(self, event)
         del self
 
-    def initUI(self, tags):
+    def setupUi(self, tags):
 
         # Define UI elements
 
@@ -497,10 +500,6 @@ class ImageOcc_Editor(QtGui.QWidget):
         self.tab_widget.setCurrentIndex(0)
         self.svg_edit.setFocus()
 
-        # Show window
-
-        self.show()
-
     # keybinding related functions
 
     def switch_tabs(self):
@@ -604,8 +603,6 @@ class ImageOcc_Options(QDialog):
         # 2nd row:
         grid.addWidget(initFill_label, 1, 0)
         grid.addWidget(self.initFill_button, 1, 1)
-        # 3rd row:
-        grid.addWidget(note_label, 2, 0, 1, 2)
 
         self.setLayout(grid)
         self.setMinimumWidth(400)
