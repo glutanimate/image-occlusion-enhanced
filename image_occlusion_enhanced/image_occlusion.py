@@ -320,6 +320,7 @@ class ImageOcc_Editor(QtGui.QWidget):
     def __init__(self, IoAdd, tags):
         super(ImageOcc_Editor, self).__init__()
         self.IoAdd = IoAdd
+        self.editing = self.IoAdd.editing
         self.initUI(tags)
         utils.restoreGeom(self, "imageOccEditor")
 
@@ -437,14 +438,24 @@ class ImageOcc_Editor(QtGui.QWidget):
 
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(True)
-        nonoverlapping_button = button_box.addButton("Add &nonoverlapping occlusions",
-                QDialogButtonBox.ActionRole)
-        nonoverlapping_button.setToolTip(
-            "Generate cards where all labels are hidden on each card")
-        overlapping_button = button_box.addButton("Add &overlapping occlusions",
-                QDialogButtonBox.ActionRole)
-        overlapping_button.setToolTip(
-            "Generate cards where only one label is hidden per card")
+        if not self.editing:
+            nonoverlapping_button = button_box.addButton("Add &nonoverlapping occlusions",
+                    QDialogButtonBox.ActionRole)
+            nonoverlapping_button.setToolTip(
+                "Generate cards where all labels are hidden on each card")
+            overlapping_button = button_box.addButton("Add &overlapping occlusions",
+                    QDialogButtonBox.ActionRole)
+            overlapping_button.setToolTip(
+                "Generate cards where only one label is hidden per card")
+        else:
+            edit1_button = button_box.addButton("&Edit notes",
+                    QDialogButtonBox.ActionRole)
+            edit2_button = button_box.addButton("Edit and &switch type",
+                    QDialogButtonBox.ActionRole)
+            nonoverlapping_button = button_box.addButton("New &nonoverlapping notes",
+                    QDialogButtonBox.ActionRole)
+            overlapping_button = button_box.addButton("New &overlapping notes",
+                    QDialogButtonBox.ActionRole)
         close_button = button_box.addButton("&Close",
                 QDialogButtonBox.ActionRole)
         close_button.setToolTip("Close Image Occlusion Editor without generating cards")
