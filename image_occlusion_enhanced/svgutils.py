@@ -40,7 +40,7 @@ def strip_attributes(root, attrs):
         except:
             pass
         # only remove attributes for elements in shapes layer
-        if title == "Masks":
+        if title == "Masks" or title == "Shapes":
             for attr in attrs:
                 elt.attrib.pop(attr, None)
 
@@ -50,23 +50,12 @@ def imageProp(image_path):
     width, height = image.size
     return width, height
 
-def image2svg(im_path, orig_svg_path=None):
-    width, height = imageProp(im_path)
-    if orig_svg_path:
-        doc = etree.parse(orig_svg_path)
-        svg = doc.getroot()
-    else:
-        doc = etree.parse(blank_svg_path)
-        svg = doc.getroot()
-        svg.set('width', str(width))
-        svg.set('height', str(height))
+def svgToBase64(svg_path):
+    doc = etree.parse(svg_path)
+    svg = doc.getroot()
     svg_content = etree.tostring(svg)
     svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
-    return {'svg': svg_content,
-            'svg_b64': svg_b64,
-            'height': height,
-            'width': width}
-
+    return svg_b64
 
 # Copied from 'simplestyle.py', from the Inkscape project
 def parseStyle(s):
@@ -93,7 +82,7 @@ def get_shapes_layer_idx(svg):
             title = svg_ele.find('{' + svg_namespace + '}' + 'title').text
         except:
             title = None
-        if title == "Masks":
+        if title == "Masks" or title == "Shapes":
             return idx
             break
 

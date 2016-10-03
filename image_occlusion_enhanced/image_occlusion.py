@@ -16,7 +16,6 @@ import os
 import sys
 import re
 import tempfile
-import copy
 
 from PyQt4 import QtCore, QtGui
 
@@ -58,9 +57,6 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('initTool', 'rect'),
                        ('text[font_family]', "'Helvetica LT Std', Arial, sans-serif"),
                        ('extensions', svg_edit_extensions)]
-
-FILE_DIALOG_MESSAGE = "Choose Image"
-FILE_DIALOG_FILTER = "Image Files (*.png *jpg *.jpeg)"
 
 IO_MODEL_NAME = "Image Occlusion Enhanced"
 
@@ -198,25 +194,20 @@ class ImageOcc_Add(QtCore.QObject):
         # 1: Edit existing note if note type is set to IO and note valid
         if self.editing:
             image_path = onote["image"]
-
         # 2: use first image found in note, regardless of note type
         elif existing_image:
-            print "Yet to be implemented"
-        
+            print "Yet to be implemented"  
         # 3: use clipboard data for note
         elif clip.mimeData().imageData():
             handle, image_path = tempfile.mkstemp(suffix='.png')
             clip.image().save(image_path)
             clip.clear()
-
         # 4: prompt user to select image
         else:
-            image_path = QtGui.QFileDialog.getOpenFileName(None,  # parent
-                                                       FILE_DIALOG_MESSAGE,
-                                                       prev_image_dir,
-                                                       FILE_DIALOG_FILTER)
-
-
+            image_path = QtGui.QFileDialog.getOpenFileName(self.ed.parentWindow,
+                           "Choose Image",
+                           prev_image_dir,
+                           "Image Files (*.png *jpg *.jpeg *.gif)")
 
         # Call Image Occlusion Editor on path
         if image_path:
@@ -229,25 +220,17 @@ class ImageOcc_Add(QtCore.QObject):
                 save_prefs(self)
 
     def call_ImageOcc_Editor(self):
-
-        d = svgutils.image2svg(self.mw.io_image_path, self.onote["fmask"])
-        svg = d['svg']
-        svg_b64 = d['svg_b64']
-        print svg
-        print svg_b64
-
         width, height = svgutils.imageProp(self.mw.io_image_path)
-
-        blank_svg_path = os.path.join(os.path.dirname(__file__),
-                                     "blank-svg.svg")
-
         initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
         url = QtCore.QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
         url.addQueryItem('initFill[color]', initFill_color)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', QtCore.QUrl.fromLocalFile(self.mw.io_image_path).toString())
-        url.addQueryItem('source', svg_b64)
+
+        if self.editing:
+            svg_b64 = svgutils.svgToBase64(self.onote["fmask"])
+            url.addQueryItem('source', svg_b64)
 
         tags = self.ed.note.tags
         mw.ImageOcc_Editor = ImageOcc_Editor(self, tags)
