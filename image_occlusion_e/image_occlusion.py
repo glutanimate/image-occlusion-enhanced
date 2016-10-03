@@ -49,17 +49,15 @@ svg_edit_dir = os.path.join(os.path.dirname(__file__),
                             'svg-edit-2.6')
 svg_edit_path = os.path.join(svg_edit_dir,
                             'svg-editor.html')
-svg_edit_url = QtCore.QUrl.fromLocalFile(svg_edit_path)
-svg_edit_url_string = svg_edit_url.toString()
 
 #Add all configuration options we know at this point:
 svg_edit_extensions = "ext-image-occlusion.js,ext-arrows.js,ext-markers.js,ext-shapes.js,ext-eyedropper.js"
-svg_edit_url.setQueryItems([('initStroke[opacity]', '1'),
-                            ('initStroke[color]', '2D2D2D'),
-                            ('initStroke[width]', '0'),
-                            ('initTool', 'rect'),
-                            ('text[font_family]', "'Helvetica LT Std', Arial, sans-serif"),
-                            ('extensions', svg_edit_extensions)])
+svg_edit_queryitems = [('initStroke[opacity]', '1'),
+                       ('initStroke[color]', '2D2D2D'),
+                       ('initStroke[width]', '0'),
+                       ('initTool', 'rect'),
+                       ('text[font_family]', "'Helvetica LT Std', Arial, sans-serif"),
+                       ('extensions', svg_edit_extensions)]
 
 FILE_DIALOG_MESSAGE = "Choose Image"
 FILE_DIALOG_FILTER = "Image Files (*.png *jpg *.jpeg)"
@@ -240,9 +238,11 @@ class ImageOcc_Add(QtCore.QObject):
 
         initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
         url = QtCore.QUrl.fromLocalFile(svg_edit_path)
+        url.setQueryItems(svg_edit_queryitems)
         url.addQueryItem('initFill[color]', initFill_color)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-        url.addQueryItem('source', svg_b64)
+        url.addQueryItem('bkgd_url', QtCore.QUrl.fromLocalFile(self.mw.io_image_path).toString())
+        #url.addQueryItem('source', svg_b64)
 
         tags = self.ed.note.tags
         mw.ImageOcc_Editor = ImageOcc_Editor(self, tags)
