@@ -536,10 +536,11 @@ class ImageOcc_Editor(QtGui.QWidget):
         self.svg_edit.eval(command)
         
 
-class ImageOcc_Options(QtGui.QWidget):
+class ImageOcc_Options(QDialog):
     def __init__(self, mw):
-        super(ImageOcc_Options, self).__init__()
+        QDialog.__init__(self, parent=mw)
         self.mw = mw
+        self.setupUi()
 
     def getNewMaskColor(self):
         # Remove the # sign from QColor.name():
@@ -563,7 +564,6 @@ class ImageOcc_Options(QtGui.QWidget):
             self.mw.col.setMod()
             self.changeButtonColor(self.initFill_button, color_)
 
-
     def changeButtonColor(self, button, color):
         pixmap = QPixmap(128,18)
         qcolour = QtGui.QColor(0, 0, 0)
@@ -573,25 +573,18 @@ class ImageOcc_Options(QtGui.QWidget):
         button.setIconSize(QSize(128, 18))
 
     def setupUi(self):
-
         # load preferences
         load_prefs(self)
 
-        note_label = QLabel('You might have to restart Anki to apply your changes')
-
         ### shape color for questions:
         mask_color_label = QLabel('<b>Question</b> shape color')
-
         self.mask_color_button = QPushButton()
-
         self.mask_color_button.connect(self.mask_color_button,
                                   SIGNAL("clicked()"),
                                   self.getNewMaskColor)
         ### Initial shape color:
         initFill_label = QLabel('<b>Initial</b> shape color')
-
         self.initFill_button = QPushButton()
-
         self.initFill_button.connect(self.initFill_button,
                                 SIGNAL("clicked()"),
                                 self.getNewInitFillColor)
@@ -599,7 +592,6 @@ class ImageOcc_Options(QtGui.QWidget):
         ### set colors
         initFill_color = self.mw.col.conf['image_occlusion_conf']['initFill[color]']
         mask_fill_color = self.mw.col.conf['image_occlusion_conf']['mask_fill_color']
-
         self.changeButtonColor(self.initFill_button, initFill_color)
         self.changeButtonColor(self.mask_color_button, mask_fill_color)
 
@@ -616,10 +608,13 @@ class ImageOcc_Options(QtGui.QWidget):
         grid.addWidget(note_label, 2, 0, 1, 2)
 
         self.setLayout(grid)
-
         self.setMinimumWidth(400)
         self.setWindowTitle('Image Occlusion Enhanced Options')
-        self.show()
+
+def invoke_io_settings(mw):
+    dialog = ImageOcc_Options(mw)
+    dialog.show()
+    dialog.exec_()
 
 def invoke_ImageOcc_help():
     utils.openLink(image_occlusion_help_link)
@@ -634,13 +629,13 @@ def hideIdField(self, node, hide=True, focus=False):
                 if (snowFlake) {snowFlake.style.display = 'none';};
             """ )
 
-mw.ImageOcc_Options = ImageOcc_Options(mw)
+#mw.ImageOcc_Options = ImageOcc_Options(mw)
 
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced Wiki...", mw)
 
 mw.connect(options_action, SIGNAL("triggered()"), 
-            mw.ImageOcc_Options.setupUi)
+            lambda o=mw: invoke_io_settings(o))
 
 mw.connect(help_action, SIGNAL("triggered()"),
             invoke_ImageOcc_help)
