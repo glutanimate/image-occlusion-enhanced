@@ -6443,8 +6443,9 @@ this.clear = function() {
 	// create new document
 	canvas.current_drawing_ = new svgedit.draw.Drawing(svgcontent);
 
-	// create empty first layer
-	canvas.createLayer("Layer 1");
+	// create default layers
+	canvas.createLayer("Labels");
+	canvas.createLayer("Masks");
 	
 	// clear the undo stack
 	canvas.undoMgr.resetUndoStack();
