@@ -23,9 +23,6 @@ import etree.ElementTree as etree
 labels_layer_index = 0
 shapes_layer_index = 1
 
-blank_svg_path = os.path.join(os.path.dirname(__file__),
-                             "blank-svg.svg")
-
 svg_namespace = "http://www.w3.org/2000/svg"
 
 # Make sure to use correct namespace

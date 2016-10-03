@@ -21,6 +21,7 @@ from PyQt4 import QtCore, QtGui
 
 from aqt import mw, utils, webview, deckchooser, tagedit
 from aqt.editor import Editor
+from aqt.addcards import AddCards
 from aqt.qt import *
 from anki.hooks import wrap, addHook
 from anki.utils import json
@@ -113,19 +114,19 @@ def save_prefs(self):
         json.dump(self.prefs, f)
 
 
-class ImageOcc_Add(QtCore.QObject):
-
+class ImgOccAdd(QtCore.QObject):
     def __init__(self, ed):
         super(QtCore.QObject, self).__init__()
         self.ed = ed
         self.mw = mw
+        self.dialog = None
         self.editing = False
         self.onote = {}
 
         # load preferences
         load_prefs(self)
 
-    def onEditorButton(self):
+    def getImage(self, mode=None):
         # retrieve field names
         nm = self.mw.col.models.byName(IO_MODEL_NAME)
         if nm:
@@ -147,7 +148,6 @@ class ImageOcc_Add(QtCore.QObject):
             prev_image_dir = os_home_dir     
 
         clip = QApplication.clipboard()
-        existing_image = False
         onote = self.onote
         for i in IO_FLDS.keys():
             onote[i] = None
@@ -159,7 +159,10 @@ class ImageOcc_Add(QtCore.QObject):
             onote["sources"] = note[IO_FLDS["sources"]]
 
         # Decide on what image source to use
-
+        if mode == "edit":
+            if note.model()["name"] != IO_MODEL_NAME:
+                utils.tooltip("Not an IO card")
+                return
         # Existing note editable?
         if note.model()["name"] == IO_MODEL_NAME:
             imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
@@ -189,16 +192,13 @@ class ImageOcc_Add(QtCore.QObject):
 
         # 1: Edit existing note if note type is set to IO and note valid
         if self.editing:
-            image_path = onote["image"]
-        # 2: use first image found in note, regardless of note type
-        elif existing_image:
-            print "Yet to be implemented"  
-        # 3: use clipboard data for note
+            image_path = onote["image"] 
+        # 2: use clipboard data for note
         elif clip.mimeData().imageData():
             handle, image_path = tempfile.mkstemp(suffix='.png')
             clip.image().save(image_path)
             clip.clear()
-        # 4: prompt user to select image
+        # 3: prompt user to select image
         else:
             image_path = QtGui.QFileDialog.getOpenFileName(self.ed.parentWindow,
                            "Choose Image",
@@ -208,14 +208,17 @@ class ImageOcc_Add(QtCore.QObject):
         # Call Image Occlusion Editor on path
         if image_path:
             self.mw.io_image_path = image_path
-            self.call_ImageOcc_Editor()
+            self.call_ImgOccEdit()
             # store image directory in local preferences,
             # but only if image not in the media collection or temporary directory
             if os.path.dirname(image_path) not in [mw.col.media.dir(), tempfile.gettempdir()]:
                 self.prefs["prev_image_dir"] = os.path.dirname( image_path )
                 save_prefs(self)
 
-    def call_ImageOcc_Editor(self):
+    def call_ImgOccEdit(self):
+        self.dialog = ImgOccEdit(self, mw)
+        dialog = self.dialog
+
         width, height = svgutils.imageProp(self.mw.io_image_path)
         initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
         url = QtCore.QUrl.fromLocalFile(svg_edit_path)
@@ -223,38 +226,32 @@ class ImageOcc_Add(QtCore.QObject):
         url.addQueryItem('initFill[color]', initFill_color)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', QtCore.QUrl.fromLocalFile(self.mw.io_image_path).toString())
-
-        if self.editing:
-            svg_b64 = svgutils.svgToBase64(self.onote["fmask"])
-            url.addQueryItem('source', svg_b64)
-
-        tags = self.ed.note.tags
-        dialog = ImageOcc_Editor(self, mw, tags)
-        dialog.svg_edit.load(url)   
-
-        # always copy tags over
-        dialog.tags_edit.setText(self.onote["tags"])
-        # only copy sources field if not undefined
-        if self.onote["sources"] is not None:
-            dialog.sources_edit.setPlainText(self.onote["sources"])
-        # reuse fields if started from existing i/o note
+            
         if self.editing:
             dialog.header_edit.setPlainText(self.onote["header"])
             dialog.footer_edit.setPlainText(self.onote["footer"])
             dialog.remarks_edit.setPlainText(self.onote["remarks"])
             dialog.extra1_edit.setPlainText(self.onote["extra1"])
             dialog.extra2_edit.setPlainText(self.onote["extra2"])
+            svg_b64 = svgutils.svgToBase64(self.onote["fmask"])
+            url.addQueryItem('source', svg_b64)
 
+        dialog.tags_edit.setText(self.onote["tags"])
+        dialog.tags_edit.setCol(mw.col)
+        dialog.sources_edit.setPlainText(self.onote["sources"])
+
+        dialog.svg_edit.load(url)
         dialog.show()
         dialog.exec_()
         
 
-    def onAddNotesButton(self, IoEd, mode):
-        svg_edit = IoEd.svg_edit
+    def onAddNotesButton(self, mode):
+        svg_edit = self.dialog.svg_edit
         svg_contents = svg_edit.page().mainFrame().evaluateJavaScript("svgCanvas.svgCanvasToString()")
         svg = etree.fromstring(svg_contents.encode('utf-8'))
-        (mask_fill_color, did, tags, header, footer, remarks, sources, 
-            extra1, extra2) = get_params_for_add_notes()
+        mask_fill_color = self.mw.col.conf['image_occlusion_conf']['mask_fill_color']
+        (did, tags, header, footer, remarks, sources, 
+            extra1, extra2) = self.get_params_for_add_notes()
         # Add notes to the current deck of the collection:
         if mode == "nonoverlapping":
             add_notes_non_overlapping(svg, mask_fill_color,
@@ -274,38 +271,29 @@ class ImageOcc_Add(QtCore.QObject):
             if IO_FLDS["sources"] in self.ed.note:
                 self.ed.note[IO_FLDS["sources"]] = sources
                 self.ed.loadNote()
+        elif self.editing:
+            # Reload note in case of edit
+            self.ed.loadNote()
         self.mw.reset()
 
-def get_params_for_add_notes():
-    # Get the mask color from mw.col.conf:
-    mask_fill_color = mw.col.conf['image_occlusion_conf']['mask_fill_color']
+    def get_params_for_add_notes(self):
+        header = self.dialog.header_edit.toPlainText().replace('\n', '<br />')
+        footer = self.dialog.footer_edit.toPlainText().replace('\n', '<br />')
+        remarks = self.dialog.remarks_edit.toPlainText().replace('\n', '<br />')
+        sources = self.dialog.sources_edit.toPlainText().replace('\n', '<br />')
+        extra1 = self.dialog.extra1_edit.toPlainText().replace('\n', '<br />')
+        extra2 = self.dialog.extra2_edit.toPlainText().replace('\n', '<br />')
+        did = self.dialog.deckChooser.selectedId()
+        tags = self.dialog.tags_edit.text().split()
+        return (did, tags, header, footer, remarks, sources, extra1, extra2)
 
-    header = mw.ImageOcc_Editor.header_edit.toPlainText().replace('\n', '<br />')
-    footer = mw.ImageOcc_Editor.footer_edit.toPlainText().replace('\n', '<br />')
-    remarks = mw.ImageOcc_Editor.remarks_edit.toPlainText().replace('\n', '<br />')
-    sources = mw.ImageOcc_Editor.sources_edit.toPlainText().replace('\n', '<br />')
-    extra1 = mw.ImageOcc_Editor.extra1_edit.toPlainText().replace('\n', '<br />')
-    extra2 = mw.ImageOcc_Editor.extra2_edit.toPlainText().replace('\n', '<br />')
-	
-    # Get deck id:
-    did = mw.ImageOcc_Editor.deckChooser.selectedId()
-    tags = mw.ImageOcc_Editor.tags_edit.text().split()
-    return (mask_fill_color, did, tags, header, footer, remarks, sources, 
-      extra1, extra2)
-
-
-def onSetupEditorButtons(self):
-    self.image_occlusion = ImageOcc_Add(self)
-    self._addButton("new_occlusion", self.image_occlusion.onEditorButton,
-            _("Alt+o"), _("Image Occlusion Enhanced (Alt+O)"), canDisable=False)
-
-class ImageOcc_Editor(QDialog):
-    def __init__(self, IoAdd, mw, tags):
+class ImgOccEdit(QDialog):
+    def __init__(self, ImgOccAdd, mw):
         QDialog.__init__(self, parent=mw)
         self.mw = mw
-        self.IoAdd = IoAdd
-        self.editing = self.IoAdd.editing
-        self.setupUi(tags)
+        self.ImgOccAdd = ImgOccAdd
+        self.editing = self.ImgOccAdd.editing
+        self.setupUi()
         utils.restoreGeom(self, "imageOccEditor")
 
 
@@ -315,10 +303,7 @@ class ImageOcc_Editor(QDialog):
         QWidget.closeEvent(self, event)
         del self
 
-    def setupUi(self, tags):
-
-        # Define UI elements
-
+    def setupUi(self):
         self.svg_edit = webview.AnkiWebView()
         self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
 
@@ -359,8 +344,6 @@ class ImageOcc_Editor(QDialog):
         extra2_hbox.addWidget(self.extra2_edit)
 
         self.tags_edit = tagedit.TagEdit(self)
-        self.tags_edit.setText(" ".join(tags))
-        self.tags_edit.setCol(mw.col)
         self.tags_label = QLabel("Tags")
         tags_hbox = QHBoxLayout()
         tags_hbox.addWidget(self.tags_label)
@@ -379,14 +362,12 @@ class ImageOcc_Editor(QDialog):
             i.setFixedWidth(70)        
 
         # Set layout up
-
+        
         ## Tab 1
-
         vbox1 = QVBoxLayout()
         vbox1.addWidget(self.svg_edit, stretch=1)
 
         ## Tab 2
-
         vbox2 = QVBoxLayout()
         vbox2.addLayout(header_hbox)
         vbox2.addLayout(footer_hbox)
@@ -419,11 +400,12 @@ class ImageOcc_Editor(QDialog):
 
         # Create buttons
 
-        ## Create button layout
+        ## Set up buttons
 
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(True)
         if not self.editing:
+            # Regular mode
             nonoverlapping_button = button_box.addButton("Add &nonoverlapping occlusions",
                     QDialogButtonBox.ActionRole)
             nonoverlapping_button.setToolTip(
@@ -432,7 +414,9 @@ class ImageOcc_Editor(QDialog):
                     QDialogButtonBox.ActionRole)
             overlapping_button.setToolTip(
                 "Generate cards where only one label is hidden per card")
+
         else:
+            # Editing mode
             edit1_button = button_box.addButton("&Edit notes",
                     QDialogButtonBox.ActionRole)
             edit2_button = button_box.addButton("Edit and &switch type",
@@ -441,18 +425,19 @@ class ImageOcc_Editor(QDialog):
                     QDialogButtonBox.ActionRole)
             overlapping_button = button_box.addButton("New &overlapping notes",
                     QDialogButtonBox.ActionRole)
+            self.connect(edit1_button, SIGNAL("clicked()"), self.edit)
+            self.connect(edit2_button, SIGNAL("clicked()"), self.edit_and_switch)
+
         close_button = button_box.addButton("&Close",
                 QDialogButtonBox.ActionRole)
         close_button.setToolTip("Close Image Occlusion Editor without generating cards")
-
-        ## Connect buttons to actions
-
         self.connect(nonoverlapping_button, SIGNAL("clicked()"), self.add_nonoverlapping)
         self.connect(overlapping_button, SIGNAL("clicked()"), self.add_overlapping)
         self.connect(close_button, SIGNAL("clicked()"), self.close)
 
-        # Add all widgets to main window
 
+
+        # Add all widgets to main window
         ## set widget layout up
         vbox_main = QtGui.QVBoxLayout()
         vbox_main.setMargin(0);
@@ -463,7 +448,6 @@ class ImageOcc_Editor(QDialog):
         self.setLayout(vbox_main)
 
         # Set basic window properties
-
         # self.setMinimumHeight(600)
         self.setWindowTitle('Image Occlusion Enhanced Editor')
 
@@ -496,12 +480,22 @@ class ImageOcc_Editor(QDialog):
             QtCore.SIGNAL('activated()'), self.fit_image_canvas)
 
         # Set Focus
-
         self.tab_widget.setCurrentIndex(0)
         self.svg_edit.setFocus()
 
     # keybinding related functions
 
+    ## Notes
+    def add_nonoverlapping(self): 
+        self.ImgOccAdd.onAddNotesButton("nonoverlapping")
+    def add_overlapping(self): 
+        self.ImgOccAdd.onAddNotesButton("overlapping")
+    def edit(self):
+        self.ImgOccAdd.onAddNotesButton("edit")
+    def edit_and_switch(self):
+        self.ImgOccAdd.onAddNotesButton("edit_and_switch")
+
+    ## Navigation, etc.
     def switch_tabs(self):
         currentTab = self.tab_widget.currentIndex()
         if currentTab == 0:
@@ -524,18 +518,13 @@ class ImageOcc_Editor(QDialog):
         self.reset_main_fields()
         self.sources_edit.setPlainText("")
 
-    def add_nonoverlapping(self): 
-        ImageOcc_Add.onAddNotesButton(self.IoAdd, self, "nonoverlapping")
-
-    def add_overlapping(self): 
-        ImageOcc_Add.onAddNotesButton(self.IoAdd, self, "overlapping")
-
     def fit_image_canvas(self):
         command = "svgCanvas.zoomChanged('', 'canvas');"
         self.svg_edit.eval(command)
         
 
 class ImageOcc_Options(QDialog):
+    # Main IO Options dialog
     def __init__(self, mw):
         QDialog.__init__(self, parent=mw)
         self.mw = mw
@@ -613,8 +602,21 @@ def invoke_io_settings(mw):
     dialog.show()
     dialog.exec_()
 
-def invoke_ImageOcc_help():
+def invoke_io_help():
     utils.openLink(image_occlusion_help_link)
+
+def onImgOccButton(ed, mode):
+    ioInstance = ImgOccAdd(ed)
+    ioInstance.getImage(mode)
+
+def onSetupEditorButtons(self):
+    # Add IO button to Editor
+    if isinstance(self.parentWindow, AddCards):
+        self._addButton("new_occlusion", lambda o=self: onImgOccButton(self, "add"),
+                _("Alt+o"), _("Add Image Occlusion (Alt+O)"), canDisable=False)
+    else:
+        self._addButton("edit_occlusion", lambda o=self: onImgOccButton(self, "edit"),
+                _("Alt+o"), _("Edit Image Occlusion (Alt+O)"), canDisable=False)
 
 def hideIdField(self, node, hide=True, focus=False):
     # simple hack that hides the ID field on IO notes
@@ -626,19 +628,17 @@ def hideIdField(self, node, hide=True, focus=False):
                 if (snowFlake) {snowFlake.style.display = 'none';};
             """ )
 
-#mw.ImageOcc_Options = ImageOcc_Options(mw)
-
+# Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced Wiki...", mw)
-
 mw.connect(options_action, SIGNAL("triggered()"), 
             lambda o=mw: invoke_io_settings(o))
-
 mw.connect(help_action, SIGNAL("triggered()"),
-            invoke_ImageOcc_help)
-
+            invoke_io_help)
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
+
+# Set up hooks
 addHook('setupEditorButtons', onSetupEditorButtons)
 Editor.setNote = wrap(Editor.setNote, hideIdField, "after")
