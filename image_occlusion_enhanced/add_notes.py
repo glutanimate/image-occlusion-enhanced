@@ -29,14 +29,14 @@ def notes_added_message(nrOfNotes):
     return msg
 
 
-def rm_media_dir(media_dir):
-    for f in os.listdir(media_dir):
+def rm_tmp_media_dir(tmp_media_dir):
+    for f in os.listdir(tmp_media_dir):
         try:
-            os.remove(os.path.join(media_dir, f))
+            os.remove(os.path.join(tmp_media_dir, f))
         except:
             pass
     try:
-        os.rmdir(media_dir)
+        os.rmdir(tmp_media_dir)
     except:
         pass
 
@@ -204,7 +204,7 @@ def gen_uniq():
     uniq = str(uuid.uuid4()).replace("-","")
     return uniq
 
-def new_bnames(col, media_dir, original_fname):
+def new_bnames(col, tmp_media_dir, original_fname):
 
     d = {}
     # if the original image is located under the anki collection.media folder
@@ -213,20 +213,20 @@ def new_bnames(col, media_dir, original_fname):
     orig_file_path = os.path.dirname(original_fname)
     if not orig_file_path == col.media.dir():       
         shutil.copy(original_fname,
-                    os.path.join(media_dir, original_file_base_name))
+                    os.path.join(tmp_media_dir, original_file_base_name))
     else:
         d[original_file_base_name]=original_file_base_name
 
     iouuid = gen_uniq()
     d['uuid'] = iouuid
 
-    bnames = os.listdir(media_dir)
+    bnames = os.listdir(tmp_media_dir)
     for bname in bnames:
         hash_bname = iouuid + '_' + bname
-        os.rename(os.path.join(media_dir, bname),
-                  os.path.join(media_dir, hash_bname))
+        os.rename(os.path.join(tmp_media_dir, bname),
+                  os.path.join(tmp_media_dir, hash_bname))
 
-        path = os.path.join(media_dir, hash_bname)
+        path = os.path.join(tmp_media_dir, hash_bname)
 
         # The KEY to the dictionary must be in the default file system
         # encoding, because we will write d[filename], where filename
@@ -282,10 +282,10 @@ def add_QA_note(col, uuid, fname_q, fname_a, tags, fname_svg,
     return nnote
 
 
-def add_QA_notes(col, fnames_q, fnames_a, tags, media_dir, svg_fname,
+def add_QA_notes(col, fnames_q, fnames_a, tags, tmp_media_dir, svg_fname,
                  fname_original, header, footer, remarks, sources, 
                  extra1, extra2, did):
-    d = new_bnames(col, media_dir, fname_original)
+    d = new_bnames(col, tmp_media_dir, fname_original)
     nrOfNotes = 0
     for (q, a) in zip(fnames_q, fnames_a):
         uuid = d['uuid'] + '-' + str(nrOfNotes+1)
@@ -308,7 +308,7 @@ def add_QA_notes(col, fnames_q, fnames_a, tags, media_dir, svg_fname,
 
 
 # Updates the GUI and shows a tooltip
-def gui_add_QA_notes(fnames_q, fnames_a, media_dir, tags, svg_fname,
+def gui_add_QA_notes(fnames_q, fnames_a, tmp_media_dir, tags, svg_fname,
                      fname_original, header, footer, remarks, sources, 
                      extra1, extra2, did):
     col = mw.col
@@ -318,10 +318,10 @@ def gui_add_QA_notes(fnames_q, fnames_a, media_dir, tags, svg_fname,
     m = mm.byName(IO_MODEL_NAME)
 
     nrOfNotes = add_QA_notes(col, fnames_q, fnames_a,
-                             tags, media_dir, svg_fname,
+                             tags, tmp_media_dir, svg_fname,
                              fname_original, header, footer, remarks, sources, 
                              extra1, extra2, did)
-    rm_media_dir(media_dir)  # removes the media and the directory
+    rm_tmp_media_dir(tmp_media_dir)  # removes the media and the directory
 
     #  We must update the GUI so that the user knows that cards have
     # been added.  When the GUI is updated, the number of new cards

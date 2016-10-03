@@ -17,20 +17,20 @@ import base64
 import urllib
 
 
-from Imaging.PIL import Image  # PIL.Image will only be used in 3 lines of code
+from Imaging.PIL import Image 
 import etree.ElementTree as etree
 
 labels_layer_index = 0
 shapes_layer_index = 1
 
-svg_namespace = "http://www.w3.org/2000/svg"
-
 # Make sure to use correct namespace
+svg_namespace = "http://www.w3.org/2000/svg"
 etree.register_namespace("",svg_namespace)
+svg_namespace = '{' + svg_namespace + '}'
 
 def strip_attributes(root, attrs):
     title = None
-    tag_ns = '{' + svg_namespace + '}'
+    tag_ns = svg_namespace
     for elt in root.iter():
         try:
             title = elt.find(tag_ns + 'title').text
@@ -54,7 +54,6 @@ def svgToBase64(svg_path):
     svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
     return svg_b64
 
-# Copied from 'simplestyle.py', from the Inkscape project
 def parseStyle(s):
     """Create a dictionary from the value of an inline style attribute"""
     if s is None:
@@ -62,8 +61,6 @@ def parseStyle(s):
     else:
         return dict([i.split(":") for i in s.split(";") if len(i)])
 
-
-# Copied from 'simplestyle.py', from the Inkscape project
 def formatStyle(a):
     """Format an inline style attribute from a dictionary"""
     return ";".join([att + ":" + str(val) for att, val in a.iteritems()])
@@ -76,7 +73,7 @@ def nr_of_shapes(svg, curr_shapes_index):
 def get_shapes_layer_idx(svg):
     for idx,svg_ele in enumerate(svg):
         try:
-            title = svg_ele.find('{' + svg_namespace + '}' + 'title').text
+            title = svg_ele.find(svg_namespace + 'title').text
         except:
             title = None
         if title == "Masks" or title == "Shapes":
@@ -89,9 +86,6 @@ def set_color(elt, color):
 def set_id(elt, elmid):
     elt.attrib["id"] = elmid
 
-#  Applies the change of color to the children of the
-# children and so on. Useful when we want to color shapes
-# that are part of a group.
 def set_color_recursive(elt, color):
     for e in elt.iter():
         set_color(e, color)

@@ -19,9 +19,9 @@ import tempfile
 
 from PyQt4 import QtCore, QtGui
 
-from aqt import mw, utils, webview, deckchooser, tagedit
+from aqt import mw, webview, deckchooser, tagedit
 from aqt.editor import Editor
-from aqt.addcards import AddCards
+from aqt.utils import tooltip, openLink, showWarning, saveGeom, restoreGeom
 from aqt.qt import *
 from anki.hooks import wrap, addHook
 from anki.utils import json
@@ -33,7 +33,7 @@ from notes_from_svg import add_notes_non_overlapping, add_notes_overlapping
 # import the icons
 from resources import *
 
-image_occlusion_help_link = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
+io_help_link = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
 
 # get default file system encoding
 encoding = sys.getfilesystemencoding()
@@ -51,13 +51,13 @@ svg_edit_path = os.path.join(svg_edit_dir,
                             'svg-editor.html')
 
 #Add all configuration options we know at this point:
-svg_edit_extensions = "ext-image-occlusion.js,ext-arrows.js,ext-markers.js,ext-shapes.js,ext-eyedropper.js"
+svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,ext-markers.js,ext-shapes.js,ext-eyedropper.js"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('initStroke[color]', '2D2D2D'),
                        ('initStroke[width]', '0'),
                        ('initTool', 'rect'),
                        ('text[font_family]', "'Helvetica LT Std', Arial, sans-serif"),
-                       ('extensions', svg_edit_extensions)]
+                       ('extensions', svg_edit_ext)]
 
 IO_MODEL_NAME = "Image Occlusion Enhanced"
 
@@ -120,51 +120,48 @@ class ImgOccAdd(QtCore.QObject):
         self.ed = ed
         self.mw = mw
         self.dialog = None
-        self.editing = False
+        self.mode = "add"
         self.onote = {}
 
         # load preferences
         load_prefs(self)
 
     def getImage(self, mode=None):
-        # retrieve field names
-        nm = self.mw.col.models.byName(IO_MODEL_NAME)
-        if nm:
-            nm_fields = self.mw.col.models.fieldNames(nm)
-            # check if all fields in nm_fields
-            if not all(x in nm_fields for x in IO_FLDS.values()):
-                utils.showWarning(\
-                    '<b>Error:</b><br><br>Image Occlusion note type not configured properly.\
-                    Please make sure you did not delete or rename any of the essential fields.\
-                    <br><br>You can find more information on this error message here: \
-                    <a href="' + image_occlusion_help_link + '/Customization#a-note-of-warning">\
-                    Wiki - Note Type Customization</a>')
-                return
-                
-        # retrieve last used image directory
-        prev_image_dir = self.prefs["prev_image_dir"]
-        # if directory not valid or empty use system home directory
-        if not os.path.isdir(prev_image_dir):
-            prev_image_dir = os_home_dir     
-
-        clip = QApplication.clipboard()
+        self.mode = mode
+        note = self.ed.note
         onote = self.onote
         for i in IO_FLDS.keys():
             onote[i] = None
-        note = self.ed.note
 
-        # preserve tags and sources if available
+        # always preserve tags and sources if available
         onote["tags"] = self.ed.tags.text()
         if IO_FLDS["sources"] in note:
             onote["sources"] = note[IO_FLDS["sources"]]
 
-        # Decide on what image source to use
-        if mode == "edit":
+        if mode == "add":
+            # retrieve last used image directory
+            prev_image_dir = self.prefs["prev_image_dir"]
+            # if directory not valid or empty use system home directory
+            if not os.path.isdir(prev_image_dir):
+                prev_image_dir = os_home_dir     
+
+            clip = QApplication.clipboard()
+            if clip.mimeData().imageData():
+                handle, image_path = tempfile.mkstemp(suffix='.png')
+                clip.image().save(image_path)
+                clip.clear()
+            else:
+                image_path = QtGui.QFileDialog.getOpenFileName(self.ed.parentWindow,
+                             "Choose Image", prev_image_dir, 
+                             "Image Files (*.png *jpg *.jpeg *.gif)")
+
+                if os.path.isfile(image_path):
+                    self.prefs["prev_image_dir"] = os.path.dirname( image_path )
+                    save_prefs(self)
+        else:
             if note.model()["name"] != IO_MODEL_NAME:
-                utils.tooltip("Not an IO card")
+                tooltip("Not an IO card")
                 return
-        # Existing note editable?
-        if note.model()["name"] == IO_MODEL_NAME:
             imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
             imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
             invalfile = False
@@ -185,49 +182,33 @@ class ImgOccAdd(QtCore.QObject):
                             invalfile = True
                 else:
                     onote[i] = note[fld].replace('<br />', '\n')
-
-            if not invalfile and onote["uuid"]:
-                self.editing = True
-            
-
-        # 1: Edit existing note if note type is set to IO and note valid
-        if self.editing:
+            if invalfile or onote["uuid"]:
+                showWarning("IO card not configured properly for editing")
+                return
             image_path = onote["image"] 
-        # 2: use clipboard data for note
-        elif clip.mimeData().imageData():
-            handle, image_path = tempfile.mkstemp(suffix='.png')
-            clip.image().save(image_path)
-            clip.clear()
-        # 3: prompt user to select image
-        else:
-            image_path = QtGui.QFileDialog.getOpenFileName(self.ed.parentWindow,
-                           "Choose Image",
-                           prev_image_dir,
-                           "Image Files (*.png *jpg *.jpeg *.gif)")
 
-        # Call Image Occlusion Editor on path
-        if image_path:
-            self.mw.io_image_path = image_path
-            self.call_ImgOccEdit()
-            # store image directory in local preferences,
-            # but only if image not in the media collection or temporary directory
-            if os.path.dirname(image_path) not in [mw.col.media.dir(), tempfile.gettempdir()]:
-                self.prefs["prev_image_dir"] = os.path.dirname( image_path )
-                save_prefs(self)
+        if not image_path:
+            return
+        elif not os.path.isfile(image_path):
+            tooltip("Not a valid image file.")
+            return
+
+        self.image_path = image_path
+        self.call_ImgOccEdit()
 
     def call_ImgOccEdit(self):
         self.dialog = ImgOccEdit(self, mw)
         dialog = self.dialog
 
-        width, height = svgutils.imageProp(self.mw.io_image_path)
-        initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
+        width, height = svgutils.imageProp(self.image_path)
+        initFill_color = self.mw.col.conf['image_occlusion_conf']['initFill[color]']
         url = QtCore.QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
         url.addQueryItem('initFill[color]', initFill_color)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-        url.addQueryItem('bkgd_url', QtCore.QUrl.fromLocalFile(self.mw.io_image_path).toString())
+        url.addQueryItem('bkgd_url', QtCore.QUrl.fromLocalFile(self.image_path).toString())
             
-        if self.editing:
+        if self.mode != "add":
             dialog.header_edit.setPlainText(self.onote["header"])
             dialog.footer_edit.setPlainText(self.onote["footer"])
             dialog.remarks_edit.setPlainText(self.onote["remarks"])
@@ -237,7 +218,7 @@ class ImgOccAdd(QtCore.QObject):
             url.addQueryItem('source', svg_b64)
 
         dialog.tags_edit.setText(self.onote["tags"])
-        dialog.tags_edit.setCol(mw.col)
+        dialog.tags_edit.setCol(self.mw.col)
         dialog.sources_edit.setPlainText(self.onote["sources"])
 
         dialog.svg_edit.load(url)
@@ -245,38 +226,44 @@ class ImgOccAdd(QtCore.QObject):
         dialog.exec_()
         
 
-    def onAddNotesButton(self, mode):
+    def onAddNotesButton(self, choice):
         svg_edit = self.dialog.svg_edit
-        svg_contents = svg_edit.page().mainFrame().evaluateJavaScript("svgCanvas.svgCanvasToString()")
+        svg_contents = svg_edit.page().mainFrame().evaluateJavaScript(
+            "svgCanvas.svgCanvasToString();"
+            )
         svg = etree.fromstring(svg_contents.encode('utf-8'))
+        
         mask_fill_color = self.mw.col.conf['image_occlusion_conf']['mask_fill_color']
         (did, tags, header, footer, remarks, sources, 
-            extra1, extra2) = self.get_params_for_add_notes()
+            extra1, extra2) = self.getUserInputs()
+
         # Add notes to the current deck of the collection:
-        if mode == "nonoverlapping":
+        if choice in ["nonoverlapping", "overlapping"]:
+            # add_notes(choice, svg, mask_fill_color,
+            #           tags, self.image_path,
+            #           header, footer, remarks, sources, 
+            #           extra1, extra2, did)
             add_notes_non_overlapping(svg, mask_fill_color,
-                                      tags, self.mw.io_image_path,
-                                      header, footer, remarks, sources, 
-                                      extra1, extra2, did)
+                      tags, self.image_path,
+                      header, footer, remarks, sources, 
+                      extra1, extra2, did)
+            if self.ed.note:
+                # Update Editor with modified tags and sources field
+                self.ed.tags.setText(" ".join(tags))
+                self.ed.saveTags()
+                if IO_FLDS["sources"] in self.ed.note:
+                    self.ed.note[IO_FLDS["sources"]] = sources
+                    self.ed.loadNote()
         else:
-            add_notes_overlapping(svg, mask_fill_color,
-                                  tags, self.mw.io_image_path,
-                                  header, footer, remarks, sources, 
-                                  extra1, extra2, did)
-        
-        if self.ed.note and not self.editing:
-            # Update Editor with modified tags and sources field
-            self.ed.tags.setText(" ".join(tags))
-            self.ed.saveTags()
-            if IO_FLDS["sources"] in self.ed.note:
-                self.ed.note[IO_FLDS["sources"]] = sources
-                self.ed.loadNote()
-        elif self.editing:
-            # Reload note in case of edit
+            update_notes(choice, svg, mask_fill_color,
+                          tags, self.image_path,
+                          header, footer, remarks, sources, 
+                          extra1, extra2, did)
+        if self.ed.note:
             self.ed.loadNote()
         self.mw.reset()
 
-    def get_params_for_add_notes(self):
+    def getUserInputs(self):
         header = self.dialog.header_edit.toPlainText().replace('\n', '<br />')
         footer = self.dialog.footer_edit.toPlainText().replace('\n', '<br />')
         remarks = self.dialog.remarks_edit.toPlainText().replace('\n', '<br />')
@@ -292,16 +279,14 @@ class ImgOccEdit(QDialog):
         QDialog.__init__(self, parent=mw)
         self.mw = mw
         self.ImgOccAdd = ImgOccAdd
-        self.editing = self.ImgOccAdd.editing
+        self.mode = self.ImgOccAdd.mode
         self.setupUi()
-        utils.restoreGeom(self, "imageOccEditor")
+        restoreGeom(self, "imageOccEditor")
 
 
     def closeEvent(self, event):
         if mw.pm.profile is not None:
-            utils.saveGeom(self, "imageOccEditor")
-        QWidget.closeEvent(self, event)
-        del self
+            saveGeom(self, "imageOccEditor")
 
     def setupUi(self):
         self.svg_edit = webview.AnkiWebView()
@@ -362,7 +347,7 @@ class ImgOccEdit(QDialog):
             i.setFixedWidth(70)        
 
         # Set layout up
-        
+
         ## Tab 1
         vbox1 = QVBoxLayout()
         vbox1.addWidget(self.svg_edit, stretch=1)
@@ -404,7 +389,7 @@ class ImgOccEdit(QDialog):
 
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(True)
-        if not self.editing:
+        if self.mode == "add":
             # Regular mode
             nonoverlapping_button = button_box.addButton("Add &nonoverlapping occlusions",
                     QDialogButtonBox.ActionRole)
@@ -434,8 +419,6 @@ class ImgOccEdit(QDialog):
         self.connect(nonoverlapping_button, SIGNAL("clicked()"), self.add_nonoverlapping)
         self.connect(overlapping_button, SIGNAL("clicked()"), self.add_overlapping)
         self.connect(close_button, SIGNAL("clicked()"), self.close)
-
-
 
         # Add all widgets to main window
         ## set widget layout up
@@ -603,15 +586,27 @@ def invoke_io_settings(mw):
     dialog.exec_()
 
 def invoke_io_help():
-    utils.openLink(image_occlusion_help_link)
+    openLink(io_help_link)
 
 def onImgOccButton(ed, mode):
     ioInstance = ImgOccAdd(ed)
+    # note type integrity check
+    nm = mw.col.models.byName(IO_MODEL_NAME)
+    if nm:
+        nm_fields = mw.col.models.fieldNames(nm)
+        if not all(x in nm_fields for x in IO_FLDS.values()):
+            showWarning(\
+                '<b>Error:</b><br><br>Image Occlusion note type not configured properly.\
+                Please make sure you did not delete or rename any of the essential fields.\
+                <br><br>You can find more information on this error message here: \
+                <a href="' + io_help_link + '/Customization#a-note-of-warning">\
+                Wiki - Note Type Customization</a>')
+            return
     ioInstance.getImage(mode)
 
 def onSetupEditorButtons(self):
     # Add IO button to Editor
-    if isinstance(self.parentWindow, AddCards):
+    if self.addMode:
         self._addButton("new_occlusion", lambda o=self: onImgOccButton(self, "add"),
                 _("Alt+o"), _("Add Image Occlusion (Alt+O)"), canDisable=False)
     else:
@@ -622,10 +617,9 @@ def hideIdField(self, node, hide=True, focus=False):
     # simple hack that hides the ID field on IO notes
     if self.note and self.note.model()["name"] == IO_MODEL_NAME:
         self.web.eval("""
-                var idField = document.getElementById('f0');
-                idField.style.display = 'none';
-                var snowFlake = document.getElementById('i0');
-                if (snowFlake) {snowFlake.style.display = 'none';};
+            // hide first fname, field, and snowflake (FrozenFields add-on)
+                document.styleSheets[0].addRule(
+                    'tr:first-child .fname, #f0, #i0', 'display: none;');
             """ )
 
 # Set up menus
