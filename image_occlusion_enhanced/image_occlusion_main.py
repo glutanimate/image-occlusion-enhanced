@@ -48,7 +48,7 @@ svg_edit_path = os.path.join(svg_edit_dir,
 svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,ext-markers.js,ext-shapes.js,ext-eyedropper.js"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('initStroke[color]', '2D2D2D'),
-                       ('initStroke[width]', '0'),
+                       ('initStroke[width]', '1'),
                        ('initTool', 'rect'),
                        ('text[font_family]', "'Helvetica LT Std', Arial, sans-serif"),
                        ('extensions', svg_edit_ext)]

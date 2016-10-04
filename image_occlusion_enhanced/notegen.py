@@ -38,7 +38,6 @@ import shutil
 class ImgOccNoteGenerator(object):
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
-        #image_path  is fully qualified path + filename
         self.image_path = image
         self.masks_svg = svg
         #self.fields = fields
@@ -57,18 +56,19 @@ class ImgOccNoteGenerator(object):
         self.mask_fill_color = '#' + mw.col.conf['image_occlusion_conf']['mask_fill_color']
 
     def generate_notes(self):
-        masks = self._generate_mask_svgs()
-        if not masks:
+        qmasks = self._generate_mask_svgs("Q")
+        if not qmasks:
             tooltip("No cards generated.<br>\
                 Are you sure you set your masks?")
             return
+        amasks = self._generate_mask_svgs("A")
         col_image = self.add_image_to_col()
         occl_id = '%s-%s' % (self.uniq, self.otype)
         self.omask_path = self._save_mask(self.masks_svg, occl_id, "O")
-        for i in range(len(masks)):
+        for i in range(len(qmasks)):
             card_id = '%s-%s' % (occl_id, i+1)
-            self._save_mask_and_write_note(masks[i], col_image, card_id)
-        tooltip(("Cards added: %s" % len(masks) ), period=1500)
+            self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, card_id)
+        tooltip(("Cards added: %s" % len(qmasks) ), period=1500)
 
     def add_image_to_col(self):
         media_dir = mw.col.media.dir()
@@ -80,7 +80,7 @@ class ImgOccNoteGenerator(object):
         shutil.copyfile(self.image_path, new_path)
         return new_path
 
-    def _generate_mask_svgs(self):
+    def _generate_mask_svgs(self, side):
         #Note this gets reimplemented by ImgOccNoteGeneratorSingle
         #which returns the original mask unmodified
         mask_doc = minidom.parseString(self.masks_svg)
@@ -96,21 +96,21 @@ class ImgOccNoteGenerator(object):
                 mask_node_indexes.append(i)
                 # mask_node_indexes contains the indexes of the childNodes that are elements
             # assume that all are masks. Different subclasses do different things with them
-        masks = self._generate_mask_svgs_for(mask_node_indexes)
+        masks = self._generate_mask_svgs_for(side, mask_node_indexes)
         return masks
 
-    def _generate_mask_svgs_for(self, mask_node_indexes):
-        masks = [self._create_mask(node_index, mask_node_indexes) for node_index in mask_node_indexes]
+    def _generate_mask_svgs_for(self, side, mask_node_indexes):
+        masks = [self._create_mask(side, node_index, mask_node_indexes) for node_index in mask_node_indexes]
         return masks
 
-    def _create_mask(self, mask_node_index, all_mask_node_indexes):
+    def _create_mask(self, side, mask_node_index, all_mask_node_indexes):
         mask_doc = minidom.parseString(self.masks_svg)
         svg_node = mask_doc.documentElement
         #layer_nodes = self._layer_nodes_from(svg_node)
         #layer_node = layer_nodes[0]
         layer_node = self._layer_nodes_from(svg_node)
         #This methods get implemented different by subclasses
-        self._create_mask_at_layernode(mask_node_index, all_mask_node_indexes, layer_node)
+        self._create_mask_at_layernode(side, mask_node_index, all_mask_node_indexes, layer_node)
         return svg_node.toxml()
 
     def _create_mask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
@@ -134,9 +134,9 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
-    def _save_mask_and_write_note(self, mask, col_image, note_id):
-        mask_path = self._save_mask(mask, note_id, "Q")
-        amask_path = ""
+    def _save_mask_and_write_note(self, qmask, amask, col_image, note_id):
+        qmask_path = self._save_mask(qmask, note_id, "Q")
+        amask_path = self._save_mask(amask, note_id, "A")
         model = mw.col.models.byName(IO_MODEL_NAME)
         model['did'] = self.did
         new_note = Note(mw.col, model)
@@ -153,8 +153,8 @@ class ImgOccNoteGenerator(object):
                     self.sources,
                     self.extra1,
                     self.extra2,
-                    fname2img(mask_path),
-                    "",
+                    fname2img(qmask_path),
+                    fname2img(amask_path),
                     fname2img(self.omask_path)
                     ]
 
@@ -189,7 +189,7 @@ class ImgOccNoteGeneratorHiding(ImgOccNoteGenerator):
         ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
 
-    def _create_mask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
+    def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
         def modify_fill_recursively(node):
             if (node.nodeType == node.ELEMENT_NODE):
                 if node.hasAttribute("fill"):
@@ -198,7 +198,10 @@ class ImgOccNoteGeneratorHiding(ImgOccNoteGenerator):
 
         for i in all_mask_node_indexes:
             if i == mask_node_index:
-                modify_fill_recursively(layer_node.childNodes[i])
+                if side == "Q":
+                    modify_fill_recursively(layer_node.childNodes[i])
+                if side == "A":
+                    layer_node.removeChild(layer_node.childNodes[i])
 
     def _create_amask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
         pass
