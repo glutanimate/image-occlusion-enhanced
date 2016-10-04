@@ -50,7 +50,7 @@ class ImgOccNoteGenerator(object):
         self.extra1 = extra1
         self.extra2 = extra2
         self.did = did
-        self.otype = "no"
+        self.otype = None
         self.omask_path = None
 
         self.mask_fill_color = '#' + mw.col.conf['image_occlusion_conf']['mask_fill_color']
@@ -79,6 +79,12 @@ class ImgOccNoteGenerator(object):
         new_path = os.path.join(media_dir, unique_fn)
         shutil.copyfile(self.image_path, new_path)
         return new_path
+
+    def modify_fill_recursively(self, node):
+        if (node.nodeType == node.ELEMENT_NODE):
+            if node.hasAttribute("fill"):
+                node.setAttribute("fill", self.mask_fill_color)
+            map(self.modify_fill_recursively, node.childNodes)
 
     def _generate_mask_svgs(self, side):
         #Note this gets reimplemented by ImgOccNoteGeneratorSingle
@@ -164,27 +170,40 @@ class ImgOccNoteGenerator(object):
         mw.col.addNote(new_note)
 
 
-class ImgOccNoteGeneratorSeparate(ImgOccNoteGenerator):
+class IoGenAllHideOneReveal(ImgOccNoteGenerator):
     """Each top level element of the layer becomes a separate mask"""
 
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
         ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
+        self.otype = "ao"
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
-        #Delete all child nodes except for mask_node_index
-        if side == "Q":
-            for i in reversed(all_mask_node_indexes):
-                if not i == mask_node_index:
-                    layer_node.removeChild(layer_node.childNodes[i])
-        if side == "A":
-            layer_node.unlink()
-            pass
+        for i in reversed(all_mask_node_indexes):
+            if i == mask_node_index and side == "Q":
+                self.modify_fill_recursively(layer_node.childNodes[i])
+            else:
+                layer_node.removeChild(layer_node.childNodes[i])
 
+class IoGenAllHideAllReveal(ImgOccNoteGenerator):
+    """Each top level element of the layer becomes a separate mask"""
 
+    def __init__(self, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did):
+        ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did)
+        self.otype = "aa"
 
-class ImgOccNoteGeneratorHiding(ImgOccNoteGenerator):
+    def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
+        for i in reversed(all_mask_node_indexes):
+            if side == "Q":
+                if i == mask_node_index:
+                    self.modify_fill_recursively(layer_node.childNodes[i])
+            else:
+                layer_node.removeChild(layer_node.childNodes[i])
+
+class IoGenOneHideAllReveal(ImgOccNoteGenerator):
     """Each top level element of the layer becomes a separate mask
     + the other elements are hidden"""
 
@@ -192,23 +211,15 @@ class ImgOccNoteGeneratorHiding(ImgOccNoteGenerator):
                       extra1, extra2, did):
         ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
+        self.otype = "oo"
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
-        def modify_fill_recursively(node):
-            if (node.nodeType == node.ELEMENT_NODE):
-                if node.hasAttribute("fill"):
-                    node.setAttribute("fill", self.mask_fill_color)
-                map(modify_fill_recursively, node.childNodes)
-
         for i in all_mask_node_indexes:
             if i == mask_node_index:
                 if side == "Q":
-                    modify_fill_recursively(layer_node.childNodes[i])
+                    self.modify_fill_recursively(layer_node.childNodes[i])
                 if side == "A":
                     layer_node.removeChild(layer_node.childNodes[i])
-
-    def _create_amask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
-        pass
 
 
 class ImgOccNoteGeneratorProgressive(ImgOccNoteGenerator):

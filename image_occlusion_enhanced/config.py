@@ -24,17 +24,17 @@ global IO_MODEL_NAME, IO_CARD_NAME, IO_FLDS, IO_FLDORDER, IO_DEFAULT_CONF, IO_DE
 IO_MODEL_NAME = "Image Occlusion Enhanced"
 IO_CARD_NAME = "IO Card"
 IO_FLDS = {
-    'uuid': "ID (hidden)",
-    'header': "Header",
-    'image': "Image",
-    'footer': "Footer",
-    'remarks': "Anmerkungen",
-    'sources': "Quellen",
-    'extra1': "Extra 1",
-    'extra2': "Extra 2",
-    'qmask': "Question Mask",
-    'amask': "Answer Mask",
-    'fmask': "Full Mask"
+    'uuid': u"ID (hidden)",
+    'header': u"Header",
+    'image': u"Image",
+    'footer': u"Footer",
+    'remarks': u"Anmerkungen",
+    'sources': u"Quellen",
+    'extra1': u"Extra 1",
+    'extra2': u"Extra 2",
+    'qmask': u"Question Mask",
+    'amask': u"Answer Mask",
+    'fmask': u"Full Mask"
 }
 IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
                 "extra1", "extra2", "qmask", "amask", "fmask"]

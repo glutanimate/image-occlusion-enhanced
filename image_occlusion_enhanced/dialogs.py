@@ -137,14 +137,23 @@ class ImgOccEdit(QDialog):
         button_box.setCenterButtons(True)
         if self.mode == "add":
             # Regular mode
-            nonoverlapping_button = button_box.addButton("Add &nonoverlapping occlusions",
+            allhideonereveal_btn = button_box.addButton("All Hidden, One Revealed",
                     QDialogButtonBox.ActionRole)
-            nonoverlapping_button.setToolTip(
-                "Generate cards where all labels are hidden on each card")
-            overlapping_button = button_box.addButton("Add &overlapping occlusions",
+            allhideonereveal_btn.setToolTip(
+                "Formerly known as nonoverlapping.<br>\
+                Generate cards where all labels are hidden and just one is revealed<br>\
+                on the back")
+            allhideallreveal_btn = button_box.addButton("All Hidden, All Revealed",
                     QDialogButtonBox.ActionRole)
-            overlapping_button.setToolTip(
-                "Generate cards where only one label is hidden per card")
+            allhideallreveal_btn.setToolTip(
+                "Inbetween nonoverlapping and overlapping.<br>\
+                Generate cards where all labels are hidden, but all are revealed<br>\
+                on the back")
+            onehideonereveal_btn = button_box.addButton("One Hidden, One Revealed",
+                    QDialogButtonBox.ActionRole)
+            onehideonereveal_btn.setToolTip(
+                "Formerly known as overlapping.<br>\
+                Generate cards where only one label is hidden on the front")
 
         else:
             # Editing mode
@@ -152,9 +161,9 @@ class ImgOccEdit(QDialog):
                     QDialogButtonBox.ActionRole)
             edit2_button = button_box.addButton("Edit and &switch type",
                     QDialogButtonBox.ActionRole)
-            nonoverlapping_button = button_box.addButton("New &nonoverlapping notes",
+            allhideonereveal_btn = button_box.addButton("New &nonoverlapping notes",
                     QDialogButtonBox.ActionRole)
-            overlapping_button = button_box.addButton("New &overlapping notes",
+            onehideonereveal_btn = button_box.addButton("New &overlapping notes",
                     QDialogButtonBox.ActionRole)
             self.connect(edit1_button, SIGNAL("clicked()"), self.edit)
             self.connect(edit2_button, SIGNAL("clicked()"), self.edit_and_switch)
@@ -162,8 +171,9 @@ class ImgOccEdit(QDialog):
         close_button = button_box.addButton("&Close",
                 QDialogButtonBox.ActionRole)
         close_button.setToolTip("Close Image Occlusion Editor without generating cards")
-        self.connect(nonoverlapping_button, SIGNAL("clicked()"), self.add_nonoverlapping)
-        self.connect(overlapping_button, SIGNAL("clicked()"), self.add_overlapping)
+        self.connect(allhideonereveal_btn, SIGNAL("clicked()"), self.add_allhideonereveal)
+        self.connect(allhideallreveal_btn, SIGNAL("clicked()"), self.add_allhideallreveal)
+        self.connect(onehideonereveal_btn, SIGNAL("clicked()"), self.add_onehideonereveal)
         self.connect(close_button, SIGNAL("clicked()"), self.close)
 
         # Add all widgets to main window
@@ -215,10 +225,12 @@ class ImgOccEdit(QDialog):
     # keybinding related functions
 
     ## Notes
-    def add_nonoverlapping(self): 
-        self.ImgOccAdd.onAddNotesButton("nonoverlapping")
-    def add_overlapping(self): 
-        self.ImgOccAdd.onAddNotesButton("overlapping")
+    def add_allhideonereveal(self): 
+        self.ImgOccAdd.onAddNotesButton("allhideonereveal")
+    def add_allhideallreveal(self): 
+        self.ImgOccAdd.onAddNotesButton("allhideallreveal")
+    def add_onehideonereveal(self): 
+        self.ImgOccAdd.onAddNotesButton("onehideonereveal")
     def edit(self):
         self.ImgOccAdd.onAddNotesButton("edit")
     def edit_and_switch(self):

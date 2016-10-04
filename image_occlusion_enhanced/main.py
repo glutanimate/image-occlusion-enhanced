@@ -29,14 +29,10 @@ import tempfile
 import urlparse, urllib
 
 from config import *
-
-from ngenerator import (
-    ImgOccNoteGeneratorHiding, 
-    ImgOccNoteGeneratorSeparate
-    )
+from ngenerator import *
+from dialogs import ImgOccEdit, ImgOccOpts
 
 import svgutils
-from dialogs import ImgOccEdit, ImgOccOpts
 from resources import *
 
 io_help_link = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
@@ -62,7 +58,6 @@ def path2url(path):
 class ImgOccAdd(object):
     def __init__(self, ed):
         self.ed = ed
-        self.mw = mw
         self.mode = "add"
         self.onote = {}
 
@@ -124,7 +119,7 @@ class ImgOccAdd(object):
                             invalfile = True
                 else:
                     onote[i] = note[fld].replace('<br />', '\n')
-            if invalfile or onote["uuid"]:
+            if invalfile or not onote["uuid"]:
                 showWarning("IO card not configured properly for editing")
                 return
             image_path = onote["image"] 
@@ -140,7 +135,7 @@ class ImgOccAdd(object):
 
     def call_ImgOccEdit(self):
         width, height = svgutils.imageProp(self.image_path)
-        initFill_color = self.mw.col.conf['image_occlusion_conf']['initFill[color]']
+        initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
         bkgd_url = path2url(self.image_path)
         onote = self.onote
 
@@ -168,7 +163,7 @@ class ImgOccAdd(object):
             url.addQueryItem('source', svg_b64)
 
         dialog.tags_edit.setText(onote["tags"])
-        dialog.tags_edit.setCol(self.mw.col)
+        dialog.tags_edit.setCol(mw.col)
         dialog.sources_edit.setPlainText(onote["sources"])
 
         dialog.exec_()
@@ -176,22 +171,22 @@ class ImgOccAdd(object):
 
     def onAddNotesButton(self, choice):
         svg_edit = mw.ImgOccEdit.svg_edit
-        svg_contents = svg_edit.page().mainFrame().evaluateJavaScript(
-            "svgCanvas.svgCanvasToString();"
-            )
-        # svg = etree.fromstring(svg_contents.encode('utf-8'))
-        svg = svg_contents
+        svg = svg_edit.page().mainFrame().evaluateJavaScript(
+            "svgCanvas.svgCanvasToString();")
         
-        mask_fill_color = self.mw.col.conf['image_occlusion_conf']['mask_fill_color']
+        mask_fill_color = mw.col.conf['image_occlusion_conf']['mask_fill_color']
         (did, tags, header, footer, remarks, sources, 
             extra1, extra2) = self.getUserInputs()
 
         # Add notes to the current deck of the collection:
-        if choice == "nonoverlapping":
-            gen = ImgOccNoteGeneratorHiding(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
+        if choice == "allhideonereveal":
+            gen = IoGenAllHideOneReveal(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
             gen.generate_notes()
-        elif choice == "overlapping":
-            gen = ImgOccNoteGeneratorSeparate(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
+        if choice == "allhideallreveal":
+            gen = IoGenAllHideAllReveal(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
+            gen.generate_notes()
+        elif choice == "onehideonereveal":
+            gen = IoGenOneHideAllReveal(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
             gen.generate_notes()
         elif choice == "edit":
             pass
@@ -206,7 +201,7 @@ class ImgOccAdd(object):
                 if IO_FLDS["sources"] in self.ed.note:
                     self.ed.note[IO_FLDS["sources"]] = sources
             self.ed.loadNote()
-        self.mw.reset()
+        mw.reset()
 
     def getUserInputs(self):
         header = mw.ImgOccEdit.header_edit.toPlainText().replace('\n', '<br />')
@@ -230,11 +225,11 @@ def invoke_io_help():
 
 def onImgOccButton(ed, mode):
     ed.ImgOccAdd = ImgOccAdd(ed)
-    # note type integrity check
     ioModel = mw.col.models.byName(IO_MODEL_NAME)
     if ioModel:
         ioFields = mw.col.models.fieldNames(ioModel)
-        if not all(x in ioFields for x in IO_FLDS.values()):
+        # note type integrity check
+        if set(ioFields) < set(IO_FLDS.values()):
             showWarning(\
                 '<b>Error:</b><br><br>Image Occlusion note type not configured properly.\
                 Please make sure you did not delete or rename any of the essential fields.\
