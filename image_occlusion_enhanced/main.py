@@ -143,7 +143,7 @@ class ImgOccAdd(object):
             mw.ImgOccEdit is not None
             mw.ImgOccEdit.reset_window()
         except:
-            mw.ImgOccEdit = ImgOccEdit(self, mw)
+            mw.ImgOccEdit = ImgOccEdit(mw)
         dialog = mw.ImgOccEdit
 
         url = QUrl.fromLocalFile(svg_edit_path)
@@ -224,7 +224,7 @@ def invoke_io_help():
     openLink(io_help_link)
 
 def onImgOccButton(ed, mode):
-    ed.ImgOccAdd = ImgOccAdd(ed)
+    mw.ImgOccAdd = ImgOccAdd(ed)
     ioModel = mw.col.models.byName(IO_MODEL_NAME)
     if ioModel:
         ioFields = mw.col.models.fieldNames(ioModel)
@@ -237,7 +237,7 @@ def onImgOccButton(ed, mode):
                 <a href="' + io_help_link + '/Customization#a-note-of-warning">\
                 Wiki - Note Type Customization</a>')
             return
-    ed.ImgOccAdd.getImage(mode)
+    mw.ImgOccAdd.getImage(mode)
 
 def onSetupEditorButtons(self):
     # Add IO button to Editor

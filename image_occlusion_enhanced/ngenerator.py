@@ -171,7 +171,7 @@ class ImgOccNoteGenerator(object):
 
 
 class IoGenAllHideOneReveal(ImgOccNoteGenerator):
-    """Each top level element of the layer becomes a separate mask"""
+    """Q: All hidden, A: One revealed"""
 
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
@@ -187,7 +187,7 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
                 layer_node.removeChild(layer_node.childNodes[i])
 
 class IoGenAllHideAllReveal(ImgOccNoteGenerator):
-    """Each top level element of the layer becomes a separate mask"""
+    """Q: All hidden, A: All revealed"""
 
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
@@ -204,8 +204,7 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
                 layer_node.removeChild(layer_node.childNodes[i])
 
 class IoGenOneHideAllReveal(ImgOccNoteGenerator):
-    """Each top level element of the layer becomes a separate mask
-    + the other elements are hidden"""
+    """Q: One hidden, A: All revealed"""
 
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
@@ -220,20 +219,3 @@ class IoGenOneHideAllReveal(ImgOccNoteGenerator):
                     self.modify_fill_recursively(layer_node.childNodes[i])
                 if side == "A":
                     layer_node.removeChild(layer_node.childNodes[i])
-
-
-class ImgOccNoteGeneratorProgressive(ImgOccNoteGenerator):
-    def __init__(self, path, kbd, svg):
-        ImgOccNoteGenerator.__init__(self, path, kbd, svg)
-
-    def _create_mask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
-        showWarning("Not yet implemented")
-        #todo: do this (when needed)
-
-
-class ImgOccNoteGeneratorSingle(ImgOccNoteGenerator):
-    def __init__(self, path, kbd, svg):
-        ImgOccNoteGenerator.__init__(self, path, kbd, svg)
-
-    def _generate_mask_svgs(self):
-        return [self.masks_svg]

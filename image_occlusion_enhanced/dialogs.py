@@ -21,11 +21,9 @@ from aqt.utils import saveGeom, restoreGeom
 from config import *
 
 class ImgOccEdit(QDialog):
-    def __init__(self, ImgOccAdd, mw):
+    def __init__(self, mw):
         QDialog.__init__(self, parent=None)
-        mw = mw
-        self.ImgOccAdd = ImgOccAdd
-        self.mode = self.ImgOccAdd.mode
+        self.mode = mw.ImgOccAdd.mode
         self.setupUi()
         restoreGeom(self, "imageOccEditor")
 
@@ -135,39 +133,36 @@ class ImgOccEdit(QDialog):
 
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(True)
-        if self.mode == "add":
-            # Regular mode
-            allhideonereveal_btn = button_box.addButton("All Hidden, One Revealed",
-                    QDialogButtonBox.ActionRole)
-            allhideonereveal_btn.setToolTip(
-                "Formerly known as nonoverlapping.<br>\
-                Generate cards where all labels are hidden and just one is revealed<br>\
-                on the back")
-            allhideallreveal_btn = button_box.addButton("All Hidden, All Revealed",
-                    QDialogButtonBox.ActionRole)
-            allhideallreveal_btn.setToolTip(
-                "Inbetween nonoverlapping and overlapping.<br>\
-                Generate cards where all labels are hidden, but all are revealed<br>\
-                on the back")
-            onehideonereveal_btn = button_box.addButton("One Hidden, One Revealed",
-                    QDialogButtonBox.ActionRole)
-            onehideonereveal_btn.setToolTip(
-                "Formerly known as overlapping.<br>\
-                Generate cards where only one label is hidden on the front")
 
-        else:
+        if self.mode == "edit":
             # Editing mode
             edit1_button = button_box.addButton("&Edit notes",
                     QDialogButtonBox.ActionRole)
             edit2_button = button_box.addButton("Edit and &switch type",
                     QDialogButtonBox.ActionRole)
-            allhideonereveal_btn = button_box.addButton("New &nonoverlapping notes",
-                    QDialogButtonBox.ActionRole)
-            onehideonereveal_btn = button_box.addButton("New &overlapping notes",
-                    QDialogButtonBox.ActionRole)
             self.connect(edit1_button, SIGNAL("clicked()"), self.edit)
             self.connect(edit2_button, SIGNAL("clicked()"), self.edit_and_switch)
-
+            allhideonereveal_label = ""
+            allhideallreveal_label = ""
+            onehideonereveal_label = ""
+        else:
+            allhideonereveal_label = "Formerly known as nonoverlapping.<br>\
+                Generate cards where all labels are hidden and just one is revealed<br>\
+                on the back"
+            allhideallreveal_label = "Between nonoverlapping and overlapping.<br>\
+                Generate cards where all labels are hidden, but all are revealed<br>\
+                on the back"
+            onehideonereveal_label = "Formerly known as overlapping.<br>\
+                Generate cards where only one label is hidden on the front"
+        allhideonereveal_btn = button_box.addButton("All Hidden, One Revealed",
+                QDialogButtonBox.ActionRole)
+        allhideallreveal_btn = button_box.addButton("All Hidden, All Revealed",
+                QDialogButtonBox.ActionRole)
+        onehideonereveal_btn = button_box.addButton("One Hidden, One Revealed",
+                QDialogButtonBox.ActionRole)
+        allhideonereveal_btn.setToolTip(allhideonereveal_label)
+        allhideallreveal_btn.setToolTip(allhideallreveal_label)
+        onehideonereveal_btn.setToolTip(onehideonereveal_label)
         close_button = button_box.addButton("&Close",
                 QDialogButtonBox.ActionRole)
         close_button.setToolTip("Close Image Occlusion Editor without generating cards")
@@ -226,15 +221,16 @@ class ImgOccEdit(QDialog):
 
     ## Notes
     def add_allhideonereveal(self): 
-        self.ImgOccAdd.onAddNotesButton("allhideonereveal")
+        mw.ImgOccAdd.onAddNotesButton("allhideonereveal")
     def add_allhideallreveal(self): 
-        self.ImgOccAdd.onAddNotesButton("allhideallreveal")
+        mw.ImgOccAdd.onAddNotesButton("allhideallreveal")
     def add_onehideonereveal(self): 
-        self.ImgOccAdd.onAddNotesButton("onehideonereveal")
+        mw.ImgOccAdd.onAddNotesButton("onehideonereveal")
     def edit(self):
-        self.ImgOccAdd.onAddNotesButton("edit")
+        mw.ImgOccAdd.onAddNotesButton("edit")
     def edit_and_switch(self):
-        self.ImgOccAdd.onAddNotesButton("edit_and_switch")
+        tooltip("Need to implement an occlusion type selection dialog")
+        #mw.ImgOccAdd.onAddNotesButton("edit_and_switch")
 
     ## Navigation, etc.
     def reset_window(self):
