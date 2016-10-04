@@ -36,11 +36,10 @@ import uuid
 import shutil
 
 class ImgOccNoteGenerator(object):
-    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
+    def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
         #image_path  is fully qualified path + filename
         self.image_path = image
-        self.current_editor = ed
         self.masks_svg = svg
         #self.fields = fields
         self.uniq = str(uuid.uuid4()).replace("-","")
@@ -52,15 +51,24 @@ class ImgOccNoteGenerator(object):
         self.extra1 = extra1
         self.extra2 = extra2
         self.did = did
+        self.otype = "no"
+        self.omask_path = None
+
+        self.mask_fill_color = '#' + mw.col.conf['image_occlusion_conf']['mask_fill_color']
 
     def generate_notes(self):
         masks = self._generate_mask_svgs()
-        #todo: if no notes, delete the image?
+        if not masks:
+            tooltip("No cards generated.<br>\
+                Are you sure you set your masks?")
+            return
         col_image = self.add_image_to_col()
+        occl_id = '%s-%s' % (self.uniq, self.otype)
+        self.omask_path = self._save_mask(self.masks_svg, occl_id, "O")
         for i in range(len(masks)):
-            self._save_mask_and_write_note(i, masks[i], col_image)
-        tooltip(("Cards added: %s" % len(masks) ), period=1500, parent=self.current_editor.parentWindow)
-
+            card_id = '%s-%s' % (occl_id, i+1)
+            self._save_mask_and_write_note(masks[i], col_image, card_id)
+        tooltip(("Cards added: %s" % len(masks) ), period=1500)
 
     def add_image_to_col(self):
         media_dir = mw.col.media.dir()
@@ -119,19 +127,16 @@ class ImgOccNoteGenerator(object):
         # assert (layer_nodes[0].nodeName == 'g')
         return layer_nodes[1]
 
-    def _save_mask(self, mask, note_number):
-        otype = "no"
-        mtype = "q"
-        note_id = '%s-%s-%s' % (self.uniq, otype, note_number+1)
-        mask_path = '%s-%s.svg' % (note_id, mtype)
+    def _save_mask(self, mask, id, mtype):
+        mask_path = '%s-%s.svg' % (id, mtype)
         mask_file = open(mask_path, 'w')
         mask_file.write(mask)
         mask_file.close()
-        return note_id, mask_path
+        return mask_path
 
-    def _save_mask_and_write_note(self, note_number, mask, col_image):
-        note_id, mask_path = self._save_mask(mask, note_number)
-        #see anki.collection._Collection#_newCard
+    def _save_mask_and_write_note(self, mask, col_image, note_id):
+        mask_path = self._save_mask(mask, note_id, "Q")
+        amask_path = ""
         model = mw.col.models.byName(IO_MODEL_NAME)
         model['did'] = self.did
         new_note = Note(mw.col, model)
@@ -150,7 +155,7 @@ class ImgOccNoteGenerator(object):
                     self.extra2,
                     fname2img(mask_path),
                     "",
-                    fname2img(mask_path)
+                    fname2img(self.omask_path)
                     ]
 
         for tag in self.tags:
@@ -162,9 +167,9 @@ class ImgOccNoteGenerator(object):
 class ImgOccNoteGeneratorSeparate(ImgOccNoteGenerator):
     """Each top level element of the layer becomes a separate mask"""
 
-    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
+    def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
-        ImgOccNoteGenerator.__init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
+        ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
 
     def _create_mask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
@@ -174,30 +179,34 @@ class ImgOccNoteGeneratorSeparate(ImgOccNoteGenerator):
                 layer_node.removeChild(layer_node.childNodes[i])
 
 
+
 class ImgOccNoteGeneratorHiding(ImgOccNoteGenerator):
     """Each top level element of the layer becomes a separate mask
     + the other elements are hidden"""
 
-    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
+    def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
-        ImgOccNoteGenerator.__init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
+        ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
 
     def _create_mask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
         def modify_fill_recursively(node):
             if (node.nodeType == node.ELEMENT_NODE):
                 if node.hasAttribute("fill"):
-                    node.setAttribute("fill", "#aaffff")
+                    node.setAttribute("fill", self.mask_fill_color)
                 map(modify_fill_recursively, node.childNodes)
 
         for i in all_mask_node_indexes:
-            if not i == mask_node_index:
+            if i == mask_node_index:
                 modify_fill_recursively(layer_node.childNodes[i])
+
+    def _create_amask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
+        pass
 
 
 class ImgOccNoteGeneratorProgressive(ImgOccNoteGenerator):
-    def __init__(self, path, ed, kbd, svg):
-        ImgOccNoteGenerator.__init__(self, path, ed, kbd, svg)
+    def __init__(self, path, kbd, svg):
+        ImgOccNoteGenerator.__init__(self, path, kbd, svg)
 
     def _create_mask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
         showWarning("Not yet implemented")
@@ -205,8 +214,8 @@ class ImgOccNoteGeneratorProgressive(ImgOccNoteGenerator):
 
 
 class ImgOccNoteGeneratorSingle(ImgOccNoteGenerator):
-    def __init__(self, path, ed, kbd, svg):
-        ImgOccNoteGenerator.__init__(self, path, ed, kbd, svg)
+    def __init__(self, path, kbd, svg):
+        ImgOccNoteGenerator.__init__(self, path, kbd, svg)
 
     def _generate_mask_svgs(self):
         return [self.masks_svg]

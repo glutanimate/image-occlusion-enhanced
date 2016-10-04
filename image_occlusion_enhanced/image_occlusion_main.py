@@ -186,7 +186,7 @@ class ImgOccAdd(object):
             #           tags, self.image_path,
             #           header, footer, remarks, sources, 
             #           extra1, extra2, did)
-            gen = ImgOccNoteGeneratorHiding(self.ed, self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
+            gen = ImgOccNoteGeneratorHiding(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
             gen.generate_notes()
             if self.ed.note:
                 # Update Editor with modified tags and sources field
