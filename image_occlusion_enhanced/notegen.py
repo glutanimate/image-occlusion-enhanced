@@ -122,14 +122,15 @@ class ImgOccNoteGenerator(object):
     def _save_mask(self, mask, note_number):
         otype = "no"
         mtype = "q"
-        mask_path = '%s-%s-%s-%s.svg' % (self.uniq, otype, note_number, mtype)
+        note_id = '%s-%s-%s' % (self.uniq, otype, note_number+1)
+        mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'w')
         mask_file.write(mask)
         mask_file.close()
-        return mask_path
+        return note_id, mask_path
 
     def _save_mask_and_write_note(self, note_number, mask, col_image):
-        mask_path = self._save_mask(mask, note_number)
+        note_id, mask_path = self._save_mask(mask, note_number)
         #see anki.collection._Collection#_newCard
         model = mw.col.models.byName(IO_MODEL_NAME)
         model['did'] = self.did
@@ -139,7 +140,7 @@ class ImgOccNoteGenerator(object):
             return '<img src="%s" />' % os.path.split(path)[1]
 
         new_note.fields = [
-                    self.uniq,
+                    note_id,
                     self.header,
                     fname2img(col_image),
                     self.footer,
