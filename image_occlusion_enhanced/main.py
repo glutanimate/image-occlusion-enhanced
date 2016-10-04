@@ -30,8 +30,10 @@ import urlparse, urllib
 
 from config import *
 
-from notegenerator import ImgOccNoteGenerator
-from notegenerator import ImgOccNoteGeneratorHiding
+from ngenerator import (
+    ImgOccNoteGeneratorHiding, 
+    ImgOccNoteGeneratorSeparate
+    )
 
 import svgutils
 from dialogs import ImgOccEdit, ImgOccOpts
@@ -144,22 +146,17 @@ class ImgOccAdd(object):
 
         try:
             mw.ImgOccEdit is not None
-            existing_instance = True
+            dialog.reset_window()
         except:
-            existing_instance = False
             mw.ImgOccEdit = ImgOccEdit(self, mw)
         dialog = mw.ImgOccEdit
-    
-        if not existing_instance:
-            url = QUrl.fromLocalFile(svg_edit_path)
-            url.setQueryItems(svg_edit_queryitems)
-            url.addQueryItem('initFill[color]', initFill_color)
-            url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-            url.addQueryItem('bkgd_url', bkgd_url)
-            dialog.svg_edit.load(url)
-        else:
-            dialog.reset_window(bkgd_url, width, height)
 
+        url = QUrl.fromLocalFile(svg_edit_path)
+        url.setQueryItems(svg_edit_queryitems)
+        url.addQueryItem('initFill[color]', initFill_color)
+        url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
+        url.addQueryItem('bkgd_url', bkgd_url)
+        dialog.svg_edit.load(url)
 
         if self.mode != "add":
             dialog.header_edit.setPlainText(onote["header"])

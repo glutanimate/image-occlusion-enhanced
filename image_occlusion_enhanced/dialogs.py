@@ -23,7 +23,7 @@ from config import *
 class ImgOccEdit(QDialog):
     def __init__(self, ImgOccAdd, mw):
         QDialog.__init__(self, parent=None)
-        self.mw = mw
+        mw = mw
         self.ImgOccAdd = ImgOccAdd
         self.mode = self.ImgOccAdd.mode
         self.setupUi()
@@ -225,18 +225,20 @@ class ImgOccEdit(QDialog):
         self.ImgOccAdd.onAddNotesButton("edit_and_switch")
 
     ## Navigation, etc.
-    def reset_window(self, bkgd_url, width, height):
+    def reset_window(self):
+        # fill = mw.col.conf['image_occlusion_conf']['initFill[color]']
         self.reset_all_fields()
         self.tab_widget.setCurrentIndex(0)
         self.header_edit.setFocus()
         self.svg_edit.setFocus()
-        self.svg_edit.eval("""
-            svgCanvas.clear();
-            svgCanvas.setBackground('#FFF', '%s');
-            svgCanvas.setResolution(%s, %s);
-            svgCanvas.runExtensions('onNewDocument');
-            svgCanvas.zoomChanged('', 'canvas');
-        """ %(bkgd_url, width, height))
+        # self.svg_edit.eval(
+        #     svgCanvas.clear();
+        #     svgCanvas.setBackground('#FFF', '%s');
+        #     svgCanvas.setResolution(%s, %s);
+        #     svgCanvas.runExtensions('onNewDocument');
+        #     svgCanvas.zoomChanged('', 'canvas');
+        #     svgCanvas.setMode('rect');
+        #  %(bkgd_url, width, height))
 
     def switch_tabs(self):
         currentTab = self.tab_widget.currentIndex()
@@ -268,7 +270,6 @@ class ImgOccOpts(QDialog):
     # Main IO Options dialog
     def __init__(self, mw):
         QDialog.__init__(self, parent=mw)
-        self.mw = mw
         self.setupUi()
 
     def getNewMaskColor(self):
@@ -277,9 +278,9 @@ class ImgOccOpts(QDialog):
         color = choose_color_dialog.getColor()
         if color.isValid():
             color_ = color.name()[1:]
-            self.mw.col.conf['image_occlusion_conf']['mask_fill_color'] = color_
+            mw.col.conf['image_occlusion_conf']['mask_fill_color'] = color_
             # notify db of modification
-            self.mw.col.setMod()
+            mw.col.setMod()
             self.changeButtonColor(self.mask_color_button, color_)
 
     def getNewInitFillColor(self):
@@ -288,9 +289,9 @@ class ImgOccOpts(QDialog):
         color = choose_color_dialog.getColor()
         if color.isValid():
             color_ = color.name()[1:]
-            self.mw.col.conf['image_occlusion_conf']['initFill[color]'] = color_
+            mw.col.conf['image_occlusion_conf']['initFill[color]'] = color_
             # notify db of modification
-            self.mw.col.setMod()
+            mw.col.setMod()
             self.changeButtonColor(self.initFill_button, color_)
 
     def changeButtonColor(self, button, color):
@@ -319,8 +320,8 @@ class ImgOccOpts(QDialog):
                                 self.getNewInitFillColor)
 
         ### set colors
-        initFill_color = self.mw.col.conf['image_occlusion_conf']['initFill[color]']
-        mask_fill_color = self.mw.col.conf['image_occlusion_conf']['mask_fill_color']
+        initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
+        mask_fill_color = mw.col.conf['image_occlusion_conf']['mask_fill_color']
         self.changeButtonColor(self.initFill_button, initFill_color)
         self.changeButtonColor(self.mask_color_button, mask_fill_color)
 
