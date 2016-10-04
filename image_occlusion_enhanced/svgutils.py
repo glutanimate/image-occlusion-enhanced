@@ -24,20 +24,24 @@ labels_layer_index = 0
 shapes_layer_index = 1
 
 # Make sure to use correct namespace
-svg_namespace = "http://www.w3.org/2000/svg"
-etree.register_namespace("",svg_namespace)
-svg_namespace = '{' + svg_namespace + '}'
+svg_ns = "http://www.w3.org/2000/svg"
+etree.register_namespace("",svg_ns)
+svg_ns = '{' + svg_ns + '}'
 
-def strip_attributes(root, attrs):
+def strip_attributes(root, attrs, match=None):
     title = None
-    tag_ns = svg_namespace
+    if not match:
+        for elt in root.iter():
+            for attr in attrs:
+                elt.attrib.pop(attr, None)
+        return
     for elt in root.iter():
+        # only remove in matched groups
         try:
-            title = elt.find(tag_ns + 'title').text
+            title = elt.find(svg_ns + 'title').text
         except:
             pass
-        # only remove attributes for elements in shapes layer
-        if title == "Masks" or title == "Shapes":
+        if title in match:
             for attr in attrs:
                 elt.attrib.pop(attr, None)
 
@@ -73,7 +77,7 @@ def nr_of_shapes(svg, curr_shapes_index):
 def get_shapes_layer_idx(svg):
     for idx,svg_ele in enumerate(svg):
         try:
-            title = svg_ele.find(svg_namespace + 'title').text
+            title = svg_ele.find(svg_ns + 'title').text
         except:
             title = None
         if title == "Masks" or title == "Shapes":

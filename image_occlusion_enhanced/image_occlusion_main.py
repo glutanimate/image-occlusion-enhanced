@@ -13,9 +13,6 @@
 ####################################################
 
 import os
-import sys
-import re
-import tempfile
 
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtCore import QUrl
@@ -27,11 +24,14 @@ from aqt.qt import *
 from anki.hooks import wrap, addHook
 
 import etree.ElementTree as etree
+import re
+import tempfile
+
+from notegen import ImgOccNoteGenerator, ImgOccNoteGeneratorHiding
 
 from config import *
 import svgutils
 from dialogs import ImgOccEdit, ImgOccOpts
-from notes_from_svg import add_notes_non_overlapping, add_notes_overlapping
 from resources import *
 
 io_help_link = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
@@ -167,7 +167,8 @@ class ImgOccAdd(object):
         svg_contents = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();"
             )
-        svg = etree.fromstring(svg_contents.encode('utf-8'))
+        # svg = etree.fromstring(svg_contents.encode('utf-8'))
+        svg = svg_contents
         
         mask_fill_color = self.mw.col.conf['image_occlusion_conf']['mask_fill_color']
         (did, tags, header, footer, remarks, sources, 
@@ -175,14 +176,12 @@ class ImgOccAdd(object):
 
         # Add notes to the current deck of the collection:
         if choice in ["nonoverlapping", "overlapping"]:
-            # add_notes(choice, svg, mask_fill_color,
+            # add_notes_non_overlapping(svg, mask_fill_color,
             #           tags, self.image_path,
             #           header, footer, remarks, sources, 
             #           extra1, extra2, did)
-            add_notes_non_overlapping(svg, mask_fill_color,
-                      tags, self.image_path,
-                      header, footer, remarks, sources, 
-                      extra1, extra2, did)
+            gen = ImgOccNoteGeneratorHiding(self.ed, self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
+            gen.generate_notes()
             if self.ed.note:
                 # Update Editor with modified tags and sources field
                 self.ed.tags.setText(" ".join(tags))

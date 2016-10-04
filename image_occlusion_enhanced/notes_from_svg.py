@@ -22,35 +22,29 @@ import add_notes
 
 # attributes that are useless in the shapes layer
 # (stroke and opacity settings)
-useless_attribs = ['opacity',
-                   'stroke-opacity',
-                   'fill-opacity',
-                   'stroke-dasharray',
-                   'stroke-linecap',
-                   'stroke-linejoin',
-                   'stroke']
+stripattr = ['opacity',
+           'stroke-opacity',
+           'fill-opacity',
+           'stroke-dasharray',
+           'stroke-linecap',
+           'stroke-linejoin',
+           'stroke']
 
-def generate_nonoverlapping(svg, q_color):
+def generate_nonoverlapping(svg):
     fnames_q_svg = gen_fnames_q(tmp_media_dir, nr_of_cards, 'svg')
     fnames_a_svg = gen_fnames_a(tmp_media_dir, nr_of_cards, 'svg')
+    q_color = ""
     # Generate the question sides of the cards:
     for i in xrange(nr_of_cards):
         svg_i = copy.deepcopy(svg)
         shapes_layer = svg_i[curr_shapes_index]
-        set_color_recursive(shapes_layer[i+1], q_color)  # <title>
-        set_id(shapes_layer[i+1], 'question-element')
-        strip_attributes(svg_i, useless_attribs)
-        f = open(fnames_q_svg[i], 'w')
-        f.write(etree.tostring(svg_i))
-        f.close()
-
-    # Generate the answer sides of the cards:
-    for i in xrange(nr_of_cards):
-        svg_i = copy.deepcopy(svg)
-        shapes_layer = svg_i[curr_shapes_index]
-        shapes_layer.remove(shapes_layer[i+1])
-        strip_attributes(svg_i, useless_attribs)
-        f = open(fnames_a_svg[i], 'w')
+        strip_attributes(svg_i, stripattr, ["Shapes", "Masks"])
+        if mask == "qmask":
+            set_color_recursive(shapes_layer[i+1], q_color) # <title>
+            set_id(shapes_layer[i+1], 'question-element')
+            f = open(fnames_q_svg[i], 'w')
+        else:
+            f = open(fnames_a_svg[i], 'w')
         f.write(etree.tostring(svg_i))
         f.close()
 
@@ -73,7 +67,7 @@ def generate_overlapping():
             else:
                 shapes_layer.remove(shape)
             j = j + 1
-        strip_attributes(svg_i, useless_attribs)
+        strip_attributes(svg_i, stripattr, ["Shapes", "Masks"])
 
         f = open(fnames_q_svg[i], 'w')
         f.write(etree.tostring(svg_i))
@@ -97,7 +91,7 @@ def add_notes_now(choice, svg, did, onote):
     nr_of_cards = nr_of_shapes(svg, curr_shapes_index)
     tmp_media_dir = tempfile.mkdtemp(prefix="media-for-anki")
 
-    strip_attributes(svg, useless_attribs)
+    strip_attributes(svg, stripattr)
     svg_fname = os.path.join(tmp_media_dir, "fmask.svg")
     f = open(svg_fname, 'w')
     f.write(etree.tostring(svg))
@@ -133,7 +127,7 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
     tmp_media_dir = tempfile.mkdtemp(prefix="media-for-anki")
 
 
-    strip_attributes(svg, useless_attribs)
+    strip_attributes(svg, stripattr)
     svg_fname = os.path.join(tmp_media_dir, "fmask.svg")
     f = open(svg_fname, 'w')
     f.write(etree.tostring(svg))
@@ -148,7 +142,7 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
         shapes_layer = svg_i[curr_shapes_index]
         set_color_recursive(shapes_layer[i+1], q_color)  # <title>
         set_id(shapes_layer[i+1], 'question-element')
-        strip_attributes(svg_i, useless_attribs)
+        strip_attributes(svg_i, stripattr, ["Shapes", "Masks"])
         f = open(fnames_q_svg[i], 'w')
         f.write(etree.tostring(svg_i))
         f.close()
@@ -158,7 +152,7 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
         svg_i = copy.deepcopy(svg)
         shapes_layer = svg_i[curr_shapes_index]
         shapes_layer.remove(shapes_layer[i+1])
-        strip_attributes(svg_i, useless_attribs)
+        strip_attributes(svg_i, stripattr, ["Shapes", "Masks"])
         f = open(fnames_a_svg[i], 'w')
         f.write(etree.tostring(svg_i))
         f.close()
@@ -186,7 +180,7 @@ def add_notes_overlapping(svg, q_color, tags, fname_original,
     # Get a temporary directory to store the images
     tmp_media_dir = tempfile.mkdtemp(prefix="media-for-anki")
 
-    strip_attributes(svg, useless_attribs)
+    strip_attributes(svg, stripattr)
     svg_fname = os.path.join(tmp_media_dir, "source_svg.svg")
     f = open(svg_fname, 'w')
     f.write(etree.tostring(svg))
@@ -211,7 +205,7 @@ def add_notes_overlapping(svg, q_color, tags, fname_original,
             else:
                 shapes_layer.remove(shape)
             j = j + 1
-        strip_attributes(svg_i, useless_attribs)
+        strip_attributes(svg_i, stripattr, ["Shapes", "Masks"])
 
         f = open(fnames_q_svg[i], 'w')
         f.write(etree.tostring(svg_i))
