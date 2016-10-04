@@ -23,16 +23,16 @@ from aqt.utils import tooltip, openLink, showWarning, saveGeom, restoreGeom
 from aqt.qt import *
 from anki.hooks import wrap, addHook
 
-
-
 import etree.ElementTree as etree
 import re
 import tempfile
 import urlparse, urllib
 
-from notegen import ImgOccNoteGenerator, ImgOccNoteGeneratorHiding
-
 from config import *
+
+from notegenerator import ImgOccNoteGenerator
+from notegenerator import ImgOccNoteGeneratorHiding
+
 import svgutils
 from dialogs import ImgOccEdit, ImgOccOpts
 from resources import *
@@ -140,6 +140,8 @@ class ImgOccAdd(object):
         width, height = svgutils.imageProp(self.image_path)
         initFill_color = self.mw.col.conf['image_occlusion_conf']['initFill[color]']
         bkgd_url = path2url(self.image_path)
+        onote = self.onote
+
         try:
             mw.ImgOccEdit is not None
             existing_instance = True
@@ -156,13 +158,8 @@ class ImgOccAdd(object):
             url.addQueryItem('bkgd_url', bkgd_url)
             dialog.svg_edit.load(url)
         else:
-            dialog.svg_edit.eval("""
-                svgCanvas.clear();
-                svgCanvas.setBackground('#FFF', '%s');
-                svgCanvas.setResolution(%s, %s);
-                svgCanvas.runExtensions('onNewDocument');
-                svgCanvas.zoomChanged('', 'canvas');
-            """ %(bkgd_url, width, height))
+            dialog.reset_window(bkgd_url, width, height)
+
 
         if self.mode != "add":
             dialog.header_edit.setPlainText(onote["header"])
