@@ -23,9 +23,12 @@ from aqt.utils import tooltip, openLink, showWarning, saveGeom, restoreGeom
 from aqt.qt import *
 from anki.hooks import wrap, addHook
 
+
+
 import etree.ElementTree as etree
 import re
 import tempfile
+import urlparse, urllib
 
 from notegen import ImgOccNoteGenerator, ImgOccNoteGeneratorHiding
 
@@ -50,6 +53,9 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('text[font_family]', "'Helvetica LT Std', Arial, sans-serif"),
                        ('extensions', svg_edit_ext)]
 
+def path2url(path):
+    return urlparse.urljoin(
+      'file:', urllib.pathname2url(path.encode('utf-8')))
 
 class ImgOccAdd(object):
     def __init__(self, ed):
@@ -142,7 +148,7 @@ class ImgOccAdd(object):
         url.setQueryItems(svg_edit_queryitems)
         url.addQueryItem('initFill[color]', initFill_color)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-        url.addQueryItem('bkgd_url', QUrl.fromLocalFile(self.image_path).toString())
+        url.addQueryItem('bkgd_url', path2url(self.image_path))
             
         if self.mode != "add":
             dialog.header_edit.setPlainText(onote["header"])
