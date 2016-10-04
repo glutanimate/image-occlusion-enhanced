@@ -146,7 +146,7 @@ class ImgOccAdd(object):
 
         try:
             mw.ImgOccEdit is not None
-            dialog.reset_window()
+            mw.ImgOccEdit.reset_window()
         except:
             mw.ImgOccEdit = ImgOccEdit(self, mw)
         dialog = mw.ImgOccEdit
@@ -156,7 +156,7 @@ class ImgOccAdd(object):
         url.addQueryItem('initFill[color]', initFill_color)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
-        dialog.svg_edit.load(url)
+        dialog.svg_edit.setUrl(url)
 
         if self.mode != "add":
             dialog.header_edit.setPlainText(onote["header"])

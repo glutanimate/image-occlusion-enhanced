@@ -226,19 +226,10 @@ class ImgOccEdit(QDialog):
 
     ## Navigation, etc.
     def reset_window(self):
-        # fill = mw.col.conf['image_occlusion_conf']['initFill[color]']
         self.reset_all_fields()
         self.tab_widget.setCurrentIndex(0)
         self.header_edit.setFocus()
         self.svg_edit.setFocus()
-        # self.svg_edit.eval(
-        #     svgCanvas.clear();
-        #     svgCanvas.setBackground('#FFF', '%s');
-        #     svgCanvas.setResolution(%s, %s);
-        #     svgCanvas.runExtensions('onNewDocument');
-        #     svgCanvas.zoomChanged('', 'canvas');
-        #     svgCanvas.setMode('rect');
-        #  %(bkgd_url, width, height))
 
     def switch_tabs(self):
         currentTab = self.tab_widget.currentIndex()
