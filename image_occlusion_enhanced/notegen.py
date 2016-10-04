@@ -56,24 +56,21 @@ class ImgOccNoteGenerator(object):
     def generate_notes(self):
         masks = self._generate_mask_svgs()
         #todo: if no notes, delete the image?
-        self.image_path = self.add_image_to_col()
+        col_image = self.add_image_to_col()
         for i in range(len(masks)):
-            self._save_mask_and_write_note(i, masks[i])
+            self._save_mask_and_write_note(i, masks[i], col_image)
         tooltip(("Cards added: %s" % len(masks) ), period=1500, parent=self.current_editor.parentWindow)
 
+
     def add_image_to_col(self):
-        tmp_media_dir = tempfile.mkdtemp(prefix="imgocc")
         media_dir = mw.col.media.dir()
         fn = os.path.basename(self.image_path)
-        unique_fn = self.uniq + '_' + fn
+        name, ext = os.path.splitext(fn)
+        short_name = name[:75] if len(name) > 75 else name
+        unique_fn = self.uniq + '_' + short_name + ext
         new_path = os.path.join(media_dir, unique_fn)
         shutil.copyfile(self.image_path, new_path)
         return new_path
-        # shutil.copy(self.image_path, tmp_media_dir)
-        # os.rename(os.path.join(tmp_media_dir, bname),
-        #           os.path.join(tmp_media_dir, hash_bname))
-        # new_path = os.path.join(tmp_media_dir, hash_bname)
-        # mw.col.media.addFile(path.decode(IO_ENCODING))
 
     def _generate_mask_svgs(self):
         #Note this gets reimplemented by ImgOccNoteGeneratorSingle
@@ -131,7 +128,7 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
-    def _save_mask_and_write_note(self, note_number, mask):
+    def _save_mask_and_write_note(self, note_number, mask, col_image):
         mask_path = self._save_mask(mask, note_number)
         #see anki.collection._Collection#_newCard
         model = mw.col.models.byName(IO_MODEL_NAME)
@@ -144,7 +141,7 @@ class ImgOccNoteGenerator(object):
         new_note.fields = [
                     self.uniq,
                     self.header,
-                    fname2img(self.image_path),
+                    fname2img(col_image),
                     self.footer,
                     self.remarks,
                     self.sources,
