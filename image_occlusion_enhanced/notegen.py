@@ -172,11 +172,15 @@ class ImgOccNoteGeneratorSeparate(ImgOccNoteGenerator):
         ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
 
-    def _create_mask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
+    def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
         #Delete all child nodes except for mask_node_index
-        for i in reversed(all_mask_node_indexes):
-            if not i == mask_node_index:
-                layer_node.removeChild(layer_node.childNodes[i])
+        if side == "Q":
+            for i in reversed(all_mask_node_indexes):
+                if not i == mask_node_index:
+                    layer_node.removeChild(layer_node.childNodes[i])
+        if side == "A":
+            layer_node.unlink()
+            pass
 
 
 

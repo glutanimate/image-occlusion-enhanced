@@ -61,7 +61,6 @@ class ImgOccAdd(object):
     def __init__(self, ed):
         self.ed = ed
         self.mw = mw
-        self.dialog = None
         self.mode = "add"
         self.onote = {}
 
@@ -138,18 +137,33 @@ class ImgOccAdd(object):
         self.call_ImgOccEdit()
 
     def call_ImgOccEdit(self):
-        self.dialog = ImgOccEdit(self, mw)
-        dialog = self.dialog
-        onote = self.onote
-
         width, height = svgutils.imageProp(self.image_path)
         initFill_color = self.mw.col.conf['image_occlusion_conf']['initFill[color]']
-        url = QUrl.fromLocalFile(svg_edit_path)
-        url.setQueryItems(svg_edit_queryitems)
-        url.addQueryItem('initFill[color]', initFill_color)
-        url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-        url.addQueryItem('bkgd_url', path2url(self.image_path))
-            
+        bkgd_url = path2url(self.image_path)
+        try:
+            mw.ImgOccEdit is not None
+            existing_instance = True
+        except:
+            existing_instance = False
+            mw.ImgOccEdit = ImgOccEdit(self, mw)
+        dialog = mw.ImgOccEdit
+    
+        if not existing_instance:
+            url = QUrl.fromLocalFile(svg_edit_path)
+            url.setQueryItems(svg_edit_queryitems)
+            url.addQueryItem('initFill[color]', initFill_color)
+            url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
+            url.addQueryItem('bkgd_url', bkgd_url)
+            dialog.svg_edit.load(url)
+        else:
+            dialog.svg_edit.eval("""
+                svgCanvas.clear();
+                svgCanvas.setBackground('#FFF', '%s');
+                svgCanvas.setResolution(%s, %s);
+                svgCanvas.runExtensions('onNewDocument');
+                svgCanvas.zoomChanged('', 'canvas');
+            """ %(bkgd_url, width, height))
+
         if self.mode != "add":
             dialog.header_edit.setPlainText(onote["header"])
             dialog.footer_edit.setPlainText(onote["footer"])
@@ -163,13 +177,11 @@ class ImgOccAdd(object):
         dialog.tags_edit.setCol(self.mw.col)
         dialog.sources_edit.setPlainText(onote["sources"])
 
-        dialog.svg_edit.load(url)
-        dialog.show()
         dialog.exec_()
         
 
     def onAddNotesButton(self, choice):
-        svg_edit = self.dialog.svg_edit
+        svg_edit = mw.ImgOccEdit.svg_edit
         svg_contents = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();"
             )
@@ -181,38 +193,36 @@ class ImgOccAdd(object):
             extra1, extra2) = self.getUserInputs()
 
         # Add notes to the current deck of the collection:
-        if choice in ["nonoverlapping", "overlapping"]:
-            # add_notes_non_overlapping(svg, mask_fill_color,
-            #           tags, self.image_path,
-            #           header, footer, remarks, sources, 
-            #           extra1, extra2, did)
+        if choice == "nonoverlapping":
             gen = ImgOccNoteGeneratorHiding(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
             gen.generate_notes()
-            if self.ed.note:
+        elif choice == "overlapping":
+            gen = ImgOccNoteGeneratorSeparate(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
+            gen.generate_notes()
+        elif choice == "edit":
+            pass
+        elif choice == "edit-and-switch":
+            pass
+
+        if self.ed.note:
+            if choice in ["overlapping", "nonoverlapping"]:
                 # Update Editor with modified tags and sources field
                 self.ed.tags.setText(" ".join(tags))
                 self.ed.saveTags()
                 if IO_FLDS["sources"] in self.ed.note:
                     self.ed.note[IO_FLDS["sources"]] = sources
-                    self.ed.loadNote()
-        else:
-            update_notes(choice, svg, mask_fill_color,
-                          tags, self.image_path,
-                          header, footer, remarks, sources, 
-                          extra1, extra2, did)
-        if self.ed.note:
             self.ed.loadNote()
         self.mw.reset()
 
     def getUserInputs(self):
-        header = self.dialog.header_edit.toPlainText().replace('\n', '<br />')
-        footer = self.dialog.footer_edit.toPlainText().replace('\n', '<br />')
-        remarks = self.dialog.remarks_edit.toPlainText().replace('\n', '<br />')
-        sources = self.dialog.sources_edit.toPlainText().replace('\n', '<br />')
-        extra1 = self.dialog.extra1_edit.toPlainText().replace('\n', '<br />')
-        extra2 = self.dialog.extra2_edit.toPlainText().replace('\n', '<br />')
-        did = self.dialog.deckChooser.selectedId()
-        tags = self.dialog.tags_edit.text().split()
+        header = mw.ImgOccEdit.header_edit.toPlainText().replace('\n', '<br />')
+        footer = mw.ImgOccEdit.footer_edit.toPlainText().replace('\n', '<br />')
+        remarks = mw.ImgOccEdit.remarks_edit.toPlainText().replace('\n', '<br />')
+        sources = mw.ImgOccEdit.sources_edit.toPlainText().replace('\n', '<br />')
+        extra1 = mw.ImgOccEdit.extra1_edit.toPlainText().replace('\n', '<br />')
+        extra2 = mw.ImgOccEdit.extra2_edit.toPlainText().replace('\n', '<br />')
+        did = mw.ImgOccEdit.deckChooser.selectedId()
+        tags = mw.ImgOccEdit.tags_edit.text().split()
         return (did, tags, header, footer, remarks, sources, extra1, extra2)
 
 
@@ -225,7 +235,7 @@ def invoke_io_help():
     openLink(io_help_link)
 
 def onImgOccButton(ed, mode):
-    ioInstance = ImgOccAdd(ed)
+    ed.ImgOccAdd = ImgOccAdd(ed)
     # note type integrity check
     ioModel = mw.col.models.byName(IO_MODEL_NAME)
     if ioModel:
@@ -238,7 +248,7 @@ def onImgOccButton(ed, mode):
                 <a href="' + io_help_link + '/Customization#a-note-of-warning">\
                 Wiki - Note Type Customization</a>')
             return
-    ioInstance.getImage(mode)
+    ed.ImgOccAdd.getImage(mode)
 
 def onSetupEditorButtons(self):
     # Add IO button to Editor

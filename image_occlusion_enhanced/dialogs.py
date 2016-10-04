@@ -22,7 +22,7 @@ from config import *
 
 class ImgOccEdit(QDialog):
     def __init__(self, ImgOccAdd, mw):
-        QDialog.__init__(self, parent=mw)
+        QDialog.__init__(self, parent=None)
         self.mw = mw
         self.ImgOccAdd = ImgOccAdd
         self.mode = self.ImgOccAdd.mode
@@ -32,6 +32,7 @@ class ImgOccEdit(QDialog):
     def closeEvent(self, event):
         if mw.pm.profile is not None:
             saveGeom(self, "imageOccEditor")
+        QWidget.closeEvent(self, event)
 
     def setupUi(self):
         self.svg_edit = webview.AnkiWebView()
