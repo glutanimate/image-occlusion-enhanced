@@ -20,6 +20,7 @@ import sys
 import uuid
 import shutil
 
+from config import *
 
 def notes_added_message(nrOfNotes):
     if nrOfNotes == 1:
@@ -39,27 +40,6 @@ def rm_tmp_media_dir(tmp_media_dir):
         os.rmdir(tmp_media_dir)
     except:
         pass
-
-
-IO_FLDS = {
-    'uuid': "ID (hidden)",
-    'header': "Header",
-    'image': "Image",
-    'footer': "Footer",
-    'remarks': "Anmerkungen",
-    'sources': "Quellen",
-    'extra1': "Extra 1",
-    'extra2': "Extra 2",
-    'qmask': "Question Mask",
-    'amask': "Answer Mask",
-    'fmask': "Full Mask"
-}
-
-IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
-                "extra1", "extra2", "qmask", "amask", "fmask"]
-
-IO_MODEL_NAME = "Image Occlusion Enhanced"
-IO_CARD_NAME = "IO Card"
 
 iocard_front = """\
 {{#%(src_img)s}}
@@ -231,8 +211,7 @@ def new_bnames(col, tmp_media_dir, original_fname):
         # The KEY to the dictionary must be in the default file system
         # encoding, because we will write d[filename], where filename
         # is encoded in the same encoding.
-        encoding = sys.getfilesystemencoding()
-        d[bname.decode(encoding)] = col.media.addFile(path.decode(encoding))
+        d[bname.decode(IO_ENCODING)] = col.media.addFile(path.decode(IO_ENCODING))
 
     return d
 
