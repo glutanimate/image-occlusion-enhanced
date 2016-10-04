@@ -10,6 +10,14 @@
 ##         Copyright (c) 2012-2015 tmbb           ##
 ##           (https://github.com/tmbb)            ##
 ##                                                ##
+##  --------------------------------------------  ##
+##                                                ##
+##            Notegen.py is based on              ##
+##           Simple Picture Occlusion             ##
+##                   which is                     ##
+##          Copyright (c) 2013 SteveAW            ##
+##             (steveawa@gmail.com)               ##
+##                                                ##
 ####################################################
 
 import os
