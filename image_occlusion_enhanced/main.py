@@ -29,7 +29,7 @@ import tempfile
 import urlparse, urllib
 
 from config import *
-from ngenerator import *
+from ngen import *
 from dialogs import ImgOccEdit, ImgOccOpts
 
 import svgutils
@@ -174,6 +174,7 @@ class ImgOccAdd(object):
         svg_edit = mw.ImgOccEdit.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
+        print svg
         
         mask_fill_color = mw.col.conf['image_occlusion_conf']['mask_fill_color']
         (did, tags, header, footer, remarks, sources, 
@@ -186,7 +187,7 @@ class ImgOccAdd(object):
         if choice == "allhideallreveal":
             gen = IoGenAllHideAllReveal(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
             gen.generate_notes()
-        elif choice == "onehideonereveal":
+        elif choice == "onehideallreveal":
             gen = IoGenOneHideAllReveal(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
             gen.generate_notes()
         elif choice == "edit":

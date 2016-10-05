@@ -169,9 +169,8 @@ class ImgOccNoteGenerator(object):
 
         mw.col.addNote(new_note)
 
-
 class IoGenAllHideOneReveal(ImgOccNoteGenerator):
-    """Q: All hidden, A: One revealed"""
+    """Q: All hidden, A: One revealed ('nonoverlapping')"""
 
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
@@ -180,11 +179,12 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
         self.otype = "ao"
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
-        for i in reversed(all_mask_node_indexes):
-            if i == mask_node_index and side == "Q":
-                self.modify_fill_recursively(layer_node.childNodes[i])
-            else:
-                layer_node.removeChild(layer_node.childNodes[i])
+        for i in all_mask_node_indexes:
+            if i == mask_node_index:
+                if side == "Q":
+                    self.modify_fill_recursively(layer_node.childNodes[i])
+                if side == "A":
+                    layer_node.removeChild(layer_node.childNodes[i])
 
 class IoGenAllHideAllReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
@@ -204,18 +204,16 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
                 layer_node.removeChild(layer_node.childNodes[i])
 
 class IoGenOneHideAllReveal(ImgOccNoteGenerator):
-    """Q: One hidden, A: All revealed"""
-
+    """Q: One hidden, A: All revealed ('overlapping')"""
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
         ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
-        self.otype = "oo"
+        self.otype = "oa"
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
-        for i in all_mask_node_indexes:
-            if i == mask_node_index:
-                if side == "Q":
-                    self.modify_fill_recursively(layer_node.childNodes[i])
-                if side == "A":
-                    layer_node.removeChild(layer_node.childNodes[i])
+        for i in reversed(all_mask_node_indexes):
+            if i == mask_node_index and side == "Q":
+                self.modify_fill_recursively(layer_node.childNodes[i])
+            else:
+                layer_node.removeChild(layer_node.childNodes[i])
