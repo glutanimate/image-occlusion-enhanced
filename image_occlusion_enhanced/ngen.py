@@ -64,8 +64,9 @@ def genByKey(key):
 
 
 class ImgOccNoteGenerator(object):
-    def __init__(self, image, svg, tags, header, footer, remarks, sources, 
+    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
+        self.ed = ed
         self.image_path = image
         self.masks_svg = svg
         #self.fields = fields
@@ -81,6 +82,7 @@ class ImgOccNoteGenerator(object):
         self.omask_path = None
         self.uniq = '%s-%s' % (self.oid, self.otype)
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
+        self.edit = False
 
     def generate_notes(self):
         qmasks = self._generate_mask_svgs("Q")
@@ -111,7 +113,11 @@ class ImgOccNoteGenerator(object):
         #     mw.overview.refresh()
         # else:
         #     mw.deckBrowser.refresh()
-        tooltip(("Cards added: %s" % len(qmasks) ), period=1500)
+        if self.edit:
+            parent = self.ed.parentWindow
+        else:
+            parent = None
+        tooltip(("Cards added: %s" % len(qmasks) ), period=1500, parent=parent)
 
     def add_image_to_col(self):
         media_dir = mw.col.media.dir()
@@ -237,10 +243,10 @@ class ImgOccNoteGenerator(object):
 class IoGenAllHideOneReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""
 
-    def __init__(self, image, svg, tags, header, footer, remarks, sources, 
+    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
         self.otype = "ao"
-        ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
+        ImgOccNoteGenerator.__init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
         
 
@@ -256,10 +262,10 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
 class IoGenAllHideAllReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
 
-    def __init__(self, image, svg, tags, header, footer, remarks, sources, 
+    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
         self.otype = "aa"
-        ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
+        ImgOccNoteGenerator.__init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
         
 
@@ -274,10 +280,10 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
 
 class IoGenOneHideAllReveal(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
-    def __init__(self, image, svg, tags, header, footer, remarks, sources, 
+    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
         self.otype = "oa"
-        ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
+        ImgOccNoteGenerator.__init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
         
 

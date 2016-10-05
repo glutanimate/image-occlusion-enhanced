@@ -249,8 +249,10 @@ class ImgOccEdit(QDialog):
         mw.ImgOccAdd.onAddNotesButton("oa")
     def new(self):
         mw.ImgOccAdd.onAddNotesButton("new")
+        self.close()
     def edit_all(self):
         mw.ImgOccAdd.onAddNotesButton("edit")
+        self.close()
 
     # Modes
     def switch_to_mode(self, mode):

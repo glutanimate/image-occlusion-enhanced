@@ -168,7 +168,11 @@ class ImgOccAdd(object):
         dialog.tags_edit.setCol(mw.col)
         dialog.sources_edit.setPlainText(onote["sources"])
 
-        dialog.exec_()
+        if self.mode == "add":
+            dialog.show()
+        else:
+            # modal dialog when editing
+            dialog.exec_()
         
 
     def onAddNotesButton(self, choice):
@@ -190,7 +194,7 @@ class ImgOccAdd(object):
                 choice = mw.ImgOccEdit.otype_select.currentText()
 
         noteGenerator = genByKey(choice)
-        gen = noteGenerator(self.image_path, svg, tags, header, 
+        gen = noteGenerator(self.ed, self.image_path, svg, tags, header, 
                     footer, remarks, sources, extra1, extra2, did)
         gen.generate_notes()
 
