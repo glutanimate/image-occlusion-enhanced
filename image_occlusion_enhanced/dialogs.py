@@ -104,7 +104,6 @@ class ImgOccEdit(QDialog):
 
         ## Tab 1
         vbox1 = QVBoxLayout()
-        # vbox1.addWidget(self.edit_label)
         vbox1.addWidget(self.edit_label)
         vbox1.addWidget(self.svg_edit, stretch=1)
 
@@ -143,12 +142,17 @@ class ImgOccEdit(QDialog):
 
         ## Set up buttons
 
+        self.bottom_label = QLabel()
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
-        button_box.setCenterButtons(True)
+        button_box.setCenterButtons(False)
 
-        self.edit1_btn = button_box.addButton("&Edit notes",
+        self.otype_select = QComboBox()
+        self.otype_select.addItems(["Don't change", "All Hidden, One Revealed",
+            "All Hidden, All Revealed", "One Hidden, All Revealed"])
+
+        self.edit_btn = button_box.addButton("&Edit cards",
                 QDialogButtonBox.ActionRole)
-        self.edit2_btn = button_box.addButton("Edit and &switch type",
+        self.new_btn = button_box.addButton("&Add new cards",
                 QDialogButtonBox.ActionRole)
         self.allhideonereveal_btn = button_box.addButton(u"All Hidden, &One Revealed",
                 QDialogButtonBox.ActionRole)
@@ -157,32 +161,38 @@ class ImgOccEdit(QDialog):
         self.onehideallreveal_btn = button_box.addButton(u"One Hidden, &All Revealed",
                 QDialogButtonBox.ActionRole)
         self.close_button = button_box.addButton("&Close", 
-                QDialogButtonBox.ActionRole)
+                QDialogButtonBox.RejectRole)
 
-        edit1_tt = ""
-        edit2_tt = ""
+        edit_tt = "Edit all cards using current mask shapes and field entries"
+        new_tt = "Create new batch of cards without editing existng ones"
         allhideonereveal_tt = "Formerly known as nonoverlapping.<br>\
             Generate cards where all labels are hidden and just one is revealed<br>\
             on the back"
-        allhideallreveal_tt = "Between nonoverlapping and overlapping.<br>\
-            Generate cards where all labels are hidden, but all are revealed<br>\
-            on the back"
+        allhideallreveal_tt = "A step between nonoverlapping and overlapping.<br>\
+            Generate cards where all labels are hidden on the front, but all \
+            revealed on the back"
         onehideallreveal_tt = "Formerly known as overlapping.<br>\
-            Generate cards where only one label is hidden on the front"
+            Generate cards where just one label is hidden on the front and all\
+            revealed on the back"
         close_tt = "Close Image Occlusion Editor without generating cards"
-        self.edit1_btn.setToolTip(edit1_tt)
-        self.edit2_btn.setToolTip(edit2_tt)
+        self.edit_btn.setToolTip(edit_tt)
+        self.new_btn.setToolTip(new_tt)
         self.allhideonereveal_btn.setToolTip(allhideonereveal_tt)
         self.allhideallreveal_btn.setToolTip(allhideallreveal_tt)
         self.onehideallreveal_btn.setToolTip(onehideallreveal_tt)
         self.close_button.setToolTip(close_tt)
 
-        self.connect(self.edit1_btn, SIGNAL("clicked()"), self.edit)
-        self.connect(self.edit2_btn, SIGNAL("clicked()"), self.edit_and_switch)
+        self.connect(self.edit_btn, SIGNAL("clicked()"), self.edit_all)
+        self.connect(self.new_btn, SIGNAL("clicked()"), self.new)
         self.connect(self.allhideonereveal_btn, SIGNAL("clicked()"), self.add_allhideonereveal)
         self.connect(self.allhideallreveal_btn, SIGNAL("clicked()"), self.add_allhideallreveal)
         self.connect(self.onehideallreveal_btn, SIGNAL("clicked()"), self.add_onehideallreveal)
         self.connect(self.close_button, SIGNAL("clicked()"), self.close)
+
+        bottom_hbox = QHBoxLayout()
+        bottom_hbox.addWidget(self.bottom_label)
+        bottom_hbox.addWidget(self.otype_select)
+        bottom_hbox.addWidget(button_box)
 
         # Add all widgets to main window
         ## set widget layout up
@@ -190,7 +200,7 @@ class ImgOccEdit(QDialog):
         vbox_main.setMargin(0);
         ## add widgets
         vbox_main.addWidget(self.tab_widget)
-        vbox_main.addWidget(button_box)
+        vbox_main.addLayout(bottom_hbox)
         ## apply to main window
         self.setLayout(vbox_main)
 
@@ -230,40 +240,49 @@ class ImgOccEdit(QDialog):
         self.tab_widget.setCurrentIndex(0)
         self.svg_edit.setFocus()
 
-    # Modes
+    ## Note actions
+    def add_allhideonereveal(self): 
+        mw.ImgOccAdd.onAddNotesButton("ao")
+    def add_allhideallreveal(self): 
+        mw.ImgOccAdd.onAddNotesButton("aa")
+    def add_onehideallreveal(self): 
+        mw.ImgOccAdd.onAddNotesButton("oa")
+    def new(self):
+        mw.ImgOccAdd.onAddNotesButton("new")
+    def edit_all(self):
+        mw.ImgOccAdd.onAddNotesButton("edit")
 
+    # Modes
     def switch_to_mode(self, mode):
         self.mode = mode
         if mode == "add":
             self.edit_label.hide()
-            self.edit1_btn.hide()
-            self.edit2_btn.hide()
+            self.otype_select.hide()
+            self.edit_btn.hide()
+            self.new_btn.hide()
+            self.allhideonereveal_btn.show()
+            self.allhideallreveal_btn.show()
+            self.onehideallreveal_btn.show()
             self.setWindowTitle('Image Occlusion Enhanced - Add mode')
+            self.bottom_label.setText("Add card type:")
         else:
             self.edit_label.show()
-            self.edit1_btn.show()
-            self.edit2_btn.show()
+            self.otype_select.show()
+            self.edit_btn.show()
+            self.new_btn.show()
+            self.allhideonereveal_btn.hide()
+            self.allhideallreveal_btn.hide()
+            self.onehideallreveal_btn.hide()
             self.setWindowTitle('Image Occlusion Enhanced - Editing mode')
+            self.bottom_label.setText("Choose card type:")
 
-    # keybinding related functions
-
-    ## Notes
-    def add_allhideonereveal(self): 
-        mw.ImgOccAdd.onAddNotesButton("allhideonereveal")
-    def add_allhideallreveal(self): 
-        mw.ImgOccAdd.onAddNotesButton("allhideallreveal")
-    def add_onehideallreveal(self): 
-        mw.ImgOccAdd.onAddNotesButton("onehideallreveal")
-    def edit(self):
-        mw.ImgOccAdd.onAddNotesButton("edit")
-    def edit_and_switch(self):
-        tooltip("Need to implement an occlusion type selection dialog")
-        #mw.ImgOccAdd.onAddNotesButton("edit_and_switch")
+    # Keybindings
 
     ## Navigation, etc.
     def reset_window(self):
         self.reset_all_fields()
         self.tab_widget.setCurrentIndex(0)
+        self.otype_select.setCurrentIndex(0)
         self.header_edit.setFocus()
         self.svg_edit.setFocus()
 

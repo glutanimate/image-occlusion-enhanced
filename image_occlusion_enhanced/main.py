@@ -103,11 +103,14 @@ class ImgOccAdd(object):
             imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
             invalfile = False
             for i in onote.keys():
-                if i == "tags":
+                if i in ["tags", "qmask", "amask"]:
                     continue
                 fld = IO_FLDS[i]
-                if i in ["uuid", "qmask", "amask"]:
-                    onote[i] = note[fld]
+                if i == "uuid":
+                    uuid = note[fld]
+                    onote["uuid"] = uuid
+                    onote["oid"] = uuid.split('-')[0]
+                    onote["otype"] = uuid.split('-')[1]
                 elif i in ["image", "fmask"]:
                     html = note[fld]
                     fname = imgregex.search(html)
@@ -174,26 +177,25 @@ class ImgOccAdd(object):
         svg_edit = mw.ImgOccEdit.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
-        print svg
         
         mask_fill_color = mw.col.conf['image_occlusion_conf']['mask_fill_color']
         (did, tags, header, footer, remarks, sources, 
             extra1, extra2) = self.getUserInputs()
 
-        # Add notes to the current deck of the collection:
-        if choice == "allhideonereveal":
-            gen = IoGenAllHideOneReveal(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
-            gen.generate_notes()
-        if choice == "allhideallreveal":
-            gen = IoGenAllHideAllReveal(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
-            gen.generate_notes()
-        elif choice == "onehideallreveal":
-            gen = IoGenOneHideAllReveal(self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
-            gen.generate_notes()
-        elif choice == "edit":
-            pass
-        elif choice == "edit-and-switch":
-            pass
+        if choice == "edit":
+            edit = True
+
+        if choice in ["new", "edit"]:
+            opt = mw.ImgOccEdit.otype_select.currentIndex()
+            if opt == 0: # Option 'Don't change'
+                choice = self.onote["otype"]
+            else:
+                choice = mw.ImgOccEdit.otype_select.currentText()
+
+        noteGenerator = genByKey(choice)
+        gen = noteGenerator(
+                self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
+        gen.generate_notes()
 
         if self.ed.note:
             if choice in ["overlapping", "nonoverlapping"]:

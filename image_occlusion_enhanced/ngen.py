@@ -35,13 +35,21 @@ import sys
 import uuid
 import shutil
 
+def genByKey(key):
+    if key in ["ao", "All Hidden, One Revealed"]:
+        return IoGenAllHideOneReveal
+    elif key in ["aa", "All Hidden, All Revealed"]:
+        return IoGenAllHideAllReveal
+    elif key in ["oa", "One Hidden, All Revealed"]:
+        return IoGenOneHideAllReveal
+
 class ImgOccNoteGenerator(object):
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
         self.image_path = image
         self.masks_svg = svg
         #self.fields = fields
-        self.uniq = str(uuid.uuid4()).replace("-","")
+        self.oid = str(uuid.uuid4()).replace("-","")
         self.tags = tags
         self.header = header
         self.footer = footer
@@ -63,10 +71,10 @@ class ImgOccNoteGenerator(object):
             return
         amasks = self._generate_mask_svgs("A")
         col_image = self.add_image_to_col()
-        occl_id = '%s-%s' % (self.uniq, self.otype)
-        self.omask_path = self._save_mask(self.masks_svg, occl_id, "O")
+        uuid = '%s-%s' % (self.oid, self.otype)
+        self.omask_path = self._save_mask(self.masks_svg, uuid, "O")
         for i in range(len(qmasks)):
-            card_id = '%s-%s' % (occl_id, i+1)
+            card_id = '%s-%s' % (uuid, i+1)
             self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, card_id)
         tooltip(("Cards added: %s" % len(qmasks) ), period=1500)
 
@@ -75,7 +83,7 @@ class ImgOccNoteGenerator(object):
         fn = os.path.basename(self.image_path)
         name, ext = os.path.splitext(fn)
         short_name = name[:75] if len(name) > 75 else name
-        unique_fn = self.uniq + '_' + short_name + ext
+        unique_fn = self.oid + '_' + short_name + ext
         new_path = os.path.join(media_dir, unique_fn)
         shutil.copyfile(self.image_path, new_path)
         return new_path
