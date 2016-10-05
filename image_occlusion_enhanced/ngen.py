@@ -28,14 +28,29 @@ from aqt import mw
 from xml.dom import minidom
 from anki.notes import Note
 from aqt.utils import tooltip, showInfo, showWarning, saveGeom, restoreGeom
-
-from config import *
+from Imaging.PIL import Image 
 import tempfile
 import sys
 import uuid
 import shutil
+import base64
+
+from config import *
+import template
 
 stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
+
+def imageProp(image_path):
+    image = Image.open(image_path)
+    width, height = image.size
+    return width, height
+
+def svgToBase64(svg_path):
+    doc = minidom.parse(svg_path)
+    svg_node = doc.documentElement
+    svg_content = svg_node.toxml()
+    svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
+    return svg_b64
 
 def genByKey(key):
     if key in ["ao", "All Hidden, One Revealed"]:
@@ -44,6 +59,7 @@ def genByKey(key):
         return IoGenAllHideAllReveal
     elif key in ["oa", "One Hidden, All Revealed"]:
         return IoGenOneHideAllReveal
+
 
 class ImgOccNoteGenerator(object):
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
@@ -76,6 +92,23 @@ class ImgOccNoteGenerator(object):
         for i in range(len(qmasks)):
             card_id = '%s-%s' % (self.uniq, i+1) # start from 1
             self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, card_id)
+        #  We must update the GUI so that the user knows that cards have
+        # been added.  When the GUI is updated, the number of new cards
+        # changes, and it provides the feedback we want.
+        # If we want more feedback, we can add a tooltip that tells the
+        # user how many cards have been added.
+        # The way to update the GUI will depend on the state
+        # of the main window. There are four states (from what I understand):
+        #  - "review"
+        #  - "overview"
+        #  - "deckBrowser"
+        #  - "resetRequired" (we will treat this one like "deckBrowser)
+        # if mw.state == "review":
+        #     mw.reviewer.show()
+        # elif mw.state == "overview":
+        #     mw.overview.refresh()
+        # else:
+        #     mw.deckBrowser.refresh()
         tooltip(("Cards added: %s" % len(qmasks) ), period=1500)
 
     def add_image_to_col(self):
@@ -164,12 +197,22 @@ class ImgOccNoteGenerator(object):
         qmask_path = self._save_mask(qmask, note_id, "Q")
         amask_path = self._save_mask(amask, note_id, "A")
         model = mw.col.models.byName(IO_MODEL_NAME)
+        if not model:
+            model = template.add_io_model(mw.col)
         model['did'] = self.did
         new_note = Note(mw.col, model)
 
         def fname2img(path):
             return '<img src="%s" />' % os.path.split(path)[1]
 
+        # for i in IO_FLDS.keys():
+        #     fld = IO_FLDS[i]
+        #     nnote[fld] = 
+
+        # IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
+        #                 "extra1", "extra2", "qmask", "amask", "omask"]
+
+        # static order, this is temporary
         new_note.fields = [
                     note_id,
                     self.header,

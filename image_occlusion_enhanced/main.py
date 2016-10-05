@@ -23,7 +23,6 @@ from aqt.utils import tooltip, openLink, showWarning, saveGeom, restoreGeom
 from aqt.qt import *
 from anki.hooks import wrap, addHook
 
-import etree.ElementTree as etree
 import re
 import tempfile
 import urlparse, urllib
@@ -32,7 +31,6 @@ from config import *
 from ngen import *
 from dialogs import ImgOccEdit, ImgOccOpts
 
-import svgutils
 from resources import *
 
 io_help_link = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
@@ -137,7 +135,7 @@ class ImgOccAdd(object):
         self.call_ImgOccEdit()
 
     def call_ImgOccEdit(self):
-        width, height = svgutils.imageProp(self.image_path)
+        width, height = imageProp(self.image_path)
         ofill = mw.col.conf['imgocc']['ofill']
         bkgd_url = path2url(self.image_path)
         onote = self.onote
@@ -162,7 +160,7 @@ class ImgOccAdd(object):
             dialog.remarks_edit.setPlainText(onote["remarks"])
             dialog.extra1_edit.setPlainText(onote["extra1"])
             dialog.extra2_edit.setPlainText(onote["extra2"])
-            svg_b64 = svgutils.svgToBase64(onote["omask"])
+            svg_b64 = svgToBase64(onote["omask"])
             url.addQueryItem('source', svg_b64)
 
         dialog.svg_edit.setUrl(url)

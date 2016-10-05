@@ -12,9 +12,9 @@
 ##                                                ##
 ####################################################
 
+from config import *
 
 # Default card template
-
 iocard_front = """\
 {{#%(src_img)s}}
 <div id="io-title">{{%(header)s}}</div>
@@ -123,31 +123,31 @@ iocard_css = """\
 
 def add_io_model(col):
     models = col.models
-    iomodel = models.new(IO_MODEL_NAME)
+    io_model = models.new(IO_MODEL_NAME)
     # Add fields:
     for i in IO_FLDORDER:
       fld = models.newField(IO_FLDS[i])
       if i == "uuid":
         fld['size'] = 0
-      models.addField(iomodel, fld)
+      models.addField(io_model, fld)
     # Add template
     template = models.newTemplate(IO_CARD_NAME)
     template['qfmt'] = iocard_front
     template['afmt'] = iocard_back
-    iomodel['css'] = iocard_css
-    iomodel['sortf'] = 1 # set sortfield to header
-    models.addTemplate(iomodel, template)
-    models.add(iomodel)
-    return iomodel
+    io_model['css'] = iocard_css
+    io_model['sortf'] = 1 # set sortfield to header
+    models.addTemplate(io_model, template)
+    models.add(io_model)
+    return io_model
 
 
 def update_template(col):
-    iomodel = col.models.byName(IO_MODEL_NAME)
+    io_model = col.models.byName(IO_MODEL_NAME)
     # We are assuming that the template list contains only one element.
     # This will be true as long as no one has been trampling the model.
-    template = iomodel['tmpls'][0]
+    template = io_model['tmpls'][0]
     template['qfmt'] = iocard_front
     template['afmt'] = iocard_back
     template['css'] = iocard_css
-    return iomodel
+    return io_model
     
