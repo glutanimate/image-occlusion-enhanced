@@ -134,42 +134,44 @@ class ImgOccEdit(QDialog):
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(True)
 
-        if self.mode == "edit":
-            # Editing mode
-            edit1_button = button_box.addButton("&Edit notes",
-                    QDialogButtonBox.ActionRole)
-            edit2_button = button_box.addButton("Edit and &switch type",
-                    QDialogButtonBox.ActionRole)
-            self.connect(edit1_button, SIGNAL("clicked()"), self.edit)
-            self.connect(edit2_button, SIGNAL("clicked()"), self.edit_and_switch)
-            allhideonereveal_label = ""
-            allhideallreveal_label = ""
-            onehideonereveal_label = ""
-        else:
-            allhideonereveal_label = "Formerly known as nonoverlapping.<br>\
-                Generate cards where all labels are hidden and just one is revealed<br>\
-                on the back"
-            allhideallreveal_label = "Between nonoverlapping and overlapping.<br>\
-                Generate cards where all labels are hidden, but all are revealed<br>\
-                on the back"
-            onehideonereveal_label = "Formerly known as overlapping.<br>\
-                Generate cards where only one label is hidden on the front"
-        allhideonereveal_btn = button_box.addButton("All Hidden, One Revealed",
+        self.edit1_btn = button_box.addButton("&Edit notes",
                 QDialogButtonBox.ActionRole)
-        allhideallreveal_btn = button_box.addButton("All Hidden, All Revealed",
+        self.edit2_btn = button_box.addButton("Edit and &switch type",
                 QDialogButtonBox.ActionRole)
-        onehideonereveal_btn = button_box.addButton("One Hidden, One Revealed",
+        self.allhideonereveal_btn = button_box.addButton("All Hidden, One Revealed",
                 QDialogButtonBox.ActionRole)
-        allhideonereveal_btn.setToolTip(allhideonereveal_label)
-        allhideallreveal_btn.setToolTip(allhideallreveal_label)
-        onehideonereveal_btn.setToolTip(onehideonereveal_label)
-        close_button = button_box.addButton("&Close",
+        self.allhideallreveal_btn = button_box.addButton("All Hidden, All Revealed",
                 QDialogButtonBox.ActionRole)
-        close_button.setToolTip("Close Image Occlusion Editor without generating cards")
-        self.connect(allhideonereveal_btn, SIGNAL("clicked()"), self.add_allhideonereveal)
-        self.connect(allhideallreveal_btn, SIGNAL("clicked()"), self.add_allhideallreveal)
-        self.connect(onehideonereveal_btn, SIGNAL("clicked()"), self.add_onehideonereveal)
-        self.connect(close_button, SIGNAL("clicked()"), self.close)
+        self.onehideonereveal_btn = button_box.addButton("One Hidden, One Revealed",
+                QDialogButtonBox.ActionRole)
+        self.close_button = button_box.addButton("&Close", 
+                QDialogButtonBox.ActionRole)
+
+        edit1_tt = ""
+        edit2_tt = ""
+        allhideonereveal_tt = "Formerly known as nonoverlapping.<br>\
+            Generate cards where all labels are hidden and just one is revealed<br>\
+            on the back"
+        allhideallreveal_tt = "Between nonoverlapping and overlapping.<br>\
+            Generate cards where all labels are hidden, but all are revealed<br>\
+            on the back"
+        onehideonereveal_tt = "Formerly known as overlapping.<br>\
+            Generate cards where only one label is hidden on the front"
+        close_tt = "Close Image Occlusion Editor without generating cards"
+        self.edit1_btn.setToolTip(edit1_tt)
+        self.edit2_btn.setToolTip(edit2_tt)
+        self.onehideonereveal_btn.setToolTip(onehideonereveal_tt)
+        self.allhideonereveal_btn.setToolTip(allhideonereveal_tt)
+        self.allhideallreveal_btn.setToolTip(allhideallreveal_tt)
+        self.onehideonereveal_btn.setToolTip(onehideonereveal_tt)
+        self.close_button.setToolTip(close_tt)
+
+        self.connect(self.edit1_btn, SIGNAL("clicked()"), self.edit)
+        self.connect(self.edit2_btn, SIGNAL("clicked()"), self.edit_and_switch)
+        self.connect(self.allhideonereveal_btn, SIGNAL("clicked()"), self.add_allhideonereveal)
+        self.connect(self.allhideallreveal_btn, SIGNAL("clicked()"), self.add_allhideallreveal)
+        self.connect(self.onehideonereveal_btn, SIGNAL("clicked()"), self.add_onehideonereveal)
+        self.connect(self.close_button, SIGNAL("clicked()"), self.close)
 
         # Add all widgets to main window
         ## set widget layout up
@@ -216,6 +218,17 @@ class ImgOccEdit(QDialog):
         # Set Focus
         self.tab_widget.setCurrentIndex(0)
         self.svg_edit.setFocus()
+
+    # Modes
+
+    def switch_to_mode(self, mode):
+        self.mode = mode
+        if mode == "add":
+            self.edit1_btn.hide()
+            self.edit2_btn.hide()
+        else:
+            self.edit1_btn.show()
+            self.edit2_btn.show()
 
     # keybinding related functions
 

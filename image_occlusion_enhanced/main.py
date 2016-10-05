@@ -145,13 +145,13 @@ class ImgOccAdd(object):
         except:
             mw.ImgOccEdit = ImgOccEdit(mw)
         dialog = mw.ImgOccEdit
+        dialog.switch_to_mode(self.mode)
 
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
         url.addQueryItem('initFill[color]', initFill_color)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
-        dialog.svg_edit.setUrl(url)
 
         if self.mode != "add":
             dialog.header_edit.setPlainText(onote["header"])
@@ -162,6 +162,7 @@ class ImgOccAdd(object):
             svg_b64 = svgutils.svgToBase64(onote["fmask"])
             url.addQueryItem('source', svg_b64)
 
+        dialog.svg_edit.setUrl(url)
         dialog.tags_edit.setText(onote["tags"])
         dialog.tags_edit.setCol(mw.col)
         dialog.sources_edit.setPlainText(onote["sources"])
