@@ -35,6 +35,8 @@ import sys
 import uuid
 import shutil
 
+stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
+
 def genByKey(key):
     if key in ["ao", "All Hidden, One Revealed"]:
         return IoGenAllHideOneReveal
@@ -60,7 +62,6 @@ class ImgOccNoteGenerator(object):
         self.did = did
         self.omask_path = None
         self.uniq = '%s-%s' % (self.oid, self.otype)
-
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
 
     def generate_notes(self):
@@ -93,6 +94,13 @@ class ImgOccNoteGenerator(object):
                 node.setAttribute("fill", self.qfill)
             map(self.modify_fill_recursively, node.childNodes)
 
+    def remove_attrs_recursively(self, node, attrs):
+        if (node.nodeType == node.ELEMENT_NODE):
+            for i in attrs:
+                if node.hasAttribute(i):
+                    node.removeAttribute(i)
+            map(self.modify_fill_recursively, node.childNodes)
+
     def _generate_mask_svgs(self, side):
         #Note this gets reimplemented by ImgOccNoteGeneratorSingle
         #which returns the original mask unmodified
@@ -106,11 +114,13 @@ class ImgOccNoteGenerator(object):
         for i in range(len(layer_node.childNodes)):
             node = layer_node.childNodes[i]
             if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
+                # mask_node_indexes contains the indexes of the childNodes that are elements:
                 mask_node_indexes.append(i)
+                # set IDs for each element childNote in the masks layer:
                 layer_node.childNodes[i].setAttribute("id", self.uniq + '-' + str(len(mask_node_indexes)))
-                # ↑ set IDs for each element childNote in the masks layer
-                # mask_node_indexes contains the indexes of the childNodes that are elements
-            # assume that all are masks. Different subclasses do different things with them
+                # remove attributes that could cause issues later on:
+                self.remove_attrs_recursively(layer_node.childNodes[i], stripattr)
+        # write changes to masks_svg:
         self.masks_svg = svg_node.toxml()
         masks = self._generate_mask_svgs_for(side, mask_node_indexes)
         return masks
@@ -133,6 +143,7 @@ class ImgOccNoteGenerator(object):
         raise NotImplementedError
 
     def _layer_nodes_from(self, svg_node):
+        #TODO: understand this better
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
         layer_nodes = [node for node in svg_node.childNodes if node.nodeType == node.ELEMENT_NODE]
@@ -193,6 +204,7 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
             if i == mask_node_index:
                 if side == "Q":
                     self.modify_fill_recursively(layer_node.childNodes[i])
+                    layer_node.childNodes[i].setAttribute("class", "qshape")
                 if side == "A":
                     layer_node.removeChild(layer_node.childNodes[i])
 
@@ -211,6 +223,7 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
             if side == "Q":
                 if i == mask_node_index:
                     self.modify_fill_recursively(layer_node.childNodes[i])
+                    layer_node.childNodes[i].setAttribute("class", "qshape")
             else:
                 layer_node.removeChild(layer_node.childNodes[i])
 
@@ -227,5 +240,6 @@ class IoGenOneHideAllReveal(ImgOccNoteGenerator):
         for i in reversed(all_mask_node_indexes):
             if i == mask_node_index and side == "Q":
                 self.modify_fill_recursively(layer_node.childNodes[i])
+                layer_node.childNodes[i].setAttribute("class", "qshape")
             else:
                 layer_node.removeChild(layer_node.childNodes[i])
