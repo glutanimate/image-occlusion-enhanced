@@ -175,7 +175,7 @@ class ImgOccAdd(object):
         svg_edit = mw.ImgOccEdit.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
-        
+
         qfill = mw.col.conf['imgocc']['qfill']
         (did, tags, header, footer, remarks, sources, 
             extra1, extra2) = self.getUserInputs()
