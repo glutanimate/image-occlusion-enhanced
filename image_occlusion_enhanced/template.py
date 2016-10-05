@@ -27,7 +27,7 @@ iocard_front = """\
 """ % \
  {'que': IO_FLDS['qmask'],
   'ans': IO_FLDS['amask'],
-  'svg': IO_FLDS['fmask'],
+  'svg': IO_FLDS['omask'],
   'src_img': IO_FLDS['image'],
   'header': IO_FLDS['header'],
   'footer': IO_FLDS['footer'],
@@ -64,7 +64,7 @@ iocard_back = """\
 """ % \
  {'que': IO_FLDS['qmask'],
   'ans': IO_FLDS['amask'],
-  'svg': IO_FLDS['fmask'],
+  'svg': IO_FLDS['omask'],
   'src_img': IO_FLDS['image'],
   'header': IO_FLDS['header'],
   'footer': IO_FLDS['footer'],

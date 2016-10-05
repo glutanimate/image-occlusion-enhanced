@@ -58,8 +58,8 @@ class ImgOccNoteGenerator(object):
         self.extra1 = extra1
         self.extra2 = extra2
         self.did = did
-        self.otype = None
         self.omask_path = None
+        self.uniq = '%s-%s' % (self.oid, self.otype)
 
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
 
@@ -71,10 +71,9 @@ class ImgOccNoteGenerator(object):
             return
         amasks = self._generate_mask_svgs("A")
         col_image = self.add_image_to_col()
-        uuid = '%s-%s' % (self.oid, self.otype)
-        self.omask_path = self._save_mask(self.masks_svg, uuid, "O")
+        self.omask_path = self._save_mask(self.masks_svg, self.uniq, "O")
         for i in range(len(qmasks)):
-            card_id = '%s-%s' % (uuid, i+1)
+            card_id = '%s-%s' % (self.uniq, i+1) # start from 1
             self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, card_id)
         tooltip(("Cards added: %s" % len(qmasks) ), period=1500)
 
@@ -108,8 +107,11 @@ class ImgOccNoteGenerator(object):
             node = layer_node.childNodes[i]
             if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
                 mask_node_indexes.append(i)
+                layer_node.childNodes[i].setAttribute("id", self.uniq + '-' + str(len(mask_node_indexes)))
+                # ↑ set IDs for each element childNote in the masks layer
                 # mask_node_indexes contains the indexes of the childNodes that are elements
             # assume that all are masks. Different subclasses do different things with them
+        self.masks_svg = svg_node.toxml()
         masks = self._generate_mask_svgs_for(side, mask_node_indexes)
         return masks
 
@@ -134,7 +136,6 @@ class ImgOccNoteGenerator(object):
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
         layer_nodes = [node for node in svg_node.childNodes if node.nodeType == node.ELEMENT_NODE]
-        print layer_nodes[1].toxml()
         # layer_notes = layer_nodes[1]
         # print layer_nodes[1]
         # assert (len(layer_nodes) == 1)
@@ -182,9 +183,10 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
 
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
+        self.otype = "ao"
         ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
-        self.otype = "ao"
+        
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
         for i in all_mask_node_indexes:
@@ -199,9 +201,10 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
 
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
+        self.otype = "aa"
         ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
-        self.otype = "aa"
+        
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
         for i in reversed(all_mask_node_indexes):
@@ -215,9 +218,10 @@ class IoGenOneHideAllReveal(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
     def __init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did):
+        self.otype = "oa"
         ImgOccNoteGenerator.__init__(self, image, svg, tags, header, footer, remarks, sources, 
                       extra1, extra2, did)
-        self.otype = "oa"
+        
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
         for i in reversed(all_mask_node_indexes):

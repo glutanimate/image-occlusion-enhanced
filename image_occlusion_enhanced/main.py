@@ -111,7 +111,7 @@ class ImgOccAdd(object):
                     onote["uuid"] = uuid
                     onote["oid"] = uuid.split('-')[0]
                     onote["otype"] = uuid.split('-')[1]
-                elif i in ["image", "fmask"]:
+                elif i in ["image", "omask"]:
                     html = note[fld]
                     fname = imgregex.search(html)
                     if fname:
@@ -162,7 +162,7 @@ class ImgOccAdd(object):
             dialog.remarks_edit.setPlainText(onote["remarks"])
             dialog.extra1_edit.setPlainText(onote["extra1"])
             dialog.extra2_edit.setPlainText(onote["extra2"])
-            svg_b64 = svgutils.svgToBase64(onote["fmask"])
+            svg_b64 = svgutils.svgToBase64(onote["omask"])
             url.addQueryItem('source', svg_b64)
 
         dialog.svg_edit.setUrl(url)
@@ -232,7 +232,7 @@ def onImgOccButton(ed, mode):
     if ioModel:
         ioFields = mw.col.models.fieldNames(ioModel)
         # note type integrity check
-        if set(ioFields) < set(IO_FLDS.values()):
+        if not all(x in ioFields for x in IO_FLDS.values()):
             showWarning(\
                 '<b>Error:</b><br><br>Image Occlusion note type not configured properly.\
                 Please make sure you did not delete or rename any of the essential fields.\

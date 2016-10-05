@@ -53,7 +53,7 @@ iocard_front = """\
 """ % \
  {'que': IO_FLDS['qmask'],
   'ans': IO_FLDS['amask'],
-  'svg': IO_FLDS['fmask'],
+  'svg': IO_FLDS['omask'],
   'src_img': IO_FLDS['image'],
   'header': IO_FLDS['header'],
   'footer': IO_FLDS['footer'],
@@ -90,7 +90,7 @@ iocard_back = """\
 """ % \
  {'que': IO_FLDS['qmask'],
   'ans': IO_FLDS['amask'],
-  'svg': IO_FLDS['fmask'],
+  'svg': IO_FLDS['omask'],
   'src_img': IO_FLDS['image'],
   'header': IO_FLDS['header'],
   'footer': IO_FLDS['footer'],
@@ -235,7 +235,7 @@ def add_QA_note(col, uuid, fname_q, fname_a, tags, fname_svg,
     #     nnote[fld] = 
 
     # IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
-    #                 "extra1", "extra2", "qmask", "amask", "fmask"]
+    #                 "extra1", "extra2", "qmask", "amask", "omask"]
 
 
     # static order, this is temporary

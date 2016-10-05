@@ -34,10 +34,10 @@ IO_FLDS = {
     'extra2': u"Extra 2",
     'qmask': u"Question Mask",
     'amask': u"Answer Mask",
-    'fmask': u"Full Mask"
+    'omask': u"Original Mask"
 }
 IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
-                "extra1", "extra2", "qmask", "amask", "fmask"]
+                "extra1", "extra2", "qmask", "amask", "omask"]
 
 
 IO_DEFAULT_CONF =   {'ofill': '00AA7F',
@@ -70,8 +70,8 @@ def load_prefs(self):
     self.io_conf = mw.col.conf['imgocc']
 
     if self.io_conf['version'] < IO_DEFAULT_CONF['version']:
-        print "upgrading from earlier IO release"
-        # insert other upgrade actions here
+        print "updating from earlier IO release"
+        # insert other update actions here
         self.io_conf['version'] = IO_DEFAULT_CONF['version']
 
     # load local preferences

@@ -92,7 +92,7 @@ def add_notes_now(choice, svg, did, onote):
     tmp_media_dir = tempfile.mkdtemp(prefix="media-for-anki")
 
     strip_attributes(svg, stripattr)
-    svg_fname = os.path.join(tmp_media_dir, "fmask.svg")
+    svg_fname = os.path.join(tmp_media_dir, "omask.svg")
     f = open(svg_fname, 'w')
     f.write(etree.tostring(svg))
     f.close()
@@ -128,7 +128,7 @@ def add_notes_non_overlapping(svg, q_color, tags, fname_original,
 
 
     strip_attributes(svg, stripattr)
-    svg_fname = os.path.join(tmp_media_dir, "fmask.svg")
+    svg_fname = os.path.join(tmp_media_dir, "omask.svg")
     f = open(svg_fname, 'w')
     f.write(etree.tostring(svg))
     f.close()
