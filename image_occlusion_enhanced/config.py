@@ -40,9 +40,9 @@ IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
                 "extra1", "extra2", "qmask", "amask", "fmask"]
 
 
-IO_DEFAULT_CONF =   {'initFill[color]': '00AA7F',
-                    'mask_fill_color': 'FF0000',
-                    'io-version': 'enhanced-0.5'}
+IO_DEFAULT_CONF =   {'ofill': '00AA7F',
+                    'qfill': 'FF0000',
+                    'version': 0.5}
 
 # get default file system encoding
 IO_ENCODING = sys.getfilesystemencoding()
@@ -56,19 +56,23 @@ prefs_path = os.path.join(addons_folder, "image_occlusion_enhanced",
 
 def load_prefs(self):
 
-    # check if synced configuration exists
-    if not 'image_occlusion_conf' in mw.col.conf:
-        self.mw.col.conf['image_occlusion_conf'] = IO_DEFAULT_CONF
+    if not 'imgocc' in mw.col.conf:
+        # create initial configuration
+        mw.col.conf['imgocc'] = IO_DEFAULT_CONF
+        
+        if 'image_occlusion_conf' in mw.col.conf:
+            # upgrade from earlier IO versions
+            old_conf = mw.col.conf['image_occlusion_conf']
+            mw.col.conf['imgocc']['ofill'] = old_conf['initFill[color]']
+            mw.col.conf['imgocc']['qfill'] = old_conf['mask_fill_color']
+            # insert other upgrade actions here
 
-    # upgrade from Image Occlusion 2.0
-    self.io_conf = mw.col.conf['image_occlusion_conf']
-    if not 'io-version' in self.io_conf:
-        # set io version
-        self.io_conf['io-version'] = IO_DEFAULT_CONF['io-version']
-        # change default colours
-        if self.io_conf['initFill[color]'] == "FFFFFF":
-            self.io_conf['initFill[color]'] = IO_DEFAULT_CONF['initFill[color]']
-            self.io_conf['mask_fill_color'] = IO_DEFAULT_CONF['mask_fill_color']
+    self.io_conf = mw.col.conf['imgocc']
+
+    if self.io_conf['version'] < IO_DEFAULT_CONF['version']:
+        print "upgrading from earlier IO release"
+        # insert other upgrade actions here
+        self.io_conf['version'] = IO_DEFAULT_CONF['version']
 
     # load local preferences
     self.prefs = None

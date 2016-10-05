@@ -138,7 +138,7 @@ class ImgOccAdd(object):
 
     def call_ImgOccEdit(self):
         width, height = svgutils.imageProp(self.image_path)
-        initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
+        ofill = mw.col.conf['imgocc']['ofill']
         bkgd_url = path2url(self.image_path)
         onote = self.onote
 
@@ -152,7 +152,7 @@ class ImgOccAdd(object):
 
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
-        url.addQueryItem('initFill[color]', initFill_color)
+        url.addQueryItem('initFill[color]', ofill)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
 
@@ -178,13 +178,12 @@ class ImgOccAdd(object):
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
         
-        mask_fill_color = mw.col.conf['image_occlusion_conf']['mask_fill_color']
+        qfill = mw.col.conf['imgocc']['qfill']
         (did, tags, header, footer, remarks, sources, 
             extra1, extra2) = self.getUserInputs()
 
         if choice == "edit":
             edit = True
-
         if choice in ["new", "edit"]:
             opt = mw.ImgOccEdit.otype_select.currentIndex()
             if opt == 0: # Option 'Don't change'
@@ -193,8 +192,8 @@ class ImgOccAdd(object):
                 choice = mw.ImgOccEdit.otype_select.currentText()
 
         noteGenerator = genByKey(choice)
-        gen = noteGenerator(
-                self.image_path, svg, tags, header, footer, remarks, sources, extra1, extra2, did)
+        gen = noteGenerator(self.image_path, svg, tags, header, 
+                    footer, remarks, sources, extra1, extra2, did)
         gen.generate_notes()
 
         if self.ed.note:

@@ -324,21 +324,21 @@ class ImgOccOpts(QDialog):
         color = choose_color_dialog.getColor()
         if color.isValid():
             color_ = color.name()[1:]
-            mw.col.conf['image_occlusion_conf']['mask_fill_color'] = color_
+            mw.col.conf['imgocc']['qfill'] = color_
             # notify db of modification
             mw.col.setMod()
             self.changeButtonColor(self.mask_color_button, color_)
 
-    def getNewInitFillColor(self):
+    def getNewOfillColor(self):
         # Remove the # sign from QColor.name():
         choose_color_dialog = QColorDialog()
         color = choose_color_dialog.getColor()
         if color.isValid():
             color_ = color.name()[1:]
-            mw.col.conf['image_occlusion_conf']['initFill[color]'] = color_
+            mw.col.conf['imgocc']['ofill'] = color_
             # notify db of modification
             mw.col.setMod()
-            self.changeButtonColor(self.initFill_button, color_)
+            self.changeButtonColor(self.ofill_button, color_)
 
     def changeButtonColor(self, button, color):
         pixmap = QPixmap(128,18)
@@ -353,33 +353,33 @@ class ImgOccOpts(QDialog):
         load_prefs(self)
 
         ### shape color for questions:
-        mask_color_label = QLabel('<b>Question</b> shape color')
+        qfill_label = QLabel('<b>Question</b> shape color')
         self.mask_color_button = QPushButton()
         self.mask_color_button.connect(self.mask_color_button,
                                   SIGNAL("clicked()"),
                                   self.getNewMaskColor)
-        ### Initial shape color:
-        initFill_label = QLabel('<b>Initial</b> shape color')
-        self.initFill_button = QPushButton()
-        self.initFill_button.connect(self.initFill_button,
+        ### initial shape color:
+        ofill_label = QLabel('<b>Initial</b> shape color')
+        self.ofill_button = QPushButton()
+        self.ofill_button.connect(self.ofill_button,
                                 SIGNAL("clicked()"),
-                                self.getNewInitFillColor)
+                                self.getNewOfillColor)
 
         ### set colors
-        initFill_color = mw.col.conf['image_occlusion_conf']['initFill[color]']
-        mask_fill_color = mw.col.conf['image_occlusion_conf']['mask_fill_color']
-        self.changeButtonColor(self.initFill_button, initFill_color)
-        self.changeButtonColor(self.mask_color_button, mask_fill_color)
+        ofill = mw.col.conf['imgocc']['ofill']
+        qfill = mw.col.conf['imgocc']['qfill']
+        self.changeButtonColor(self.ofill_button, ofill)
+        self.changeButtonColor(self.mask_color_button, qfill)
 
         grid = QtGui.QGridLayout()
         grid.setSpacing(10)
 
         # 1st row:
-        grid.addWidget(mask_color_label, 0, 0)
+        grid.addWidget(qfill_label, 0, 0)
         grid.addWidget(self.mask_color_button, 0, 1)
         # 2nd row:
-        grid.addWidget(initFill_label, 1, 0)
-        grid.addWidget(self.initFill_button, 1, 1)
+        grid.addWidget(ofill_label, 1, 0)
+        grid.addWidget(self.ofill_button, 1, 1)
 
         self.setLayout(grid)
         self.setMinimumWidth(400)

@@ -61,7 +61,7 @@ class ImgOccNoteGenerator(object):
         self.otype = None
         self.omask_path = None
 
-        self.mask_fill_color = '#' + mw.col.conf['image_occlusion_conf']['mask_fill_color']
+        self.qfill = '#' + mw.col.conf['imgocc']['qfill']
 
     def generate_notes(self):
         qmasks = self._generate_mask_svgs("Q")
@@ -91,7 +91,7 @@ class ImgOccNoteGenerator(object):
     def modify_fill_recursively(self, node):
         if (node.nodeType == node.ELEMENT_NODE):
             if node.hasAttribute("fill"):
-                node.setAttribute("fill", self.mask_fill_color)
+                node.setAttribute("fill", self.qfill)
             map(self.modify_fill_recursively, node.childNodes)
 
     def _generate_mask_svgs(self, side):
