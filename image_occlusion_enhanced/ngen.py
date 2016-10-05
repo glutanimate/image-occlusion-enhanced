@@ -28,7 +28,9 @@ from aqt import mw
 from xml.dom import minidom
 from anki.notes import Note
 from aqt.utils import tooltip, showInfo, showWarning, saveGeom, restoreGeom
+
 from Imaging.PIL import Image 
+
 import tempfile
 import sys
 import uuid
