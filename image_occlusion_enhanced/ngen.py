@@ -28,7 +28,7 @@ from aqt import mw
 from xml.dom import minidom
 from anki.notes import Note
 from aqt.utils import tooltip, showInfo, showWarning, saveGeom, restoreGeom
-
+from aqt.qt import *
 from Imaging.PIL import Image 
 
 import tempfile
@@ -64,12 +64,12 @@ def genByKey(key):
 
 
 class ImgOccNoteGenerator(object):
-    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did):
+    def __init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did, edit):
         self.ed = ed
+        self.onote = onote
         self.image_path = image
         self.masks_svg = svg
-        #self.fields = fields
         self.oid = str(uuid.uuid4()).replace("-","")
         self.tags = tags
         self.header = header
@@ -80,10 +80,13 @@ class ImgOccNoteGenerator(object):
         self.extra2 = extra2
         self.did = did
         self.omask_path = None
-        self.uniq = '%s-%s' % (self.oid, self.otype)
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
-        self.edit = False
-
+        self.edit = edit
+        if self.edit:
+            self.uniq =  '%s-%s' % (self.onote['oid'], self.onote['otype'])
+        else:
+            self.uniq = '%s-%s' % (self.oid, self.otype)
+        
     def generate_notes(self):
         qmasks = self._generate_mask_svgs("Q")
         if not qmasks:
@@ -94,29 +97,14 @@ class ImgOccNoteGenerator(object):
         col_image = self.add_image_to_col()
         self.omask_path = self._save_mask(self.masks_svg, self.uniq, "O")
         for i in range(len(qmasks)):
-            card_id = '%s-%s' % (self.uniq, i+1) # start from 1
-            self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, card_id)
-        #  We must update the GUI so that the user knows that cards have
-        # been added.  When the GUI is updated, the number of new cards
-        # changes, and it provides the feedback we want.
-        # If we want more feedback, we can add a tooltip that tells the
-        # user how many cards have been added.
-        # The way to update the GUI will depend on the state
-        # of the main window. There are four states (from what I understand):
-        #  - "review"
-        #  - "overview"
-        #  - "deckBrowser"
-        #  - "resetRequired" (we will treat this one like "deckBrowser)
-        # if mw.state == "review":
-        #     mw.reviewer.show()
-        # elif mw.state == "overview":
-        #     mw.overview.refresh()
-        # else:
-        #     mw.deckBrowser.refresh()
+            note_id = '%s-%s' % (self.uniq, i+1) # start from 1
+            self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, note_id)
+        parent = None
         if self.edit:
             parent = self.ed.parentWindow
-        else:
-            parent = None
+            QWebSettings.clearMemoryCaches() # refreshes webview image caches
+            mw.reset()
+            self.ed.loadNote()
         tooltip(("Cards added: %s" % len(qmasks) ), period=1500, parent=parent)
 
     def add_image_to_col(self):
@@ -208,7 +196,16 @@ class ImgOccNoteGenerator(object):
         if not model:
             model = template.add_io_model(mw.col)
         model['did'] = self.did
-        new_note = Note(mw.col, model)
+        if not self.edit:
+            note = Note(mw.col, model)
+        else:
+            query = "'%s':'%s'" % ( IO_FLDS['uuid'], note_id )
+            print note_id
+            res = mw.col.findNotes(query)
+            if res:
+                note = mw.col.getNote(res[0])
+            else:
+                return
 
         def fname2img(path):
             return '<img src="%s" />' % os.path.split(path)[1]
@@ -221,7 +218,7 @@ class ImgOccNoteGenerator(object):
         #                 "extra1", "extra2", "qmask", "amask", "omask"]
 
         # static order, this is temporary
-        new_note.fields = [
+        note.fields = [
                     note_id,
                     self.header,
                     fname2img(col_image),
@@ -236,18 +233,26 @@ class ImgOccNoteGenerator(object):
                     ]
 
         for tag in self.tags:
-            new_note.addTag(tag)
+            note.addTag(tag)
 
-        mw.col.addNote(new_note)
+        if not self.edit:
+            mw.col.addNote(note)
+        else:
+            note.flush()
+
+    def find_by_noteid(self, note_id):
+        query = "'%s':'%s'" % ( IO_FLDS['uuid'], note_id )
+        res = mw.col.findNotes(query)
+        return res
 
 class IoGenAllHideOneReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""
 
-    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did):
+    def __init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did, edit):
         self.otype = "ao"
-        ImgOccNoteGenerator.__init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did)
+        ImgOccNoteGenerator.__init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did, edit)
         
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
@@ -262,11 +267,11 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
 class IoGenAllHideAllReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
 
-    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did):
+    def __init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did, edit):
         self.otype = "aa"
-        ImgOccNoteGenerator.__init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did)
+        ImgOccNoteGenerator.__init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did, edit)
         
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
@@ -280,11 +285,11 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
 
 class IoGenOneHideAllReveal(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
-    def __init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did):
+    def __init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did, edit):
         self.otype = "oa"
-        ImgOccNoteGenerator.__init__(self, ed, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did)
+        ImgOccNoteGenerator.__init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
+                      extra1, extra2, did, edit)
         
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
