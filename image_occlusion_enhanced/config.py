@@ -40,9 +40,9 @@ IO_FLDORDER = ["note_id", "header", "image", "footer", "remarks", "sources",
                 "extra1", "extra2", "qmask", "amask", "omask"]
 
 
-IO_DEFAULT_CONF =   {'ofill': '00AA7F',
-                    'qfill': 'FF0000',
-                    'version': 0.5}
+IO_DEFAULT_CONF = {'ofill': '00AA7F',
+                  'qfill': 'FF0000',
+                  'version': 0.5}
 
 # get default file system encoding
 IO_ENCODING = sys.getfilesystemencoding()

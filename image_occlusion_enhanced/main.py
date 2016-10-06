@@ -122,7 +122,7 @@ class ImgOccAdd(object):
                             invalfile = True
                 else:
                     onote[i] = note[fld].replace('<br />', '\n')
-            if invalfile or not onote["uuid"]:
+            if invalfile or not onote["note_id"]:
                 showWarning("IO card not configured properly for editing")
                 return
             image_path = onote["image"] 
@@ -200,8 +200,13 @@ class ImgOccAdd(object):
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(self.ed, svg, self.image_path, 
-                                self.onote, tags, fields, did, edit)
-        gen.generate_notes()
+                                    self.onote, tags, fields, did)
+        
+        if edit == True:
+            gen.update_notes()
+        else:
+            gen.generate_notes()
+
 
         if self.ed.note:
             if choice not in ["new", "edit"]:
@@ -264,7 +269,7 @@ def onSetupEditorButtons(self):
 def hideIdField(self, node, hide=True, focus=False):
     # simple hack that hides the ID field on IO notes
     if (self.note and self.note.model()["name"] == IO_MODEL_NAME and
-            self.note.model()['flds'][0]['name'] == IO_FLDS['uuid']):
+            self.note.model()['flds'][0]['name'] == IO_FLDS['note_id']):
         self.web.eval("""
             // hide first fname, field, and snowflake (FrozenFields add-on)
                 document.styleSheets[0].addRule(
