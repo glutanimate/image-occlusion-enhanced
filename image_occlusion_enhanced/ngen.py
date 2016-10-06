@@ -103,13 +103,13 @@ class ImgOccNoteGenerator(object):
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
         self.edit = True
         self._find_all_notes()
-        ( svg_node, layer_node ) = self._get_mnodes()
+        ( svg_node, mlayer_node ) = self._get_mnodes()
         if not self.mnode_ids:
             tooltip("No shapes to update.<br>\
                 Are you sure you set your masks correctly?")
             return
         self._delete_unused_notes()
-        self._prepare_svg(svg_node, layer_node)
+        self._prepare_svg(svg_node, mlayer_node)
         qmasks = self._generate_mask_svgs_for("Q")
         amasks = self._generate_mask_svgs_for("A")            
         for i in range(len(qmasks)):
@@ -126,19 +126,20 @@ class ImgOccNoteGenerator(object):
         self.mnode_ids = {}
         mask_doc = minidom.parseString(self.masks_svg)
         svg_node = mask_doc.documentElement
-        layer_node = self._layer_nodes_from(svg_node)
-        for i, node in enumerate(layer_node.childNodes):
+        layer_notes = self._layer_notes_from(svg_node)
+        mlayer_node = layer_notes[-1] # treat topmost layer as masks layer
+        for i, node in enumerate(mlayer_node.childNodes):
             # minidom doesn't offer a childElements method and childNodes
-            # also returns whitespace found in the layer_node as a child node. 
+            # also returns whitespace found in the mlayer_node as a child node. 
             # For that reason we use self.mnode_indexes to register all 
-            # indexes of layer_node children that contain actual elements, 
+            # indexes of mlayer_node children that contain actual elements, 
             # i.e. mask nodes
             if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
                 self.mnode_indexes.append(i)
-                self.remove_attribs_recursively(layer_node.childNodes[i], stripattr)
-                self.mnode_ids[i] = layer_node.childNodes[i].attributes["id"].value
+                self.remove_attribs_recursively(mlayer_node.childNodes[i], stripattr)
+                self.mnode_ids[i] = mlayer_node.childNodes[i].attributes["id"].value
         if self.edit:
-            return (svg_node, layer_node)
+            return (svg_node, mlayer_node)
 
     def find_by_noteid(self, note_id):
         query = "'%s':'%s'" % ( IO_FLDS['note_id'], note_id )
@@ -161,14 +162,14 @@ class ImgOccNoteGenerator(object):
         availbl = set(full_range) - set(valid_mnode_note_nrs)
 
 
-    def _prepare_svg(self, svg_node, layer_node):
+    def _prepare_svg(self, svg_node, mlayer_node):
         ( avlbl_nrs, max_nr) = self._delete_unused_notes() 
         for nr, idx in enumerate(self.mnode_indexes):
             # remove attributes that could cause issues later on:
-            self.remove_attribs_recursively(layer_node.childNodes[idx], stripattr)
+            self.remove_attribs_recursively(mlayer_node.childNodes[idx], stripattr)
             if not self.edit:
                 new_mnode_id = self.occl_id + '-' + str(nr+1)
-                layer_node.childNodes[i].setAttribute("id", new_mnode_id)
+                mlayer_node.childNodes[i].setAttribute("id", new_mnode_id)
                 continue
             mnode_id = self.mnode_ids[i]
             mnode_id_uniq = mnode_id.split('-')[0]
@@ -193,7 +194,7 @@ class ImgOccNoteGenerator(object):
                 self.nids
 
             if new_mnode_id:
-                layer_node.childNodes[i].setAttribute("id", new_mnode_id)
+                mlayer_node.childNodes[i].setAttribute("id", new_mnode_id)
 
         # write changes to masks_svg:
         self.masks_svg = svg_node.toxml()    
@@ -219,12 +220,13 @@ class ImgOccNoteGenerator(object):
     def _create_mask(self, side, mask_node_index):
         mask_doc = minidom.parseString(self.masks_svg)
         svg_node = mask_doc.documentElement
-        layer_node = self._layer_nodes_from(svg_node)
+        layer_notes = self._layer_notes_from(svg_node)
+        mlayer_node = layer_notes[-1] # treat topmost layer as masks layer
         #This methods get implemented different by subclasses
-        self._create_mask_at_layernode(side, mask_node_index, layer_node)
+        self._create_mask_at_layernode(side, mask_node_index, mlayer_node)
         return svg_node.toxml()
 
-    def _create_mask_at_layernode(self, mask_node_index, layer_node):
+    def _create_mask_at_layernode(self, mask_node_index, mlayer_node):
         raise NotImplementedError
 
     def set_q_attribs(self, node):
@@ -243,16 +245,13 @@ class ImgOccNoteGenerator(object):
                     node.removeAttribute(i)
             map(self.remove_attribs_recursively, node.childNodes)
 
-    def _layer_nodes_from(self, svg_node):
-        #TODO: understand this better
+    def _layer_notes_from(self, svg_node):
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
-        layer_nodes = [node for node in svg_node.childNodes if node.nodeType == node.ELEMENT_NODE]
-        # layer_notes = layer_nodes[1]
-        # print layer_nodes[1]
-        # assert (len(layer_nodes) == 1)
-        # assert (layer_nodes[0].nodeName == 'g')
-        return layer_nodes[1]
+        layer_notes = [node for node in svg_node.childNodes if node.nodeType == node.ELEMENT_NODE]
+        assert (len(layer_notes) >= 1)
+        assert (layer_notes[0].nodeName == 'g')
+        return layer_notes
 
     def _save_mask(self, mask, id, mtype):
         mask_path = '%s-%s.svg' % (id, mtype)
@@ -314,13 +313,13 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did)
 
-    def _create_mask_at_layernode(self, side, mask_node_index, layer_node):
+    def _create_mask_at_layernode(self, side, mask_node_index, mlayer_node):
         for i in self.mnode_indexes:
             if i == mask_node_index:
                 if side == "Q":
-                    self.set_q_attribs(layer_node.childNodes[i])
+                    self.set_q_attribs(mlayer_node.childNodes[i])
                 if side == "A":
-                    layer_node.removeChild(layer_node.childNodes[i])
+                    mlayer_node.removeChild(mlayer_node.childNodes[i])
 
 class IoGenAllHideAllReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
@@ -329,13 +328,13 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did)
 
-    def _create_mask_at_layernode(self, side, mask_node_index, layer_node):
+    def _create_mask_at_layernode(self, side, mask_node_index, mlayer_node):
         for i in reversed(self.mnode_indexes):
             if side == "Q":
                 if i == mask_node_index:
-                    self.set_q_attribs(layer_node.childNodes[i])
+                    self.set_q_attribs(mlayer_node.childNodes[i])
             else:
-                layer_node.removeChild(layer_node.childNodes[i])
+                mlayer_node.removeChild(mlayer_node.childNodes[i])
 
 class IoGenOneHideAllReveal(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
@@ -344,10 +343,10 @@ class IoGenOneHideAllReveal(ImgOccNoteGenerator):
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did)
 
-    def _create_mask_at_layernode(self, side, mask_node_index, layer_node):
+    def _create_mask_at_layernode(self, side, mask_node_index, mlayer_node):
         for i in reversed(self.mnode_indexes):
             if i == mask_node_index and side == "Q":
-                self.set_q_attribs(layer_node.childNodes[i])
-                layer_node.childNodes[i].setAttribute("class", "qshape")
+                self.set_q_attribs(mlayer_node.childNodes[i])
+                mlayer_node.childNodes[i].setAttribute("class", "qshape")
             else:
-                layer_node.removeChild(layer_node.childNodes[i])
+                mlayer_node.removeChild(mlayer_node.childNodes[i])

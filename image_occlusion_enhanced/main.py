@@ -235,7 +235,6 @@ class ImgOccAdd(object):
 
 def invoke_io_settings(mw):
     dialog = ImgOccOpts(mw)
-    dialog.show()
     dialog.exec_()
 
 def invoke_io_help():
@@ -276,12 +275,6 @@ def hideIdField(self, node, hide=True, focus=False):
                     'tr:first-child .fname, #f0, #i0', 'display: none;');
             """ )
 
-# def interceptEditCall(self, _old):
-#     if mw.reviewer.card.note().model()["name"] == IO_MODEL_NAME:
-        
-#     else:
-#         return _old(self)
-
 # Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced Wiki...", mw)
@@ -296,4 +289,3 @@ mw.form.menuHelp.addAction(help_action)
 # Set up hooks
 addHook('setupEditorButtons', onSetupEditorButtons)
 Editor.setNote = wrap(Editor.setNote, hideIdField, "after")
-#mw.onEditCurrent = wrap(mw.onEditCurrent, interceptEditCall, "around")
