@@ -24,7 +24,7 @@ global IO_MODEL_NAME, IO_CARD_NAME, IO_FLDS, IO_FLDORDER, IO_DEFAULT_CONF, IO_DE
 IO_MODEL_NAME = "Image Occlusion Enhanced"
 IO_CARD_NAME = "IO Card"
 IO_FLDS = {
-    'uuid': u"ID (hidden)",
+    'note_id': u"ID (hidden)",
     'header': u"Header",
     'image': u"Image",
     'footer': u"Footer",
@@ -36,7 +36,7 @@ IO_FLDS = {
     'amask': u"Answer Mask",
     'omask': u"Original Mask"
 }
-IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
+IO_FLDORDER = ["note_id", "header", "image", "footer", "remarks", "sources",
                 "extra1", "extra2", "qmask", "amask", "omask"]
 
 

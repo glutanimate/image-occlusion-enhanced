@@ -197,7 +197,7 @@ class ImgOccEdit(QDialog):
         # Add all widgets to main window
         ## set widget layout up
         vbox_main = QtGui.QVBoxLayout()
-        vbox_main.setMargin(0);
+        vbox_main.setMargin(5);
         ## add widgets
         vbox_main.addWidget(self.tab_widget)
         vbox_main.addLayout(bottom_hbox)
@@ -265,6 +265,7 @@ class ImgOccEdit(QDialog):
             self.allhideonereveal_btn.show()
             self.allhideallreveal_btn.show()
             self.onehideallreveal_btn.show()
+            self.deckChooser.deckLabel.setText("Deck")
             self.setWindowTitle('Image Occlusion Enhanced - Add mode')
             self.bottom_label.setText("Add card type:")
         else:
@@ -275,6 +276,7 @@ class ImgOccEdit(QDialog):
             self.allhideonereveal_btn.hide()
             self.allhideallreveal_btn.hide()
             self.onehideallreveal_btn.hide()
+            self.deckChooser.deckLabel.setText("Deck for <i>Add new cards</i>")
             self.setWindowTitle('Image Occlusion Enhanced - Editing mode')
             self.bottom_label.setText("Choose card type:")
 

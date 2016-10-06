@@ -73,98 +73,127 @@ class ImgOccNoteGenerator(object):
         self.fields = fields
         self.did = did
         self.edit = edit
-
-        self.omask_path = None
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
-        self.oid = str(uuid.uuid4()).replace("-","")
+        self.uniq_id = str(uuid.uuid4()).replace("-","")
         if self.edit:
-            self.uniq =  '%s-%s' % (self.onote['oid'], self.onote['otype'])
+            self.occl_id = '%s-%s' % (self.onote['uniq_id'], self.onote['occl_type'])
         else:
-            self.uniq = '%s-%s' % (self.oid, self.otype)
+            self.occl_id = '%s-%s' % (self.uniq_id, self.occl_type)
         
     def generate_notes(self):
+        edit = self.edit
+
+        if edit:
+            self._find_all_notes()
+
+        self._prepare_svg_and_ids()
+
         qmasks = self._generate_mask_svgs("Q")
+        amasks = self._generate_mask_svgs("A")
         if not qmasks:
             tooltip("No cards generated.<br>\
                 Are you sure you set your masks?")
             return
-        amasks = self._generate_mask_svgs("A")
         col_image = self.add_image_to_col()
-        self.omask_path = self._save_mask(self.masks_svg, self.uniq, "O")
+        self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
         for i in range(len(qmasks)):
-            note_id = '%s-%s' % (self.uniq, i+1) # start from 1
+            note_id = '%s-%s' % (self.occl_id, i+1) # start from 1
             self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, note_id)
         parent = None
-        if self.edit:
+        tt = "added"
+        if edit:
             parent = self.ed.parentWindow
+            tt = "edited"
             QWebSettings.clearMemoryCaches() # refreshes webview image caches
             mw.reset()
             self.ed.loadNote()
-        tooltip(("Cards added: %s" % len(qmasks) ), period=1500, parent=parent)
+        tooltip(("Cards %s: %s" % ( tt, len(qmasks)) ), period=1500, parent=parent)
+
+    def find_by_noteid(self, note_id):
+        query = "'%s':'%s'" % ( IO_FLDS['note_id'], note_id )
+        res = mw.col.findNotes(query)
+        return res
+
+    def _find_all_notes(self):
+        res = self.find_by_noteid(self.occl_id)
+        note_cnt = len(res)
+        self.nids = {}
+        for nid in res:
+            note_id = mw.col.getNote(i)[IO_FLDS["note_id"]]
+            self.nids[note_id] = nid
+
+    def _prepare_svg_and_ids(self):
+        self.mnode_indexes = []
+        self.elementnrs = {}
+        self.note_ids = {}
+        mask_doc = minidom.parseString(self.masks_svg)
+        svg_node = mask_doc.documentElement
+        #layer_nodes = self._layer_nodes_from(svg_node)
+        #assume all masks are on a single layer
+        layer_node = self._layer_nodes_from(svg_node)
+        #todo: iter
+        for i, node in enumerate(layer_node.childNodes):
+            # minidom doesn't offer a childElements method and childNodes
+            # also returns whitespace found in the layer_node as a child node. 
+            # For that reason we use self.mnode_indexes to register all 
+            # indexes of layer_node children that contain actual elements, 
+            # i.e. mask nodes
+            if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
+                self.mnode_indexes.append(i)
+                print layer_node.childNodes[i].attributes["id"].value
+                # set IDs for each element childNote in the masks layer:
+                layer_node.childNodes[i].setAttribute("id", self.occl_id + '-' + str(len(self.mnode_indexes)))
+                # remove attributes that could cause issues later on:
+                self.remove_attribs_recursively(layer_node.childNodes[i], stripattr)
+        # write changes to masks_svg:
+        self.masks_svg = svg_node.toxml()    
 
     def add_image_to_col(self):
         media_dir = mw.col.media.dir()
         fn = os.path.basename(self.image_path)
         name, ext = os.path.splitext(fn)
         short_name = name[:75] if len(name) > 75 else name
-        unique_fn = self.oid + '_' + short_name + ext
+        unique_fn = self.uniq_id + '_' + short_name + ext
         new_path = os.path.join(media_dir, unique_fn)
         shutil.copyfile(self.image_path, new_path)
         return new_path
 
-    def modify_fill_recursively(self, node):
-        if (node.nodeType == node.ELEMENT_NODE):
-            if node.hasAttribute("fill"):
-                node.setAttribute("fill", self.qfill)
-            map(self.modify_fill_recursively, node.childNodes)
-
-    def remove_attrs_recursively(self, node, attrs):
-        if (node.nodeType == node.ELEMENT_NODE):
-            for i in attrs:
-                if node.hasAttribute(i):
-                    node.removeAttribute(i)
-            map(self.modify_fill_recursively, node.childNodes)
-
     def _generate_mask_svgs(self, side):
-        #Note this gets reimplemented by ImgOccNoteGeneratorSingle
-        #which returns the original mask unmodified
-        mask_doc = minidom.parseString(self.masks_svg)
-        svg_node = mask_doc.documentElement
-        #layer_nodes = self._layer_nodes_from(svg_node)
-        #assume all masks are on a single layer
-        layer_node = self._layer_nodes_from(svg_node)
-        mask_node_indexes = []
-        #todo: iter
-        for i in range(len(layer_node.childNodes)):
-            node = layer_node.childNodes[i]
-            if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
-                # mask_node_indexes contains the indexes of the childNodes that are elements:
-                mask_node_indexes.append(i)
-                # set IDs for each element childNote in the masks layer:
-                layer_node.childNodes[i].setAttribute("id", self.uniq + '-' + str(len(mask_node_indexes)))
-                # remove attributes that could cause issues later on:
-                self.remove_attrs_recursively(layer_node.childNodes[i], stripattr)
-        # write changes to masks_svg:
-        self.masks_svg = svg_node.toxml()
-        masks = self._generate_mask_svgs_for(side, mask_node_indexes)
+        masks = self._generate_mask_svgs_for(side)
         return masks
 
-    def _generate_mask_svgs_for(self, side, mask_node_indexes):
-        masks = [self._create_mask(side, node_index, mask_node_indexes) for node_index in mask_node_indexes]
+    def _generate_mask_svgs_for(self, side):
+        masks = [self._create_mask(side, node_index) for node_index in self.mnode_indexes]
         return masks
 
-    def _create_mask(self, side, mask_node_index, all_mask_node_indexes):
+    def _create_mask(self, side, mask_node_index):
         mask_doc = minidom.parseString(self.masks_svg)
         svg_node = mask_doc.documentElement
         #layer_nodes = self._layer_nodes_from(svg_node)
         #layer_node = layer_nodes[0]
         layer_node = self._layer_nodes_from(svg_node)
         #This methods get implemented different by subclasses
-        self._create_mask_at_layernode(side, mask_node_index, all_mask_node_indexes, layer_node)
+        self._create_mask_at_layernode(side, mask_node_index, layer_node)
         return svg_node.toxml()
 
-    def _create_mask_at_layernode(self, mask_node_index, all_mask_node_indexes, layer_node):
+    def _create_mask_at_layernode(self, mask_node_index, layer_node):
         raise NotImplementedError
+
+    def set_q_attribs(self, node):
+        # set element class
+        node.setAttribute("class", "qshape")
+        # set element color
+        if (node.nodeType == node.ELEMENT_NODE):
+            if node.hasAttribute("fill"):
+                node.setAttribute("fill", self.qfill)
+            map(self.set_q_attribs, node.childNodes)
+
+    def remove_attribs_recursively(self, node, attrs):
+        if (node.nodeType == node.ELEMENT_NODE):
+            for i in attrs:
+                if node.hasAttribute(i):
+                    node.removeAttribute(i)
+            map(self.remove_attribs_recursively, node.childNodes)
 
     def _layer_nodes_from(self, svg_node):
         #TODO: understand this better
@@ -192,22 +221,23 @@ class ImgOccNoteGenerator(object):
         if not model:
             model = template.add_io_model(mw.col)
         model['did'] = self.did
+
         if not self.edit:
             note = Note(mw.col, model)
         else:
-            query = "'%s':'%s'" % ( IO_FLDS['uuid'], note_id )
+            res = self.find_by_noteid(note_id)
             print note_id
-            res = mw.col.findNotes(query)
+            print res
             if res:
                 note = mw.col.getNote(res[0])
             else:
-                return
+                note = Note(mw.col, model)
 
         def fname2img(path):
             return '<img src="%s" />' % os.path.split(path)[1]
 
         # define fields we just generated
-        fields[IO_FLDS['uuid']] = note_id
+        fields[IO_FLDS['note_id']] = note_id
         fields[IO_FLDS['image']] = fname2img(col_image)
         fields[IO_FLDS['qmask']] = fname2img(qmask_path)
         fields[IO_FLDS['amask']] = fname2img(amask_path)
@@ -220,69 +250,56 @@ class ImgOccNoteGenerator(object):
 
         note.tags = self.tags
 
-        if self.edit:
+        if self.edit and res:
             note.flush()
             return
 
         mw.col.addNote(note)
-        deck = mw.col.decks.nameOrNone(self.did)
-        self.ed.parentWindow.deckChooser.deck.setText(deck)
-
-            
-
-    def find_by_noteid(self, note_id):
-        query = "'%s':'%s'" % ( IO_FLDS['uuid'], note_id )
-        res = mw.col.findNotes(query)
-        return res
+        if not self.edit:
+            deck = mw.col.decks.nameOrNone(self.did)
+            self.ed.parentWindow.deckChooser.deck.setText(deck)
 
 class IoGenAllHideOneReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""
-
     def __init__(self, ed, svg, image_path, onote, tags, fields, did, edit):
-        self.otype = "ao"
+        self.occl_type = "ao"
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did, edit)
 
-
-    def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
-        for i in all_mask_node_indexes:
+    def _create_mask_at_layernode(self, side, mask_node_index, layer_node):
+        for i in self.mnode_indexes:
             if i == mask_node_index:
                 if side == "Q":
-                    self.modify_fill_recursively(layer_node.childNodes[i])
-                    layer_node.childNodes[i].setAttribute("class", "qshape")
+                    self.set_q_attribs(layer_node.childNodes[i])
                 if side == "A":
                     layer_node.removeChild(layer_node.childNodes[i])
 
 class IoGenAllHideAllReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
-
     def __init__(self, ed, svg, image_path, onote, tags, fields, did, edit):
-        self.otype = "aa"
+        self.occl_type = "aa"
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did, edit)
-        
 
-    def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
-        for i in reversed(all_mask_node_indexes):
+    def _create_mask_at_layernode(self, side, mask_node_index, layer_node):
+        for i in reversed(self.mnode_indexes):
             if side == "Q":
                 if i == mask_node_index:
-                    self.modify_fill_recursively(layer_node.childNodes[i])
-                    layer_node.childNodes[i].setAttribute("class", "qshape")
+                    self.set_q_attribs(layer_node.childNodes[i])
             else:
                 layer_node.removeChild(layer_node.childNodes[i])
 
 class IoGenOneHideAllReveal(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
     def __init__(self, ed, svg, image_path, onote, tags, fields, did, edit):
-        self.otype = "oa"
+        self.occl_type = "oa"
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did, edit)
-        
 
-    def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
-        for i in reversed(all_mask_node_indexes):
+    def _create_mask_at_layernode(self, side, mask_node_index, layer_node):
+        for i in reversed(self.mnode_indexes):
             if i == mask_node_index and side == "Q":
-                self.modify_fill_recursively(layer_node.childNodes[i])
+                self.set_q_attribs(layer_node.childNodes[i])
                 layer_node.childNodes[i].setAttribute("class", "qshape")
             else:
                 layer_node.removeChild(layer_node.childNodes[i])

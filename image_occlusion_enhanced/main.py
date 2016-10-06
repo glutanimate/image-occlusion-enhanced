@@ -69,13 +69,13 @@ class ImgOccAdd(object):
         for i in IO_FLDS.keys():
             onote[i] = None
 
-        # always preserve deck, tags, and sources (if available)
-        onote["deck"] = self.ed.parentWindow.deckChooser.deck.text()
+        # always preserve tags and sources (if available)
         onote["tags"] = self.ed.tags.text()
         if IO_FLDS["sources"] in note:
             onote["sources"] = note[IO_FLDS["sources"]]
 
         if mode == "add":
+            onote["did"] = self.ed.parentWindow.deckChooser.selectedId()
             clip = QApplication.clipboard()
             if clip.mimeData().imageData():
                 handle, image_path = tempfile.mkstemp(suffix='.png')
@@ -98,18 +98,19 @@ class ImgOccAdd(object):
             if note.model()["name"] != IO_MODEL_NAME:
                 tooltip("Not an IO card")
                 return
+            onote["did"] = self.ed.note.model()['did']
             imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
             imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
             invalfile = False
             for i in onote.keys():
-                if i in ["tags", "qmask", "amask"]:
+                if i in ["did", "tags", "qmask", "amask"]:
                     continue
                 fld = IO_FLDS[i]
-                if i == "uuid":
-                    uuid = note[fld]
-                    onote["uuid"] = uuid
-                    onote["oid"] = uuid.split('-')[0]
-                    onote["otype"] = uuid.split('-')[1]
+                if i == "note_id":
+                    note_id = note[fld]
+                    onote["note_id"] = note_id
+                    onote["uniq_id"] = note_id.split('-')[0]
+                    onote["occl_type"] = note_id.split('-')[1]
                 elif i in ["image", "omask"]:
                     html = note[fld]
                     fname = imgregex.search(html)
@@ -140,6 +141,7 @@ class ImgOccAdd(object):
         ofill = mw.col.conf['imgocc']['ofill']
         bkgd_url = path2url(self.image_path)
         onote = self.onote
+        deck = mw.col.decks.nameOrNone(onote["did"])
 
         try:
             mw.ImgOccEdit is not None
@@ -166,7 +168,7 @@ class ImgOccAdd(object):
 
         dialog.svg_edit.setUrl(url)
         dialog.tags_edit.setText(onote["tags"])
-        dialog.deckChooser.deck.setText(onote["deck"])
+        dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
         dialog.sources_edit.setPlainText(onote["sources"])
 
@@ -182,17 +184,19 @@ class ImgOccAdd(object):
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
 
-        (fields, did, tags) = self.getUserInputs()
+        (fields, tags) = self.getUserInputs()
+        did = mw.ImgOccEdit.deckChooser.selectedId()
 
         edit = False
         if choice == "edit":
+            did = self.onote["did"]
             edit = True
         if choice in ["new", "edit"]:
-            opt = mw.ImgOccEdit.otype_select.currentIndex()
+            opt = mw.ImgOccEdit.occl_type_select.currentIndex()
             if opt == 0: # Option 'Don't change'
-                choice = self.onote["otype"]
+                choice = self.onote["occl_type"]
             else:
-                choice = mw.ImgOccEdit.otype_select.currentText()
+                choice = mw.ImgOccEdit.occl_type_select.currentText()
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(self.ed, svg, self.image_path, 
@@ -220,9 +224,8 @@ class ImgOccAdd(object):
         fields[IO_FLDS['extra2']] = mw.ImgOccEdit.extra2_edit.toPlainText()
         for key, val in fields.iteritems():
             fields[key] = val.replace('\n', '<br />')
-        did = mw.ImgOccEdit.deckChooser.selectedId()
         tags = mw.ImgOccEdit.tags_edit.text().split()
-        return (fields, did, tags)
+        return (fields, tags)
 
 
 def invoke_io_settings(mw):

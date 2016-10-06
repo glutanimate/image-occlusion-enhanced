@@ -127,7 +127,7 @@ def add_io_model(col):
     # Add fields:
     for i in IO_FLDORDER:
       fld = models.newField(IO_FLDS[i])
-      if i == "uuid":
+      if i == "note_id":
         fld['size'] = 0
       models.addField(io_model, fld)
     # Add template
