@@ -14,7 +14,7 @@
 
 import os
 
-from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QFileDialog, QAction, QKeySequence
 from PyQt4.QtCore import QUrl
 
 from aqt import mw, webview, deckchooser, tagedit
@@ -259,11 +259,16 @@ def onImgOccButton(ed, mode):
 def onSetupEditorButtons(self):
     # Add IO button to Editor
     if self.addMode:
-        self._addButton("new_occlusion", lambda o=self: onImgOccButton(self, "add"),
-                _("Alt+o"), _("Add Image Occlusion (Alt+O)"), canDisable=False)
+        btn = self._addButton("new_occlusion", lambda o=self: onImgOccButton(self, "add"),
+                _("Alt+a"), _("Add Image Occlusion (Alt+A)"), canDisable=False)
     else:
-        self._addButton("edit_occlusion", lambda o=self: onImgOccButton(self, "edit"),
-                _("Alt+o"), _("Edit Image Occlusion (Alt+O)"), canDisable=False)
+        btn = self._addButton("edit_occlusion", lambda o=self: onImgOccButton(self, "edit"),
+                _("Alt+a"), _("Edit Image Occlusion (Alt+A)"), canDisable=False)
+
+    press_action = QAction(self.parentWindow, triggered=btn.animateClick)
+    press_action.setShortcut(QKeySequence(_("Alt+o")))
+    btn.addAction(press_action)
+
 
 def hideIdField(self, node, hide=True, focus=False):
     # simple hack that hides the ID field on IO notes
