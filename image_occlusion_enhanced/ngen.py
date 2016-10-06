@@ -64,24 +64,19 @@ def genByKey(key):
 
 
 class ImgOccNoteGenerator(object):
-    def __init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did, edit):
+    def __init__(self, ed, svg, image_path, onote, tags, fields, did, edit):
         self.ed = ed
-        self.onote = onote
-        self.image_path = image
         self.masks_svg = svg
-        self.oid = str(uuid.uuid4()).replace("-","")
+        self.image_path = image_path
+        self.onote = onote
         self.tags = tags
-        self.header = header
-        self.footer = footer
-        self.remarks = remarks
-        self.sources = sources
-        self.extra1 = extra1
-        self.extra2 = extra2
+        self.fields = fields
         self.did = did
+        self.edit = edit
+
         self.omask_path = None
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
-        self.edit = edit
+        self.oid = str(uuid.uuid4()).replace("-","")
         if self.edit:
             self.uniq =  '%s-%s' % (self.onote['oid'], self.onote['otype'])
         else:
@@ -193,6 +188,7 @@ class ImgOccNoteGenerator(object):
         qmask_path = self._save_mask(qmask, note_id, "Q")
         amask_path = self._save_mask(amask, note_id, "A")
         model = mw.col.models.byName(IO_MODEL_NAME)
+        fields = self.fields
         if not model:
             model = template.add_io_model(mw.col)
         model['did'] = self.did
@@ -210,35 +206,29 @@ class ImgOccNoteGenerator(object):
         def fname2img(path):
             return '<img src="%s" />' % os.path.split(path)[1]
 
-        # for i in IO_FLDS.keys():
-        #     fld = IO_FLDS[i]
-        #     nnote[fld] = 
+        # define fields we just generated
+        fields[IO_FLDS['uuid']] = note_id
+        fields[IO_FLDS['image']] = fname2img(col_image)
+        fields[IO_FLDS['qmask']] = fname2img(qmask_path)
+        fields[IO_FLDS['amask']] = fname2img(amask_path)
+        fields[IO_FLDS['omask']] = fname2img(self.omask_path)
 
-        # IO_FLDORDER = ["uuid", "header", "image", "footer", "remarks", "sources",
-        #                 "extra1", "extra2", "qmask", "amask", "omask"]
+        # add fields to note
+        for i in IO_FLDORDER:
+            fldlabel = IO_FLDS[i]
+            note[fldlabel] = fields[fldlabel]
 
-        # static order, this is temporary
-        note.fields = [
-                    note_id,
-                    self.header,
-                    fname2img(col_image),
-                    self.footer,
-                    self.remarks,
-                    self.sources,
-                    self.extra1,
-                    self.extra2,
-                    fname2img(qmask_path),
-                    fname2img(amask_path),
-                    fname2img(self.omask_path)
-                    ]
+        note.tags = self.tags
 
-        for tag in self.tags:
-            note.addTag(tag)
-
-        if not self.edit:
-            mw.col.addNote(note)
-        else:
+        if self.edit:
             note.flush()
+            return
+
+        mw.col.addNote(note)
+        deck = mw.col.decks.nameOrNone(self.did)
+        self.ed.parentWindow.deckChooser.deck.setText(deck)
+
+            
 
     def find_by_noteid(self, note_id):
         query = "'%s':'%s'" % ( IO_FLDS['uuid'], note_id )
@@ -248,12 +238,11 @@ class ImgOccNoteGenerator(object):
 class IoGenAllHideOneReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""
 
-    def __init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did, edit):
+    def __init__(self, ed, svg, image_path, onote, tags, fields, did, edit):
         self.otype = "ao"
-        ImgOccNoteGenerator.__init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did, edit)
-        
+        ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
+                                        onote, tags, fields, did, edit)
+
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
         for i in all_mask_node_indexes:
@@ -267,11 +256,10 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
 class IoGenAllHideAllReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
 
-    def __init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did, edit):
+    def __init__(self, ed, svg, image_path, onote, tags, fields, did, edit):
         self.otype = "aa"
-        ImgOccNoteGenerator.__init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did, edit)
+        ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
+                                        onote, tags, fields, did, edit)
         
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):
@@ -285,11 +273,10 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
 
 class IoGenOneHideAllReveal(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
-    def __init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did, edit):
+    def __init__(self, ed, svg, image_path, onote, tags, fields, did, edit):
         self.otype = "oa"
-        ImgOccNoteGenerator.__init__(self, ed, onote, image, svg, tags, header, footer, remarks, sources, 
-                      extra1, extra2, did, edit)
+        ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
+                                        onote, tags, fields, did, edit)
         
 
     def _create_mask_at_layernode(self, side, mask_node_index, all_mask_node_indexes, layer_node):

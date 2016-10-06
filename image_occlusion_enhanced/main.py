@@ -69,7 +69,8 @@ class ImgOccAdd(object):
         for i in IO_FLDS.keys():
             onote[i] = None
 
-        # always preserve tags and sources if available
+        # always preserve deck, tags, and sources (if available)
+        onote["deck"] = self.ed.parentWindow.deckChooser.deck.text()
         onote["tags"] = self.ed.tags.text()
         if IO_FLDS["sources"] in note:
             onote["sources"] = note[IO_FLDS["sources"]]
@@ -165,6 +166,7 @@ class ImgOccAdd(object):
 
         dialog.svg_edit.setUrl(url)
         dialog.tags_edit.setText(onote["tags"])
+        dialog.deckChooser.deck.setText(onote["deck"])
         dialog.tags_edit.setCol(mw.col)
         dialog.sources_edit.setPlainText(onote["sources"])
 
@@ -180,9 +182,7 @@ class ImgOccAdd(object):
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
 
-        qfill = mw.col.conf['imgocc']['qfill']
-        (did, tags, header, footer, remarks, sources, 
-            extra1, extra2) = self.getUserInputs()
+        (fields, did, tags) = self.getUserInputs()
 
         edit = False
         if choice == "edit":
@@ -195,30 +195,34 @@ class ImgOccAdd(object):
                 choice = mw.ImgOccEdit.otype_select.currentText()
 
         noteGenerator = genByKey(choice)
-        gen = noteGenerator(self.ed, self.onote, self.image_path, svg, tags, header, 
-                    footer, remarks, sources, extra1, extra2, did, edit)
+        gen = noteGenerator(self.ed, svg, self.image_path, 
+                                self.onote, tags, fields, did, edit)
         gen.generate_notes()
 
         if self.ed.note:
-            if choice in ["overlapping", "nonoverlapping"]:
+            if choice not in ["new", "edit"]:
                 # Update Editor with modified tags and sources field
                 self.ed.tags.setText(" ".join(tags))
                 self.ed.saveTags()
-                if IO_FLDS["sources"] in self.ed.note:
-                    self.ed.note[IO_FLDS["sources"]] = sources
+                srcfld = IO_FLDS["sources"]
+                if srcfld in self.ed.note:
+                    self.ed.note[srcfld] = fields[srcfld]
             self.ed.loadNote()
         mw.reset()
 
     def getUserInputs(self):
-        header = mw.ImgOccEdit.header_edit.toPlainText().replace('\n', '<br />')
-        footer = mw.ImgOccEdit.footer_edit.toPlainText().replace('\n', '<br />')
-        remarks = mw.ImgOccEdit.remarks_edit.toPlainText().replace('\n', '<br />')
-        sources = mw.ImgOccEdit.sources_edit.toPlainText().replace('\n', '<br />')
-        extra1 = mw.ImgOccEdit.extra1_edit.toPlainText().replace('\n', '<br />')
-        extra2 = mw.ImgOccEdit.extra2_edit.toPlainText().replace('\n', '<br />')
+        fields = {}
+        fields[IO_FLDS['header']] = mw.ImgOccEdit.header_edit.toPlainText()
+        fields[IO_FLDS['footer']] = mw.ImgOccEdit.footer_edit.toPlainText()
+        fields[IO_FLDS['remarks']] = mw.ImgOccEdit.remarks_edit.toPlainText()
+        fields[IO_FLDS['sources']] = mw.ImgOccEdit.sources_edit.toPlainText()
+        fields[IO_FLDS['extra1']] = mw.ImgOccEdit.extra1_edit.toPlainText()
+        fields[IO_FLDS['extra2']] = mw.ImgOccEdit.extra2_edit.toPlainText()
+        for key, val in fields.iteritems():
+            fields[key] = val.replace('\n', '<br />')
         did = mw.ImgOccEdit.deckChooser.selectedId()
         tags = mw.ImgOccEdit.tags_edit.text().split()
-        return (did, tags, header, footer, remarks, sources, extra1, extra2)
+        return (fields, did, tags)
 
 
 def invoke_io_settings(mw):
