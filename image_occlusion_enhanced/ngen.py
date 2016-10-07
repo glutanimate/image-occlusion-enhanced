@@ -181,24 +181,27 @@ class ImgOccNoteGenerator(object):
 
         # look for missing shapes by note_id
         valid_mnode_note_ids = filter (lambda x:x.startswith(uniq_id), mnode_ids.values())
-        valid_mnode_note_nrs = sorted([int(i.split('-')[-1]) for i in valid_mnode_note_ids])
-        max_mnode_note_nr = int(valid_mnode_note_nrs[-1])
+        valid_nid_note_ids = filter (lambda x:x.startswith(uniq_id), nids.keys())
+        # filter out notes that have already been deleted manually
+        exstg_mnode_note_ids = [x for x in valid_mnode_note_ids if x in valid_nid_note_ids]
+        exstg_mnode_note_nrs = sorted([int(i.split('-')[-1]) for i in exstg_mnode_note_ids])
+        # determine available nrs available for note numbering
+        max_mnode_note_nr = int(exstg_mnode_note_nrs[-1])
         full_range = range(1, max_mnode_note_nr+1)
-        available_nrs = set(full_range) - set(valid_mnode_note_nrs)
+        available_nrs = set(full_range) - set(exstg_mnode_note_nrs)
         available_nrs = sorted(list(available_nrs))
 
         print '--------------------'
         print "nids", nids
         print "nids.keys", nids.keys()
         print "valid_mnode_note_ids", valid_mnode_note_ids
-        print "valid_mnode_note_nrs", valid_mnode_note_nrs
+        print "exstg_mnode_note_nrs", exstg_mnode_note_nrs
         print "max_mnode_note_nr", max_mnode_note_nr
         print "full_range", full_range
         print "available_nrs", available_nrs
         print '--------------------'
 
         # compare note_ids as present in note collection with masks on svg
-        valid_nid_note_ids = filter (lambda x:x.startswith(uniq_id), nids.keys())
         deleted_note_ids = set(valid_nid_note_ids) - set(valid_mnode_note_ids)
         deleted_note_ids = sorted(list(deleted_note_ids))
         del_count = len(deleted_note_ids)
@@ -218,7 +221,7 @@ class ImgOccNoteGenerator(object):
         for nr, idx in enumerate(self.mnode_indexes):
             mnode_id = mnode_ids[idx]
             new_mnode_id = None
-            if mnode_id not in valid_mnode_note_ids:
+            if mnode_id not in exstg_mnode_note_ids:
                 if available_nrs:
                     # use gap in note_id numbering
                     note_nr = available_nrs.pop(0)
