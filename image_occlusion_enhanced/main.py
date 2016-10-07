@@ -145,7 +145,7 @@ class ImgOccAdd(object):
         onote = self.onote
 
         deck = mw.col.decks.nameOrNone(onote["did"])
-
+        # use existing IO instance when available:
         try:
             mw.ImgOccEdit is not None
             mw.ImgOccEdit.reset_window()

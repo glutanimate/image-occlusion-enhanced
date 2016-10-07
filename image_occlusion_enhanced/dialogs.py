@@ -201,31 +201,31 @@ class ImgOccEdit(QDialog):
         self.setLayout(vbox_main)
 
         # Define and connect key bindings
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_Tab), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Tab"), self), 
             QtCore.SIGNAL('activated()'), self.switch_tabs)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_R), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+r"), self), 
             QtCore.SIGNAL('activated()'), self.reset_main_fields)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_R), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+r"), self), 
             QtCore.SIGNAL('activated()'), self.reset_all_fields)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_1), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+1"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.header_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_2), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+2"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.footer_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_3), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+3"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.remarks_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_4), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+4"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.sources_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_5), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+5"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.extra1_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_6), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+6"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.extra2_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_D), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+d"), self), 
             QtCore.SIGNAL('activated()'), deck_container.setFocus)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_T), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+t"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.tags_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_I), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+i"), self), 
             QtCore.SIGNAL('activated()'), self.svg_edit.setFocus)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence(Qt.CTRL + Qt.Key_F), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+f"), self), 
             QtCore.SIGNAL('activated()'), self.fit_image_canvas)
 
         # Set Focus
@@ -248,28 +248,28 @@ class ImgOccEdit(QDialog):
 
     # Modes
     def switch_to_mode(self, mode):
+        hide_on_add = [self.edit_label, self.occl_tp_select, 
+                        self.edit_btn, self.new_btn]
+        hide_on_edit = [self.ao_btn, self.aa_btn, self.oa_btn]
         if mode == "add":
-            self.edit_label.hide()
-            self.occl_tp_select.hide()
-            self.edit_btn.hide()
-            self.new_btn.hide()
-            self.ao_btn.show()
-            self.aa_btn.show()
-            self.oa_btn.show()
-            self.deckChooser.deckLabel.setText("Deck")
-            self.setWindowTitle('Image Occlusion Enhanced - Add mode')
-            self.bottom_label.setText("Add card type:")
+            for i in hide_on_add:
+                i.hide()
+            for i in hide_on_edit:
+                i.show()
+            dl_txt = "Deck"
+            ttl = "Image Occlusion Enhanced - Add mode"
+            bl_txt = "Add card type:"
         else:
-            self.edit_label.show()
-            self.occl_tp_select.show()
-            self.edit_btn.show()
-            self.new_btn.show()
-            self.ao_btn.hide()
-            self.aa_btn.hide()
-            self.oa_btn.hide()
-            self.deckChooser.deckLabel.setText("Deck for <i>Add new cards</i>")
-            self.setWindowTitle('Image Occlusion Enhanced - Editing mode')
-            self.bottom_label.setText("Choose card type:")
+            for i in hide_on_add:
+                i.show()
+            for i in hide_on_edit:
+                i.hide()
+            dl_txt = "Deck for <i>Add new cards</i>"
+            ttl = "Image Occlusion Enhanced - Editing mode"
+            bl_txt = "Choose card type:"
+        self.deckChooser.deckLabel.setText(dl_txt)
+        self.setWindowTitle(ttl)
+        self.bottom_label.setText(bl_txt)
 
     # Other actions
     def reset_window(self):
