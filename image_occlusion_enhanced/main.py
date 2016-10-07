@@ -182,44 +182,42 @@ class ImgOccAdd(object):
             dialog.exec_()
         
 
-    def onAddNotesButton(self, choice):
+    def onAddNotesButton(self, choice, edit=False):
         svg_edit = mw.ImgOccEdit.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
-
-        (fields, tags) = self.getUserInputs()
-        did = mw.ImgOccEdit.deckChooser.selectedId()
-
-        edit = False
-        if choice == "edit":
-            did = self.onote["did"]
-            edit = True
-        if choice in ["new", "edit"]:
-            opt = mw.ImgOccEdit.occl_tp_select.currentIndex()
-            if opt == 0: # Option 'Don't change'
-                choice = self.onote["occl_tp"]
-            else:
-                choice = mw.ImgOccEdit.occl_tp_select.currentText()
-
-        noteGenerator = genByKey(choice)
-        gen = noteGenerator(self.ed, svg, self.image_path, 
-                                    self.onote, tags, fields, did)
         
-        if edit == True:
+        (fields, tags) = self.getUserInputs()
+
+        if edit:
+            did = self.onote["did"]
+            old_occl_tp = self.onote["occl_tp"]
+        else:
+            did = mw.ImgOccEdit.deckChooser.selectedId()
+            old_occl_tp = None
+
+        noteGenerator = genByKey(choice, old_occl_tp)
+        gen = noteGenerator(self.ed, svg, self.image_path, 
+                                    self.onote, tags, fields, did)        
+        if edit:
             gen.update_notes()
         else:
             gen.generate_notes()
 
-
-        if self.ed.note:
-            if choice not in ["new", "edit"]:
-                # Update Editor with modified tags and sources field
-                self.ed.tags.setText(" ".join(tags))
-                self.ed.saveTags()
-                srcfld = IO_FLDS["sources"]
-                if srcfld in self.ed.note:
-                    self.ed.note[srcfld] = fields[srcfld]
+        if self.ed and self.ed.addMode:
+            # Update Editor with modified tags and sources field
+            self.ed.tags.setText(" ".join(tags))
+            self.ed.saveTags()
+            srcfld = IO_FLDS["sources"]
+            if srcfld in self.ed.note:
+                self.ed.note[srcfld] = fields[srcfld]
             self.ed.loadNote()
+            deck = mw.col.decks.nameOrNone(did)
+            self.ed.parentWindow.deckChooser.deck.setText(deck)
+        elif edit:
+            QWebSettings.clearMemoryCaches() # refresh webview image cache
+            #self.ed.loadNote()
+
         mw.reset()
 
     def getUserInputs(self):

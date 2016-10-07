@@ -240,10 +240,12 @@ class ImgOccEdit(QDialog):
     def add_oa(self): 
         mw.ImgOccAdd.onAddNotesButton("oa")
     def new(self):
-        mw.ImgOccAdd.onAddNotesButton("new")
+        choice = self.occl_tp_select.currentText()
+        mw.ImgOccAdd.onAddNotesButton(choice)
         self.close()
     def edit_all(self):
-        mw.ImgOccAdd.onAddNotesButton("edit")
+        choice = self.occl_tp_select.currentText()
+        mw.ImgOccAdd.onAddNotesButton(choice, True)
         self.close()
 
     # Modes

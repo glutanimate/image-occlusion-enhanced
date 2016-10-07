@@ -61,13 +61,17 @@ def svgToBase64(svg_path):
     svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
     return svg_b64
 
-def genByKey(key):
-    if key in ["ao", "All Hidden, One Revealed"]:
+def genByKey(key, old_occl_tp):
+    if key in ["Don't change"]:
+        return genByKey(old_occl_tp, None)
+    elif key in ["ao", "All Hidden, One Revealed"]:
         return IoGenAllHideOneReveal
     elif key in ["aa", "All Hidden, All Revealed"]:
         return IoGenAllHideAllReveal
     elif key in ["oa", "One Hidden, All Revealed"]:
         return IoGenOneHideAllReveal
+    else:
+        return IoGenAllHideOneReveal
 
 class ImgOccNoteGenerator(object):
     def __init__(self, ed, svg, image_path, onote, tags, fields, did):
@@ -100,11 +104,10 @@ class ImgOccNoteGenerator(object):
             note_id = self.mnode_ids[idx]
             self._save_mask_and_return_note(qmasks[nr], amasks[nr], 
                                                     col_image, note_id)
-        deck = mw.col.decks.nameOrNone(self.did)
-        if hasattr(self.ed.parentWindow, 'deckChooser'):
-            self.ed.parentWindow.deckChooser.deck.setText(deck)
-        mw.reset()
-        tooltip("Cards added: %s" % len(qmasks), period=1500)
+        parent = None
+        if not self.ed.addMode:
+            parent = self.ed.parentWindow
+        tooltip("Cards added: %s" % len(qmasks), period=1500, parent=parent)
 
     def update_notes(self):
         self.uniq_id = self.onote['uniq_id']
@@ -133,9 +136,6 @@ class ImgOccNoteGenerator(object):
             self._save_mask_and_return_note(qmasks[nr], amasks[nr],    
                                                 col_image, note_id, nid)
         parent = self.ed.parentWindow
-        QWebSettings.clearMemoryCaches() # refreshes webview image caches
-        mw.reset()
-        self.ed.loadNote()
         tooltip("Cards updated: %s" % len(qmasks), period=1500, parent=parent)
 
     def _get_mnodes_and_set_ids(self, edit=False):
