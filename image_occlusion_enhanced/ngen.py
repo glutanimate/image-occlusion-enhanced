@@ -84,11 +84,15 @@ class ImgOccNoteGenerator(object):
     def generate_notes(self):
         self.uniq_id = str(uuid.uuid4()).replace("-","") 
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
-        self._get_mnodes()
+        ( svg_node, layer_node ) = self._get_mnodes_and_set_ids()
         if not self.mnode_ids:
             tooltip("No cards to generate.<br>\
                 Are you sure you set your masks correctly?")
             return
+
+        print svg_node.toxml()
+        return
+        self.masks_svg = svg_node.toxml() # write changes to svg
         qmasks = self._generate_mask_svgs_for("Q")
         amasks = self._generate_mask_svgs_for("A")
         col_image = self.add_image_to_col()
@@ -103,14 +107,15 @@ class ImgOccNoteGenerator(object):
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
         self.edit = True
         self._find_all_notes()
-        ( svg_node, mlayer_node ) = self._get_mnodes()
+        ( svg_node, mlayer_node ) = self._get_mnodes_and_set_ids(True)
         if not self.mnode_ids:
             tooltip("No shapes to update.<br>\
                 Are you sure you set your masks correctly?")
             return
-        self._delete_unused_notes()
+        self._delete_and_id_notes(mlayer_node)
+        self.masks_svg = svg_node.toxml() # write changes to svg
+        print self.masks_svg
         return
-        self._prepare_svg(svg_node, mlayer_node)
         qmasks = self._generate_mask_svgs_for("Q")
         amasks = self._generate_mask_svgs_for("A")            
         for i in range(len(qmasks)):
@@ -122,7 +127,7 @@ class ImgOccNoteGenerator(object):
         self.ed.loadNote()
         tooltip("Cards updated: %s" % len(qmasks), period=1500, parent=self.ed)
 
-    def _get_mnodes(self):
+    def _get_mnodes_and_set_ids(self, edit=False):
         self.mnode_indexes = []
         self.mnode_ids = {}
         mask_doc = minidom.parseString(self.masks_svg)
@@ -139,8 +144,10 @@ class ImgOccNoteGenerator(object):
                 self.mnode_indexes.append(i)
                 self.remove_attribs_recursively(mlayer_node.childNodes[i], stripattr)
                 self.mnode_ids[i] = mlayer_node.childNodes[i].attributes["id"].value
-        if self.edit:
-            return (svg_node, mlayer_node)
+                if not edit:
+                    new_mnode_id = "%s-%i" %(self.occl_id, len(self.mnode_indexes))
+                    mlayer_node.childNodes[i].setAttribute("id", new_mnode_id)
+        return (svg_node, mlayer_node)
 
     def find_by_noteid(self, note_id):
         query = "'%s':'%s*'" % ( IO_FLDS['note_id'], note_id )
@@ -157,30 +164,17 @@ class ImgOccNoteGenerator(object):
             note_id = mw.col.getNote(nid)[IO_FLDS["note_id"]]
             self.nids[note_id] = nid
 
-    def _delete_unused_notes(self):
+    def _delete_and_id_notes(self, mlayer_node):
         uniq_id = self.onote['uniq_id']
         mnode_ids = self.mnode_ids
         nids = self.nids
+        # look for missing shapes by note_id
         valid_mnode_note_ids = filter (lambda x:x.startswith(uniq_id), mnode_ids.values())
         valid_mnode_note_nrs = sorted([int(i.split('-')[-1]) for i in valid_mnode_note_ids])
         max_mnode_note_nr = int(valid_mnode_note_nrs[-1])
         full_range = range(1, max_mnode_note_nr+1)
-        availbl = set(full_range) - set(valid_mnode_note_nrs)
-        availbl = sorted(list(availbl))
-        valid_nid_note_ids = filter (lambda x:x.startswith(uniq_id), nids.keys())
-        #valid_nid_note_nrs = sorted([i.split('-')[-1] for i in valid_nid_note_ids])
-        deleted_note_ids = set(valid_nid_note_ids) - set(valid_mnode_note_ids)
-        deleted_note_ids = sorted(list(deleted_note_ids))
-        deleted_nr = len(deleted_note_ids)
-        print "Insert dialog here: This will delete %i card(s). Proceed?" % deleted_nr
-        #mw.checkpoint(_("Edit Image Occlusion"))
-        #model.beginReset()
-        # no checkpoints available in editcurrent, sadly
-        deleted_nids = [nids[x] for x in deleted_note_ids]
-        mw.col.remNotes(deleted_nids)
-        for i in deleted_note_ids:
-            nids[i] = None
-        # mw.reset()
+        available_nrs = set(full_range) - set(valid_mnode_note_nrs)
+        available_nrs = sorted(list(available_nrs))
 
         print '--------------------'
         print "nids", nids
@@ -189,50 +183,66 @@ class ImgOccNoteGenerator(object):
         print "valid_mnode_note_nrs", valid_mnode_note_nrs
         print "max_mnode_note_nr", max_mnode_note_nr
         print "full_range", full_range
-        print "availbl", availbl
+        print "available_nrs", available_nrs
+        print '--------------------'
+
+        # add note_id to missing shapes
+        note_nr_max = max_mnode_note_nr
+        new_count = 0
+        for nr, idx in enumerate(self.mnode_indexes):
+            mnode_id = mnode_ids[idx]
+            new_mnode_id = None
+            if mnode_id not in valid_mnode_note_ids:
+                if available_nrs:
+                    # use gap in note_id numbering
+                    note_nr = available_nrs.pop(0)
+                else:
+                    # increment maximum note_id number
+                    note_nr_max = note_nr_max +1
+                    note_nr = note_nr_max
+                new_mnode_id = self.occl_id + '-' + str(note_nr)
+                new_count += 1
+            nids[mnode_id] = None
+            if new_mnode_id:
+                mlayer_node.childNodes[idx].setAttribute("id", new_mnode_id)
+            print "====================="
+            print "nr", nr
+            print "idx", idx
+            print "mnode_id", mnode_id
+            print "available_nrs", available_nrs
+            print "note_nr_max", note_nr_max
+            print "new_mnode_id", new_mnode_id
+            print "====================="
+
+        # compare note_ids as present in note collection with masks on svg
+        valid_nid_note_ids = filter (lambda x:x.startswith(uniq_id), nids.keys())
+        deleted_note_ids = set(valid_nid_note_ids) - set(valid_mnode_note_ids)
+        deleted_note_ids = sorted(list(deleted_note_ids))
+        del_count = len(deleted_note_ids)
+        # set notes of missing masks on svg to be deleted
+        deleted_nids = [nids[x] for x in deleted_note_ids]
+
+        # for i in deleted_note_ids:
+        #     nids[i] = None
+
+        print "##########################"
         print "valid_nid_note_ids", valid_nid_note_ids
         print "deleted_note_ids", deleted_note_ids
-        #print "valid_nid_note_nrs", valid_nid_note_nrs
         print "deleted_nids", deleted_nids
         print "edited nids", nids
+        print "##########################"
 
 
-    def _prepare_svg(self, svg_node, mlayer_node):
-        ( avlbl_nrs, max_nr) = self._delete_unused_notes() 
-        for nr, idx in enumerate(self.mnode_indexes):
-            # remove attributes that could cause issues later on:
-            self.remove_attribs_recursively(mlayer_node.childNodes[idx], stripattr)
-            if not self.edit:
-                new_mnode_id = self.occl_id + '-' + str(nr+1)
-                mlayer_node.childNodes[i].setAttribute("id", new_mnode_id)
-                continue
-            mnode_id = self.mnode_ids[i]
-            mnode_id_uniq = mnode_id.split('-')[0]
-            if mnode_id_uniq == self.onote['uniq_id']:
-                # reuse old ID
-                new_mnode_id = None
-            elif not incrmax:
-                # use possibly missing IDs
-                # note_nrs = sorted([i.split('-')[-1] for i in self.nids.keys()])
-                # max_note_nr = note_nrs[-1]
-                # full_range = range(1, max_note_nr)
-                # availbl = set(full_range) - set(note_nrs)
-                if availbl:
-                    new_mnode_id = self.occl_id + '-' + str(availbl)
-                else:
-                    incrmax = max_note_nr + 1
-                    new_mnode_id = self.occl_id + '-' + str(incrmax)
-            else:
-                pass
+        print "Insert dialog here: This will delete %i card(s) \
+                    and create %i new one(s). Proceed?" % (del_count, new_count)
 
-            if self.mnode_ids[i] not in self.nids.values():
-                self.nids
+        # no checkpoints available in editcurrent, sadly
+        #mw.checkpoint(_("Edit Image Occlusion"))
+        #model.beginReset()
+        #mw.col.remNotes(deleted_nids)
+        # mw.reset()
 
-            if new_mnode_id:
-                mlayer_node.childNodes[i].setAttribute("id", new_mnode_id)
-
-        # write changes to masks_svg:
-        self.masks_svg = svg_node.toxml()    
+        return True
 
     def add_image_to_col(self):
         media_dir = mw.col.media.dir()
