@@ -251,15 +251,14 @@ class ImgOccNoteGenerator(object):
             print "====================="
 
 
-        q = "This will delete %i card(s) and create %i new one(s).\
-                     Proceed?" % (del_count, new_count)
+        q = "This will <b>delete %i</b> card(s) and \
+             <b>create %i</b> new one(s).\
+             Please note that this action is irreversible.<br><br>\
+             Would you still like to proceed?" % (del_count, new_count)
 
         if del_count or new_count:
            if not askUser(q, parent=mw.ImgOccEdit):
                 return False
-        # no checkpoints available in editcurrent, sadly
-        #mw.checkpoint(_("Edit Image Occlusion"))
-        #model.beginReset()
         if deleted_nids:
             mw.col.remNotes(deleted_nids)
         return True
