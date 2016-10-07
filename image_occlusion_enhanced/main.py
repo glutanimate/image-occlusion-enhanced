@@ -16,11 +16,11 @@ import os
 
 from PyQt4.QtGui import QFileDialog, QAction, QKeySequence
 from PyQt4.QtCore import QUrl
+from aqt.qt import *
 
 from aqt import mw, webview, deckchooser, tagedit
 from aqt.editor import Editor
 from aqt.utils import tooltip, openLink, showWarning, saveGeom, restoreGeom
-from aqt.qt import *
 from anki.hooks import wrap, addHook
 
 import re
@@ -30,7 +30,6 @@ import urlparse, urllib
 from config import *
 from ngen import *
 from dialogs import ImgOccEdit, ImgOccOpts
-
 from resources import *
 
 io_help_link = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
@@ -183,6 +182,7 @@ class ImgOccAdd(object):
         
 
     def onAddNotesButton(self, choice, edit=False):
+        print "onaddnotesbutton"
         svg_edit = mw.ImgOccEdit.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
@@ -200,9 +200,12 @@ class ImgOccAdd(object):
         gen = noteGenerator(self.ed, svg, self.image_path, 
                                     self.onote, tags, fields, did)        
         if edit:
-            gen.update_notes()
+            ret = gen.update_notes()
         else:
-            gen.generate_notes()
+            ret = gen.generate_notes()
+        print "ret", ret
+        if ret == False:
+            return False
 
         if self.ed and self.ed.addMode:
             # Update Editor with modified tags and sources field
@@ -216,7 +219,6 @@ class ImgOccAdd(object):
             self.ed.parentWindow.deckChooser.deck.setText(deck)
         elif edit:
             QWebSettings.clearMemoryCaches() # refresh webview image cache
-            #self.ed.loadNote()
 
         mw.reset()
 

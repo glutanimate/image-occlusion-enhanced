@@ -24,7 +24,7 @@ import os
 
 from aqt.qt import *
 from aqt import mw
-from aqt.utils import tooltip
+from aqt.utils import tooltip, askUser
 from anki.notes import Note
 
 from xml.dom import minidom
@@ -115,10 +115,12 @@ class ImgOccNoteGenerator(object):
         self._find_all_notes()
         ( svg_node, mlayer_node ) = self._get_mnodes_and_set_ids(True)
         if not self.mnode_ids:
-            tooltip("No shapes to update.<br>\
+            tooltip("No shapes left. You can't delete all cards.<br>\
                 Are you sure you set your masks correctly?")
             return
-        self._delete_and_id_notes(mlayer_node)
+        ret = self._delete_and_id_notes(mlayer_node)
+        if not ret:
+            return False
         self.masks_svg = svg_node.toxml() # write changes to svg
         self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
         qmasks = self._generate_mask_svgs_for("Q")
@@ -137,6 +139,7 @@ class ImgOccNoteGenerator(object):
                                                 col_image, note_id, nid)
         parent = self.ed.parentWindow
         tooltip("Cards updated: %s" % len(qmasks), period=1500, parent=parent)
+        mw.ImgOccEdit.close()
 
     def _get_mnodes_and_set_ids(self, edit=False):
         self.mnode_indexes = []
@@ -248,15 +251,17 @@ class ImgOccNoteGenerator(object):
             print "====================="
 
 
-        print "Insert dialog here: This will delete %i card(s) \
-                    and create %i new one(s). Proceed?" % (del_count, new_count)
+        q = "This will delete %i card(s) and create %i new one(s).\
+                     Proceed?" % (del_count, new_count)
 
+        if del_count or new_count:
+           if not askUser(q, parent=mw.ImgOccEdit):
+                return False
         # no checkpoints available in editcurrent, sadly
         #mw.checkpoint(_("Edit Image Occlusion"))
         #model.beginReset()
         if deleted_nids:
             mw.col.remNotes(deleted_nids)
-
         return True
 
     def add_image_to_col(self):

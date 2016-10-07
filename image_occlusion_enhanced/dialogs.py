@@ -111,9 +111,6 @@ class ImgOccEdit(QDialog):
         self.occl_tp_select.addItems(["Don't change", "All Hidden, One Revealed",
             "All Hidden, All Revealed", "One Hidden, All Revealed"])
 
-        # TODO: use itemdata for occl_type:
-        # http://doc.qt.io/qt-5/qt.html#ItemDataRole-enum
-
         self.edit_btn = button_box.addButton("&Edit cards",
                 QDialogButtonBox.ActionRole)
         self.new_btn = button_box.addButton("&Add new cards",
@@ -242,11 +239,10 @@ class ImgOccEdit(QDialog):
     def new(self):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onAddNotesButton(choice)
-        self.close()
     def edit_all(self):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onAddNotesButton(choice, True)
-        self.close()
+        print "btnpress"
 
     # Modes
     def switch_to_mode(self, mode):
