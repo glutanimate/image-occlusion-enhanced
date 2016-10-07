@@ -12,7 +12,7 @@
 ##                                                ##
 ##  --------------------------------------------  ##
 ##                                                ##
-##            Notegen.py is based on              ##
+##              ngen.py is based on               ##
 ##           Simple Picture Occlusion             ##
 ##                   which is                     ##
 ##          Copyright (c) 2013 SteveAW            ##
@@ -78,8 +78,10 @@ class ImgOccNoteGenerator(object):
         self.tags = tags
         self.fields = fields
         self.did = did
-        self.edit = False
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
+        self.model = mw.col.models.byName(IO_MODEL_NAME)
+        if not self.model:
+            self.model = template.add_io_model(mw.col)
         
     def generate_notes(self):
         self.uniq_id = str(uuid.uuid4()).replace("-","") 
@@ -89,23 +91,22 @@ class ImgOccNoteGenerator(object):
             tooltip("No cards to generate.<br>\
                 Are you sure you set your masks correctly?")
             return
-
-        print svg_node.toxml()
-        return
         self.masks_svg = svg_node.toxml() # write changes to svg
+        self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
         qmasks = self._generate_mask_svgs_for("Q")
         amasks = self._generate_mask_svgs_for("A")
         col_image = self.add_image_to_col()
-        self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
-        for i in range(len(qmasks)):
-            note_id = '%s-%s' % (self.occl_id, i+1) # start from 1
-            self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, note_id)
+        for nr, idx in enumerate(self.mnode_indexes):
+            note_id = self.mnode_ids[idx]
+            self._save_mask_and_return_note(qmasks[nr], amasks[nr], 
+                                                    col_image, note_id)
+        deck = mw.col.decks.nameOrNone(self.did)
+        self.ed.parentWindow.deckChooser.deck.setText(deck)
         tooltip("Cards added: %s" % len(qmasks), period=1500)
 
     def update_notes(self):
         self.uniq_id = self.onote['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
-        self.edit = True
         self._find_all_notes()
         ( svg_node, mlayer_node ) = self._get_mnodes_and_set_ids(True)
         if not self.mnode_ids:
@@ -114,18 +115,26 @@ class ImgOccNoteGenerator(object):
             return
         self._delete_and_id_notes(mlayer_node)
         self.masks_svg = svg_node.toxml() # write changes to svg
-        print self.masks_svg
-        return
+        self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
         qmasks = self._generate_mask_svgs_for("Q")
-        amasks = self._generate_mask_svgs_for("A")            
-        for i in range(len(qmasks)):
-            note_id = '%s-%s' % (self.occl_id, i+1) # start from 1
-            self._save_mask_and_write_note(qmasks[i], amasks[i], col_image, note_id)
+        amasks = self._generate_mask_svgs_for("A")
+        col_image = self.image_path
+        print "mnode_indexes", self.mnode_indexes
+        for nr, idx in enumerate(self.mnode_indexes):
+            print "nr", nr
+            print "idx", idx
+            note_id = self.mnode_ids[idx]
+            print "note_id", note_id
+            print "self.nids", self.nids
+            nid = self.nids[note_id]
+            print "nid", nid
+            self._save_mask_and_return_note(qmasks[nr], amasks[nr],    
+                                                col_image, note_id, nid)
         parent = self.ed.parentWindow
         QWebSettings.clearMemoryCaches() # refreshes webview image caches
         mw.reset()
         self.ed.loadNote()
-        tooltip("Cards updated: %s" % len(qmasks), period=1500, parent=self.ed)
+        tooltip("Cards updated: %s" % len(qmasks), period=1500, parent=parent)
 
     def _get_mnodes_and_set_ids(self, edit=False):
         self.mnode_indexes = []
@@ -143,10 +152,11 @@ class ImgOccNoteGenerator(object):
             if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
                 self.mnode_indexes.append(i)
                 self.remove_attribs_recursively(mlayer_node.childNodes[i], stripattr)
-                self.mnode_ids[i] = mlayer_node.childNodes[i].attributes["id"].value
                 if not edit:
-                    new_mnode_id = "%s-%i" %(self.occl_id, len(self.mnode_indexes))
-                    mlayer_node.childNodes[i].setAttribute("id", new_mnode_id)
+                    self.mnode_ids[i] = "%s-%i" %(self.occl_id, len(self.mnode_indexes))
+                    mlayer_node.childNodes[i].setAttribute("id", self.mnode_ids[i])
+                else:
+                    self.mnode_ids[i] = mlayer_node.childNodes[i].attributes["id"].value
         return (svg_node, mlayer_node)
 
     def find_by_noteid(self, note_id):
@@ -168,6 +178,7 @@ class ImgOccNoteGenerator(object):
         uniq_id = self.onote['uniq_id']
         mnode_ids = self.mnode_ids
         nids = self.nids
+
         # look for missing shapes by note_id
         valid_mnode_note_ids = filter (lambda x:x.startswith(uniq_id), mnode_ids.values())
         valid_mnode_note_nrs = sorted([int(i.split('-')[-1]) for i in valid_mnode_note_ids])
@@ -186,6 +197,21 @@ class ImgOccNoteGenerator(object):
         print "available_nrs", available_nrs
         print '--------------------'
 
+        # compare note_ids as present in note collection with masks on svg
+        valid_nid_note_ids = filter (lambda x:x.startswith(uniq_id), nids.keys())
+        deleted_note_ids = set(valid_nid_note_ids) - set(valid_mnode_note_ids)
+        deleted_note_ids = sorted(list(deleted_note_ids))
+        del_count = len(deleted_note_ids)
+        # set notes of missing masks on svg to be deleted
+        deleted_nids = [nids[x] for x in deleted_note_ids]
+
+        print "##########################"
+        print "valid_nid_note_ids", valid_nid_note_ids
+        print "deleted_note_ids", deleted_note_ids
+        print "deleted_nids", deleted_nids
+        print "edited nids", nids
+        print "##########################"
+
         # add note_id to missing shapes
         note_nr_max = max_mnode_note_nr
         new_count = 0
@@ -202,9 +228,10 @@ class ImgOccNoteGenerator(object):
                     note_nr = note_nr_max
                 new_mnode_id = self.occl_id + '-' + str(note_nr)
                 new_count += 1
-            nids[mnode_id] = None
+                nids[new_mnode_id] = None
             if new_mnode_id:
                 mlayer_node.childNodes[idx].setAttribute("id", new_mnode_id)
+                self.mnode_ids[idx] = new_mnode_id
             print "====================="
             print "nr", nr
             print "idx", idx
@@ -214,24 +241,6 @@ class ImgOccNoteGenerator(object):
             print "new_mnode_id", new_mnode_id
             print "====================="
 
-        # compare note_ids as present in note collection with masks on svg
-        valid_nid_note_ids = filter (lambda x:x.startswith(uniq_id), nids.keys())
-        deleted_note_ids = set(valid_nid_note_ids) - set(valid_mnode_note_ids)
-        deleted_note_ids = sorted(list(deleted_note_ids))
-        del_count = len(deleted_note_ids)
-        # set notes of missing masks on svg to be deleted
-        deleted_nids = [nids[x] for x in deleted_note_ids]
-
-        # for i in deleted_note_ids:
-        #     nids[i] = None
-
-        print "##########################"
-        print "valid_nid_note_ids", valid_nid_note_ids
-        print "deleted_note_ids", deleted_note_ids
-        print "deleted_nids", deleted_nids
-        print "edited nids", nids
-        print "##########################"
-
 
         print "Insert dialog here: This will delete %i card(s) \
                     and create %i new one(s). Proceed?" % (del_count, new_count)
@@ -239,8 +248,8 @@ class ImgOccNoteGenerator(object):
         # no checkpoints available in editcurrent, sadly
         #mw.checkpoint(_("Edit Image Occlusion"))
         #model.beginReset()
-        #mw.col.remNotes(deleted_nids)
-        # mw.reset()
+        if deleted_nids:
+            mw.col.remNotes(deleted_nids)
 
         return True
 
@@ -298,58 +307,50 @@ class ImgOccNoteGenerator(object):
         assert (layer_notes[0].nodeName == 'g')
         return layer_notes
 
-    def _save_mask(self, mask, id, mtype):
-        mask_path = '%s-%s.svg' % (id, mtype)
+    def _save_mask(self, mask, note_id, mtype):
+        print "saving", note_id, mtype
+        mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'w')
         mask_file.write(mask)
         mask_file.close()
         return mask_path
 
-    def _save_mask_and_write_note(self, qmask, amask, col_image, note_id):
+    def fname2img(self, path):
+        return '<img src="%s" />' % os.path.split(path)[1]
+
+    def _save_mask_and_return_note(self, qmask, amask, col_image, note_id, nid=None):
         qmask_path = self._save_mask(qmask, note_id, "Q")
         amask_path = self._save_mask(amask, note_id, "A")
-        model = mw.col.models.byName(IO_MODEL_NAME)
-        fields = self.fields
-        if not model:
-            model = template.add_io_model(mw.col)
+        omask_path = self.omask_path
+
+        model = self.model
         model['did'] = self.did
+        fields = self.fields
 
-        if not self.edit:
-            note = Note(mw.col, model)
+        if nid:
+            note = mw.col.getNote(nid)
         else:
-            res = self.find_by_noteid(note_id)
-            print note_id
-            print res
-            if res:
-                note = mw.col.getNote(res[0])
-            else:
-                note = Note(mw.col, model)
-
-        def fname2img(path):
-            return '<img src="%s" />' % os.path.split(path)[1]
+            note = Note(mw.col, model)
 
         # define fields we just generated
         fields[IO_FLDS['note_id']] = note_id
-        fields[IO_FLDS['image']] = fname2img(col_image)
-        fields[IO_FLDS['qmask']] = fname2img(qmask_path)
-        fields[IO_FLDS['amask']] = fname2img(amask_path)
-        fields[IO_FLDS['omask']] = fname2img(self.omask_path)
+        fields[IO_FLDS['image']] = self.fname2img(col_image)
+        fields[IO_FLDS['qmask']] = self.fname2img(qmask_path)
+        fields[IO_FLDS['amask']] = self.fname2img(amask_path)
+        fields[IO_FLDS['omask']] = self.fname2img(omask_path)
 
         # add fields to note
-        for i in IO_FLDORDER:
-            fldlabel = IO_FLDS[i]
-            note[fldlabel] = fields[fldlabel]
-
         note.tags = self.tags
+        for i in IO_FLDS.values():
+            note[i] = fields[i]
 
-        if self.edit and res:
+        if nid:
             note.flush()
-            return
+            print "noteflush", note
+        else:
+            print "notecreate", note
+            mw.col.addNote(note)
 
-        mw.col.addNote(note)
-        if not self.edit:
-            deck = mw.col.decks.nameOrNone(self.did)
-            self.ed.parentWindow.deckChooser.deck.setText(deck)
 
 class IoGenAllHideOneReveal(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""

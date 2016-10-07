@@ -98,7 +98,9 @@ class ImgOccAdd(object):
             if note.model()["name"] != IO_MODEL_NAME:
                 tooltip("Not an IO card")
                 return
-            onote["did"] = self.ed.note.model()['did']
+            # can only get the deck of the current note/card via a db call:
+            onote["did"] = mw.col.db.scalar(
+                    "select did from cards where id = ?", note.cards()[0].id)
             imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
             imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
             invalfile = False
@@ -141,6 +143,7 @@ class ImgOccAdd(object):
         ofill = mw.col.conf['imgocc']['ofill']
         bkgd_url = path2url(self.image_path)
         onote = self.onote
+
         deck = mw.col.decks.nameOrNone(onote["did"])
 
         try:
