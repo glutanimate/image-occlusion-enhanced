@@ -148,9 +148,9 @@ class ImgOccEdit(QDialog):
         self.oa_btn.setToolTip(oa_tt)
         self.close_button.setToolTip(close_tt)
         self.occl_tp_select.setItemData(0, dc_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(0, ao_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(0, aa_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(0, oa_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(1, ao_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(2, aa_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(3, oa_tt, Qt.ToolTipRole)
 
         self.connect(self.edit_btn, SIGNAL("clicked()"), self.edit_all)
         self.connect(self.new_btn, SIGNAL("clicked()"), self.new)

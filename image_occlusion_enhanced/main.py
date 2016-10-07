@@ -112,7 +112,7 @@ class ImgOccAdd(object):
                     note_id = note[fld]
                     onote["note_id"] = note_id
                     onote["uniq_id"] = note_id.split('-')[0]
-                    onote["occl_type"] = note_id.split('-')[1]
+                    onote["occl_tp"] = note_id.split('-')[1]
                 elif i in ["image", "omask"]:
                     html = note[fld]
                     fname = imgregex.search(html)
@@ -197,7 +197,7 @@ class ImgOccAdd(object):
         if choice in ["new", "edit"]:
             opt = mw.ImgOccEdit.occl_tp_select.currentIndex()
             if opt == 0: # Option 'Don't change'
-                choice = self.onote["occl_type"]
+                choice = self.onote["occl_tp"]
             else:
                 choice = mw.ImgOccEdit.occl_tp_select.currentText()
 

@@ -101,7 +101,9 @@ class ImgOccNoteGenerator(object):
             self._save_mask_and_return_note(qmasks[nr], amasks[nr], 
                                                     col_image, note_id)
         deck = mw.col.decks.nameOrNone(self.did)
-        self.ed.parentWindow.deckChooser.deck.setText(deck)
+        if hasattr(self.ed.parentWindow, 'deckChooser'):
+            self.ed.parentWindow.deckChooser.deck.setText(deck)
+        mw.reset()
         tooltip("Cards added: %s" % len(qmasks), period=1500)
 
     def update_notes(self):
@@ -166,7 +168,8 @@ class ImgOccNoteGenerator(object):
         return res
 
     def _find_all_notes(self):
-        res = self.find_by_noteid(self.occl_id)
+        old_occl_id = '%s-%s' % (self.uniq_id, self.onote["occl_tp"])
+        res = self.find_by_noteid(old_occl_id)
         print "res", res
         self.nids = {}
         for nid in res:
