@@ -192,11 +192,11 @@ class ImgOccAdd(object):
             did = self.onote["did"]
             edit = True
         if choice in ["new", "edit"]:
-            opt = mw.ImgOccEdit.occl_type_select.currentIndex()
+            opt = mw.ImgOccEdit.occl_tp_select.currentIndex()
             if opt == 0: # Option 'Don't change'
                 choice = self.onote["occl_type"]
             else:
-                choice = mw.ImgOccEdit.occl_type_select.currentText()
+                choice = mw.ImgOccEdit.occl_tp_select.currentText()
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(self.ed, svg, self.image_path, 

@@ -107,8 +107,8 @@ class ImgOccEdit(QDialog):
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(False)
 
-        self.otype_select = QComboBox()
-        self.otype_select.addItems(["Don't change", "All Hidden, One Revealed",
+        self.occl_tp_select = QComboBox()
+        self.occl_tp_select.addItems(["Don't change", "All Hidden, One Revealed",
             "All Hidden, All Revealed", "One Hidden, All Revealed"])
 
         # TODO: use itemdata for occl_type:
@@ -147,10 +147,10 @@ class ImgOccEdit(QDialog):
         self.aa_btn.setToolTip(aa_tt)
         self.oa_btn.setToolTip(oa_tt)
         self.close_button.setToolTip(close_tt)
-        self.otype_select.setItemData(0, dc_tt, Qt.ToolTipRole)
-        self.otype_select.setItemData(0, ao_tt, Qt.ToolTipRole)
-        self.otype_select.setItemData(0, aa_tt, Qt.ToolTipRole)
-        self.otype_select.setItemData(0, oa_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(0, dc_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(0, ao_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(0, aa_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(0, oa_tt, Qt.ToolTipRole)
 
         self.connect(self.edit_btn, SIGNAL("clicked()"), self.edit_all)
         self.connect(self.new_btn, SIGNAL("clicked()"), self.new)
@@ -161,7 +161,7 @@ class ImgOccEdit(QDialog):
 
         bottom_hbox = QHBoxLayout()
         bottom_hbox.addWidget(self.bottom_label)
-        bottom_hbox.addWidget(self.otype_select)
+        bottom_hbox.addWidget(self.occl_tp_select)
         bottom_hbox.addWidget(button_box)
 
         # Set layout up
@@ -250,7 +250,7 @@ class ImgOccEdit(QDialog):
     def switch_to_mode(self, mode):
         if mode == "add":
             self.edit_label.hide()
-            self.otype_select.hide()
+            self.occl_tp_select.hide()
             self.edit_btn.hide()
             self.new_btn.hide()
             self.ao_btn.show()
@@ -261,7 +261,7 @@ class ImgOccEdit(QDialog):
             self.bottom_label.setText("Add card type:")
         else:
             self.edit_label.show()
-            self.otype_select.show()
+            self.occl_tp_select.show()
             self.edit_btn.show()
             self.new_btn.show()
             self.ao_btn.hide()
@@ -275,7 +275,7 @@ class ImgOccEdit(QDialog):
     def reset_window(self):
         self.reset_all_fields()
         self.tab_widget.setCurrentIndex(0)
-        self.otype_select.setCurrentIndex(0)
+        self.occl_tp_select.setCurrentIndex(0)
         self.header_edit.setFocus()
         self.svg_edit.setFocus()
 
