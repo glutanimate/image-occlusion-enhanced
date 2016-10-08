@@ -224,7 +224,7 @@ class ImgOccAdd(object):
         if ret == False:
             return False
 
-        if self.ed and self.ed.addMode:
+        if self.ed.note and self.ed.addMode:
             # Update Editor with modified tags and sources field
             self.ed.tags.setText(" ".join(tags))
             self.ed.saveTags()
