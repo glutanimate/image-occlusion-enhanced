@@ -72,14 +72,14 @@ def fname2img(path):
 def genByKey(key, old_occl_tp):
     if key in ["Don't Change"]:
         return genByKey(old_occl_tp, None)
-    elif key in ["ao", "All Hidden, One Revealed"]:
-        return IoGenAllHideOneReveal
-    elif key in ["aa", "All Hidden, All Revealed"]:
-        return IoGenAllHideAllReveal
-    elif key in ["oa", "One Hidden, All Revealed"]:
-        return IoGenOneHideAllReveal
+    elif key in ["ao", "Hide All, Reveal One"]:
+        return IoGenHideAllRevealOne
+    elif key in ["aa", "Hide All, Reveal All"]:
+        return IoGenHideAllRevealAll
+    elif key in ["oa", "Hide One, Reveal All"]:
+        return IoGenHideOneRevealAll
     else:
-        return IoGenAllHideOneReveal
+        return IoGenHideAllRevealOne
 
 class ImgOccNoteGenerator(object):
     def __init__(self, ed, svg, image_path, onote, tags, fields, did):
@@ -378,7 +378,7 @@ class ImgOccNoteGenerator(object):
             logging.debug("!notecreate %s", note)
 
 
-class IoGenAllHideOneReveal(ImgOccNoteGenerator):
+class IoGenHideAllRevealOne(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""
     def __init__(self, ed, svg, image_path, onote, tags, fields, did):
         self.occl_tp = "ao"
@@ -393,7 +393,7 @@ class IoGenAllHideOneReveal(ImgOccNoteGenerator):
                 if side == "A":
                     mlayer_node.removeChild(mlayer_node.childNodes[i])
 
-class IoGenAllHideAllReveal(ImgOccNoteGenerator):
+class IoGenHideAllRevealAll(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
     def __init__(self, ed, svg, image_path, onote, tags, fields, did):
         self.occl_tp = "aa"
@@ -408,7 +408,7 @@ class IoGenAllHideAllReveal(ImgOccNoteGenerator):
             else:
                 mlayer_node.removeChild(mlayer_node.childNodes[i])
 
-class IoGenOneHideAllReveal(ImgOccNoteGenerator):
+class IoGenHideOneRevealAll(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
     def __init__(self, ed, svg, image_path, onote, tags, fields, did):
         self.occl_tp = "oa"

@@ -102,18 +102,18 @@ class ImgOccEdit(QDialog):
         self.image_btn.setIconSize(QSize(16, 16))
 
         self.occl_tp_select = QComboBox()
-        self.occl_tp_select.addItems(["Don't Change", "All Hidden, One Revealed",
-            "All Hidden, All Revealed", "One Hidden, All Revealed"])
+        self.occl_tp_select.addItems(["Don't Change", "Hide All, Reveal One",
+            "Hide All, Reveal All", "Hide One, Reveal All"])
 
         self.edit_btn = button_box.addButton("&Edit Cards",
                 QDialogButtonBox.ActionRole)
         self.new_btn = button_box.addButton("&Add New Cards",
                 QDialogButtonBox.ActionRole)
-        self.ao_btn = button_box.addButton(u"All Hidden, &One Revealed",
+        self.ao_btn = button_box.addButton(u"Hide &All, Reveal One",
                 QDialogButtonBox.ActionRole)
-        self.aa_btn = button_box.addButton(u"All Hidde&n, All Revealed",
+        self.aa_btn = button_box.addButton(u"Hide All, &Reveal All",
                 QDialogButtonBox.ActionRole)
-        self.oa_btn = button_box.addButton(u"One Hidden, &All Revealed",
+        self.oa_btn = button_box.addButton(u"Hide &One, Reveal One",
                 QDialogButtonBox.ActionRole)
         self.close_button = button_box.addButton("&Close", 
                 QDialogButtonBox.RejectRole)
