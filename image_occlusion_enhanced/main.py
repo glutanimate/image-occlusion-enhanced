@@ -19,6 +19,7 @@ from PyQt4.QtCore import QUrl
 from aqt.qt import *
 
 from aqt import mw, webview, deckchooser, tagedit
+from aqt.editcurrent import EditCurrent
 from aqt.editor import Editor
 from aqt.utils import tooltip, openLink, showWarning, saveGeom, restoreGeom
 from anki.hooks import wrap, addHook
@@ -291,7 +292,7 @@ def onSetupEditorButtons(self):
 
 
 def hideIdField(self, node, hide=True, focus=False):
-    # simple hack that hides the ID field on IO notes
+    """simple hack that hides the ID field on IO notes"""
     if (self.note and self.note.model()["name"] == IO_MODEL_NAME and
             self.note.model()['flds'][0]['name'] == IO_FLDS['note_id']):
         self.web.eval("""
@@ -299,6 +300,12 @@ def hideIdField(self, node, hide=True, focus=False):
                 document.styleSheets[0].addRule(
                     'tr:first-child .fname, #f0, #i0', 'display: none;');
             """ )
+
+def onEditCurrentInit(self, mw):
+    """automatically launch IO when editing IO notes"""
+    note = self.editor.note
+    if note and note.model()["name"] == IO_MODEL_NAME:
+        onImgOccButton(self.editor, "edit")
 
 # Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
@@ -314,3 +321,4 @@ mw.form.menuHelp.addAction(help_action)
 # Set up hooks
 addHook('setupEditorButtons', onSetupEditorButtons)
 Editor.setNote = wrap(Editor.setNote, hideIdField, "after")
+EditCurrent.__init__ = wrap(EditCurrent.__init__, onEditCurrentInit, "after")
