@@ -351,6 +351,7 @@ class ImgOccNoteGenerator(object):
 
         model = self.model
         model['did'] = self.did
+        flds = model['flds']
         fields = self.fields
 
         if nid:
@@ -367,8 +368,9 @@ class ImgOccNoteGenerator(object):
 
         # add fields to note
         note.tags = self.tags
-        for i in IO_FLDS.values():
-            note[i] = fields[i]
+        for i in flds:
+            fname = i["name"]
+            note[fname] = fields[fname]
 
         if nid:
             note.flush()

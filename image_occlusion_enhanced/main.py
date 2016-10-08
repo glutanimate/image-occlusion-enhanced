@@ -162,20 +162,31 @@ class ImgOccAdd(object):
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
 
+        model = mw.col.models.byName(IO_MODEL_NAME)
+        flds = model['flds']
+
         if mode != "add":
-            dialog.header_edit.setPlainText(onote["header"])
-            dialog.footer_edit.setPlainText(onote["footer"])
-            dialog.remarks_edit.setPlainText(onote["remarks"])
-            dialog.extra1_edit.setPlainText(onote["extra1"])
-            dialog.extra2_edit.setPlainText(onote["extra2"])
+            for i in flds:
+                fname = flds["name"]
+                if fname in dialog.text_edit.keys():
+                    dialog.text_edit["fname"] = self.ed.note["fname"]
             svg_b64 = svgToBase64(onote["omask"])
             url.addQueryItem('source', svg_b64)
+
+        # if mode != "add":
+        #     dialog.header_edit.setPlainText(onote["header"])
+        #     dialog.footer_edit.setPlainText(onote["footer"])
+        #     dialog.remarks_edit.setPlainText(onote["remarks"])
+        #     dialog.extra1_edit.setPlainText(onote["extra1"])
+        #     dialog.extra2_edit.setPlainText(onote["extra2"])
+        #     svg_b64 = svgToBase64(onote["omask"])
+        #     url.addQueryItem('source', svg_b64)
 
         dialog.svg_edit.setUrl(url)
         dialog.tags_edit.setText(onote["tags"])
         dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
-        dialog.sources_edit.setPlainText(onote["sources"])
+        dialog.text_edit[IO_FLDS["sources"]].setPlainText(onote["sources"])
 
         if mode == "add":
             dialog.show()
@@ -198,17 +209,18 @@ class ImgOccAdd(object):
 
 
     def onAddNotesButton(self, choice, edit=False):
-        svg_edit = mw.ImgOccEdit.svg_edit
+        dialog = mw.ImgOccEdit
+        svg_edit = dialog.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
         
-        (fields, tags) = self.getUserInputs()
+        (fields, tags) = self.getUserInputs(dialog)
 
         if edit:
             did = self.onote["did"]
             old_occl_tp = self.onote["occl_tp"]
         else:
-            did = mw.ImgOccEdit.deckChooser.selectedId()
+            did = dialog.deckChooser.selectedId()
             old_occl_tp = None
 
         noteGenerator = genByKey(choice, old_occl_tp)
@@ -237,17 +249,15 @@ class ImgOccAdd(object):
 
         mw.reset()
 
-    def getUserInputs(self):
+    def getUserInputs(self, dialog):
         fields = {}
-        fields[IO_FLDS['header']] = mw.ImgOccEdit.header_edit.toPlainText()
-        fields[IO_FLDS['footer']] = mw.ImgOccEdit.footer_edit.toPlainText()
-        fields[IO_FLDS['remarks']] = mw.ImgOccEdit.remarks_edit.toPlainText()
-        fields[IO_FLDS['sources']] = mw.ImgOccEdit.sources_edit.toPlainText()
-        fields[IO_FLDS['extra1']] = mw.ImgOccEdit.extra1_edit.toPlainText()
-        fields[IO_FLDS['extra2']] = mw.ImgOccEdit.extra2_edit.toPlainText()
-        for key, val in fields.iteritems():
-            fields[key] = val.replace('\n', '<br />')
-        tags = mw.ImgOccEdit.tags_edit.text().split()
+        model = mw.col.models.byName(IO_MODEL_NAME)
+        flds = model['flds']
+        for i in flds:
+            fname = i['name']
+            if fname in dialog.text_edit.keys():
+                fields[fname] = dialog.text_edit[fname].toPlainText().replace('\n', '<br />')
+        tags = dialog.tags_edit.text().split()
         return (fields, tags)
 
 
@@ -265,12 +275,9 @@ def onImgOccButton(ed, mode):
         ioFields = mw.col.models.fieldNames(ioModel)
         # note type integrity check
         if not all(x in ioFields for x in IO_FLDS.values()):
-            showWarning(\
-                '<b>Error:</b><br><br>Image Occlusion note type not configured properly.\
-                Please make sure you did not delete or rename any of the essential fields.\
-                <br><br>You can find more information on this error message here: \
-                <a href="' + io_help_link + '/Customization#a-note-of-warning">\
-                Wiki - Note Type Customization</a>')
+            showWarning('<b>Error:</b><br><br>Image Occlusion note type \
+                not configured properly.Please make sure you did not \
+                manually delete or rename any of the default fields.')
             return
     mw.ImgOccAdd.selImage()
 

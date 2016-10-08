@@ -37,59 +37,80 @@ class ImgOccEdit(QDialog):
         self.svg_edit = webview.AnkiWebView()
         self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
 
-        self.header_edit = QPlainTextEdit()
-        self.header_label = QLabel(IO_FLDS["header"])
-        header_hbox = QHBoxLayout()
-        header_hbox.addWidget(self.header_label)
-        header_hbox.addWidget(self.header_edit)
+        model = mw.col.models.byName(IO_MODEL_NAME)
+        flds = model['flds']
+        self.text_edit = {}
+        f_hboxs = []
+        for i in flds:
+            if i["name"] in [IO_FLDS["note_id"], IO_FLDS["image"], 
+                    IO_FLDS["qmask"], IO_FLDS["amask"], IO_FLDS["omask"]]:
+                continue
+            f = QPlainTextEdit()
+            f_label = QLabel(i["name"])
+            f_hbox = QHBoxLayout()
+            f_hbox.addWidget(f_label)
+            f_hbox.addWidget(f)
+            self.text_edit[i["name"]] = f
+            f_hboxs.append(f_hbox)
+            f.setTabChangesFocus(True)
+            f.setMinimumHeight(40)
+            f_label.setFixedWidth(70) 
 
-        self.footer_edit = QPlainTextEdit()
-        self.footer_label = QLabel(IO_FLDS["footer"])
-        footer_hbox = QHBoxLayout()
-        footer_hbox.addWidget(self.footer_label)
-        footer_hbox.addWidget(self.footer_edit)
 
-        self.remarks_edit = QPlainTextEdit()
-        self.remarks_label = QLabel(IO_FLDS["remarks"])
-        remarks_hbox = QHBoxLayout()
-        remarks_hbox.addWidget(self.remarks_label)
-        remarks_hbox.addWidget(self.remarks_edit)
+        # self.header_edit = QPlainTextEdit()
+        # self.header_label = QLabel(IO_FLDS["header"])
+        # header_hbox = QHBoxLayout()
+        # header_hbox.addWidget(self.header_label)
+        # header_hbox.addWidget(self.header_edit)
 
-        self.sources_edit = QPlainTextEdit()
-        self.sources_label = QLabel(IO_FLDS["sources"])
-        sources_hbox = QHBoxLayout()
-        sources_hbox.addWidget(self.sources_label)
-        sources_hbox.addWidget(self.sources_edit)
+        # self.footer_edit = QPlainTextEdit()
+        # self.footer_label = QLabel(IO_FLDS["footer"])
+        # footer_hbox = QHBoxLayout()
+        # footer_hbox.addWidget(self.footer_label)
+        # footer_hbox.addWidget(self.footer_edit)
 
-        self.extra1_edit = QPlainTextEdit()
-        self.extra1_label = QLabel(IO_FLDS["extra1"])
-        extra1_hbox = QHBoxLayout()
-        extra1_hbox.addWidget(self.extra1_label)
-        extra1_hbox.addWidget(self.extra1_edit)
+        # self.remarks_edit = QPlainTextEdit()
+        # self.remarks_label = QLabel(IO_FLDS["remarks"])
+        # remarks_hbox = QHBoxLayout()
+        # remarks_hbox.addWidget(self.remarks_label)
+        # remarks_hbox.addWidget(self.remarks_edit)
 
-        self.extra2_edit = QPlainTextEdit()
-        self.extra2_label = QLabel(IO_FLDS["extra2"])
-        extra2_hbox = QHBoxLayout()
-        extra2_hbox.addWidget(self.extra2_label)
-        extra2_hbox.addWidget(self.extra2_edit)
+        # self.sources_edit = QPlainTextEdit()
+        # self.sources_label = QLabel(IO_FLDS["sources"])
+        # sources_hbox = QHBoxLayout()
+        # sources_hbox.addWidget(self.sources_label)
+        # sources_hbox.addWidget(self.sources_edit)
+
+        # self.extra1_edit = QPlainTextEdit()
+        # self.extra1_label = QLabel(IO_FLDS["extra1"])
+        # extra1_hbox = QHBoxLayout()
+        # extra1_hbox.addWidget(self.extra1_label)
+        # extra1_hbox.addWidget(self.extra1_edit)
+
+        # self.extra2_edit = QPlainTextEdit()
+        # self.extra2_label = QLabel(IO_FLDS["extra2"])
+        # extra2_hbox = QHBoxLayout()
+        # extra2_hbox.addWidget(self.extra2_label)
+        # extra2_hbox.addWidget(self.extra2_edit)
 
         self.tags_edit = tagedit.TagEdit(self)
-        self.tags_label = QLabel("Tags")
+        tags_label = QLabel("Tags")
+        tags_label.setFixedWidth(70)
         tags_hbox = QHBoxLayout()
-        tags_hbox.addWidget(self.tags_label)
+        tags_hbox.addWidget(tags_label)
         tags_hbox.addWidget(self.tags_edit)
 
-        deck_container = QGroupBox()
+        deck_container = QWidget()
         self.deckChooser = deckchooser.DeckChooser(mw, deck_container,
                                                    label=True) 
 
-        for i in [self.header_edit, self.footer_edit, self.remarks_edit, 
-            self.sources_edit, self.extra1_edit, self.extra2_edit]:
-            i.setTabChangesFocus(True)
+        # for i in [self.header_edit, self.footer_edit, self.remarks_edit, 
+        #     self.sources_edit, self.extra1_edit, self.extra2_edit]:
+        #     i.setTabChangesFocus(True)
 
-        for i in [self.header_label, self.footer_label, self.remarks_label, 
-            self.sources_label, self.extra1_label, self.extra2_label, self.tags_label]:
-            i.setFixedWidth(70)        
+        # for i in [self.header_label, self.footer_label, self.remarks_label, 
+        #     self.sources_label, self.extra1_label, self.extra2_label, tags_label]:
+        #     i.setFixedWidth(70)        
 
         # Create buttons
 
@@ -168,12 +189,14 @@ class ImgOccEdit(QDialog):
 
         ## Tab 2
         vbox2 = QVBoxLayout()
-        vbox2.addLayout(header_hbox)
-        vbox2.addLayout(footer_hbox)
-        vbox2.addLayout(remarks_hbox)
-        vbox2.addLayout(sources_hbox)
-        vbox2.addLayout(extra1_hbox)
-        vbox2.addLayout(extra2_hbox)
+        for i in f_hboxs:
+            vbox2.addLayout(i)
+        # vbox2.addLayout(header_hbox)
+        # vbox2.addLayout(footer_hbox)
+        # vbox2.addLayout(remarks_hbox)
+        # vbox2.addLayout(sources_hbox)
+        # vbox2.addLayout(extra1_hbox)
+        # vbox2.addLayout(extra2_hbox)
         vbox2.addLayout(tags_hbox)
         vbox2.addWidget(deck_container)
 
