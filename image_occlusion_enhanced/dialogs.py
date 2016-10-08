@@ -37,17 +37,6 @@ class ImgOccEdit(QDialog):
         self.svg_edit = webview.AnkiWebView()
         self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
 
-        editing_text = "<b>Instructions for editing</b>:\
-            Each mask shape represents a card.\
-            Removing any of the existing shapes will remove the corresponding card.\
-            New shapes will generate new cards. You can change the occlusion type\
-            by using the dropdown box on the left. If you click on the <i>Add new \
-            cards</i> button a completely new batch of cards will be generated, \
-            leaving your originals untouched."
-
-        self.edit_label = QLabel(editing_text)
-        self.edit_label.setWordWrap(True)
-
         self.header_edit = QPlainTextEdit()
         self.header_label = QLabel(IO_FLDS["header"])
         header_hbox = QHBoxLayout()
@@ -176,7 +165,6 @@ class ImgOccEdit(QDialog):
         ## Tab 1
         vbox1 = QVBoxLayout()
         vbox1.addWidget(self.svg_edit, stretch=1)
-        vbox1.addWidget(self.edit_label)
 
         ## Tab 2
         vbox2 = QVBoxLayout()
@@ -258,7 +246,7 @@ class ImgOccEdit(QDialog):
 
     # Modes
     def switch_to_mode(self, mode):
-        hide_on_add = [self.edit_label, self.occl_tp_select, 
+        hide_on_add = [self.occl_tp_select, 
                         self.edit_btn, self.new_btn]
         hide_on_edit = [self.ao_btn, self.aa_btn, self.oa_btn]
         if mode == "add":
@@ -267,7 +255,7 @@ class ImgOccEdit(QDialog):
             for i in hide_on_edit:
                 i.show()
             dl_txt = "Deck"
-            ttl = "Image Occlusion Enhanced - Add mode"
+            ttl = "Image Occlusion Enhanced - Add Mode"
             bl_txt = "Add Cards:"
         else:
             for i in hide_on_add:
@@ -275,7 +263,7 @@ class ImgOccEdit(QDialog):
             for i in hide_on_edit:
                 i.hide()
             dl_txt = "Deck for <i>Add new cards</i>"
-            ttl = "Image Occlusion Enhanced - Editing mode"
+            ttl = "Image Occlusion Enhanced - Editing Mode"
             bl_txt = "Type:"
         self.deckChooser.deckLabel.setText(dl_txt)
         self.setWindowTitle(ttl)
@@ -387,3 +375,47 @@ class ImgOccOpts(QDialog):
         self.setLayout(grid)
         self.setMinimumWidth(400)
         self.setWindowTitle('Image Occlusion Enhanced Options')
+
+
+def ioAskUser(text, title="Image Occlusion Enhanced", parent=None, 
+                    help="", defaultno=False, msgfunc=None):
+    """Show a yes/no question. Return true if yes.
+                Based on anki/utils.py by Damien Elmes"""
+    if not parent:
+        parent = mw.app.activeWindow()
+    if not msgfunc:
+        msgfunc = QMessageBox.question
+    sb = QMessageBox.Yes | QMessageBox.No
+    if help:
+        sb |= QMessageBox.Help
+    while 1:
+        if defaultno:
+            default = QMessageBox.No
+        else:
+            default = QMessageBox.Yes
+        r = msgfunc(parent, title, text, sb, default)
+        if r == QMessageBox.Help:
+            ioHelp(help, parent=parent)
+        else:
+            break
+    return r == QMessageBox.Yes
+
+def ioHelp(help, title=None, text=None, parent=None):
+    help_text = {}
+    help_text["editing"]= "<center><b>Instructions for editing</b>: \
+        <br><br> Each mask shape represents a card.\
+        Removing any of the existing shapes will remove the corresponding card.\
+        New shapes will generate new cards. You can change the occlusion type\
+        by using the dropdown box on the left.<br><br>If you click on the \
+        <i>Add new cards</i> button a completely new batch of cards will be \
+        generated, leaving your originals untouched.<br><br> \
+        <b>Actions performed in Image Occlusion's <i>Editing Mode</i> cannot be\
+        easily undone, so please make sure to check your changes twice before\
+        applying them.</b></center>"
+    if help != "custom":
+        text = help_text[help]
+    if not title:
+        title = "Image Occlusion Enhanced Help"
+    if not parent:
+        parent = mw.app.activeWindow()
+    QMessageBox.about(parent, title, text)

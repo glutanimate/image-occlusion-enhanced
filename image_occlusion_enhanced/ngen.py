@@ -25,7 +25,7 @@ import logging, sys
 
 from aqt.qt import *
 from aqt import mw
-from aqt.utils import tooltip, askUser
+from aqt.utils import tooltip
 from anki.notes import Note
 
 from xml.dom import minidom
@@ -34,6 +34,7 @@ import uuid
 import shutil
 import base64
 
+from dialogs import ioHelp, ioAskUser
 from config import *
 import template
 
@@ -268,14 +269,15 @@ class ImgOccNoteGenerator(object):
         logging.debug("edited nids %s", nids)
         logging.debug("edited self.mnode_ids %s", self.mnode_ids)
 
-        q = "This will <b>delete %i card(s)</b> and \
-             <b>create %i new one(s)</b>.\
-             Please note that this action is irreversible.<br><br>\
-             Would you still like to proceed?" % (del_count, new_count)
-
         if del_count or new_count:
-           if not askUser(q, parent=mw.ImgOccEdit):
+            q = "This will <b>delete %i card(s)</b> and \
+                 <b>create %i new one(s)</b>.\
+                 Please note that this action is irreversible.<br><br>\
+                 Would you still like to proceed?" % (del_count, new_count)
+            if not ioAskUser(q, title="Please confirm action",
+                                    parent=mw.ImgOccEdit, help="editing"):
                 return False
+
         if deleted_nids:
             mw.col.remNotes(deleted_nids)
         return True

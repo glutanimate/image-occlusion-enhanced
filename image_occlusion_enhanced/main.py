@@ -182,8 +182,10 @@ class ImgOccAdd(object):
         if self.mode == "add":
             dialog.show()
         else:
-            # modal dialog when editing
-            dialog.exec_()
+            if isinstance(self.ed.parentWindow, EditCurrent):
+                # fully cover editcurrent window with IO window
+                restoreGeom(dialog, "editcurrent")
+            dialog.exec_() # modal dialog when editing
       
 
     def onChangeImage(self):
