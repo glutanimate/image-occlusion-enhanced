@@ -206,6 +206,7 @@ class ImgOccEdit(QDialog):
         vbox_main.addWidget(self.tab_widget)
         vbox_main.addLayout(bottom_hbox)
         self.setLayout(vbox_main)
+        self.setMinimumWidth(640)
 
         # Define and connect key bindings
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Tab"), self), 
@@ -267,7 +268,7 @@ class ImgOccEdit(QDialog):
                 i.show()
             dl_txt = "Deck"
             ttl = "Image Occlusion Enhanced - Add mode"
-            bl_txt = "Add card type:"
+            bl_txt = "Add Cards:"
         else:
             for i in hide_on_add:
                 i.show()
@@ -275,7 +276,7 @@ class ImgOccEdit(QDialog):
                 i.hide()
             dl_txt = "Deck for <i>Add new cards</i>"
             ttl = "Image Occlusion Enhanced - Editing mode"
-            bl_txt = "Choose card type:"
+            bl_txt = "Type:"
         self.deckChooser.deckLabel.setText(dl_txt)
         self.setWindowTitle(ttl)
         self.bottom_label.setText(bl_txt)
