@@ -19,6 +19,7 @@ from aqt import mw, webview, deckchooser, tagedit
 from aqt.utils import saveGeom, restoreGeom
 
 from config import *
+from resources import *
 
 class ImgOccEdit(QDialog):
     def __init__(self, mw):
@@ -107,7 +108,9 @@ class ImgOccEdit(QDialog):
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(False)
 
-        self.image_btn = QPushButton("Change image", clicked=self.change_image)
+        self.image_btn = QPushButton("&Change image", clicked=self.change_image)
+        self.image_btn.setIcon(QIcon(":/icons/new_occlusion.png"))
+        self.image_btn.setIconSize(QSize(16, 16))
 
         self.occl_tp_select = QComboBox()
         self.occl_tp_select.addItems(["Don't change", "All Hidden, One Revealed",
@@ -126,6 +129,8 @@ class ImgOccEdit(QDialog):
         self.close_button = button_box.addButton("&Close", 
                 QDialogButtonBox.RejectRole)
 
+        image_tt = "Switch to a different image while preserving all of \
+            the shapes and fields"
         dc_tt = "Preserve existing occlusion type"
         edit_tt = "Edit all cards using current mask shapes and field entries"
         new_tt = "Create new batch of cards without editing existing ones"
@@ -140,6 +145,7 @@ class ImgOccEdit(QDialog):
             revealed on the back"
         close_tt = "Close Image Occlusion Editor without generating cards"
 
+        self.image_btn.setToolTip(image_tt)
         self.edit_btn.setToolTip(edit_tt)
         self.new_btn.setToolTip(new_tt)
         self.ao_btn.setToolTip(ao_tt)
@@ -160,6 +166,7 @@ class ImgOccEdit(QDialog):
 
         bottom_hbox = QHBoxLayout()
         bottom_hbox.addWidget(self.image_btn)
+        bottom_hbox.insertStretch(1, stretch=1)
         bottom_hbox.addWidget(self.bottom_label)
         bottom_hbox.addWidget(self.occl_tp_select)
         bottom_hbox.addWidget(button_box)

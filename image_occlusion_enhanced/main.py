@@ -96,7 +96,6 @@ class ImgOccAdd(object):
 
         if mode == "add":
             onote["did"] = self.ed.parentWindow.deckChooser.selectedId()
-            clip = QApplication.clipboard()
             image_path = self.getImage(self.ed.parentWindow)
         else:
             if note.model()["name"] != IO_MODEL_NAME:
