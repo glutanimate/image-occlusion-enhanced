@@ -162,25 +162,13 @@ class ImgOccAdd(object):
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
 
-        model = mw.col.models.byName(IO_MODEL_NAME)
-        flds = model['flds']
-
         if mode != "add":
-            for i in flds:
+            for i in self.mflds:
                 fname = flds["name"]
                 if fname in dialog.text_edit.keys():
                     dialog.text_edit["fname"] = self.ed.note["fname"]
             svg_b64 = svgToBase64(onote["omask"])
             url.addQueryItem('source', svg_b64)
-
-        # if mode != "add":
-        #     dialog.header_edit.setPlainText(onote["header"])
-        #     dialog.footer_edit.setPlainText(onote["footer"])
-        #     dialog.remarks_edit.setPlainText(onote["remarks"])
-        #     dialog.extra1_edit.setPlainText(onote["extra1"])
-        #     dialog.extra2_edit.setPlainText(onote["extra2"])
-        #     svg_b64 = svgToBase64(onote["omask"])
-        #     url.addQueryItem('source', svg_b64)
 
         dialog.svg_edit.setUrl(url)
         dialog.tags_edit.setText(onote["tags"])
@@ -251,9 +239,7 @@ class ImgOccAdd(object):
 
     def getUserInputs(self, dialog):
         fields = {}
-        model = mw.col.models.byName(IO_MODEL_NAME)
-        flds = model['flds']
-        for i in flds:
+        for i in self.mflds:
             fname = i['name']
             if fname in dialog.text_edit.keys():
                 fields[fname] = dialog.text_edit[fname].toPlainText().replace('\n', '<br />')

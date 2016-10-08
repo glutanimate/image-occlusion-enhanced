@@ -74,6 +74,9 @@ def load_prefs(self):
         # insert other update actions here
         self.io_conf['version'] = IO_DEFAULT_CONF['version']
 
+    model = mw.col.models.byName(IO_MODEL_NAME)
+    self.mflds = model['flds']
+
     # load local preferences
     self.prefs = None
     try:

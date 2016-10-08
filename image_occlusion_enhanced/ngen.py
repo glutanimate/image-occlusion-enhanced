@@ -351,8 +351,7 @@ class ImgOccNoteGenerator(object):
 
         model = self.model
         model['did'] = self.did
-        flds = model['flds']
-        fields = self.fields
+        mflds = model['flds']
 
         if nid:
             note = mw.col.getNote(nid)
@@ -360,6 +359,7 @@ class ImgOccNoteGenerator(object):
             note = Note(mw.col, model)
 
         # define fields we just generated
+        fields = self.fields
         fields[IO_FLDS['note_id']] = note_id
         fields[IO_FLDS['image']] = fname2img(col_image)
         fields[IO_FLDS['qmask']] = fname2img(qmask_path)
@@ -368,7 +368,7 @@ class ImgOccNoteGenerator(object):
 
         # add fields to note
         note.tags = self.tags
-        for i in flds:
+        for i in mflds:
             fname = i["name"]
             note[fname] = fields[fname]
 
