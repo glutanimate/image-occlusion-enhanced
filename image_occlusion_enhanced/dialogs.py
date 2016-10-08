@@ -108,17 +108,17 @@ class ImgOccEdit(QDialog):
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(False)
 
-        self.image_btn = QPushButton("&Change image", clicked=self.change_image)
+        self.image_btn = QPushButton("Change &Image", clicked=self.change_image)
         self.image_btn.setIcon(QIcon(":/icons/new_occlusion.png"))
         self.image_btn.setIconSize(QSize(16, 16))
 
         self.occl_tp_select = QComboBox()
-        self.occl_tp_select.addItems(["Don't change", "All Hidden, One Revealed",
+        self.occl_tp_select.addItems(["Don't Change", "All Hidden, One Revealed",
             "All Hidden, All Revealed", "One Hidden, All Revealed"])
 
-        self.edit_btn = button_box.addButton("&Edit cards",
+        self.edit_btn = button_box.addButton("&Edit Cards",
                 QDialogButtonBox.ActionRole)
-        self.new_btn = button_box.addButton("&Add new cards",
+        self.new_btn = button_box.addButton("&Add New Cards",
                 QDialogButtonBox.ActionRole)
         self.ao_btn = button_box.addButton(u"All Hidden, &One Revealed",
                 QDialogButtonBox.ActionRole)

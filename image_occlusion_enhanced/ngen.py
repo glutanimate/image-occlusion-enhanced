@@ -64,8 +64,12 @@ def svgToBase64(svg_path):
     svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
     return svg_b64
 
+
+def fname2img(path):
+    return '<img src="%s" />' % os.path.split(path)[1]
+
 def genByKey(key, old_occl_tp):
-    if key in ["Don't change"]:
+    if key in ["Don't Change"]:
         return genByKey(old_occl_tp, None)
     elif key in ["ao", "All Hidden, One Revealed"]:
         return IoGenAllHideOneReveal
@@ -93,20 +97,24 @@ class ImgOccNoteGenerator(object):
     def generate_notes(self):
         self.uniq_id = str(uuid.uuid4()).replace("-","") 
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
+        
         ( svg_node, layer_node ) = self._get_mnodes_and_set_ids()
         if not self.mnode_ids:
             tooltip("No cards to generate.<br>\
                 Are you sure you set your masks correctly?")
             return
+        
         self.masks_svg = svg_node.toxml() # write changes to svg
         self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
         qmasks = self._generate_mask_svgs_for("Q")
         amasks = self._generate_mask_svgs_for("A")
         col_image = self.add_image_to_col()
+        
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
             self._save_mask_and_return_note(qmasks[nr], amasks[nr], 
                                                     col_image, note_id)
+        
         parent = None
         if not self.ed.addMode:
             parent = self.ed.parentWindow
@@ -115,6 +123,7 @@ class ImgOccNoteGenerator(object):
     def update_notes(self):
         self.uniq_id = self.onote['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
+        
         self._find_all_notes()
         ( svg_node, mlayer_node ) = self._get_mnodes_and_set_ids(True)
         if not self.mnode_ids:
@@ -124,11 +133,17 @@ class ImgOccNoteGenerator(object):
         ret = self._delete_and_id_notes(mlayer_node)
         if not ret:
             return False
+        
         self.masks_svg = svg_node.toxml() # write changes to svg
         self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
         qmasks = self._generate_mask_svgs_for("Q")
         amasks = self._generate_mask_svgs_for("A")
-        col_image = self.image_path
+        if fname2img(self.image_path) != fname2img(self.onote['image']):
+            # updated image
+            col_image = self.add_image_to_col()
+        else:
+            col_image = self.image_path
+       
         logging.debug("mnode_indexes %s", self.mnode_indexes)
         for nr, idx in enumerate(self.mnode_indexes):
             logging.debug("=====================")
@@ -327,9 +342,6 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
-    def fname2img(self, path):
-        return '<img src="%s" />' % os.path.split(path)[1]
-
     def _save_mask_and_return_note(self, qmask, amask, col_image, note_id, nid=None):
         qmask_path = self._save_mask(qmask, note_id, "Q")
         amask_path = self._save_mask(amask, note_id, "A")
@@ -346,10 +358,10 @@ class ImgOccNoteGenerator(object):
 
         # define fields we just generated
         fields[IO_FLDS['note_id']] = note_id
-        fields[IO_FLDS['image']] = self.fname2img(col_image)
-        fields[IO_FLDS['qmask']] = self.fname2img(qmask_path)
-        fields[IO_FLDS['amask']] = self.fname2img(amask_path)
-        fields[IO_FLDS['omask']] = self.fname2img(omask_path)
+        fields[IO_FLDS['image']] = fname2img(col_image)
+        fields[IO_FLDS['qmask']] = fname2img(qmask_path)
+        fields[IO_FLDS['amask']] = fname2img(amask_path)
+        fields[IO_FLDS['omask']] = fname2img(omask_path)
 
         # add fields to note
         note.tags = self.tags
