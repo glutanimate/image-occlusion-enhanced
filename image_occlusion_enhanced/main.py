@@ -61,7 +61,28 @@ class ImgOccAdd(object):
         # load preferences
         load_prefs(self)
 
-    def getImage(self, mode=None):
+    def getImage(self, parent=None):
+        clip = QApplication.clipboard()
+        if clip.mimeData().imageData():
+            handle, image_path = tempfile.mkstemp(suffix='.png')
+            clip.image().save(image_path)
+            clip.clear()
+        else:
+            # retrieve last used image directory
+            prev_image_dir = self.prefs["prev_image_dir"]
+            if not os.path.isdir(prev_image_dir):
+                prev_image_dir = IO_HOME
+
+            image_path = QFileDialog.getOpenFileName(parent,
+                         "Choose Image", prev_image_dir, 
+                         "Image Files (*.png *jpg *.jpeg *.gif)")
+
+            if os.path.isfile(image_path):
+                self.prefs["prev_image_dir"] = os.path.dirname( image_path )
+                save_prefs(self)
+        return image_path
+
+    def selImage(self, mode=None):
         self.mode = mode
         note = self.ed.note
         onote = self.onote
@@ -76,23 +97,7 @@ class ImgOccAdd(object):
         if mode == "add":
             onote["did"] = self.ed.parentWindow.deckChooser.selectedId()
             clip = QApplication.clipboard()
-            if clip.mimeData().imageData():
-                handle, image_path = tempfile.mkstemp(suffix='.png')
-                clip.image().save(image_path)
-                clip.clear()
-            else:
-                # retrieve last used image directory
-                prev_image_dir = self.prefs["prev_image_dir"]
-                if not os.path.isdir(prev_image_dir):
-                    prev_image_dir = IO_HOME
-
-                image_path = QFileDialog.getOpenFileName(self.ed.parentWindow,
-                             "Choose Image", prev_image_dir, 
-                             "Image Files (*.png *jpg *.jpeg *.gif)")
-
-                if os.path.isfile(image_path):
-                    self.prefs["prev_image_dir"] = os.path.dirname( image_path )
-                    save_prefs(self)
+            image_path = self.getImage(self.ed.parentWindow)
         else:
             if note.model()["name"] != IO_MODEL_NAME:
                 tooltip("Not an IO card")
@@ -179,10 +184,20 @@ class ImgOccAdd(object):
         else:
             # modal dialog when editing
             dialog.exec_()
-        
+      
+
+    def onChangeImage(self):
+        self.image_path = self.getImage()
+        width, height = imageProp(self.image_path)
+        bkgd_url = path2url(self.image_path)
+        mw.ImgOccEdit.svg_edit.eval("""
+                        svgCanvas.setBackground('#FFF', '%s');
+                        svgCanvas.setResolution(%s, %s);
+                        svgCanvas.zoomChanged('', 'canvas');
+                    """ %(bkgd_url, width, height))
+
 
     def onAddNotesButton(self, choice, edit=False):
-        print "onaddnotesbutton"
         svg_edit = mw.ImgOccEdit.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
@@ -203,7 +218,7 @@ class ImgOccAdd(object):
             ret = gen.update_notes()
         else:
             ret = gen.generate_notes()
-        print "ret", ret
+        
         if ret == False:
             return False
 
@@ -257,7 +272,7 @@ def onImgOccButton(ed, mode):
                 <a href="' + io_help_link + '/Customization#a-note-of-warning">\
                 Wiki - Note Type Customization</a>')
             return
-    mw.ImgOccAdd.getImage(mode)
+    mw.ImgOccAdd.selImage(mode)
 
 def onSetupEditorButtons(self):
     # Add IO button to Editor

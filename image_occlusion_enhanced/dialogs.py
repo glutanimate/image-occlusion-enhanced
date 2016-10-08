@@ -107,6 +107,8 @@ class ImgOccEdit(QDialog):
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(False)
 
+        self.image_btn = QPushButton("Change image", clicked=self.change_image)
+
         self.occl_tp_select = QComboBox()
         self.occl_tp_select.addItems(["Don't change", "All Hidden, One Revealed",
             "All Hidden, All Revealed", "One Hidden, All Revealed"])
@@ -157,6 +159,7 @@ class ImgOccEdit(QDialog):
         self.connect(self.close_button, SIGNAL("clicked()"), self.close)
 
         bottom_hbox = QHBoxLayout()
+        bottom_hbox.addWidget(self.image_btn)
         bottom_hbox.addWidget(self.bottom_label)
         bottom_hbox.addWidget(self.occl_tp_select)
         bottom_hbox.addWidget(button_box)
@@ -230,6 +233,8 @@ class ImgOccEdit(QDialog):
         self.svg_edit.setFocus()
 
     # Note actions
+    def change_image(self):
+        mw.ImgOccAdd.onChangeImage()
     def add_ao(self): 
         mw.ImgOccAdd.onAddNotesButton("ao")
     def add_aa(self): 
@@ -242,7 +247,6 @@ class ImgOccEdit(QDialog):
     def edit_all(self):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onAddNotesButton(choice, True)
-        print "btnpress"
 
     # Modes
     def switch_to_mode(self, mode):
