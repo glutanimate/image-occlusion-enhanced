@@ -63,7 +63,6 @@ def svgToBase64(svg_path):
     svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
     return svg_b64
 
-
 def fname2img(path):
     return '<img src="%s" />' % os.path.split(path)[1]
 
@@ -90,29 +89,29 @@ class ImgOccNoteGenerator(object):
         self.did = did
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
         self.model = mw.col.models.byName(IO_MODEL_NAME)
-        stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
+        self.stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
         if not self.model:
             self.model = template.add_io_model(mw.col)
         
-    def generate_notes(self):
+    def generateNotes(self):
         self.uniq_id = str(uuid.uuid4()).replace("-","") 
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
         
-        ( svg_node, layer_node ) = self._get_mnodes_and_set_ids()
+        ( svg_node, layer_node ) = self._getMnodesAndSetIds()
         if not self.mnode_ids:
             tooltip("No cards to generate.<br>\
                 Are you sure you set your masks correctly?")
             return
         
         self.masks_svg = svg_node.toxml() # write changes to svg
-        self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
-        qmasks = self._generate_mask_svgs_for("Q")
-        amasks = self._generate_mask_svgs_for("A")
-        col_image = self.add_image_to_col()
+        self.omask_path = self._saveMask(self.masks_svg, self.occl_id, "O")
+        qmasks = self._generateMaskSVGsFor("Q")
+        amasks = self._generateMaskSVGsFor("A")
+        col_image = self._addImageToCol()
         
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
-            self._save_mask_and_return_note(qmasks[nr], amasks[nr], 
+            self._saveMaskAndReturnNote(qmasks[nr], amasks[nr], 
                                                     col_image, note_id)
         
         parent = None
@@ -120,27 +119,27 @@ class ImgOccNoteGenerator(object):
             parent = self.ed.parentWindow # display tt on browser/editcurrent
         tooltip("Cards added: %s" % len(qmasks), period=1500, parent=parent)
 
-    def update_notes(self):
+    def updateNotes(self):
         self.uniq_id = self.onote['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
         
-        self._find_all_notes()
-        ( svg_node, mlayer_node ) = self._get_mnodes_and_set_ids(True)
+        self._findAllNotes()
+        ( svg_node, mlayer_node ) = self._getMnodesAndSetIds(True)
         if not self.mnode_ids:
             tooltip("No shapes left. You can't delete all cards.<br>\
                 Are you sure you set your masks correctly?")
             return
-        ret = self._delete_and_id_notes(mlayer_node)
+        ret = self._deleteAndIdNotes(mlayer_node)
         if not ret:
             return False
         
         self.masks_svg = svg_node.toxml() # write changes to svg
-        self.omask_path = self._save_mask(self.masks_svg, self.occl_id, "O")
-        qmasks = self._generate_mask_svgs_for("Q")
-        amasks = self._generate_mask_svgs_for("A")
+        self.omask_path = self._saveMask(self.masks_svg, self.occl_id, "O")
+        qmasks = self._generateMaskSVGsFor("Q")
+        amasks = self._generateMaskSVGsFor("A")
         if fname2img(self.image_path) != fname2img(self.onote['image']):
             # updated image
-            col_image = self.add_image_to_col()
+            col_image = self._addImageToCol()
         else:
             col_image = self.image_path
        
@@ -154,18 +153,18 @@ class ImgOccNoteGenerator(object):
             logging.debug("self.nids %s", self.nids)
             nid = self.nids[note_id]
             logging.debug("nid %s", nid)
-            self._save_mask_and_return_note(qmasks[nr], amasks[nr],    
+            self._saveMaskAndReturnNote(qmasks[nr], amasks[nr],    
                                                 col_image, note_id, nid)
         parent = self.ed.parentWindow
         tooltip("Cards updated: %s" % len(qmasks), period=1500, parent=parent)
         mw.ImgOccEdit.close()
 
-    def _get_mnodes_and_set_ids(self, edit=False):
+    def _getMnodesAndSetIds(self, edit=False):
         self.mnode_indexes = []
         self.mnode_ids = {}
         mask_doc = minidom.parseString(self.masks_svg)
         svg_node = mask_doc.documentElement
-        layer_notes = self._layer_notes_from(svg_node)
+        layer_notes = self._layerNotesFrom(svg_node)
         mlayer_node = layer_notes[-1] # treat topmost layer as masks layer
         for i, node in enumerate(mlayer_node.childNodes):
             # minidom doesn't offer a childElements method and childNodes
@@ -175,7 +174,7 @@ class ImgOccNoteGenerator(object):
             # i.e. mask nodes
             if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
                 self.mnode_indexes.append(i)
-                self.remove_attribs_recursively(mlayer_node.childNodes[i], stripattr)
+                self._removeAttribsRecursively(mlayer_node.childNodes[i], self.stripattr)
                 if not edit:
                     self.mnode_ids[i] = "%s-%i" %(self.occl_id, len(self.mnode_indexes))
                     mlayer_node.childNodes[i].setAttribute("id", self.mnode_ids[i])
@@ -183,15 +182,15 @@ class ImgOccNoteGenerator(object):
                     self.mnode_ids[i] = mlayer_node.childNodes[i].attributes["id"].value
         return (svg_node, mlayer_node)
 
-    def find_by_noteid(self, note_id):
+    def findByNoteId(self, note_id):
         query = "'%s':'%s*'" % ( IO_FLDS['note_id'], note_id )
         logging.debug("query %s", query)
         res = mw.col.findNotes(query)
         return res
 
-    def _find_all_notes(self):
+    def _findAllNotes(self):
         old_occl_id = '%s-%s' % (self.uniq_id, self.onote["occl_tp"])
-        res = self.find_by_noteid(old_occl_id)
+        res = self.findByNoteId(old_occl_id)
         self.nids = {}
         for nid in res:
             note_id = mw.col.getNote(nid)[IO_FLDS["note_id"]]
@@ -200,7 +199,7 @@ class ImgOccNoteGenerator(object):
         logging.debug("res %s", res)
         logging.debug("nids %s", self.nids)
 
-    def _delete_and_id_notes(self, mlayer_node):
+    def _deleteAndIdNotes(self, mlayer_node):
         uniq_id = self.onote['uniq_id']
         mnode_ids = self.mnode_ids
         nids = self.nids
@@ -281,7 +280,7 @@ class ImgOccNoteGenerator(object):
             mw.col.remNotes(deleted_nids)
         return True
 
-    def add_image_to_col(self):
+    def _addImageToCol(self):
         media_dir = mw.col.media.dir()
         fn = os.path.basename(self.image_path)
         name, ext = os.path.splitext(fn)
@@ -291,43 +290,43 @@ class ImgOccNoteGenerator(object):
         shutil.copyfile(self.image_path, new_path)
         return new_path
 
-    def _generate_mask_svgs(self, side):
-        masks = self._generate_mask_svgs_for(side)
+    def _generateMaskSVGs(self, side):
+        masks = self._generateMaskSVGsFor(side)
         return masks
 
-    def _generate_mask_svgs_for(self, side):
-        masks = [self._create_mask(side, node_index) for node_index in self.mnode_indexes]
+    def _generateMaskSVGsFor(self, side):
+        masks = [self._createMask(side, node_index) for node_index in self.mnode_indexes]
         return masks
 
-    def _create_mask(self, side, mask_node_index):
+    def _createMask(self, side, mask_node_index):
         mask_doc = minidom.parseString(self.masks_svg)
         svg_node = mask_doc.documentElement
-        layer_notes = self._layer_notes_from(svg_node)
+        layer_notes = self._layerNotesFrom(svg_node)
         mlayer_node = layer_notes[-1] # treat topmost layer as masks layer
         #This methods get implemented different by subclasses
-        self._create_mask_at_layernode(side, mask_node_index, mlayer_node)
+        self._createMaskAtLayernode(side, mask_node_index, mlayer_node)
         return svg_node.toxml()
 
-    def _create_mask_at_layernode(self, mask_node_index, mlayer_node):
+    def _createMaskAtLayernode(self, mask_node_index, mlayer_node):
         raise NotImplementedError
 
-    def set_q_attribs(self, node):
+    def _setQuestionAttribs(self, node):
         # set element class
         node.setAttribute("class", "qshape")
         # set element color
         if (node.nodeType == node.ELEMENT_NODE):
             if node.hasAttribute("fill"):
                 node.setAttribute("fill", self.qfill)
-            map(self.set_q_attribs, node.childNodes)
+            map(self._setQuestionAttribs, node.childNodes)
 
-    def remove_attribs_recursively(self, node, attrs):
+    def _removeAttribsRecursively(self, node, attrs):
         if (node.nodeType == node.ELEMENT_NODE):
             for i in attrs:
                 if node.hasAttribute(i):
                     node.removeAttribute(i)
-            map(self.remove_attribs_recursively, node.childNodes)
+            map(self._removeAttribsRecursively, node.childNodes)
 
-    def _layer_notes_from(self, svg_node):
+    def _layerNotesFrom(self, svg_node):
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
         layer_notes = [node for node in svg_node.childNodes if node.nodeType == node.ELEMENT_NODE]
@@ -335,7 +334,7 @@ class ImgOccNoteGenerator(object):
         assert (layer_notes[0].nodeName == 'g')
         return layer_notes
 
-    def _save_mask(self, mask, note_id, mtype):
+    def _saveMask(self, mask, note_id, mtype):
         logging.debug("!saving %s, %s", note_id, mtype)
         mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'w')
@@ -343,9 +342,9 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
-    def _save_mask_and_return_note(self, qmask, amask, col_image, note_id, nid=None):
-        qmask_path = self._save_mask(qmask, note_id, "Q")
-        amask_path = self._save_mask(amask, note_id, "A")
+    def _saveMaskAndReturnNote(self, qmask, amask, col_image, note_id, nid=None):
+        qmask_path = self._saveMask(qmask, note_id, "Q")
+        amask_path = self._saveMask(amask, note_id, "A")
         omask_path = self.omask_path
 
         model = self.model
@@ -386,11 +385,11 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did)
 
-    def _create_mask_at_layernode(self, side, mask_node_index, mlayer_node):
+    def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         for i in self.mnode_indexes:
             if i == mask_node_index:
                 if side == "Q":
-                    self.set_q_attribs(mlayer_node.childNodes[i])
+                    self._setQuestionAttribs(mlayer_node.childNodes[i])
                 if side == "A":
                     mlayer_node.removeChild(mlayer_node.childNodes[i])
 
@@ -401,11 +400,11 @@ class IoGenHideAllRevealAll(ImgOccNoteGenerator):
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did)
 
-    def _create_mask_at_layernode(self, side, mask_node_index, mlayer_node):
+    def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         for i in reversed(self.mnode_indexes):
             if side == "Q":
                 if i == mask_node_index:
-                    self.set_q_attribs(mlayer_node.childNodes[i])
+                    self._setQuestionAttribs(mlayer_node.childNodes[i])
             else:
                 mlayer_node.removeChild(mlayer_node.childNodes[i])
 
@@ -416,10 +415,10 @@ class IoGenHideOneRevealAll(ImgOccNoteGenerator):
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
                                         onote, tags, fields, did)
 
-    def _create_mask_at_layernode(self, side, mask_node_index, mlayer_node):
+    def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         for i in reversed(self.mnode_indexes):
             if i == mask_node_index and side == "Q":
-                self.set_q_attribs(mlayer_node.childNodes[i])
+                self._setQuestionAttribs(mlayer_node.childNodes[i])
                 mlayer_node.childNodes[i].setAttribute("class", "qshape")
             else:
                 mlayer_node.removeChild(mlayer_node.childNodes[i])

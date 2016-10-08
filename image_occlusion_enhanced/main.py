@@ -59,7 +59,7 @@ class ImgOccAdd(object):
         self.onote = {}
 
         # load preferences
-        load_prefs(self)
+        loadPrefs(self)
 
     def selImage(self):
         note = self.ed.note
@@ -117,7 +117,7 @@ class ImgOccAdd(object):
             return
 
         self.image_path = image_path
-        self.call_ImgOccEdit(self.mode)
+        self.callImgOccEdit(self.mode)
 
     def getImage(self, parent=None):
         clip = QApplication.clipboard()
@@ -137,10 +137,10 @@ class ImgOccAdd(object):
 
             if os.path.isfile(image_path):
                 self.prefs["prev_image_dir"] = os.path.dirname( image_path )
-                save_prefs(self)
+                savePrefs(self)
         return image_path
 
-    def call_ImgOccEdit(self, mode):
+    def callImgOccEdit(self, mode):
         width, height = imageProp(self.image_path)
         ofill = mw.col.conf['imgocc']['ofill']
         bkgd_url = path2url(self.image_path)
@@ -150,11 +150,11 @@ class ImgOccAdd(object):
         # use existing IO instance when available:
         try:
             mw.ImgOccEdit is not None
-            mw.ImgOccEdit.reset_window()
+            mw.ImgOccEdit.resetWindow()
         except:
             mw.ImgOccEdit = ImgOccEdit(mw)
         dialog = mw.ImgOccEdit
-        dialog.switch_to_mode(mode)
+        dialog.switchToMode(mode)
 
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
@@ -164,9 +164,10 @@ class ImgOccAdd(object):
 
         if mode != "add":
             for i in self.mflds:
-                fname = flds["name"]
+                fname = i["name"]
                 if fname in dialog.tedit.keys():
-                    dialog.tedit["fname"] = self.ed.note["fname"]
+                    dialog.tedit[fname].setPlainText(
+                        self.ed.note[fname].replace('<br />', '\n'))
             svg_b64 = svgToBase64(onote["omask"])
             url.addQueryItem('source', svg_b64)
 
@@ -215,9 +216,9 @@ class ImgOccAdd(object):
         gen = noteGenerator(self.ed, svg, self.image_path, 
                                     self.onote, tags, fields, did)        
         if edit:
-            ret = gen.update_notes()
+            ret = gen.updateNotes()
         else:
-            ret = gen.generate_notes()
+            ret = gen.generateNotes()
         
         if ret == False:
             return False
@@ -242,16 +243,17 @@ class ImgOccAdd(object):
         for i in self.mflds:
             fname = i['name']
             if fname in dialog.tedit.keys():
-                fields[fname] = dialog.tedit[fname].toPlainText().replace('\n', '<br />')
+                text = dialog.tedit[fname].toPlainText().replace('\n', '<br />')
+                fields[fname] = text
         tags = dialog.tags_edit.text().split()
         return (fields, tags)
 
 
-def invoke_io_settings(mw):
+def onIoSettings(mw):
     dialog = ImgOccOpts(mw)
     dialog.exec_()
 
-def invoke_io_help():
+def onIoHelp():
     ioHelp("main")
 
 def onImgOccButton(ed, mode):
@@ -284,7 +286,7 @@ def onSetupEditorButtons(self):
     btn.addAction(press_action)
 
 
-def hideIdField(self, node, hide=True, focus=False):
+def onSetNote(self, node, hide=True, focus=False):
     """simple hack that hides the ID field on IO notes"""
     if (self.note and self.note.model()["name"] == IO_MODEL_NAME and
             self.note.model()['flds'][0]['name'] == IO_FLDS['note_id']):
@@ -304,14 +306,14 @@ def onEditCurrentInit(self, mw):
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
 mw.connect(options_action, SIGNAL("triggered()"), 
-            lambda o=mw: invoke_io_settings(o))
+            lambda o=mw: onIoSettings(o))
 mw.connect(help_action, SIGNAL("triggered()"),
-            invoke_io_help)
+            onIoHelp)
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
 
 # Set up hooks
 addHook('setupEditorButtons', onSetupEditorButtons)
-Editor.setNote = wrap(Editor.setNote, hideIdField, "after")
+Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
 EditCurrent.__init__ = wrap(EditCurrent.__init__, onEditCurrentInit, "after")

@@ -54,7 +54,7 @@ addons_folder = mw.pm.addonFolder().encode('utf-8')
 prefs_path = os.path.join(addons_folder, "image_occlusion_enhanced", 
                           ".image_occlusion_prefs").decode('utf-8')
 
-def load_prefs(self):
+def loadPrefs(self):
 
     if not 'imgocc' in mw.col.conf:
         # create initial configuration
@@ -88,7 +88,7 @@ def load_prefs(self):
             self.prefs = default_prefs
             json.dump(self.prefs, f)
 
-def save_prefs(self):
+def savePrefs(self):
     # save local preferences to disk
     with open(prefs_path, "w") as f:
         json.dump(self.prefs, f)
