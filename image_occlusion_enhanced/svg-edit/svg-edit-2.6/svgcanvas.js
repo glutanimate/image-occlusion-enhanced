@@ -5172,13 +5172,29 @@ this.svgToString = function(elem, indent) {
 		
 		for (var i=0; i<indent; i++) out.push(" ");
 		out.push("<"); out.push(elem.nodeName);
-		if(elem.id === 'svgcontent') {		
-			var vb = "";
-
-			width = curConfig.dimensions[0]
-			height = curConfig.dimensions[1]
+		if(elem.id === 'svgcontent') {
+			// Process root element separately
+			var res = getResolution();
 			
-			out.push(' width="' + width + '" height="' + height + '"' + vb + ' xmlns="'+svgns+'"');
+			var vb = "";
+			// TODO: Allow this by dividing all values by current baseVal
+			// Note that this also means we should properly deal with this on import
+// 			if(curConfig.baseUnit !== "px") {
+// 				var unit = curConfig.baseUnit;
+// 				var unit_m = svgedit.units.getTypeMap()[unit];
+// 				res.w = svgedit.units.shortFloat(res.w / unit_m)
+// 				res.h = svgedit.units.shortFloat(res.h / unit_m)
+// 				vb = ' viewBox="' + [0, 0, res.w, res.h].join(' ') + '"';				
+// 				res.w += unit;
+// 				res.h += unit;
+// 			}
+			
+			if(unit !== "px") {
+				res.w = Math.round(svgedit.units.convertUnit(res.w, unit) + unit);
+				res.h = Math.round(svgedit.units.convertUnit(res.h, unit) + unit);
+			}
+			
+			out.push(' width="' + res.w + '" height="' + res.h + '"' + vb + ' xmlns="'+svgns+'"');
 			
 			var nsuris = {};
 			

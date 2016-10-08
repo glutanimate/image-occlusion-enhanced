@@ -186,14 +186,17 @@ class ImgOccAdd(object):
       
 
     def onChangeImage(self):
-        self.image_path = self.getImage()
-        width, height = imageProp(self.image_path)
-        bkgd_url = path2url(self.image_path)
+        image_path = self.getImage()
+        if not image_path:
+            return
+        width, height = imageProp(image_path)
+        bkgd_url = path2url(image_path)
         mw.ImgOccEdit.svg_edit.eval("""
                         svgCanvas.setBackground('#FFF', '%s');
                         svgCanvas.setResolution(%s, %s);
                         svgCanvas.zoomChanged('', 'canvas');
                     """ %(bkgd_url, width, height))
+        self.image_path = image_path
 
 
     def onAddNotesButton(self, choice, edit=False):
