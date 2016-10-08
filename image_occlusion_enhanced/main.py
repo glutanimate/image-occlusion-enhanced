@@ -21,7 +21,7 @@ from aqt.qt import *
 from aqt import mw, webview, deckchooser, tagedit
 from aqt.editcurrent import EditCurrent
 from aqt.editor import Editor
-from aqt.utils import tooltip, openLink, showWarning, saveGeom, restoreGeom
+from aqt.utils import tooltip, showWarning, saveGeom, restoreGeom
 from anki.hooks import wrap, addHook
 
 import re
@@ -30,10 +30,8 @@ import urlparse, urllib
 
 from config import *
 from ngen import *
-from dialogs import ImgOccEdit, ImgOccOpts
+from dialogs import ImgOccEdit, ImgOccOpts, ioHelp
 from resources import *
-
-io_help_link = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
 
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
@@ -261,7 +259,7 @@ def invoke_io_settings(mw):
     dialog.exec_()
 
 def invoke_io_help():
-    openLink(io_help_link)
+    ioHelp("main")
 
 def onImgOccButton(ed, mode):
     mw.ImgOccAdd = ImgOccAdd(ed)
@@ -311,7 +309,7 @@ def onEditCurrentInit(self, mw):
 
 # Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
-help_action = QAction("Image &Occlusion Enhanced Wiki...", mw)
+help_action = QAction("Image &Occlusion Enhanced...", mw)
 mw.connect(options_action, SIGNAL("triggered()"), 
             lambda o=mw: invoke_io_settings(o))
 mw.connect(help_action, SIGNAL("triggered()"),

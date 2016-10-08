@@ -401,8 +401,10 @@ def ioAskUser(text, title="Image Occlusion Enhanced", parent=None,
     return r == QMessageBox.Yes
 
 def ioHelp(help, title=None, text=None, parent=None):
+    io_link_wiki = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
+    io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o"
     help_text = {}
-    help_text["editing"]= "<center><b>Instructions for editing</b>: \
+    help_text["editing"] = """<center><b>Instructions for editing</b>: \
         <br><br> Each mask shape represents a card.\
         Removing any of the existing shapes will remove the corresponding card.\
         New shapes will generate new cards. You can change the occlusion type\
@@ -411,7 +413,28 @@ def ioHelp(help, title=None, text=None, parent=None):
         generated, leaving your originals untouched.<br><br> \
         <b>Actions performed in Image Occlusion's <i>Editing Mode</i> cannot be\
         easily undone, so please make sure to check your changes twice before\
-        applying them.</b></center>"
+        applying them.</b></center>"""
+    help_text["main"] = u"""<h2>Help and Support</h2>
+        <p><a href="%s">Image Occlusion Enhanced Wiki</a></p>
+        <p><a href="%s">Official Video Tutorial Series</a></p>
+        <h2>Credits and License</h2>
+        <p style="font-size:12pt;"><em>Copyright © 2016 \
+        <a href="https://github.com/Glutanimate">Glutanimate</a></em></p>
+        <p style="font-size:12pt;"><em>Copyright © 2012-2015 \
+        <a href="https://github.com/tmbb">tmbb</a></em></p>
+        <p style="font-size:12pt;"><em>Copyright © 2013 \
+        <a href="https://github.com/steveaw">Steve AW</a></em></p>
+        <p><em>Image Occlusion Enhanced</em> is licensed under the GNU GPLv3 License.</p>
+        <p>Third-party open-source software shipped with <em>Image Occlusion Enhanced</em>:</p>
+        <ul><li><p><a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> \
+        (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik \
+        Lundh. Licensed under the <a href="http://www.pythonware.com/products/pil/license.htm">\
+        PIL license</a></p></li>
+        <li><p><a href="https://github.com/SVG-Edit/svgedit">SVG Edit</a> 2.6. \
+        Copyright (c) 2009-2012 by SVG-edit authors. Licensed under the
+        <a href="https://github.com/SVG-Edit/svgedit/blob/master/LICENSE">MIT license</a></p></li>
+        </ul>
+        """ % (io_link_wiki, io_link_tut)
     if help != "custom":
         text = help_text[help]
     if not title:
