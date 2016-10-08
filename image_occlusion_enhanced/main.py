@@ -165,8 +165,8 @@ class ImgOccAdd(object):
         if mode != "add":
             for i in self.mflds:
                 fname = flds["name"]
-                if fname in dialog.text_edit.keys():
-                    dialog.text_edit["fname"] = self.ed.note["fname"]
+                if fname in dialog.tedit.keys():
+                    dialog.tedit["fname"] = self.ed.note["fname"]
             svg_b64 = svgToBase64(onote["omask"])
             url.addQueryItem('source', svg_b64)
 
@@ -174,7 +174,7 @@ class ImgOccAdd(object):
         dialog.tags_edit.setText(onote["tags"])
         dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
-        dialog.text_edit[IO_FLDS["sources"]].setPlainText(onote["sources"])
+        dialog.tedit[IO_FLDS["sources"]].setPlainText(onote["sources"])
 
         if mode == "add":
             dialog.show()
@@ -241,8 +241,8 @@ class ImgOccAdd(object):
         fields = {}
         for i in self.mflds:
             fname = i['name']
-            if fname in dialog.text_edit.keys():
-                fields[fname] = dialog.text_edit[fname].toPlainText().replace('\n', '<br />')
+            if fname in dialog.tedit.keys():
+                fields[fname] = dialog.tedit[fname].toPlainText().replace('\n', '<br />')
         tags = dialog.tags_edit.text().split()
         return (fields, tags)
 

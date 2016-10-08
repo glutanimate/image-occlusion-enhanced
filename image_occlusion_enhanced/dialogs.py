@@ -28,9 +28,12 @@ class ImgOccEdit(QDialog):
         self.setupUi()
 
     def closeEvent(self, event):
-        if mw.pm.profile is not None and self.mode != "edit":
-            # only save geom in add and browse modes
-            saveGeom(self, "imgoccedit")
+        if mw.pm.profile is not None:
+            self.deckChooser.cleanup()
+            if self.mode != "edit":
+                # only save geom in add and browse modes
+                saveGeom(self, "imgoccedit")
+
         QWidget.closeEvent(self, event)
 
     def setupUi(self):
@@ -39,7 +42,7 @@ class ImgOccEdit(QDialog):
 
         model = mw.col.models.byName(IO_MODEL_NAME)
         flds = model['flds']
-        self.text_edit = {}
+        self.tedit = {}
         f_hboxs = []
         for i in flds:
             if i["name"] in [IO_FLDS["note_id"], IO_FLDS["image"], 
@@ -50,7 +53,7 @@ class ImgOccEdit(QDialog):
             f_hbox = QHBoxLayout()
             f_hbox.addWidget(f_label)
             f_hbox.addWidget(f)
-            self.text_edit[i["name"]] = f
+            self.tedit[i["name"]] = f
             f_hboxs.append(f_hbox)
             f.setTabChangesFocus(True)
             f.setMinimumHeight(40)
@@ -73,26 +76,26 @@ class ImgOccEdit(QDialog):
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(False)
 
-        self.image_btn = QPushButton("Change &Image", clicked=self.change_image)
-        self.image_btn.setIcon(QIcon(":/icons/new_occlusion.png"))
-        self.image_btn.setIconSize(QSize(16, 16))
+        image_btn = QPushButton("Change &Image", clicked=self.change_image)
+        image_btn.setIcon(QIcon(":/icons/new_occlusion.png"))
+        image_btn.setIconSize(QSize(16, 16))
 
         self.occl_tp_select = QComboBox()
         self.occl_tp_select.addItems(["Don't Change", "Hide All, Reveal One",
             "Hide All, Reveal All", "Hide One, Reveal All"])
 
         self.edit_btn = button_box.addButton("&Edit Cards",
-                QDialogButtonBox.ActionRole)
+           QDialogButtonBox.ActionRole)
         self.new_btn = button_box.addButton("&Add New Cards",
-                QDialogButtonBox.ActionRole)
+           QDialogButtonBox.ActionRole)
         self.ao_btn = button_box.addButton(u"Hide &All, Reveal One",
-                QDialogButtonBox.ActionRole)
+           QDialogButtonBox.ActionRole)
         self.aa_btn = button_box.addButton(u"Hide All, &Reveal All",
-                QDialogButtonBox.ActionRole)
+           QDialogButtonBox.ActionRole)
         self.oa_btn = button_box.addButton(u"Hide &One, Reveal One",
-                QDialogButtonBox.ActionRole)
-        self.close_button = button_box.addButton("&Close", 
-                QDialogButtonBox.RejectRole)
+           QDialogButtonBox.ActionRole)
+        close_button = button_box.addButton("&Close", 
+            QDialogButtonBox.RejectRole)
 
         image_tt = "Switch to a different image while preserving all of \
             the shapes and fields"
@@ -110,13 +113,13 @@ class ImgOccEdit(QDialog):
             revealed on the back"
         close_tt = "Close Image Occlusion Editor without generating cards"
 
-        self.image_btn.setToolTip(image_tt)
+        image_btn.setToolTip(image_tt)
         self.edit_btn.setToolTip(edit_tt)
         self.new_btn.setToolTip(new_tt)
         self.ao_btn.setToolTip(ao_tt)
         self.aa_btn.setToolTip(aa_tt)
         self.oa_btn.setToolTip(oa_tt)
-        self.close_button.setToolTip(close_tt)
+        close_button.setToolTip(close_tt)
         self.occl_tp_select.setItemData(0, dc_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(1, ao_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(2, aa_tt, Qt.ToolTipRole)
@@ -127,10 +130,10 @@ class ImgOccEdit(QDialog):
         self.connect(self.ao_btn, SIGNAL("clicked()"), self.add_ao)
         self.connect(self.aa_btn, SIGNAL("clicked()"), self.add_aa)
         self.connect(self.oa_btn, SIGNAL("clicked()"), self.add_oa)
-        self.connect(self.close_button, SIGNAL("clicked()"), self.close)
+        self.connect(close_button, SIGNAL("clicked()"), self.close)
 
         bottom_hbox = QHBoxLayout()
-        bottom_hbox.addWidget(self.image_btn)
+        bottom_hbox.addWidget(image_btn)
         bottom_hbox.insertStretch(1, stretch=1)
         bottom_hbox.addWidget(self.bottom_label)
         bottom_hbox.addWidget(self.occl_tp_select)
@@ -161,7 +164,7 @@ class ImgOccEdit(QDialog):
         self.tab_widget.setTabToolTip(0, "Create image occlusion masks (required)")
 
         # Add all widgets to main window
-        vbox_main = QtGui.QVBoxLayout()
+        vbox_main = QVBoxLayout()
         vbox_main.setMargin(5);
         vbox_main.addWidget(self.tab_widget)
         vbox_main.addLayout(bottom_hbox)
@@ -176,23 +179,25 @@ class ImgOccEdit(QDialog):
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+r"), self), 
             QtCore.SIGNAL('activated()'), self.reset_all_fields)
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+1"), self), 
-            QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.header_edit))
+            QtCore.SIGNAL('activated()'), 
+            lambda:self.focus_field(self.tedit[IO_FLDS["header"]]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+2"), self), 
-            QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.footer_edit))
+            QtCore.SIGNAL('activated()'), 
+            lambda:self.focus_field(self.tedit[IO_FLDS["footer"]]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+3"), self), 
-            QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.remarks_edit))
+            QtCore.SIGNAL('activated()'), 
+            lambda:self.focus_field(self.tedit[IO_FLDS["remarks"]]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+4"), self), 
-            QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.sources_edit))
+            QtCore.SIGNAL('activated()'), 
+            lambda:self.focus_field(self.tedit[IO_FLDS["sources"]]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+5"), self), 
-            QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.extra1_edit))
+            QtCore.SIGNAL('activated()'), 
+            lambda:self.focus_field(self.tedit[IO_FLDS["extra1"]]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+6"), self), 
-            QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.extra2_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+d"), self), 
-            QtCore.SIGNAL('activated()'), deck_container.setFocus)
+            QtCore.SIGNAL('activated()'), 
+            lambda:self.focus_field(self.tedit[IO_FLDS["extra2"]]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+t"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focus_field(self.tags_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+i"), self), 
-            QtCore.SIGNAL('activated()'), self.svg_edit.setFocus)
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+f"), self), 
             QtCore.SIGNAL('activated()'), self.fit_image_canvas)
 
@@ -219,8 +224,7 @@ class ImgOccEdit(QDialog):
     # Modes
     def switch_to_mode(self, mode):
         self.mode = mode
-        hide_on_add = [self.occl_tp_select, 
-                        self.edit_btn, self.new_btn]
+        hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]
         hide_on_edit = [self.ao_btn, self.aa_btn, self.oa_btn]
         if mode == "add":
             for i in hide_on_add:
@@ -251,7 +255,7 @@ class ImgOccEdit(QDialog):
         self.reset_all_fields()
         self.tab_widget.setCurrentIndex(0)
         self.occl_tp_select.setCurrentIndex(0)
-        self.header_edit.setFocus()
+        self.tedit[IO_FLDS["header"]].setFocus()
         self.svg_edit.setFocus()
 
     def switch_tabs(self):
@@ -259,7 +263,7 @@ class ImgOccEdit(QDialog):
         if currentTab == 0:
           self.tab_widget.setCurrentIndex(1)
           if isinstance(QApplication.focusWidget(), QPushButton):
-              self.header_edit.setFocus()
+              self.tedit[IO_FLDS["header"]].setFocus()
         else:
           self.tab_widget.setCurrentIndex(0)
 
@@ -268,13 +272,13 @@ class ImgOccEdit(QDialog):
         target_field.setFocus()
 
     def reset_main_fields(self):
-        for i in [self.header_edit, self.footer_edit, self.remarks_edit, 
-          self.extra1_edit, self.extra2_edit]:
-            i.setPlainText("")
+        for i in [IO_FLDS["header"], IO_FLDS["footer"], IO_FLDS["remarks"],
+                    IO_FLDS["extra1"], IO_FLDS["extra2"]]:
+            self.tedit[i].setFocus.setPlainText("")
 
     def reset_all_fields(self):
         self.reset_main_fields()
-        self.sources_edit.setPlainText("")
+        self.tedit[IO_FLDS["sources"]].setPlainText("")
 
     def fit_image_canvas(self):
         command = "svgCanvas.zoomChanged('', 'canvas');"

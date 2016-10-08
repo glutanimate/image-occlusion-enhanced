@@ -51,8 +51,6 @@ import template
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
-stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
-
 def imageProp(image_path):
     image = Image.open(image_path)
     width, height = image.size
@@ -92,6 +90,7 @@ class ImgOccNoteGenerator(object):
         self.did = did
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
         self.model = mw.col.models.byName(IO_MODEL_NAME)
+        stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
         if not self.model:
             self.model = template.add_io_model(mw.col)
         
