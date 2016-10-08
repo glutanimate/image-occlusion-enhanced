@@ -118,7 +118,7 @@ class ImgOccNoteGenerator(object):
         
         parent = None
         if not self.ed.addMode:
-            parent = self.ed.parentWindow
+            parent = self.ed.parentWindow # display tt on browser/editcurrent
         tooltip("Cards added: %s" % len(qmasks), period=1500, parent=parent)
 
     def update_notes(self):

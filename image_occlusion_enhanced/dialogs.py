@@ -24,13 +24,13 @@ from resources import *
 class ImgOccEdit(QDialog):
     def __init__(self, mw):
         QDialog.__init__(self, parent=None)
-        self.mode = mw.ImgOccAdd.mode
+        self.mode = "add"
         self.setupUi()
-        restoreGeom(self, "imageOccEditor")
 
     def closeEvent(self, event):
-        if mw.pm.profile is not None:
-            saveGeom(self, "imageOccEditor")
+        if mw.pm.profile is not None and self.mode != "edit":
+            # only save geom in add and browse modes
+            saveGeom(self, "imgoccedit")
         QWidget.closeEvent(self, event)
 
     def setupUi(self):
@@ -246,6 +246,7 @@ class ImgOccEdit(QDialog):
 
     # Modes
     def switch_to_mode(self, mode):
+        self.mode = mode
         hide_on_add = [self.occl_tp_select, 
                         self.edit_btn, self.new_btn]
         hide_on_edit = [self.ao_btn, self.aa_btn, self.oa_btn]
@@ -268,9 +269,13 @@ class ImgOccEdit(QDialog):
         self.deckChooser.deckLabel.setText(dl_txt)
         self.setWindowTitle(ttl)
         self.bottom_label.setText(bl_txt)
+        if mode == "edit":
+            restoreGeom(self, "editcurrent") # cover editcurrent window
+        else:
+            restoreGeom(self, "imgoccedit")
 
     # Other actions
-    def reset_window(self):
+    def reset_window(self, mode):
         self.reset_all_fields()
         self.tab_widget.setCurrentIndex(0)
         self.occl_tp_select.setCurrentIndex(0)

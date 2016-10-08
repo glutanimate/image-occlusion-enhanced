@@ -21,6 +21,7 @@ from aqt.qt import *
 from aqt import mw, webview, deckchooser, tagedit
 from aqt.editcurrent import EditCurrent
 from aqt.editor import Editor
+from aqt.addcards import AddCards
 from aqt.utils import tooltip, showWarning, saveGeom, restoreGeom
 from anki.hooks import wrap, addHook
 
@@ -52,37 +53,15 @@ def path2url(path):
       'file:', urllib.pathname2url(path.encode('utf-8')))
 
 class ImgOccAdd(object):
-    def __init__(self, ed):
+    def __init__(self, ed, mode):
         self.ed = ed
-        self.mode = "add"
+        self.mode = mode
         self.onote = {}
 
         # load preferences
         load_prefs(self)
 
-    def getImage(self, parent=None):
-        clip = QApplication.clipboard()
-        if clip.mimeData().imageData():
-            handle, image_path = tempfile.mkstemp(suffix='.png')
-            clip.image().save(image_path)
-            clip.clear()
-        else:
-            # retrieve last used image directory
-            prev_image_dir = self.prefs["prev_image_dir"]
-            if not os.path.isdir(prev_image_dir):
-                prev_image_dir = IO_HOME
-
-            image_path = QFileDialog.getOpenFileName(parent,
-                         "Choose Image", prev_image_dir, 
-                         "Image Files (*.png *jpg *.jpeg *.gif)")
-
-            if os.path.isfile(image_path):
-                self.prefs["prev_image_dir"] = os.path.dirname( image_path )
-                save_prefs(self)
-        return image_path
-
-    def selImage(self, mode=None):
-        self.mode = mode
+    def selImage(self):
         note = self.ed.note
         onote = self.onote
         for i in IO_FLDS.keys():
@@ -93,7 +72,7 @@ class ImgOccAdd(object):
         if IO_FLDS["sources"] in note:
             onote["sources"] = note[IO_FLDS["sources"]]
 
-        if mode == "add":
+        if self.mode == "add":
             onote["did"] = self.ed.parentWindow.deckChooser.selectedId()
             image_path = self.getImage(self.ed.parentWindow)
         else:
@@ -138,9 +117,30 @@ class ImgOccAdd(object):
             return
 
         self.image_path = image_path
-        self.call_ImgOccEdit()
+        self.call_ImgOccEdit(self.mode)
 
-    def call_ImgOccEdit(self):
+    def getImage(self, parent=None):
+        clip = QApplication.clipboard()
+        if clip.mimeData().imageData():
+            handle, image_path = tempfile.mkstemp(suffix='.png')
+            clip.image().save(image_path)
+            clip.clear()
+        else:
+            # retrieve last used image directory
+            prev_image_dir = self.prefs["prev_image_dir"]
+            if not os.path.isdir(prev_image_dir):
+                prev_image_dir = IO_HOME
+
+            image_path = QFileDialog.getOpenFileName(parent,
+                         "Choose Image", prev_image_dir, 
+                         "Image Files (*.png *jpg *.jpeg *.gif)")
+
+            if os.path.isfile(image_path):
+                self.prefs["prev_image_dir"] = os.path.dirname( image_path )
+                save_prefs(self)
+        return image_path
+
+    def call_ImgOccEdit(self, mode):
         width, height = imageProp(self.image_path)
         ofill = mw.col.conf['imgocc']['ofill']
         bkgd_url = path2url(self.image_path)
@@ -154,7 +154,7 @@ class ImgOccAdd(object):
         except:
             mw.ImgOccEdit = ImgOccEdit(mw)
         dialog = mw.ImgOccEdit
-        dialog.switch_to_mode(self.mode)
+        dialog.switch_to_mode(mode)
 
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
@@ -162,7 +162,7 @@ class ImgOccAdd(object):
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
 
-        if self.mode != "add":
+        if mode != "add":
             dialog.header_edit.setPlainText(onote["header"])
             dialog.footer_edit.setPlainText(onote["footer"])
             dialog.remarks_edit.setPlainText(onote["remarks"])
@@ -177,12 +177,9 @@ class ImgOccAdd(object):
         dialog.tags_edit.setCol(mw.col)
         dialog.sources_edit.setPlainText(onote["sources"])
 
-        if self.mode == "add":
+        if mode == "add":
             dialog.show()
         else:
-            if isinstance(self.ed.parentWindow, EditCurrent):
-                # fully cover editcurrent window with IO window
-                restoreGeom(dialog, "editcurrent")
             dialog.exec_() # modal dialog when editing
       
 
@@ -262,7 +259,7 @@ def invoke_io_help():
     ioHelp("main")
 
 def onImgOccButton(ed, mode):
-    mw.ImgOccAdd = ImgOccAdd(ed)
+    mw.ImgOccAdd = ImgOccAdd(ed, mode)
     ioModel = mw.col.models.byName(IO_MODEL_NAME)
     if ioModel:
         ioFields = mw.col.models.fieldNames(ioModel)
@@ -275,15 +272,18 @@ def onImgOccButton(ed, mode):
                 <a href="' + io_help_link + '/Customization#a-note-of-warning">\
                 Wiki - Note Type Customization</a>')
             return
-    mw.ImgOccAdd.selImage(mode)
+    mw.ImgOccAdd.selImage()
 
 def onSetupEditorButtons(self):
-    # Add IO button to Editor
-    if self.addMode:
+    # Add IO button to Editor  
+    if isinstance(self.parentWindow, AddCards):
         btn = self._addButton("new_occlusion", lambda o=self: onImgOccButton(self, "add"),
                 _("Alt+a"), _("Add Image Occlusion (Alt+A)"), canDisable=False)
-    else:
+    elif isinstance(self.parentWindow, EditCurrent):
         btn = self._addButton("edit_occlusion", lambda o=self: onImgOccButton(self, "edit"),
+                _("Alt+a"), _("Edit Image Occlusion (Alt+A)"), canDisable=False)
+    else:
+        btn = self._addButton("edit_occlusion", lambda o=self: onImgOccButton(self, "browse"),
                 _("Alt+a"), _("Edit Image Occlusion (Alt+A)"), canDisable=False)
 
     press_action = QAction(self.parentWindow, triggered=btn.animateClick)
