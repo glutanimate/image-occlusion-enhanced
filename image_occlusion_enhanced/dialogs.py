@@ -26,13 +26,12 @@ class ImgOccEdit(QDialog):
         QDialog.__init__(self, parent=None)
         self.mode = "add"
         self.setupUi()
+        restoreGeom(self, "imgoccedit")
 
     def closeEvent(self, event):
         if mw.pm.profile is not None:
             self.deckChooser.cleanup()
-            if self.mode != "edit":
-                # only save geom in add and browse modes
-                saveGeom(self, "imgoccedit")
+            saveGeom(self, "imgoccedit")
 
         QWidget.closeEvent(self, event)
 
@@ -245,10 +244,6 @@ class ImgOccEdit(QDialog):
         self.deckChooser.deckLabel.setText(dl_txt)
         self.setWindowTitle(ttl)
         self.bottom_label.setText(bl_txt)
-        if mode == "edit":
-            restoreGeom(self, "editcurrent") # cover editcurrent window
-        else:
-            restoreGeom(self, "imgoccedit")
 
     # Other actions
     def resetWindow(self, mode):

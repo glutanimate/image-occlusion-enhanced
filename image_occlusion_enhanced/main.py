@@ -221,6 +221,7 @@ class ImgOccAdd(object):
             ret = gen.generateNotes()
         
         if ret == False:
+            # user dismissed confirmation dialog
             return False
 
         if self.ed.note and self.ed.addMode:
@@ -236,7 +237,8 @@ class ImgOccAdd(object):
         elif edit:
             QWebSettings.clearMemoryCaches() # refresh webview image cache
 
-        mw.reset()
+        if not edit:
+            mw.reset() # causes glitches in editcurrent mode
 
     def getUserInputs(self, dialog):
         fields = {}
@@ -272,14 +274,20 @@ def onImgOccButton(ed, mode):
 def onSetupEditorButtons(self):
     # Add IO button to Editor  
     if isinstance(self.parentWindow, AddCards):
-        btn = self._addButton("new_occlusion", lambda o=self: onImgOccButton(self, "add"),
-                _("Alt+a"), _("Add Image Occlusion (Alt+A)"), canDisable=False)
+        btn = self._addButton("new_occlusion", 
+                lambda o=self: onImgOccButton(self, "add"),
+                _("Alt+a"), _("Add Image Occlusion (Alt+A/Alt+O))"), 
+                canDisable=False)
     elif isinstance(self.parentWindow, EditCurrent):
-        btn = self._addButton("edit_occlusion", lambda o=self: onImgOccButton(self, "edit"),
-                _("Alt+a"), _("Edit Image Occlusion (Alt+A)"), canDisable=False)
+        btn = self._addButton("edit_occlusion",
+                lambda o=self: onImgOccButton(self, "edit"),
+                _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"), 
+                canDisable=False)
     else:
-        btn = self._addButton("edit_occlusion", lambda o=self: onImgOccButton(self, "browse"),
-                _("Alt+a"), _("Edit Image Occlusion (Alt+A)"), canDisable=False)
+        btn = self._addButton("edit_occlusion",
+                lambda o=self: onImgOccButton(self, "browse"),
+                _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"), 
+                canDisable=False)
 
     press_action = QAction(self.parentWindow, triggered=btn.animateClick)
     press_action.setShortcut(QKeySequence(_("Alt+o")))
@@ -296,12 +304,6 @@ def onSetNote(self, node, hide=True, focus=False):
                     'tr:first-child .fname, #f0, #i0', 'display: none;');
             """)
 
-def onEditCurrentInit(self, mw):
-    """automatically launch IO when editing IO notes"""
-    note = self.editor.note
-    if note and note.model()["name"] == IO_MODEL_NAME:
-        onImgOccButton(self.editor, "edit")
-
 # Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
@@ -316,4 +318,3 @@ mw.form.menuHelp.addAction(help_action)
 # Set up hooks
 addHook('setupEditorButtons', onSetupEditorButtons)
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
-EditCurrent.__init__ = wrap(EditCurrent.__init__, onEditCurrentInit, "after")

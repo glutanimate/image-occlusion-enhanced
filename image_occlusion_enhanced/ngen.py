@@ -49,7 +49,7 @@ import template
 #               by all notes created in one IO session
 # note_nr:      Third part of the note_id
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 def imageProp(image_path):
     image = Image.open(image_path)
