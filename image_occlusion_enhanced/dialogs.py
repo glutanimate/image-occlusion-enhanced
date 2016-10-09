@@ -44,8 +44,7 @@ class ImgOccEdit(QDialog):
         self.tedit = {}
         f_hboxs = []
         for i in flds:
-            if i["name"] in [IO_FLDS["note_id"], IO_FLDS["image"], 
-                    IO_FLDS["qmask"], IO_FLDS["amask"], IO_FLDS["omask"]]:
+            if i['name'] in IO_FLDS_PRIV:
                 continue
             f = QPlainTextEdit()
             f_label = QLabel(i["name"])
@@ -179,22 +178,22 @@ class ImgOccEdit(QDialog):
             QtCore.SIGNAL('activated()'), self.resetAllFields)
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+1"), self), 
             QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS["header"]]))
+            lambda:self.focusField(self.tedit[IO_FLDS['hd']]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+2"), self), 
             QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS["footer"]]))
+            lambda:self.focusField(self.tedit[IO_FLDS['ft']]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+3"), self), 
             QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS["remarks"]]))
+            lambda:self.focusField(self.tedit[IO_FLDS['rk']]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+4"), self), 
             QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS["sources"]]))
+            lambda:self.focusField(self.tedit[IO_FLDS['sc']]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+5"), self), 
             QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS["extra1"]]))
+            lambda:self.focusField(self.tedit[IO_FLDS['e1']]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+6"), self), 
             QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS["extra2"]]))
+            lambda:self.focusField(self.tedit[IO_FLDS['e2']]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+t"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focusField(self.tags_edit))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+f"), self), 
@@ -250,7 +249,7 @@ class ImgOccEdit(QDialog):
         self.resetAllFields()
         self.tab_widget.setCurrentIndex(0)
         self.occl_tp_select.setCurrentIndex(0)
-        self.tedit[IO_FLDS["header"]].setFocus()
+        self.tedit[IO_FLDS["hd"]].setFocus()
         self.svg_edit.setFocus()
 
     def switchTabs(self):
@@ -258,7 +257,7 @@ class ImgOccEdit(QDialog):
         if currentTab == 0:
           self.tab_widget.setCurrentIndex(1)
           if isinstance(QApplication.focusWidget(), QPushButton):
-              self.tedit[IO_FLDS["header"]].setFocus()
+              self.tedit[IO_FLDS["hd"]].setFocus()
         else:
           self.tab_widget.setCurrentIndex(0)
 
@@ -267,13 +266,13 @@ class ImgOccEdit(QDialog):
         target_field.setFocus()
 
     def resetMainFields(self):
-        for i in [IO_FLDS["header"], IO_FLDS["footer"], IO_FLDS["remarks"],
-                    IO_FLDS["extra1"], IO_FLDS["extra2"]]:
+        for i in [IO_FLDS['hd'], IO_FLDS['ft'], IO_FLDS['rk'], 
+                    IO_FLDS['e1'], IO_FLDS['e2']]:
             self.tedit[i].setFocus.setPlainText("")
 
     def resetAllFields(self):
         self.resetMainFields()
-        self.tedit[IO_FLDS["sources"]].setPlainText("")
+        self.tedit[IO_FLDS['sc']].setPlainText("")
 
     def fitImageCanvas(self):
         command = "svgCanvas.zoomChanged('', 'canvas');"

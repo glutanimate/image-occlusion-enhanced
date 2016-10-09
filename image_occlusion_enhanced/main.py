@@ -52,72 +52,56 @@ def path2url(path):
     return urlparse.urljoin(
       'file:', urllib.pathname2url(path.encode('utf-8')))
 
+def img2fpath(img):
+    imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
+    imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
+    fname = imgregex.search(img)
+    if not fname:
+        return None
+    fpath = os.path.join(mw.col.media.dir(),fname.group(2))
+    if not os.path.isfile(fpath):
+        return None
+    else:
+        return fpath
+
 class ImgOccAdd(object):
     def __init__(self, ed, mode):
         self.ed = ed
         self.mode = mode
-        self.onote = {}
+        self.opref = {} # original io session preference
 
         # load preferences
         loadPrefs(self)
 
     def selImage(self):
         note = self.ed.note
-        onote = self.onote
-        for i in IO_FLDS.keys():
-            onote[i] = None
+        opref = self.opref
 
         # always preserve tags and sources (if available)
-        onote["tags"] = self.ed.tags.text()
-        if IO_FLDS["sources"] in note:
-            onote["sources"] = note[IO_FLDS["sources"]]
-
-        if self.mode == "add":
-            onote["did"] = self.ed.parentWindow.deckChooser.selectedId()
-            image_path = self.getImage(self.ed.parentWindow)
-        else:
-            if note.model()["name"] != IO_MODEL_NAME:
-                tooltip("Not an IO card")
-                return
+        opref["tags"] = self.ed.tags.text()
+        
+        if self.mode != "add":
             # can only get the deck of the current note/card via a db call:
-            onote["did"] = mw.col.db.scalar(
+            opref["did"] = mw.col.db.scalar(
                     "select did from cards where id = ?", note.cards()[0].id)
-            imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
-            imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
-            invalfile = False
-            for i in onote.keys():
-                if i in ["did", "tags", "qmask", "amask"]:
-                    continue
-                fld = IO_FLDS[i]
-                if i == "note_id":
-                    note_id = note[fld]
-                    onote["note_id"] = note_id
-                    onote["uniq_id"] = note_id.split('-')[0]
-                    onote["occl_tp"] = note_id.split('-')[1]
-                elif i in ["image", "omask"]:
-                    html = note[fld]
-                    fname = imgregex.search(html)
-                    if fname:
-                        fpath = os.path.join(mw.col.media.dir(),fname.group(2))
-                        if os.path.isfile(fpath):
-                            onote[i] = fpath
-                        else:
-                            invalfile = True
-                else:
-                    onote[i] = note[fld].replace('<br />', '\n')
-            if invalfile or not onote["note_id"]:
+            note_id = note[IO_FLDS['id']]
+            opref["note_id"] = note_id
+            opref["uniq_id"] = note_id.split('-')[0]
+            opref["occl_tp"] = note_id.split('-')[1]
+            opref["image"] = img2fpath(note[IO_FLDS['im']])
+            opref["omask"] = img2fpath(note[IO_FLDS['om']])
+            if None in opref:
                 showWarning("IO card not configured properly for editing")
                 return
-            image_path = onote["image"] 
-
-        if not image_path:
-            return
-        elif not os.path.isfile(image_path):
-            tooltip("Not a valid image file.")
-            return
+            image_path = opref["image"] 
+        else:
+            opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
+            image_path = self.getImage(self.ed.parentWindow)
+            if not image_path:
+                return
 
         self.image_path = image_path
-        self.callImgOccEdit(self.mode)
+        self.callImgOccEdit()
 
     def getImage(self, parent=None):
         clip = QApplication.clipboard()
@@ -130,23 +114,28 @@ class ImgOccAdd(object):
             prev_image_dir = self.prefs["prev_image_dir"]
             if not os.path.isdir(prev_image_dir):
                 prev_image_dir = IO_HOME
-
             image_path = QFileDialog.getOpenFileName(parent,
                          "Choose Image", prev_image_dir, 
                          "Image Files (*.png *jpg *.jpeg *.gif)")
+        if not image_path:
+            return None
+        elif not os.path.isfile(image_path):
+            tooltip("Not a valid image file.")
+            return None
+        else:
+            self.prefs["prev_image_dir"] = os.path.dirname( image_path )
+            savePrefs(self)
+            return image_path
 
-            if os.path.isfile(image_path):
-                self.prefs["prev_image_dir"] = os.path.dirname( image_path )
-                savePrefs(self)
-        return image_path
-
-    def callImgOccEdit(self, mode):
+    def callImgOccEdit(self):
         width, height = imageProp(self.image_path)
         ofill = mw.col.conf['imgocc']['ofill']
         bkgd_url = path2url(self.image_path)
-        onote = self.onote
+        opref = self.opref
+        onote = self.ed.note
+        mode = self.mode
 
-        deck = mw.col.decks.nameOrNone(onote["did"])
+        deck = mw.col.decks.nameOrNone(opref["did"])
         # use existing IO instance when available:
         try:
             mw.ImgOccEdit is not None
@@ -154,7 +143,7 @@ class ImgOccAdd(object):
         except:
             mw.ImgOccEdit = ImgOccEdit(mw)
         dialog = mw.ImgOccEdit
-        dialog.switchToMode(mode)
+        dialog.switchToMode(self.mode)
 
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
@@ -162,22 +151,22 @@ class ImgOccAdd(object):
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
 
-        if mode != "add":
+        if self.mode != "add":
             for i in self.mflds:
                 fname = i["name"]
                 if fname in dialog.tedit.keys():
                     dialog.tedit[fname].setPlainText(
                         self.ed.note[fname].replace('<br />', '\n'))
-            svg_b64 = svgToBase64(onote["omask"])
+            svg_b64 = svgToBase64(opref["omask"])
             url.addQueryItem('source', svg_b64)
 
         dialog.svg_edit.setUrl(url)
-        dialog.tags_edit.setText(onote["tags"])
         dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
-        dialog.tedit[IO_FLDS["sources"]].setPlainText(onote["sources"])
+        dialog.tags_edit.setText(opref["tags"])
+        dialog.tedit[IO_FLDS['sc']].setPlainText(onote[IO_FLDS['sc']])
 
-        if mode == "add":
+        if self.mode == "add":
             dialog.show()
         else:
             dialog.exec_() # modal dialog when editing
@@ -206,15 +195,15 @@ class ImgOccAdd(object):
         (fields, tags) = self.getUserInputs(dialog)
 
         if edit:
-            did = self.onote["did"]
-            old_occl_tp = self.onote["occl_tp"]
+            did = self.opref["did"]
+            old_occl_tp = self.opref["occl_tp"]
         else:
             did = dialog.deckChooser.selectedId()
             old_occl_tp = None
 
         noteGenerator = genByKey(choice, old_occl_tp)
         gen = noteGenerator(self.ed, svg, self.image_path, 
-                                    self.onote, tags, fields, did)        
+                                    self.opref, tags, fields, did)        
         if edit:
             ret = gen.updateNotes()
         else:
@@ -228,7 +217,7 @@ class ImgOccAdd(object):
             # Update Editor with modified tags and sources field
             self.ed.tags.setText(" ".join(tags))
             self.ed.saveTags()
-            srcfld = IO_FLDS["sources"]
+            srcfld = IO_FLDS['sc']
             if srcfld in self.ed.note:
                 self.ed.note[srcfld] = fields[srcfld]
             self.ed.loadNote()
@@ -237,8 +226,7 @@ class ImgOccAdd(object):
         elif edit:
             QWebSettings.clearMemoryCaches() # refresh webview image cache
 
-        if not edit:
-            mw.reset() # causes glitches in editcurrent mode
+        mw.reset() # FIXME: causes glitches in editcurrent mode
 
     def getUserInputs(self, dialog):
         fields = {}
@@ -259,7 +247,6 @@ def onIoHelp():
     ioHelp("main")
 
 def onImgOccButton(ed, mode):
-    mw.ImgOccAdd = ImgOccAdd(ed, mode)
     ioModel = mw.col.models.byName(IO_MODEL_NAME)
     if ioModel:
         ioFields = mw.col.models.fieldNames(ioModel)
@@ -269,6 +256,10 @@ def onImgOccButton(ed, mode):
                 not configured properly.Please make sure you did not \
                 manually delete or rename any of the default fields.')
             return
+    if mode != "add" and ed.note.model() != ioModel:
+        tooltip("Can only edit notes with the %s note type" % IO_MODEL_NAME)
+        return
+    mw.ImgOccAdd = ImgOccAdd(ed, mode)
     mw.ImgOccAdd.selImage()
 
 def onSetupEditorButtons(self):
@@ -276,16 +267,16 @@ def onSetupEditorButtons(self):
     if isinstance(self.parentWindow, AddCards):
         btn = self._addButton("new_occlusion", 
                 lambda o=self: onImgOccButton(self, "add"),
-                _("Alt+a"), _("Add Image Occlusion (Alt+A/Alt+O))"), 
+                _("Alt+a"), _("Add Image Occlusion (Alt+A/Alt+O)"), 
                 canDisable=False)
     elif isinstance(self.parentWindow, EditCurrent):
         btn = self._addButton("edit_occlusion",
-                lambda o=self: onImgOccButton(self, "edit"),
+                lambda o=self: onImgOccButton(self, "editcurrent"),
                 _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"), 
                 canDisable=False)
     else:
         btn = self._addButton("edit_occlusion",
-                lambda o=self: onImgOccButton(self, "browse"),
+                lambda o=self: onImgOccButton(self, "browser"),
                 _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"), 
                 canDisable=False)
 
@@ -297,7 +288,7 @@ def onSetupEditorButtons(self):
 def onSetNote(self, node, hide=True, focus=False):
     """simple hack that hides the ID field on IO notes"""
     if (self.note and self.note.model()["name"] == IO_MODEL_NAME and
-            self.note.model()['flds'][0]['name'] == IO_FLDS['note_id']):
+            self.note.model()['flds'][0]['name'] == IO_FLDS['id']):
         self.web.eval("""
             // hide first fname, field, and snowflake (FrozenFields add-on)
                 document.styleSheets[0].addRule(

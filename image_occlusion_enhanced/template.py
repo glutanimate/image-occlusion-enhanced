@@ -25,16 +25,16 @@ iocard_front = """\
 <div id="io-footer">{{%(footer)s}}</div>
 {{/%(src_img)s}}
 """ % \
- {'que': IO_FLDS['qmask'],
-  'ans': IO_FLDS['amask'],
-  'svg': IO_FLDS['omask'],
-  'src_img': IO_FLDS['image'],
-  'header': IO_FLDS['header'],
-  'footer': IO_FLDS['footer'],
-  'remarks': IO_FLDS['remarks'],
-  'sources': IO_FLDS['sources'],
-  'extra1': IO_FLDS['extra1'],
-  'extra2': IO_FLDS['extra2']}
+ {'que': IO_FLDS['qm'],
+  'ans': IO_FLDS['am'],
+  'svg': IO_FLDS['om'],
+  'src_img': IO_FLDS['im'],
+  'header': IO_FLDS['hd'],
+  'footer': IO_FLDS['ft'],
+  'remarks': IO_FLDS['rk'],
+  'sources': IO_FLDS['sc'],
+  'extra1': IO_FLDS['e1'],
+  'extra2': IO_FLDS['e2']}
 
 iocard_back = """\
 {{#%(src_img)s}}
@@ -62,16 +62,16 @@ iocard_back = """\
 </div>
 {{/%(src_img)s}}
 """ % \
- {'que': IO_FLDS['qmask'],
-  'ans': IO_FLDS['amask'],
-  'svg': IO_FLDS['omask'],
-  'src_img': IO_FLDS['image'],
-  'header': IO_FLDS['header'],
-  'footer': IO_FLDS['footer'],
-  'remarks': IO_FLDS['remarks'],
-  'sources': IO_FLDS['sources'],
-  'extra1': IO_FLDS['extra1'],
-  'extra2': IO_FLDS['extra2']}
+ {'que': IO_FLDS['qm'],
+  'ans': IO_FLDS['am'],
+  'svg': IO_FLDS['om'],
+  'src_img': IO_FLDS['im'],
+  'header': IO_FLDS['hd'],
+  'footer': IO_FLDS['ft'],
+  'remarks': IO_FLDS['rk'],
+  'sources': IO_FLDS['sc'],
+  'extra1': IO_FLDS['e1'],
+  'extra2': IO_FLDS['e2']}
 
 iocard_css = """\
 .card {
@@ -125,7 +125,7 @@ def add_io_model(col):
     models = col.models
     io_model = models.new(IO_MODEL_NAME)
     # Add fields:
-    for i in IO_FLDORDER:
+    for i in IO_FLDS_ORDER:
       fld = models.newField(IO_FLDS[i])
       if i == "note_id":
         fld['size'] = 0

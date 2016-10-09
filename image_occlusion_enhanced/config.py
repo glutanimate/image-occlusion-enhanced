@@ -18,38 +18,42 @@ import sys
 from aqt import mw
 from anki.utils import json
 
-
-global IO_MODEL_NAME, IO_CARD_NAME, IO_FLDS, IO_FLDORDER, IO_DEFAULT_CONF, IO_DEFAULT_PREFS
+global IO_FLDS, IO_FLDS_IDS, IO_FLDS_PRIV, IO_FLDS_PRSV
+global IO_MODEL_NAME, IO_CARD_NAME, IO_DEFAULT_CONF, IO_HOME
 
 IO_MODEL_NAME = "Image Occlusion Enhanced"
 IO_CARD_NAME = "IO Card"
-IO_FLDS = {
-    'note_id': u"ID (hidden)",
-    'header': u"Header",
-    'image': u"Image",
-    'footer': u"Footer",
-    'remarks': u"Anmerkungen",
-    'sources': u"Quellen",
-    'extra1': u"Extra 1",
-    'extra2': u"Extra 2",
-    'qmask': u"Question Mask",
-    'amask': u"Answer Mask",
-    'omask': u"Original Mask"
-}
-IO_FLDORDER = ["note_id", "header", "image", "footer", "remarks", "sources",
-                "extra1", "extra2", "qmask", "amask", "omask"]
 
+IO_FLDS = {
+    'id': u"ID (hidden)",
+    'hd': u"Header",
+    'im': u"Image",
+    'ft': u"Footer",
+    'rk': u"Anmerkungen",
+    'sc': u"Quellen",
+    'e1': u"Extra 1",
+    'e2': u"Extra 2",
+    'qm': u"Question Mask",
+    'am': u"Answer Mask",
+    'om': u"Original Mask"
+}
+
+IO_FLDS_IDS = ["id", "hd", "im", "ft", "rk", "sc", 
+                "e1", "e2", "qm", "am", "om"]
+
+IO_FLDS_PRIV = [IO_FLDS['id'], IO_FLDS['im'], IO_FLDS['qm'], 
+                IO_FLDS['am'], IO_FLDS['om']]
+
+IO_FLDS_PRSV = [IO_FLDS['sc']]
 
 IO_DEFAULT_CONF = {'ofill': '00AA7F',
                   'qfill': 'FF0000',
                   'version': 0.5}
 
-# get default file system encoding
-IO_ENCODING = sys.getfilesystemencoding()
-IO_HOME = os.path.expanduser('~').decode(IO_ENCODING)
-
-IO_DEFAULT_PREFS = {"prev_image_dir": IO_HOME}
-
+# variables for local preference handling
+sys_encoding = sys.getfilesystemencoding()
+IO_HOME = os.path.expanduser('~').decode(sys_encoding)
+default_prefs = {"prev_image_dir": IO_HOME}
 addons_folder = mw.pm.addonFolder().encode('utf-8')
 prefs_path = os.path.join(addons_folder, "image_occlusion_enhanced", 
                           ".image_occlusion_prefs").decode('utf-8')
