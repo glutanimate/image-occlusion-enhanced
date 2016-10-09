@@ -294,7 +294,7 @@ def onSetNote(self, node, hide=True, focus=False):
             // hide first fname, field, and snowflake (FrozenFields add-on)
                 document.styleSheets[0].addRule(
                     'tr:first-child .fname, #f0, #i0', 'display: none;');
-            """ )
+            """)
 
 def onEditCurrentInit(self, mw):
     """automatically launch IO when editing IO notes"""

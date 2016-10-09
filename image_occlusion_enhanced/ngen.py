@@ -49,7 +49,7 @@ import template
 #               by all notes created in one IO session
 # note_nr:      Third part of the note_id
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 def imageProp(image_path):
     image = Image.open(image_path)
@@ -211,10 +211,16 @@ class ImgOccNoteGenerator(object):
         exstg_mnode_note_ids = [x for x in valid_mnode_note_ids if x in valid_nid_note_ids]
         exstg_mnode_note_nrs = sorted([int(i.split('-')[-1]) for i in exstg_mnode_note_ids])
         # determine available nrs available for note numbering
-        max_mnode_note_nr = int(exstg_mnode_note_nrs[-1])
-        full_range = range(1, max_mnode_note_nr+1)
-        available_nrs = set(full_range) - set(exstg_mnode_note_nrs)
-        available_nrs = sorted(list(available_nrs))
+        if not exstg_mnode_note_nrs:
+            # only the case if the user deletes all existing shapes
+            max_mnode_note_nr = 0
+            full_range = None
+            available_nrs = None
+        else:
+            max_mnode_note_nr = int(exstg_mnode_note_nrs[-1])
+            full_range = range(1, max_mnode_note_nr+1)
+            available_nrs = set(full_range) - set(exstg_mnode_note_nrs)
+            available_nrs = sorted(list(available_nrs))
 
         # compare note_ids as present in note collection with masks on svg
         deleted_note_ids = set(valid_nid_note_ids) - set(valid_mnode_note_ids)
