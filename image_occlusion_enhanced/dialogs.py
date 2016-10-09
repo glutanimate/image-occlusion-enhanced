@@ -39,33 +39,15 @@ class ImgOccEdit(QDialog):
         self.svg_edit = webview.AnkiWebView()
         self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
 
-        model = mw.col.models.byName(IO_MODEL_NAME)
-        flds = model['flds']
-        self.tedit = {}
-        f_hboxs = []
-        for i in flds:
-            if i['name'] in IO_FLDS_PRIV:
-                continue
-            f = QPlainTextEdit()
-            f_label = QLabel(i["name"])
-            f_hbox = QHBoxLayout()
-            f_hbox.addWidget(f_label)
-            f_hbox.addWidget(f)
-            self.tedit[i["name"]] = f
-            f_hboxs.append(f_hbox)
-            f.setTabChangesFocus(True)
-            f.setMinimumHeight(40)
-            f_label.setFixedWidth(70) 
-
         self.tags_edit = tagedit.TagEdit(self)
         tags_label = QLabel("Tags")
         tags_label.setFixedWidth(70)
-        tags_hbox = QHBoxLayout()
-        tags_hbox.addWidget(tags_label)
-        tags_hbox.addWidget(self.tags_edit)
+        self.tags_hbox = QHBoxLayout()
+        self.tags_hbox.addWidget(tags_label)
+        self.tags_hbox.addWidget(self.tags_edit)
 
-        deck_container = QWidget()
-        self.deckChooser = deckchooser.DeckChooser(mw, deck_container,
+        self.deck_container = QWidget()
+        self.deckChooser = deckchooser.DeckChooser(mw, self.deck_container,
                                                    label=True)     
 
         # Create buttons
@@ -144,17 +126,13 @@ class ImgOccEdit(QDialog):
         vbox1.addWidget(self.svg_edit, stretch=1)
 
         ## Tab 2
-        vbox2 = QVBoxLayout()
-        for i in f_hboxs:
-            vbox2.addLayout(i)
-        vbox2.addLayout(tags_hbox)
-        vbox2.addWidget(deck_container)
+        self.vbox2 = QVBoxLayout()
 
         # Create tabs, set their layout, add them to the QTabWidget
         tab1 = QWidget()
         tab2 = QWidget()
         tab1.setLayout(vbox1)
-        tab2.setLayout(vbox2)
+        tab2.setLayout(self.vbox2)
         self.tab_widget = QtGui.QTabWidget() 
         self.tab_widget.addTab(tab1,"&Masks Editor")
         self.tab_widget.addTab(tab2,"&Fields")
@@ -220,6 +198,25 @@ class ImgOccEdit(QDialog):
         mw.ImgOccAdd.onAddNotesButton(choice, True)
 
     # Modes
+    def setupFields(self, flds):
+        self.tedit = {}
+        for i in flds:
+            if i['name'] in IO_FLDS_PRIV:
+                continue
+            hbox = QHBoxLayout()
+            tedit = QPlainTextEdit()
+            label = QLabel(i["name"])
+            hbox.addWidget(label)
+            hbox.addWidget(tedit)
+            tedit.setTabChangesFocus(True)
+            tedit.setMinimumHeight(40)
+            label.setFixedWidth(70) 
+            self.tedit[i["name"]] = tedit
+            self.vbox2.addLayout(hbox)
+     
+        self.vbox2.addLayout(self.tags_hbox)
+        self.vbox2.addWidget(self.deck_container)
+
     def switchToMode(self, mode):
         self.mode = mode
         hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]

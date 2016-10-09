@@ -40,19 +40,21 @@ svg_edit_dir = os.path.join(os.path.dirname(__file__),
                             'svg-edit-2.6')
 svg_edit_path = os.path.join(svg_edit_dir,
                             'svg-editor.html')
-svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,ext-markers.js,ext-shapes.js,ext-eyedropper.js"
+svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,\
+ext-markers.js,ext-shapes.js,ext-eyedropper.js"
+svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('initStroke[color]', '2D2D2D'),
                        ('initStroke[width]', '1'),
                        ('initTool', 'rect'),
-                       ('text[font_family]', "'Helvetica LT Std', Arial, sans-serif"),
+                       ('text[font_family]', svg_edit_fonts),
                        ('extensions', svg_edit_ext)]
 
 def path2url(path):
     return urlparse.urljoin(
       'file:', urllib.pathname2url(path.encode('utf-8')))
 
-def img2fpath(img):
+def img2path(img):
     imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
     imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
     fname = imgregex.search(img)
@@ -77,7 +79,6 @@ class ImgOccAdd(object):
         note = self.ed.note
         opref = self.opref
 
-        # always preserve tags and sources (if available)
         opref["tags"] = self.ed.tags.text()
         
         if self.mode != "add":
@@ -88,8 +89,8 @@ class ImgOccAdd(object):
             opref["note_id"] = note_id
             opref["uniq_id"] = note_id.split('-')[0]
             opref["occl_tp"] = note_id.split('-')[1]
-            opref["image"] = img2fpath(note[IO_FLDS['im']])
-            opref["omask"] = img2fpath(note[IO_FLDS['om']])
+            opref["image"] = img2path(note[IO_FLDS['im']])
+            opref["omask"] = img2path(note[IO_FLDS['om']])
             if None in opref:
                 showWarning("IO card not configured properly for editing")
                 return
@@ -134,6 +135,8 @@ class ImgOccAdd(object):
         opref = self.opref
         onote = self.ed.note
         mode = self.mode
+        model = mw.col.models.byName(IO_MODEL_NAME)
+        flds = model['flds']
 
         deck = mw.col.decks.nameOrNone(opref["did"])
         # use existing IO instance when available:
@@ -144,6 +147,7 @@ class ImgOccAdd(object):
             mw.ImgOccEdit = ImgOccEdit(mw)
         dialog = mw.ImgOccEdit
         dialog.switchToMode(self.mode)
+        dialog.setupFields(flds)
 
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
@@ -151,12 +155,12 @@ class ImgOccAdd(object):
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
 
-        if self.mode != "add":
+        if mode != "add":
             for i in self.mflds:
-                fname = i["name"]
-                if fname in dialog.tedit.keys():
-                    dialog.tedit[fname].setPlainText(
-                        self.ed.note[fname].replace('<br />', '\n'))
+                fn = i["name"]
+                if fn in IO_FLDS_PRIV:
+                    continue
+                dialog.tedit[fn].setPlainText(onote[fn].replace('<br />', '\n'))
             svg_b64 = svgToBase64(opref["omask"])
             url.addQueryItem('source', svg_b64)
 
@@ -166,12 +170,12 @@ class ImgOccAdd(object):
         dialog.tags_edit.setText(opref["tags"])
         dialog.tedit[IO_FLDS['sc']].setPlainText(onote[IO_FLDS['sc']])
 
-        if self.mode == "add":
+        if mode == "add":
             dialog.show()
         else:
-            dialog.exec_() # modal dialog when editing
+            # modal dialog when editing
+            dialog.exec_() 
       
-
     def onChangeImage(self):
         image_path = self.getImage()
         if not image_path:
@@ -184,7 +188,6 @@ class ImgOccAdd(object):
                         //svgCanvas.zoomChanged('', 'canvas');
                     """ %(bkgd_url, width, height))
         self.image_path = image_path
-
 
     def onAddNotesButton(self, choice, edit=False):
         dialog = mw.ImgOccEdit
@@ -231,10 +234,11 @@ class ImgOccAdd(object):
     def getUserInputs(self, dialog):
         fields = {}
         for i in self.mflds:
-            fname = i['name']
-            if fname in dialog.tedit.keys():
-                text = dialog.tedit[fname].toPlainText().replace('\n', '<br />')
-                fields[fname] = text
+            fn = i['name']
+            if fn in IO_FLDS_PRIV:
+                continue
+            text = dialog.tedit[fn].toPlainText().replace('\n', '<br />')
+            fields[fn] = text
         tags = dialog.tags_edit.text().split()
         return (fields, tags)
 
