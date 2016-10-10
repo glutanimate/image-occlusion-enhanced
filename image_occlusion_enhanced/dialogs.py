@@ -70,7 +70,7 @@ class ImgOccEdit(QDialog):
            QDialogButtonBox.ActionRole)
         self.aa_btn = button_box.addButton(u"Hide All, &Reveal All",
            QDialogButtonBox.ActionRole)
-        self.oa_btn = button_box.addButton(u"Hide &One, Reveal One",
+        self.oa_btn = button_box.addButton(u"Hide &One, Reveal All",
            QDialogButtonBox.ActionRole)
         close_button = button_box.addButton("&Close", 
             QDialogButtonBox.RejectRole)

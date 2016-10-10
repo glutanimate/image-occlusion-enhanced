@@ -81,7 +81,7 @@ def genByKey(key, old_occl_tp):
 class ImgOccNoteGenerator(object):
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
         self.ed = ed
-        self.masks_svg = svg
+        self.new_svg = svg
         self.image_path = image_path
         self.opref = opref
         self.tags = tags
@@ -103,16 +103,16 @@ class ImgOccNoteGenerator(object):
                 Are you sure you set your masks correctly?")
             return
         
-        self.masks_svg = svg_node.toxml() # write changes to svg
-        self.omask_path = self._saveMask(self.masks_svg, self.occl_id, "O")
+        self.new_svg = svg_node.toxml() # write changes to svg
+        omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
         qmasks = self._generateMaskSVGsFor("Q")
         amasks = self._generateMaskSVGsFor("A")
-        col_image = self._addImageToCol()
+        new_image = self._addImageToCol()
         
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
-            self._saveMaskAndReturnNote(qmasks[nr], amasks[nr], 
-                                                    col_image, note_id)
+            self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr], 
+                                        new_image, note_id)
         
         parent = None
         if not self.ed.addMode:
@@ -122,6 +122,8 @@ class ImgOccNoteGenerator(object):
     def updateNotes(self):
         self.uniq_id = self.opref['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
+        omask_path = None
+        new_image = None
         
         self._findAllNotes()
         ( svg_node, mlayer_node ) = self._getMnodesAndSetIds(True)
@@ -131,17 +133,20 @@ class ImgOccNoteGenerator(object):
             return
         ret = self._deleteAndIdNotes(mlayer_node)
         if not ret:
+            # confirmation window rejected
             return False
         
-        self.masks_svg = svg_node.toxml() # write changes to svg
-        self.omask_path = self._saveMask(self.masks_svg, self.occl_id, "O")
-        qmasks = self._generateMaskSVGsFor("Q")
-        amasks = self._generateMaskSVGsFor("A")
+        self.new_svg = svg_node.toxml() # write changes to svg
+        old_svg = self._getOriginalSvg() # load original svg
+        if self.new_svg != old_svg or self.occl_tp != self.opref["occl_tp"]:
+            # updated masks or occlusion type
+            omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
+            qmasks = self._generateMaskSVGsFor("Q")
+            amasks = self._generateMaskSVGsFor("A")
+        
         if fname2img(self.image_path) != fname2img(self.opref['image']):
             # updated image
-            col_image = self._addImageToCol()
-        else:
-            col_image = self.image_path
+            new_image = self._addImageToCol() 
        
         logging.debug("mnode_indexes %s", self.mnode_indexes)
         for nr, idx in enumerate(self.mnode_indexes):
@@ -153,16 +158,25 @@ class ImgOccNoteGenerator(object):
             logging.debug("self.nids %s", self.nids)
             nid = self.nids[note_id]
             logging.debug("nid %s", nid)
-            self._saveMaskAndReturnNote(qmasks[nr], amasks[nr],    
-                                                col_image, note_id, nid)
+            if omask_path:
+                self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr],    
+                                            new_image, note_id, nid)
+            else:
+                self._saveMaskAndReturnNote(None, None, None,    
+                                            new_image, note_id, nid)
         parent = self.ed.parentWindow
-        tooltip("Cards updated: %s" % len(qmasks), period=1500, parent=parent)
+        tooltip("Cards updated: %s" % len(self.mnode_indexes), period=1500, parent=parent)
         mw.ImgOccEdit.close()
+
+    def _getOriginalSvg(self):
+        mask_doc = minidom.parse(self.opref["omask"])
+        svg_node = mask_doc.documentElement
+        return svg_node.toxml()
 
     def _getMnodesAndSetIds(self, edit=False):
         self.mnode_indexes = []
         self.mnode_ids = {}
-        mask_doc = minidom.parseString(self.masks_svg)
+        mask_doc = minidom.parseString(self.new_svg)
         svg_node = mask_doc.documentElement
         layer_notes = self._layerNotesFrom(svg_node)
         mlayer_node = layer_notes[-1] # treat topmost layer as masks layer
@@ -305,7 +319,7 @@ class ImgOccNoteGenerator(object):
         return masks
 
     def _createMask(self, side, mask_node_index):
-        mask_doc = minidom.parseString(self.masks_svg)
+        mask_doc = minidom.parseString(self.new_svg)
         svg_node = mask_doc.documentElement
         layer_notes = self._layerNotesFrom(svg_node)
         mlayer_node = layer_notes[-1] # treat topmost layer as masks layer
@@ -349,10 +363,19 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
-    def _saveMaskAndReturnNote(self, qmask, amask, col_image, note_id, nid=None):
-        qmask_path = self._saveMask(qmask, note_id, "Q")
-        amask_path = self._saveMask(amask, note_id, "A")
-        omask_path = self.omask_path
+    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, new_image, note_id, nid=None):
+        fields = self.fields
+        if omask_path:
+            # Occlusions updated
+            qmask_path = self._saveMask(qmask, note_id, "Q")
+            amask_path = self._saveMask(amask, note_id, "A")
+            fields[IO_FLDS['qm']] = fname2img(qmask_path)
+            fields[IO_FLDS['am']] = fname2img(amask_path)
+            fields[IO_FLDS['om']] = fname2img(omask_path)
+            fields[IO_FLDS['id']] = note_id
+        if new_image:
+            # Image updated
+            fields[IO_FLDS['im']] = fname2img(new_image)
 
         model = self.model
         model['did'] = self.did
@@ -363,19 +386,13 @@ class ImgOccNoteGenerator(object):
         else:
             note = Note(mw.col, model)
 
-        # define fields we just generated
-        fields = self.fields
-        fields[IO_FLDS['id']] = note_id
-        fields[IO_FLDS['im']] = fname2img(col_image)
-        fields[IO_FLDS['qm']] = fname2img(qmask_path)
-        fields[IO_FLDS['am']] = fname2img(amask_path)
-        fields[IO_FLDS['om']] = fname2img(omask_path)
-
         # add fields to note
         note.tags = self.tags
         for i in mflds:
             fname = i["name"]
-            note[fname] = fields[fname]
+            if fname in fields:
+                # only update fields that have been modified
+                note[fname] = fields[fname]
 
         if nid:
             note.flush()
