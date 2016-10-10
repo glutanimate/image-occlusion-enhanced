@@ -308,6 +308,9 @@ class ImgOccOpts(QDialog):
     """Main Image Occlusion Options dialog"""
     def __init__(self, mw):
         QDialog.__init__(self, parent=mw)
+        loadConfig(self)
+        self.ofill = mw.col.conf['imgocc']['ofill']
+        self.qfill = mw.col.conf['imgocc']['qfill']
         self.setupUi()
 
     def getNewMaskColor(self):
@@ -316,9 +319,7 @@ class ImgOccOpts(QDialog):
         color = choose_color_dialog.getColor()
         if color.isValid():
             color_ = color.name()[1:]
-            mw.col.conf['imgocc']['qfill'] = color_
-            # notify db of modification
-            mw.col.setMod()
+            self.qfill = color_
             self.changeButtonColor(self.mask_color_button, color_)
 
     def getNewOfillColor(self):
@@ -327,9 +328,7 @@ class ImgOccOpts(QDialog):
         color = choose_color_dialog.getColor()
         if color.isValid():
             color_ = color.name()[1:]
-            mw.col.conf['imgocc']['ofill'] = color_
-            # notify db of modification
-            mw.col.setMod()
+            self.ofill = color_
             self.changeButtonColor(self.ofill_button, color_)
 
     def changeButtonColor(self, button, color):
@@ -341,42 +340,132 @@ class ImgOccOpts(QDialog):
         button.setIconSize(QSize(128, 18))
 
     def setupUi(self):
-        # load preferences
-        load_prefs(self)
-
         ### shape color for questions:
-        qfill_label = QLabel('<b>Question</b> shape color')
+        qfill_label = QLabel('Question shape')
         self.mask_color_button = QPushButton()
         self.mask_color_button.connect(self.mask_color_button,
                                   SIGNAL("clicked()"),
                                   self.getNewMaskColor)
         ### initial shape color:
-        ofill_label = QLabel('<b>Initial</b> shape color')
+        ofill_label = QLabel('Initial shape')
         self.ofill_button = QPushButton()
         self.ofill_button.connect(self.ofill_button,
                                 SIGNAL("clicked()"),
                                 self.getNewOfillColor)
 
         ### set colors
-        ofill = mw.col.conf['imgocc']['ofill']
-        qfill = mw.col.conf['imgocc']['qfill']
-        self.changeButtonColor(self.ofill_button, ofill)
-        self.changeButtonColor(self.mask_color_button, qfill)
+        self.changeButtonColor(self.ofill_button, self.ofill)
+        self.changeButtonColor(self.mask_color_button, self.qfill)
 
+        ### layout
         grid = QtGui.QGridLayout()
         grid.setSpacing(10)
 
-        # 1st row:
-        grid.addWidget(qfill_label, 0, 0)
-        grid.addWidget(self.mask_color_button, 0, 1)
-        # 2nd row:
-        grid.addWidget(ofill_label, 1, 0)
-        grid.addWidget(self.ofill_button, 1, 1)
+        colors_heading = QLabel("<b>Colors</b>")
+        fields_heading = QLabel("<b>Custom Field Names</b>")
 
-        self.setLayout(grid)
-        self.setMinimumWidth(400)
+        frame = QFrame()
+        frame.setFrameShape(QFrame.HLine)
+        frame.setFrameShadow(QFrame.Sunken)
+
+        grid.addWidget(colors_heading, 0, 0, 1, 6)
+        grid.addWidget(qfill_label, 1, 1, 1, 2)
+        grid.addWidget(self.mask_color_button, 1, 3, 1, 2)
+        grid.addWidget(ofill_label, 2, 1, 1, 2)
+        grid.addWidget(self.ofill_button, 2, 3, 1, 2)
+        grid.addWidget(frame, 3, 0, 1, 6)
+        grid.addWidget(fields_heading, 4, 0, 1, 6)
+
+        # Fields
+
+        fields_text = ("Changing any of the entries below will rename "
+        "the corresponding default field of the IO Enhanced note type. "
+        "This is the only way you can rename any of the default fields. "
+        "<br><br><i>Renaming these fields through Anki's regular dialogs "
+        "will cause the add-on to fail. So please don't do that.</i>")
+
+        fields_description = QLabel(fields_text)
+        fields_description.setWordWrap(True)
+        grid.addWidget(fields_description, 5, 0, 1, 6)
+
+        self.lnedit = {}
+        nr = 6
+        c = 0
+        for key in IO_FLDS_IDS:
+            if nr == 12: # switch to right columns
+                c = 3
+                nr = 6
+            default_name = IO_FLDS[key]
+            current_name = mw.col.conf['imgocc']['flds'][key]
+            l = QLabel(default_name)
+            l.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            t = QLineEdit()
+            t.setText(current_name)
+            grid.addWidget(l, nr, c, 1, 2)
+            grid.addWidget(t, nr, c+1, 1, 2)
+            self.lnedit[key] = t
+            nr = nr+1
+        
+        button_box = QtGui.QDialogButtonBox(
+                    QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel
+                )
+        defaults_btn = button_box.addButton("Restore &Defaults",
+           QDialogButtonBox.ResetRole)
+
+        button_box.accepted.connect(self.onAccept)
+        button_box.rejected.connect(self.onReject)
+        
+        self.connect(defaults_btn, SIGNAL("clicked()"), self.restoreDefaults)
+
+        mainlayout = QVBoxLayout()
+        mainlayout.addLayout(grid)
+        mainlayout.addWidget(button_box)
+        self.setLayout(mainlayout)
+        self.setMinimumWidth(640)
+        self.setMinimumHeight(520)
         self.setWindowTitle('Image Occlusion Enhanced Options')
 
+    def restoreDefaults(self):
+        for key in self.lnedit.keys():
+            self.lnedit[key].setText(IO_FLDS[key])
+            self.lnedit[key].setModified(True)
+        self.changeButtonColor(self.ofill_button, self.sconf_d['ofill'])
+        self.changeButtonColor(self.mask_color_button, self.sconf_d['qfill'])
+        self.ofill = self.sconf_d['ofill']
+        self.qfill = self.sconf_d['qfill']
+
+    def renameFields(self):
+        model = mw.col.models.byName(IO_MODEL_NAME)
+        for key in self.lnedit.keys():
+            if not self.lnedit[key].isModified():
+                print "not modified:", key
+                continue
+            name = self.lnedit[key].text()
+            oldname = mw.col.conf['imgocc']['flds'][key]
+            if name is None or not name.strip():
+                continue
+            elif name == oldname:
+                print "no change to", oldname
+                continue
+            idx = mw.col.models.fieldNames(model).index(oldname)
+            fld = model['flds'][idx]
+            if fld:
+                mw.col.models.renameField(model, fld, name)
+                mw.col.conf['imgocc']['flds'][key] = name
+                modified = True
+                print "renamed %s to %s" % (oldname, name)
+        if modified:
+            pass
+
+    def onAccept(self):
+        self.renameFields()
+        mw.col.conf['imgocc']['ofill'] = self.ofill
+        mw.col.conf['imgocc']['qfill'] = self.qfill
+        mw.col.setMod()
+        self.close()
+
+    def onReject(self):
+        self.close()
 
 def ioAskUser(text, title="Image Occlusion Enhanced", parent=None, 
                     help="", defaultno=False, msgfunc=None):

@@ -77,7 +77,7 @@ class ImgOccAdd(object):
         self.mflds = self.model['flds']
 
         # load preferences
-        loadPrefs(self)
+        loadConfig(self)
 
     def selImage(self):
         note = self.ed.note

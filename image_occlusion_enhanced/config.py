@@ -57,9 +57,10 @@ IO_HOME = os.path.expanduser('~').decode(sys_encoding)
 default_conf_local = {"dir": IO_HOME}
 default_conf_syncd = {'ofill': 'FFEBA2',
                       'qfill': 'FF7E7E',
-                      'version': 0.5}
+                      'version': 0.7,
+                      'flds': IO_FLDS}
 
-def loadPrefs(self):
+def loadConfig(self):
     """load and/or create add-on preferences"""
     # Synced preferences
     if not 'imgocc' in mw.col.conf:
@@ -74,11 +75,16 @@ def loadPrefs(self):
             # insert other upgrade actions here
 
     if mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
-        print "updating from earlier IO release"
+        print "updating synced config db from earlier IO release"
         # insert other update actions here
+        mw.col.conf['imgocc']['flds'] = IO_FLDS
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
 
     # Local preferences
     if not 'imgocc' in mw.pm.profile:
         mw.pm.profile["imgocc"] = default_conf_local
 
+    self.sconf_d = default_conf_syncd
+    self.sconf = mw.col.conf['imgocc']
+    self.ioflds = mw.col.conf['imgocc']['flds']
+    self.lconf = mw.pm.profile["imgocc"]
