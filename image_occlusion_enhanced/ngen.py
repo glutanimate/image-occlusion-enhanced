@@ -271,6 +271,11 @@ class ImgOccNoteGenerator(object):
                 new_mnode_id = self.occl_id + '-' + str(note_nr)
                 new_count += 1
                 nids[new_mnode_id] = None
+            else:
+                # update occlusion type
+                mnode_id_nr = mnode_id.split('-')[-1]
+                new_mnode_id = self.occl_id + '-' + mnode_id_nr
+                nids[new_mnode_id] = nids.pop(mnode_id)
             if new_mnode_id:
                 mlayer_node.childNodes[idx].setAttribute("id", new_mnode_id)
                 self.mnode_ids[idx] = new_mnode_id
