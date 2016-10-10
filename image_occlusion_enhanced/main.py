@@ -12,6 +12,7 @@
 ##                                                ##
 ####################################################
 
+import logging, sys
 import os
 
 from PyQt4.QtGui import QFileDialog, QAction, QKeySequence
@@ -33,6 +34,8 @@ from config import *
 from ngen import *
 from dialogs import ImgOccEdit, ImgOccOpts, ioHelp
 from resources import *
+
+logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
@@ -159,7 +162,7 @@ class ImgOccAdd(object):
         except AttributeError:
             mw.ImgOccEdit = ImgOccEdit(mw)
             mw.ImgOccEdit.setupFields(flds)
-            print "new instance"
+            logging.debug("Launching new ImgOccEdit instance")
         dialog = mw.ImgOccEdit
         dialog.switchToMode(self.mode)
         url = QUrl.fromLocalFile(svg_edit_path)
@@ -186,13 +189,13 @@ class ImgOccAdd(object):
             if i in onote:
                 dialog.tedit[i].setPlainText(onote[i])
 
+        dialog.visible = True
         if mode == "add":
             dialog.show()
         else:
             # modal dialog when editing
-            dialog.exec_() 
-
-        dialog.visible = True
+            dialog.exec_()
+        
       
     def onChangeImage(self):
         image_path = self.getImage()
@@ -287,11 +290,10 @@ class ImgOccAdd(object):
 
 
 def onIoSettings(mw):
-    if hasattr(mw, "ImgOccEdit"):
-        if mw.ImgOccEdit.visible:
-            tooltip("Please close Image Occlusion Editor\
-                to access the Options.")
-            return
+    if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
+        tooltip("Please close Image Occlusion Editor\
+            to access the Options.")
+        return
     dialog = ImgOccOpts(mw)
     dialog.exec_()
 

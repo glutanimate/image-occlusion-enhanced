@@ -12,6 +12,8 @@
 ##                                                ##
 ####################################################
 
+import logging, sys
+
 from PyQt4 import QtCore, QtGui
 from aqt.qt import *
 
@@ -21,12 +23,15 @@ from aqt.utils import saveGeom, restoreGeom
 from config import *
 from resources import *
 
+logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+
 class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
     def __init__(self, mw):
         QDialog.__init__(self, parent=None)
         self.mode = "add"
         loadConfig(self)
+        self.visible = False
         self.setupUi()
         restoreGeom(self, "imgoccedit")
 
@@ -438,24 +443,21 @@ class ImgOccOpts(QDialog):
     def renameFields(self):
         modified = False
         model = mw.col.models.byName(IO_MODEL_NAME)
+        flds = model['flds']
         for key in self.lnedit.keys():
             if not self.lnedit[key].isModified():
-                print "not modified:", key
                 continue
             name = self.lnedit[key].text()
             oldname = mw.col.conf['imgocc']['flds'][key]
-            if name is None or not name.strip():
-                continue
-            elif name == oldname:
-                print "no change to", oldname
+            if name is None or not name.strip() or name == oldname:
                 continue
             idx = mw.col.models.fieldNames(model).index(oldname)
-            fld = model['flds'][idx]
+            fld = flds[idx]
             if fld:
                 mw.col.models.renameField(model, fld, name)
                 mw.col.conf['imgocc']['flds'][key] = name
                 modified = True
-                print "renamed %s to %s" % (oldname, name)
+                logging.debug("Renamed %s to %s", oldname, name)
         if modified:
             flds = model['flds']
 
