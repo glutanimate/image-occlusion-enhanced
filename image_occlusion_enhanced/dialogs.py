@@ -40,15 +40,12 @@ class ImgOccEdit(QDialog):
         self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
 
         self.tags_edit = tagedit.TagEdit(self)
-        tags_label = QLabel("Tags")
-        tags_label.setFixedWidth(70)
+        self.tags_label = QLabel("Tags")
+        self.tags_label.setFixedWidth(70)
         self.tags_hbox = QHBoxLayout()
-        self.tags_hbox.addWidget(tags_label)
-        self.tags_hbox.addWidget(self.tags_edit)
-
         self.deck_container = QWidget()
-        self.deckChooser = deckchooser.DeckChooser(mw, self.deck_container,
-                                                   label=True)     
+        self.deckChooser = deckchooser.DeckChooser(mw, 
+                        self.deck_container, label=True)
 
         # Create buttons
 
@@ -105,7 +102,7 @@ class ImgOccEdit(QDialog):
         self.occl_tp_select.setItemData(2, aa_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(3, oa_tt, Qt.ToolTipRole)
 
-        self.connect(self.edit_btn, SIGNAL("clicked()"), self.editAll)
+        self.connect(self.edit_btn, SIGNAL("clicked()"), self.edit_note)
         self.connect(self.new_btn, SIGNAL("clicked()"), self.new)
         self.connect(self.ao_btn, SIGNAL("clicked()"), self.addAO)
         self.connect(self.aa_btn, SIGNAL("clicked()"), self.addAA)
@@ -193,12 +190,40 @@ class ImgOccEdit(QDialog):
     def new(self):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onAddNotesButton(choice)
-    def editAll(self):
+    def edit_note(self):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onAddNotesButton(choice, True)
 
-    # Modes
+
+
+    # Window state
+
+    def resetFields(self):
+        """Reset all window fields. Needed for changes to the note type"""
+        layout = self.vbox2
+        for i in reversed(range(layout.count())): 
+            item = layout.takeAt(i)
+            layout.removeItem(item)
+            if item.widget():
+                item.widget().setParent(None)
+            elif item.layout():
+                sublayout = item.layout()
+                sublayout.setParent(None)
+                for i in reversed(range(sublayout.count())):
+                    subitem = sublayout.takeAt(i)
+                    sublayout.removeItem(subitem)
+                    subitem.widget().setParent(None)
+        self.tags_hbox.setParent(None)
+
+    def resetWindow(self):
+        """Reset window state"""
+        self.tab_widget.setCurrentIndex(0)
+        self.occl_tp_select.setCurrentIndex(0)
+        self.tedit[IO_FLDS["hd"]].setFocus()
+        self.svg_edit.setFocus()
+
     def setupFields(self, flds):
+        """Setup window fields based on note type fields"""
         self.tedit = {}
         for i in flds:
             if i['name'] in IO_FLDS_PRIV:
@@ -213,11 +238,14 @@ class ImgOccEdit(QDialog):
             label.setFixedWidth(70) 
             self.tedit[i["name"]] = tedit
             self.vbox2.addLayout(hbox)
-     
+        
+        self.tags_hbox.addWidget(self.tags_label)
+        self.tags_hbox.addWidget(self.tags_edit)
         self.vbox2.addLayout(self.tags_hbox)
         self.vbox2.addWidget(self.deck_container)
 
     def switchToMode(self, mode):
+        """Toggle between add and edit layouts"""
         self.mode = mode
         hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]
         hide_on_edit = [self.ao_btn, self.aa_btn, self.oa_btn]
@@ -242,12 +270,6 @@ class ImgOccEdit(QDialog):
         self.bottom_label.setText(bl_txt)
 
     # Other actions
-    def resetWindow(self, mode):
-        self.resetAllFields()
-        self.tab_widget.setCurrentIndex(0)
-        self.occl_tp_select.setCurrentIndex(0)
-        self.tedit[IO_FLDS["hd"]].setFocus()
-        self.svg_edit.setFocus()
 
     def switchTabs(self):
         currentTab = self.tab_widget.currentIndex()
@@ -265,7 +287,7 @@ class ImgOccEdit(QDialog):
     def resetMainFields(self):
         for i in [IO_FLDS['hd'], IO_FLDS['ft'], IO_FLDS['rk'], 
                     IO_FLDS['e1'], IO_FLDS['e2']]:
-            self.tedit[i].setFocus.setPlainText("")
+            self.tedit[i].setPlainText("")
 
     def resetAllFields(self):
         self.resetMainFields()

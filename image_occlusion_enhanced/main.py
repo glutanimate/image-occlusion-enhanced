@@ -139,16 +139,16 @@ class ImgOccAdd(object):
         flds = model['flds']
 
         deck = mw.col.decks.nameOrNone(opref["did"])
-        # use existing IO instance when available:
         try:
+            # use existing IO instance when available
             mw.ImgOccEdit is not None
             mw.ImgOccEdit.resetWindow()
-        except:
+        except AttributeError:
             mw.ImgOccEdit = ImgOccEdit(mw)
+            mw.ImgOccEdit.setupFields(flds)
+            print "new instance"
         dialog = mw.ImgOccEdit
         dialog.switchToMode(self.mode)
-        dialog.setupFields(flds)
-
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
         url.addQueryItem('initFill[color]', ofill)
