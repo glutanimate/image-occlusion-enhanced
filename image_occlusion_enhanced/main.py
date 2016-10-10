@@ -97,27 +97,37 @@ class ImgOccAdd(object):
             image_path = opref["image"] 
         else:
             opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
-            image_path = self.getImage(self.ed.parentWindow)
+            image_path = self.getImage(parent=self.ed.parentWindow)
             if not image_path:
                 return
 
         self.image_path = image_path
         self.callImgOccEdit()
 
-    def getImage(self, parent=None):
-        clip = QApplication.clipboard()
-        if clip.mimeData().imageData():
+    def getImage(self, parent=None, noclip=False):
+        if noclip:
+            clip = None
+        else:
+            clip = QApplication.clipboard()
+        if clip and clip.mimeData().imageData():
             handle, image_path = tempfile.mkstemp(suffix='.png')
             clip.image().save(image_path)
             clip.clear()
-        else:
-            # retrieve last used image directory
-            prev_image_dir = self.prefs["prev_image_dir"]
-            if not os.path.isdir(prev_image_dir):
-                prev_image_dir = IO_HOME
-            image_path = QFileDialog.getOpenFileName(parent,
-                         "Choose Image", prev_image_dir, 
-                         "Image Files (*.png *jpg *.jpeg *.gif)")
+            if os.stat(image_path).st_size == 0:
+                # workaround for a clipboard bug that returns
+                # an empty image file
+                return self.getImage(noclip=True)
+            else:
+                return image_path
+
+        # retrieve last used image directory
+        prev_image_dir = self.prefs["prev_image_dir"]
+        if not os.path.isdir(prev_image_dir):
+            prev_image_dir = IO_HOME
+        image_path = QFileDialog.getOpenFileName(parent,
+                     "Choose Image", prev_image_dir, 
+                     "Image Files (*.png *jpg *.jpeg *.gif)")
+        
         if not image_path:
             return None
         elif not os.path.isfile(image_path):
