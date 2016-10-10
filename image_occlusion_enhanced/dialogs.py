@@ -457,14 +457,24 @@ class ImgOccOpts(QDialog):
                 modified = True
                 print "renamed %s to %s" % (oldname, name)
         if modified:
-            pass
+            flds = model['flds']
+
+        return (modified, flds)
 
     def onAccept(self):
-        self.renameFields()
+        (modified, flds) = self.renameFields()
+        if modified and hasattr(mw, "ImgOccEdit"):
+            self.resetIoEditor(flds)
         mw.col.conf['imgocc']['ofill'] = self.ofill
         mw.col.conf['imgocc']['qfill'] = self.qfill
         mw.col.setMod()
         self.close()
+
+    def resetIoEditor(self, flds):
+        dialog = mw.ImgOccEdit
+        loadConfig(dialog)
+        dialog.resetFields()
+        dialog.setupFields(flds)
 
     def onReject(self):
         self.close()
