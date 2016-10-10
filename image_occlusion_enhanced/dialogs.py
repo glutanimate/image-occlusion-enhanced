@@ -315,75 +315,30 @@ class ImgOccOpts(QDialog):
     def __init__(self, mw):
         QDialog.__init__(self, parent=mw)
         loadConfig(self)
-        self.ofill = mw.col.conf['imgocc']['ofill']
-        self.qfill = mw.col.conf['imgocc']['qfill']
+        self.ofill = self.sconf['ofill']
+        self.qfill = self.sconf['qfill']
         self.setupUi()
-
-    def getNewMaskColor(self):
-        # Remove the # sign from QColor.name():
-        choose_color_dialog = QColorDialog()
-        color = choose_color_dialog.getColor()
-        if color.isValid():
-            color_ = color.name()[1:]
-            self.qfill = color_
-            self.changeButtonColor(self.mask_color_button, color_)
-
-    def getNewOfillColor(self):
-        # Remove the # sign from QColor.name():
-        choose_color_dialog = QColorDialog()
-        color = choose_color_dialog.getColor()
-        if color.isValid():
-            color_ = color.name()[1:]
-            self.ofill = color_
-            self.changeButtonColor(self.ofill_button, color_)
-
-    def changeButtonColor(self, button, color):
-        pixmap = QPixmap(128,18)
-        qcolour = QtGui.QColor(0, 0, 0)
-        qcolour.setNamedColor("#" + color)
-        pixmap.fill(qcolour)
-        button.setIcon(QIcon(pixmap))
-        button.setIconSize(QSize(128, 18))
+        self.changeButtonColor(self.ofill_btn, self.ofill)
+        self.changeButtonColor(self.qfill_btn, self.qfill)
 
     def setupUi(self):
-        ### shape color for questions:
+        # Color buttons and other widgets
         qfill_label = QLabel('Question shape')
-        self.mask_color_button = QPushButton()
-        self.mask_color_button.connect(self.mask_color_button,
-                                  SIGNAL("clicked()"),
-                                  self.getNewMaskColor)
-        ### initial shape color:
         ofill_label = QLabel('Initial shape')
-        self.ofill_button = QPushButton()
-        self.ofill_button.connect(self.ofill_button,
-                                SIGNAL("clicked()"),
-                                self.getNewOfillColor)
-
-        ### set colors
-        self.changeButtonColor(self.ofill_button, self.ofill)
-        self.changeButtonColor(self.mask_color_button, self.qfill)
-
-        ### layout
-        grid = QtGui.QGridLayout()
-        grid.setSpacing(10)
-
         colors_heading = QLabel("<b>Colors</b>")
         fields_heading = QLabel("<b>Custom Field Names</b>")
+
+        self.qfill_btn = QPushButton()
+        self.ofill_btn = QPushButton()
+        self.qfill_btn.connect(self.qfill_btn, SIGNAL("clicked()"), 
+            lambda a="qfill", b=self.qfill_btn: self.getNewColor(a, b))
+        self.ofill_btn.connect(self.ofill_btn, SIGNAL("clicked()"),
+            lambda a="ofill", b=self.ofill_btn: self.getNewColor(a, b))
 
         frame = QFrame()
         frame.setFrameShape(QFrame.HLine)
         frame.setFrameShadow(QFrame.Sunken)
-
-        grid.addWidget(colors_heading, 0, 0, 1, 6)
-        grid.addWidget(qfill_label, 1, 1, 1, 2)
-        grid.addWidget(self.mask_color_button, 1, 3, 1, 2)
-        grid.addWidget(ofill_label, 2, 1, 1, 2)
-        grid.addWidget(self.ofill_button, 2, 3, 1, 2)
-        grid.addWidget(frame, 3, 0, 1, 6)
-        grid.addWidget(fields_heading, 4, 0, 1, 6)
-
-        # Fields
-
+        
         fields_text = ("Changing any of the entries below will rename "
         "the corresponding default field of the IO Enhanced note type. "
         "This is the only way you can rename any of the default fields. "
@@ -392,55 +347,90 @@ class ImgOccOpts(QDialog):
 
         fields_description = QLabel(fields_text)
         fields_description.setWordWrap(True)
+
+        grid = QtGui.QGridLayout()
+        grid.setSpacing(10)
+
+        grid.addWidget(colors_heading, 0, 0, 1, 6)
+        grid.addWidget(qfill_label, 1, 1, 1, 2)
+        grid.addWidget(self.qfill_btn, 1, 3, 1, 2)
+        grid.addWidget(ofill_label, 2, 1, 1, 2)
+        grid.addWidget(self.ofill_btn, 2, 3, 1, 2)
+        grid.addWidget(frame, 3, 0, 1, 6)
+        grid.addWidget(fields_heading, 4, 0, 1, 6)  
         grid.addWidget(fields_description, 5, 0, 1, 6)
 
+        # Note type fields
+        row = 6
+        clm = 0
         self.lnedit = {}
-        nr = 6
-        c = 0
         for key in IO_FLDS_IDS:
-            if nr == 12: # switch to right columns
-                c = 3
-                nr = 6
+            if row == 12: # switch to right columns
+                clm = 3
+                row = 6
             default_name = IO_FLDS[key]
             current_name = mw.col.conf['imgocc']['flds'][key]
             l = QLabel(default_name)
             l.setTextInteractionFlags(Qt.TextSelectableByMouse)
             t = QLineEdit()
             t.setText(current_name)
-            grid.addWidget(l, nr, c, 1, 2)
-            grid.addWidget(t, nr, c+1, 1, 2)
+            grid.addWidget(l, row, clm, 1, 2)
+            grid.addWidget(t, row, clm+1, 1, 2)
             self.lnedit[key] = t
-            nr = nr+1
+            row = row+1
         
-        button_box = QtGui.QDialogButtonBox(
-                    QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel
-                )
+        # Bottom button box
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok 
+                                        | QDialogButtonBox.Cancel)
         defaults_btn = button_box.addButton("Restore &Defaults",
            QDialogButtonBox.ResetRole)
-
+        self.connect(defaults_btn, SIGNAL("clicked()"), self.restoreDefaults)
         button_box.accepted.connect(self.onAccept)
         button_box.rejected.connect(self.onReject)
-        
-        self.connect(defaults_btn, SIGNAL("clicked()"), self.restoreDefaults)
 
-        mainlayout = QVBoxLayout()
-        mainlayout.addLayout(grid)
-        mainlayout.addWidget(button_box)
-        self.setLayout(mainlayout)
+        # Main layout
+        l_main = QVBoxLayout()
+        l_main.addLayout(grid)
+        l_main.addWidget(button_box)
+        self.setLayout(l_main)
         self.setMinimumWidth(640)
         self.setMinimumHeight(520)
         self.setWindowTitle('Image Occlusion Enhanced Options')
 
+    def getNewColor(self, clrvar, clrbtn):
+        """Set color via color selection dialog"""
+        dialog = QColorDialog()
+        color = dialog.getColor()
+        if color.isValid():
+            # Remove the # sign from QColor.name():
+            color = color.name()[1:]
+            if clrvar == "qfill":
+                self.qfill = color
+            else:
+                self.ofill = color
+            self.changeButtonColor(clrbtn, color)
+
+    def changeButtonColor(self, button, color):
+        """Generate color preview pixmap and place it on button"""
+        pixmap = QPixmap(128,18)
+        qcolour = QtGui.QColor(0, 0, 0)
+        qcolour.setNamedColor('#' + color)
+        pixmap.fill(qcolour)
+        button.setIcon(QIcon(pixmap))
+        button.setIconSize(QSize(128, 18))
+
     def restoreDefaults(self):
+        """Restore colors and fields back to defaults"""
         for key in self.lnedit.keys():
             self.lnedit[key].setText(IO_FLDS[key])
             self.lnedit[key].setModified(True)
-        self.changeButtonColor(self.ofill_button, self.sconf_d['ofill'])
-        self.changeButtonColor(self.mask_color_button, self.sconf_d['qfill'])
+        self.changeButtonColor(self.ofill_btn, self.sconf_d['ofill'])
+        self.changeButtonColor(self.qfill_btn, self.sconf_d['qfill'])
         self.ofill = self.sconf_d['ofill']
         self.qfill = self.sconf_d['qfill']
 
     def renameFields(self):
+        """Check for modified names and rename fields accordingly"""
         modified = False
         model = mw.col.models.byName(IO_MODEL_NAME)
         flds = model['flds']
@@ -454,7 +444,9 @@ class ImgOccOpts(QDialog):
             idx = mw.col.models.fieldNames(model).index(oldname)
             fld = flds[idx]
             if fld:
+                # rename note type fields
                 mw.col.models.renameField(model, fld, name)
+                # update imgocc field-id <-> field-name assignment
                 mw.col.conf['imgocc']['flds'][key] = name
                 modified = True
                 logging.debug("Renamed %s to %s", oldname, name)
@@ -464,6 +456,7 @@ class ImgOccOpts(QDialog):
         return (modified, flds)
 
     def onAccept(self):
+        """Apply changes on OK button press"""
         (modified, flds) = self.renameFields()
         if modified and hasattr(mw, "ImgOccEdit"):
             self.resetIoEditor(flds)
@@ -473,12 +466,14 @@ class ImgOccOpts(QDialog):
         self.close()
 
     def resetIoEditor(self, flds):
+        """Reset existing instance of IO Editor"""
         dialog = mw.ImgOccEdit
         loadConfig(dialog)
         dialog.resetFields()
         dialog.setupFields(flds)
 
     def onReject(self):
+        """Dismiss changes on Close button press"""
         self.close()
 
 def ioAskUser(text, title="Image Occlusion Enhanced", parent=None, 
