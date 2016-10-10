@@ -125,9 +125,10 @@ class ImgOccAdd(object):
                 return image_path
 
         # retrieve last used image directory
-        prev_image_dir = self.prefs["prev_image_dir"]
-        if not os.path.isdir(prev_image_dir):
+        prev_image_dir = mw.pm.profile["imgocc"]["dir"]
+        if not prev_image_dir or not os.path.isdir(prev_image_dir):
             prev_image_dir = IO_HOME
+
         image_path = QFileDialog.getOpenFileName(parent,
                      "Choose Image", prev_image_dir, 
                      "Image Files (*.png *jpg *.jpeg *.gif)")
@@ -138,8 +139,7 @@ class ImgOccAdd(object):
             tooltip("Not a valid image file.")
             return None
         else:
-            self.prefs["prev_image_dir"] = os.path.dirname( image_path )
-            savePrefs(self)
+            mw.pm.profile["imgocc"]["dir"] = os.path.dirname(image_path)
             return image_path
 
     def callImgOccEdit(self):
