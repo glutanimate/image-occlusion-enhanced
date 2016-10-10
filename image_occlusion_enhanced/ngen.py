@@ -108,12 +108,12 @@ class ImgOccNoteGenerator(object):
         omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
         qmasks = self._generateMaskSVGsFor("Q")
         amasks = self._generateMaskSVGsFor("A")
-        new_image = self._addImageToCol()
+        col_image = self._addImageToCol()
         
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
             self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr], 
-                                        new_image, note_id)
+                                        col_image, note_id)
         
         parent = None
         if not self.ed.addMode:
@@ -126,7 +126,6 @@ class ImgOccNoteGenerator(object):
         self.uniq_id = self.opref['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
         omask_path = None
-        new_image = None
         
         self._findAllNotes()
         ( svg_node, mlayer_node ) = self._getMnodesAndSetIds(True)
@@ -148,9 +147,13 @@ class ImgOccNoteGenerator(object):
             amasks = self._generateMaskSVGsFor("A")
             state = "cacheReset"
         
-        if fname2img(self.image_path) != fname2img(self.opref['image']):
+        old_img = fname2img(self.opref['image'])
+        if fname2img(self.image_path) != old_img:
             # updated image
-            new_image = self._addImageToCol() 
+            col_image = self._addImageToCol()
+            img = fname2img(col_image)
+        else:
+            img = old_img
        
         logging.debug("mnode_indexes %s", self.mnode_indexes)
         for nr, idx in enumerate(self.mnode_indexes):
@@ -164,10 +167,10 @@ class ImgOccNoteGenerator(object):
             logging.debug("nid %s", nid)
             if omask_path:
                 self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr],    
-                                            new_image, note_id, nid)
+                                            img, note_id, nid)
             else:
                 self._saveMaskAndReturnNote(None, None, None,    
-                                            new_image, note_id, nid)
+                                            img, note_id, nid)
         parent = self.ed.parentWindow
         tooltip("Cards updated: %s" % len(self.mnode_indexes), period=1500, parent=parent)
         return state
@@ -372,9 +375,10 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
-    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, new_image, note_id, nid=None):
+    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, img, note_id, nid=None):
         fields = self.fields
         model = self.model
+        fields[IO_FLDS['im']] = img
         if omask_path:
             # Occlusions updated
             qmask_path = self._saveMask(qmask, note_id, "Q")
@@ -383,9 +387,6 @@ class ImgOccNoteGenerator(object):
             fields[IO_FLDS['am']] = fname2img(amask_path)
             fields[IO_FLDS['om']] = fname2img(omask_path)
             fields[IO_FLDS['id']] = note_id
-        if new_image:
-            # Image updated
-            fields[IO_FLDS['im']] = fname2img(new_image)
 
         self.model['did'] = self.did
         mflds = model['flds']
