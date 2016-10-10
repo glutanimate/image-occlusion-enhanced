@@ -55,8 +55,8 @@ IO_HOME = os.path.expanduser('~').decode(sys_encoding)
 
 # default configurations
 default_conf_local = {"dir": IO_HOME}
-default_conf_syncd = {'ofill': '00AA7F',
-                      'qfill': 'FF0000',
+default_conf_syncd = {'ofill': 'FFEBA2',
+                      'qfill': 'FF7E7E',
                       'version': 0.5}
 
 def loadPrefs(self):

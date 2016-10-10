@@ -118,8 +118,7 @@ class ImgOccAdd(object):
             clip.image().save(image_path)
             clip.clear()
             if os.stat(image_path).st_size == 0:
-                # workaround for a clipboard bug that returns
-                # an empty image file
+                # workaround for a clipboard bug
                 return self.getImage(noclip=True)
             else:
                 return image_path
