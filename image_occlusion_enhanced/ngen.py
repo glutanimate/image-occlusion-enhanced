@@ -88,8 +88,8 @@ class ImgOccNoteGenerator(object):
         self.fields = fields
         self.did = did
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
-        self.model = mw.col.models.byName(IO_MODEL_NAME)
         self.stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
+        self.model = mw.col.models.byName(IO_MODEL_NAME)
         if not self.model:
             self.model = template.add_io_model(mw.col)
         
@@ -374,6 +374,7 @@ class ImgOccNoteGenerator(object):
 
     def _saveMaskAndReturnNote(self, omask_path, qmask, amask, new_image, note_id, nid=None):
         fields = self.fields
+        model = self.model
         if omask_path:
             # Occlusions updated
             qmask_path = self._saveMask(qmask, note_id, "Q")
@@ -386,8 +387,7 @@ class ImgOccNoteGenerator(object):
             # Image updated
             fields[IO_FLDS['im']] = fname2img(new_image)
 
-        model = self.model
-        model['did'] = self.did
+        self.model['did'] = self.did
         mflds = model['flds']
 
         if nid:

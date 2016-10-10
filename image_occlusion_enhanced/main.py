@@ -71,6 +71,8 @@ class ImgOccAdd(object):
         self.ed = ed
         self.mode = mode
         self.opref = {} # original io session preference
+        self.model = mw.col.models.byName(IO_MODEL_NAME)
+        self.mflds = self.model['flds']
 
         # load preferences
         loadPrefs(self)
@@ -205,14 +207,17 @@ class ImgOccAdd(object):
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
         
-        (fields, tags) = self.getUserInputs(dialog)
+        r1 = self.getUserInputs(dialog)
+        if r1 == False:
+            return False
+        (fields, tags) = r1
         did = dialog.deckChooser.selectedId()
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(self.ed, svg, self.image_path,
                                     self.opref, tags, fields, did)        
-        ret = gen.generateNotes()
-        if ret == False:
+        r = gen.generateNotes()
+        if r == False:
             return False
 
         if self.mode == "add" and self.ed.note:
@@ -234,20 +239,23 @@ class ImgOccAdd(object):
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
 
-        (fields, tags) = self.getUserInputs(dialog)
+        r1 = self.getUserInputs(dialog)
+        if r1 == False:
+            return False
+        (fields, tags) = r1
         did = self.opref["did"]
         old_occl_tp = self.opref["occl_tp"]
 
         noteGenerator = genByKey(choice, old_occl_tp)
         gen = noteGenerator(self.ed, svg, self.image_path,
                                     self.opref, tags, fields, did)
-        ret = gen.updateNotes()
-        if ret == False:
+        r = gen.updateNotes()
+        if r == False:
             return False
 
         mw.ImgOccEdit.close()
 
-        if ret == "cacheReset":
+        if r == "cacheReset":
             # refresh webview image cache
             QWebSettings.clearMemoryCaches()
 
@@ -255,6 +263,13 @@ class ImgOccAdd(object):
 
     def getUserInputs(self, dialog):
         fields = {}
+        # note type integrity check:
+        io_model_fields = mw.col.models.fieldNames(self.model)
+        if not all(x in io_model_fields for x in IO_FLDS.values()):
+            showWarning('<b>Error:</b><br><br>Image Occlusion note type \
+                not configured properly.Please make sure you did not \
+                manually delete or rename any of the default fields.')
+            return False
         for i in self.mflds:
             fn = i['name']
             if fn in IO_FLDS_PRIV:
@@ -273,16 +288,16 @@ def onIoHelp():
     ioHelp("main")
 
 def onImgOccButton(ed, mode):
-    ioModel = mw.col.models.byName(IO_MODEL_NAME)
-    if ioModel:
-        ioFields = mw.col.models.fieldNames(ioModel)
+    io_model = mw.col.models.byName(IO_MODEL_NAME)
+    if io_model:
+        io_model_fields = mw.col.models.fieldNames(io_model)
         # note type integrity check
-        if not all(x in ioFields for x in IO_FLDS.values()):
+        if not all(x in io_model_fields for x in IO_FLDS.values()):
             showWarning('<b>Error:</b><br><br>Image Occlusion note type \
                 not configured properly.Please make sure you did not \
                 manually delete or rename any of the default fields.')
-            return
-    if mode != "add" and ed.note.model() != ioModel:
+            return False
+    if mode != "add" and ed.note.model() != io_model:
         tooltip("Can only edit notes with the %s note type" % IO_MODEL_NAME)
         return
     mw.ImgOccAdd = ImgOccAdd(ed, mode)
