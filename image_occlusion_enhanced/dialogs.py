@@ -34,7 +34,7 @@ class ImgOccEdit(QDialog):
         if mw.pm.profile is not None:
             self.deckChooser.cleanup()
             saveGeom(self, "imgoccedit")
-
+        self.visible = False
         QWidget.closeEvent(self, event)
 
     def setupUi(self):
@@ -436,6 +436,7 @@ class ImgOccOpts(QDialog):
         self.qfill = self.sconf_d['qfill']
 
     def renameFields(self):
+        modified = False
         model = mw.col.models.byName(IO_MODEL_NAME)
         for key in self.lnedit.keys():
             if not self.lnedit[key].isModified():

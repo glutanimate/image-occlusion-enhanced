@@ -153,9 +153,9 @@ class ImgOccAdd(object):
 
         deck = mw.col.decks.nameOrNone(opref["did"])
         try:
-            # use existing IO instance when available
             mw.ImgOccEdit is not None
             mw.ImgOccEdit.resetWindow()
+            # use existing IO instance when available
         except AttributeError:
             mw.ImgOccEdit = ImgOccEdit(mw)
             mw.ImgOccEdit.setupFields(flds)
@@ -191,6 +191,8 @@ class ImgOccAdd(object):
         else:
             # modal dialog when editing
             dialog.exec_() 
+
+        dialog.visible = True
       
     def onChangeImage(self):
         image_path = self.getImage()
@@ -285,6 +287,11 @@ class ImgOccAdd(object):
 
 
 def onIoSettings(mw):
+    if hasattr(mw, "ImgOccEdit"):
+        if mw.ImgOccEdit.visible:
+            tooltip("Please close Image Occlusion Editor\
+                to access the Options.")
+            return
     dialog = ImgOccOpts(mw)
     dialog.exec_()
 
