@@ -22,6 +22,7 @@ from config import *
 from resources import *
 
 class ImgOccEdit(QDialog):
+    """Main Image Occlusion Editor dialog"""
     def __init__(self, mw):
         QDialog.__init__(self, parent=None)
         self.mode = "add"
@@ -36,19 +37,19 @@ class ImgOccEdit(QDialog):
         QWidget.closeEvent(self, event)
 
     def setupUi(self):
+        """Set up ImgOccEdit UI"""
+        # Main widgets aside from fields
         self.svg_edit = webview.AnkiWebView()
         self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
-
+        self.tags_hbox = QHBoxLayout()
         self.tags_edit = tagedit.TagEdit(self)
         self.tags_label = QLabel("Tags")
         self.tags_label.setFixedWidth(70)
-        self.tags_hbox = QHBoxLayout()
         self.deck_container = QWidget()
         self.deckChooser = deckchooser.DeckChooser(mw, 
                         self.deck_container, label=True)
 
-        # Create buttons
-
+        # Button row widgets
         self.bottom_label = QLabel()
         button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
         button_box.setCenterButtons(False)
@@ -109,6 +110,9 @@ class ImgOccEdit(QDialog):
         self.connect(self.oa_btn, SIGNAL("clicked()"), self.addOA)
         self.connect(close_button, SIGNAL("clicked()"), self.close)
 
+        # Set basic layout up
+
+        ## Button row
         bottom_hbox = QHBoxLayout()
         bottom_hbox.addWidget(image_btn)
         bottom_hbox.insertStretch(1, stretch=1)
@@ -116,16 +120,15 @@ class ImgOccEdit(QDialog):
         bottom_hbox.addWidget(self.occl_tp_select)
         bottom_hbox.addWidget(button_box)
 
-        # Set layout up
-
         ## Tab 1
         vbox1 = QVBoxLayout()
         vbox1.addWidget(self.svg_edit, stretch=1)
 
         ## Tab 2
         self.vbox2 = QVBoxLayout()
+        # vbox2 fields are variable and added by setupFields() at a later point
 
-        # Create tabs, set their layout, add them to the QTabWidget
+        ## Main Tab Widget
         tab1 = QWidget()
         tab2 = QWidget()
         tab1.setLayout(vbox1)
@@ -136,49 +139,40 @@ class ImgOccEdit(QDialog):
         self.tab_widget.setTabToolTip(1, "Include additional information (optional)")
         self.tab_widget.setTabToolTip(0, "Create image occlusion masks (required)")
 
-        # Add all widgets to main window
+        ## Main Window
         vbox_main = QVBoxLayout()
         vbox_main.setMargin(5);
         vbox_main.addWidget(self.tab_widget)
         vbox_main.addLayout(bottom_hbox)
         self.setLayout(vbox_main)
         self.setMinimumWidth(640)
+        self.tab_widget.setCurrentIndex(0)
+        self.svg_edit.setFocus()
 
         # Define and connect key bindings
+
+        ## Field focus hotkeys
+        for i in range(1,10):
+            s = self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+%i" %i), self), 
+                QtCore.SIGNAL('activated()'), 
+                lambda f=i-1:self.focusField(f))
+        ## Other hotkeys
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Tab"), self), 
             QtCore.SIGNAL('activated()'), self.switchTabs)
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+r"), self), 
             QtCore.SIGNAL('activated()'), self.resetMainFields)
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+r"), self), 
             QtCore.SIGNAL('activated()'), self.resetAllFields)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+1"), self), 
-            QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS['hd']]))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+2"), self), 
-            QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS['ft']]))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+3"), self), 
-            QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS['rk']]))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+4"), self), 
-            QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS['sc']]))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+5"), self), 
-            QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS['e1']]))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+6"), self), 
-            QtCore.SIGNAL('activated()'), 
-            lambda:self.focusField(self.tedit[IO_FLDS['e2']]))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+t"), self), 
             QtCore.SIGNAL('activated()'), lambda:self.focusField(self.tags_edit))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+f"), self), 
             QtCore.SIGNAL('activated()'), self.fitImageCanvas)
 
-        # Set Focus
-        self.tab_widget.setCurrentIndex(0)
-        self.svg_edit.setFocus()
+
+    # Various actions that act on / interact with the ImgOccEdit UI:
 
     # Note actions
+
     def changeImage(self):
         mw.ImgOccAdd.onChangeImage()
     def addAO(self): 
@@ -193,8 +187,6 @@ class ImgOccEdit(QDialog):
     def edit_note(self):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onAddNotesButton(choice, True)
-
-
 
     # Window state
 
@@ -225,6 +217,7 @@ class ImgOccEdit(QDialog):
     def setupFields(self, flds):
         """Setup window fields based on note type fields"""
         self.tedit = {}
+        self.flds = flds
         for i in flds:
             if i['name'] in IO_FLDS_PRIV:
                 continue
@@ -280,25 +273,38 @@ class ImgOccEdit(QDialog):
         else:
           self.tab_widget.setCurrentIndex(0)
 
-    def focusField(self, target_field):
+    def focusField(self, idx):
+        """Focus field in vbox2 layout by index number"""
         self.tab_widget.setCurrentIndex(1)
-        target_field.setFocus()
+        target_item = self.vbox2.itemAt(idx)
+        if not target_item:
+            return
+        target_layout = target_item.layout()
+        target_widget = target_item.widget()
+        if target_layout:
+            target = target_layout.itemAt(1).widget()
+        elif target_widget:
+            target = target_widget
+        target.setFocus()
 
     def resetMainFields(self):
-        for i in [IO_FLDS['hd'], IO_FLDS['ft'], IO_FLDS['rk'], 
-                    IO_FLDS['e1'], IO_FLDS['e2']]:
-            self.tedit[i].setPlainText("")
+        for i in self.flds:
+            fn = i['name']
+            if fn in IO_FLDS_PRIV or fn in IO_FLDS_PRSV:
+                continue
+            self.tedit[fn].setPlainText("")
 
     def resetAllFields(self):
         self.resetMainFields()
-        self.tedit[IO_FLDS['sc']].setPlainText("")
+        for i in IO_FLDS_PRSV:
+            self.tedit[i].setPlainText("")
 
     def fitImageCanvas(self):
         command = "svgCanvas.zoomChanged('', 'canvas');"
         self.svg_edit.eval(command)
 
 class ImgOccOpts(QDialog):
-    # Main IO Options dialog
+    """Main Image Occlusion Options dialog"""
     def __init__(self, mw):
         QDialog.__init__(self, parent=mw)
         self.setupUi()
@@ -395,6 +401,7 @@ def ioAskUser(text, title="Image Occlusion Enhanced", parent=None,
     return r == QMessageBox.Yes
 
 def ioHelp(help, title=None, text=None, parent=None):
+    """Display an info message or a predefined help section"""
     io_link_wiki = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
     io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o"
     help_text = {}
