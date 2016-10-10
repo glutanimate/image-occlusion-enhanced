@@ -125,7 +125,7 @@ def add_io_model(col):
     models = col.models
     io_model = models.new(IO_MODEL_NAME)
     # Add fields:
-    for i in IO_FLDS_ORDER:
+    for i in IO_FLDS_IDS:
       fld = models.newField(IO_FLDS[i])
       if i == "note_id":
         fld['size'] = 0

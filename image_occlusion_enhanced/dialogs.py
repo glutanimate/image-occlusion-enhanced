@@ -209,6 +209,7 @@ class ImgOccEdit(QDialog):
 
     def resetWindow(self):
         """Reset window state"""
+        self.resetAllFields()
         self.tab_widget.setCurrentIndex(0)
         self.occl_tp_select.setCurrentIndex(0)
         self.tedit[IO_FLDS["hd"]].setFocus()

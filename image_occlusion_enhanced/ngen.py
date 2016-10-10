@@ -106,12 +106,12 @@ class ImgOccNoteGenerator(object):
         omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
         qmasks = self._generateMaskSVGsFor("Q")
         amasks = self._generateMaskSVGsFor("A")
-        col_image = self._addImageToCol()
+        img = fname2img(self._addImageToCol())
         
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
             self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr], 
-                                        col_image, note_id)
+                                        img, note_id)
         
         parent = None
         if not self.ed.addMode:
