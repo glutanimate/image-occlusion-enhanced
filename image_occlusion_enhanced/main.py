@@ -72,6 +72,8 @@ class ImgOccAdd(object):
         self.mode = mode
         self.opref = {} # original io session preference
         self.model = mw.col.models.byName(IO_MODEL_NAME)
+        if not self.model:
+            self.model = template.add_io_model(mw.col)
         self.mflds = self.model['flds']
 
         # load preferences
