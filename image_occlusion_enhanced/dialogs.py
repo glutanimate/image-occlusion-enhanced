@@ -26,6 +26,7 @@ class ImgOccEdit(QDialog):
     def __init__(self, mw):
         QDialog.__init__(self, parent=None)
         self.mode = "add"
+        loadConfig(self)
         self.setupUi()
         restoreGeom(self, "imgoccedit")
 
@@ -212,7 +213,7 @@ class ImgOccEdit(QDialog):
         self.resetAllFields()
         self.tab_widget.setCurrentIndex(0)
         self.occl_tp_select.setCurrentIndex(0)
-        self.tedit[IO_FLDS["hd"]].setFocus()
+        self.tedit[self.ioflds["hd"]].setFocus()
         self.svg_edit.setFocus()
 
     def setupFields(self, flds):
@@ -220,7 +221,7 @@ class ImgOccEdit(QDialog):
         self.tedit = {}
         self.flds = flds
         for i in flds:
-            if i['name'] in IO_FLDS_PRIV:
+            if i['name'] in self.ioflds_priv:
                 continue
             hbox = QHBoxLayout()
             tedit = QPlainTextEdit()
@@ -270,7 +271,7 @@ class ImgOccEdit(QDialog):
         if currentTab == 0:
           self.tab_widget.setCurrentIndex(1)
           if isinstance(QApplication.focusWidget(), QPushButton):
-              self.tedit[IO_FLDS["hd"]].setFocus()
+              self.tedit[self.ioflds["hd"]].setFocus()
         else:
           self.tab_widget.setCurrentIndex(0)
 
@@ -291,13 +292,13 @@ class ImgOccEdit(QDialog):
     def resetMainFields(self):
         for i in self.flds:
             fn = i['name']
-            if fn in IO_FLDS_PRIV or fn in IO_FLDS_PRSV:
+            if fn in self.ioflds_priv or fn in self.ioflds_prsv:
                 continue
             self.tedit[fn].setPlainText("")
 
     def resetAllFields(self):
         self.resetMainFields()
-        for i in IO_FLDS_PRSV:
+        for i in self.ioflds_prsv:
             self.tedit[i].setPlainText("")
 
     def fitImageCanvas(self):

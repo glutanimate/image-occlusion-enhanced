@@ -90,6 +90,7 @@ class ImgOccNoteGenerator(object):
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
         self.stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
         self.model = mw.col.models.byName(IO_MODEL_NAME)
+        loadConfig(self)
         
     def generateNotes(self):
         state = "default"
@@ -204,7 +205,7 @@ class ImgOccNoteGenerator(object):
         return (svg_node, mlayer_node)
 
     def findByNoteId(self, note_id):
-        query = "'%s':'%s*'" % ( IO_FLDS['id'], note_id )
+        query = "'%s':'%s*'" % ( self.ioflds['id'], note_id )
         logging.debug("query %s", query)
         res = mw.col.findNotes(query)
         return res
@@ -214,7 +215,7 @@ class ImgOccNoteGenerator(object):
         res = self.findByNoteId(old_occl_id)
         self.nids = {}
         for nid in res:
-            note_id = mw.col.getNote(nid)[IO_FLDS['id']]
+            note_id = mw.col.getNote(nid)[self.ioflds['id']]
             self.nids[note_id] = nid
         logging.debug('--------------------')
         logging.debug("res %s", res)
@@ -378,15 +379,15 @@ class ImgOccNoteGenerator(object):
     def _saveMaskAndReturnNote(self, omask_path, qmask, amask, img, note_id, nid=None):
         fields = self.fields
         model = self.model
-        fields[IO_FLDS['im']] = img
+        fields[self.ioflds['im']] = img
         if omask_path:
             # Occlusions updated
             qmask_path = self._saveMask(qmask, note_id, "Q")
             amask_path = self._saveMask(amask, note_id, "A")
-            fields[IO_FLDS['qm']] = fname2img(qmask_path)
-            fields[IO_FLDS['am']] = fname2img(amask_path)
-            fields[IO_FLDS['om']] = fname2img(omask_path)
-            fields[IO_FLDS['id']] = note_id
+            fields[self.ioflds['qm']] = fname2img(qmask_path)
+            fields[self.ioflds['am']] = fname2img(amask_path)
+            fields[self.ioflds['om']] = fname2img(omask_path)
+            fields[self.ioflds['id']] = note_id
 
         self.model['did'] = self.did
         mflds = model['flds']

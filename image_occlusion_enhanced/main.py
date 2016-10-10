@@ -89,12 +89,12 @@ class ImgOccAdd(object):
             # can only get the deck of the current note/card via a db call:
             opref["did"] = mw.col.db.scalar(
                     "select did from cards where id = ?", note.cards()[0].id)
-            note_id = note[IO_FLDS['id']]
+            note_id = note[self.ioflds['id']]
             opref["note_id"] = note_id
             opref["uniq_id"] = note_id.split('-')[0]
             opref["occl_tp"] = note_id.split('-')[1]
-            opref["image"] = img2path(note[IO_FLDS['im']])
-            opref["omask"] = img2path(note[IO_FLDS['om']])
+            opref["image"] = img2path(note[self.ioflds['im']])
+            opref["omask"] = img2path(note[self.ioflds['om']])
             if None in opref:
                 showWarning("IO card not configured properly for editing")
                 return
@@ -171,7 +171,7 @@ class ImgOccAdd(object):
         if mode != "add":
             for i in self.mflds:
                 fn = i["name"]
-                if fn in IO_FLDS_PRIV:
+                if fn in self.ioflds_priv:
                     continue
                 dialog.tedit[fn].setPlainText(onote[fn].replace('<br />', '\n'))
             svg_b64 = svgToBase64(opref["omask"])
@@ -181,7 +181,10 @@ class ImgOccAdd(object):
         dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
         dialog.tags_edit.setText(opref["tags"])
-        dialog.tedit[IO_FLDS['sc']].setPlainText(onote[IO_FLDS['sc']])
+
+        for i in self.ioflds_prsv:
+            if i in onote:
+                dialog.tedit[i].setPlainText(onote[i])
 
         if mode == "add":
             dialog.show()
@@ -225,7 +228,7 @@ class ImgOccAdd(object):
             # Update Editor with modified tags and sources field
             self.ed.tags.setText(" ".join(tags))
             self.ed.saveTags()
-            for i in IO_FLDS_PRSV:
+            for i in self.ioflds_prsv:
                 if i in self.ed.note:
                     self.ed.note[i] = fields[i]            
             self.ed.loadNote()
@@ -266,14 +269,14 @@ class ImgOccAdd(object):
         fields = {}
         # note type integrity check:
         io_model_fields = mw.col.models.fieldNames(self.model)
-        if not all(x in io_model_fields for x in IO_FLDS.values()):
+        if not all(x in io_model_fields for x in self.ioflds.values()):
             showWarning('<b>Error:</b><br><br>Image Occlusion note type \
                 not configured properly.Please make sure you did not \
                 manually delete or rename any of the default fields.')
             return False
         for i in self.mflds:
             fn = i['name']
-            if fn in IO_FLDS_PRIV:
+            if fn in self.ioflds_priv:
                 continue
             text = dialog.tedit[fn].toPlainText().replace('\n', '<br />')
             fields[fn] = text
@@ -293,7 +296,8 @@ def onImgOccButton(ed, mode):
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
         # note type integrity check
-        if not all(x in io_model_fields for x in IO_FLDS.values()):
+        if not all(x in io_model_fields 
+                            for x in mw.col.conf['imgocc']['flds'].values()):
             showWarning('<b>Error:</b><br><br>Image Occlusion note type \
                 not configured properly.Please make sure you did not \
                 manually delete or rename any of the default fields.')

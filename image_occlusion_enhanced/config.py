@@ -17,7 +17,7 @@ import sys
 
 from aqt import mw
 
-global IO_FLDS, IO_FLDS_IDS, IO_FLDS_PRIV, IO_FLDS_PRSV
+global IO_FLDS, IO_FLDS_IDS
 global IO_MODEL_NAME, IO_CARD_NAME, IO_HOME
 
 IO_MODEL_NAME = "Image Occlusion Enhanced"
@@ -28,8 +28,8 @@ IO_FLDS = {
     'hd': u"Header",
     'im': u"Image",
     'ft': u"Footer",
-    'rk': u"Anmerkungen",
-    'sc': u"Quellen",
+    'rk': u"Remarks",
+    'sc': u"Sources",
     'e1': u"Extra 1",
     'e2': u"Extra 2",
     'qm': u"Question Mask",
@@ -40,12 +40,13 @@ IO_FLDS = {
 IO_FLDS_IDS = ["id", "hd", "im", "ft", "rk", "sc", 
                 "e1", "e2", "qm", "am", "om"]
 
+# TODO: Use IDs instead of names to make these compatible with self.ioflds
+
 # fields that aren't user-editable
-IO_FLDS_PRIV = [IO_FLDS['id'], IO_FLDS['im'], IO_FLDS['qm'], 
-                IO_FLDS['am'], IO_FLDS['om']]
+IO_FIDS_PRIV = ['id', 'im', 'qm', 'am', 'om']
 
 # fields that are synced between an IO Editor session and Anki's Editor
-IO_FLDS_PRSV = [IO_FLDS['sc']]
+IO_FIDS_PRSV = ['sc']
 
 
 
@@ -84,7 +85,19 @@ def loadConfig(self):
     if not 'imgocc' in mw.pm.profile:
         mw.pm.profile["imgocc"] = default_conf_local
 
+    ioflds = mw.col.conf['imgocc']['flds']
+    ioflds_priv = []
+    ioflds_prsv = []
+    for i in IO_FIDS_PRIV:
+        ioflds_priv.append(ioflds[i])
+
+    for i in IO_FIDS_PRSV:
+        ioflds_prsv.append(ioflds[i])
+
+
     self.sconf_d = default_conf_syncd
     self.sconf = mw.col.conf['imgocc']
-    self.ioflds = mw.col.conf['imgocc']['flds']
     self.lconf = mw.pm.profile["imgocc"]
+    self.ioflds = ioflds
+    self.ioflds_priv = ioflds_priv
+    self.ioflds_prsv = ioflds_prsv
