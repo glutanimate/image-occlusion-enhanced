@@ -415,7 +415,10 @@ def ioHelp(help, title=None, text=None, parent=None):
         generated, leaving your originals untouched.<br><br> \
         <b>Actions performed in Image Occlusion's <i>Editing Mode</i> cannot be\
         easily undone, so please make sure to check your changes twice before\
-        applying them.</b></center>"""
+        applying them.</b><br><br>The only exception to this are purely textual\
+        changes to fields like the header or footer of your notes. These can\
+        be fully reverted by using Ctrl+Z in the Browser or Reviewer view\
+        </center>"""
     help_text["main"] = u"""<h2>Help and Support</h2>
         <p><a href="%s">Image Occlusion Enhanced Wiki</a></p>
         <p><a href="%s">Official Video Tutorial Series</a></p>

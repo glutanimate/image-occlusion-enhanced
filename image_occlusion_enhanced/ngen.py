@@ -108,6 +108,7 @@ class ImgOccNoteGenerator(object):
         amasks = self._generateMaskSVGsFor("A")
         img = fname2img(self._addImageToCol())
         
+        mw.checkpoint("Adding Image Occlusion Cards")
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
             self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr], 
@@ -131,6 +132,7 @@ class ImgOccNoteGenerator(object):
             tooltip("No shapes left. You can't delete all cards.<br>\
                 Are you sure you set your masks correctly?")
             return False
+        mw.checkpoint("Editing Image Occlusion Cards")
         ret = self._deleteAndIdNotes(mlayer_node)
         if not ret:
             # confirmation window rejected
