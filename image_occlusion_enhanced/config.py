@@ -73,12 +73,12 @@ def loadPrefs(self):
             mw.col.conf['imgocc']['qfill'] = old_conf['mask_fill_color']
             # insert other upgrade actions here
 
-    if mw.col.conf['version'] < default_conf_syncd['version']:
+    if mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
         print "updating from earlier IO release"
         # insert other update actions here
-        mw.col.conf['version'] = default_conf_syncd['version']
+        mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
 
     # Local preferences
     if not 'imgocc' in mw.pm.profile:
-        mw.pm.profile["imgocc"] = default_prefs_local
+        mw.pm.profile["imgocc"] = default_conf_local
 
