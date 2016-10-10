@@ -189,45 +189,57 @@ class ImgOccAdd(object):
                     """ %(bkgd_url, width, height))
         self.image_path = image_path
 
-    def onAddNotesButton(self, choice, edit=False):
+    def onAddNotesButton(self, choice):
         dialog = mw.ImgOccEdit
         svg_edit = dialog.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
         
         (fields, tags) = self.getUserInputs(dialog)
+        did = dialog.deckChooser.selectedId()
 
-        if edit:
-            did = self.opref["did"]
-            old_occl_tp = self.opref["occl_tp"]
-        else:
-            did = dialog.deckChooser.selectedId()
-            old_occl_tp = None
-
-        noteGenerator = genByKey(choice, old_occl_tp)
+        noteGenerator = genByKey(choice)
         gen = noteGenerator(self.ed, svg, self.image_path,
                                     self.opref, tags, fields, did)        
-        if edit:
-            ret = gen.updateNotes()
-        else:
-            ret = gen.generateNotes()
-        
+        ret = gen.generateNotes()
         if ret == False:
-            # user dismissed confirmation dialog
             return False
 
-        if self.ed.note and self.ed.addMode:
+        if self.mode == "add" and self.ed.note:
             # Update Editor with modified tags and sources field
             self.ed.tags.setText(" ".join(tags))
             self.ed.saveTags()
-            srcfld = IO_FLDS['sc']
-            if srcfld in self.ed.note:
-                self.ed.note[srcfld] = fields[srcfld]
+            for i in IO_FLDS_PRSV:
+                if i in self.ed.note:
+                    self.ed.note[i] = fields[i]            
             self.ed.loadNote()
             deck = mw.col.decks.nameOrNone(did)
             self.ed.parentWindow.deckChooser.deck.setText(deck)
-        elif edit:
-            QWebSettings.clearMemoryCaches() # refresh webview image cache
+
+        mw.reset()
+
+    def onEditNotesButton(self, choice):
+        dialog = mw.ImgOccEdit
+        svg_edit = dialog.svg_edit
+        svg = svg_edit.page().mainFrame().evaluateJavaScript(
+            "svgCanvas.svgCanvasToString();")
+
+        (fields, tags) = self.getUserInputs(dialog)
+        did = self.opref["did"]
+        old_occl_tp = self.opref["occl_tp"]
+
+        noteGenerator = genByKey(choice, old_occl_tp)
+        gen = noteGenerator(self.ed, svg, self.image_path,
+                                    self.opref, tags, fields, did)
+        ret = gen.updateNotes()
+        if ret == False:
+            return False
+
+        mw.ImgOccEdit.close()
+
+        if ret == "cacheReset":
+            # refresh webview image cache
+            QWebSettings.clearMemoryCaches()
 
         mw.reset() # FIXME: causes glitches in editcurrent mode
 

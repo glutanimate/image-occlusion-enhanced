@@ -186,7 +186,7 @@ class ImgOccEdit(QDialog):
         mw.ImgOccAdd.onAddNotesButton(choice)
     def edit_note(self):
         choice = self.occl_tp_select.currentText()
-        mw.ImgOccAdd.onAddNotesButton(choice, True)
+        mw.ImgOccAdd.onEditNotesButton(choice)
 
     # Window state
 

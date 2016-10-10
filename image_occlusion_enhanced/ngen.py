@@ -66,7 +66,7 @@ def svgToBase64(svg_path):
 def fname2img(path):
     return '<img src="%s" />' % os.path.split(path)[1]
 
-def genByKey(key, old_occl_tp):
+def genByKey(key, old_occl_tp=None):
     if key in ["Don't Change"]:
         return genByKey(old_occl_tp, None)
     elif key in ["ao", "Hide All, Reveal One"]:
@@ -94,6 +94,7 @@ class ImgOccNoteGenerator(object):
             self.model = template.add_io_model(mw.col)
         
     def generateNotes(self):
+        state = "default"
         self.uniq_id = str(uuid.uuid4()).replace("-","") 
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
         
@@ -101,7 +102,7 @@ class ImgOccNoteGenerator(object):
         if not self.mnode_ids:
             tooltip("No cards to generate.<br>\
                 Are you sure you set your masks correctly?")
-            return
+            return False
         
         self.new_svg = svg_node.toxml() # write changes to svg
         omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
@@ -118,8 +119,10 @@ class ImgOccNoteGenerator(object):
         if not self.ed.addMode:
             parent = self.ed.parentWindow # display tt on browser/editcurrent
         tooltip("Cards added: %s" % len(qmasks), period=1500, parent=parent)
+        return state
 
     def updateNotes(self):
+        state = "default"
         self.uniq_id = self.opref['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
         omask_path = None
@@ -130,7 +133,7 @@ class ImgOccNoteGenerator(object):
         if not self.mnode_ids:
             tooltip("No shapes left. You can't delete all cards.<br>\
                 Are you sure you set your masks correctly?")
-            return
+            return False
         ret = self._deleteAndIdNotes(mlayer_node)
         if not ret:
             # confirmation window rejected
@@ -143,6 +146,7 @@ class ImgOccNoteGenerator(object):
             omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
             qmasks = self._generateMaskSVGsFor("Q")
             amasks = self._generateMaskSVGsFor("A")
+            state = "cacheReset"
         
         if fname2img(self.image_path) != fname2img(self.opref['image']):
             # updated image
@@ -166,7 +170,7 @@ class ImgOccNoteGenerator(object):
                                             new_image, note_id, nid)
         parent = self.ed.parentWindow
         tooltip("Cards updated: %s" % len(self.mnode_indexes), period=1500, parent=parent)
-        mw.ImgOccEdit.close()
+        return state
 
     def _getOriginalSvg(self):
         mask_doc = minidom.parse(self.opref["omask"])

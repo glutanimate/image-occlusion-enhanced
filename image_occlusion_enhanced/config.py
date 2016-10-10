@@ -41,9 +41,11 @@ IO_FLDS = {
 IO_FLDS_IDS = ["id", "hd", "im", "ft", "rk", "sc", 
                 "e1", "e2", "qm", "am", "om"]
 
+# fields that aren't user-editable
 IO_FLDS_PRIV = [IO_FLDS['id'], IO_FLDS['im'], IO_FLDS['qm'], 
                 IO_FLDS['am'], IO_FLDS['om']]
 
+# fields that are synced between an IO Editor session and Anki's Editor
 IO_FLDS_PRSV = [IO_FLDS['sc']]
 
 IO_DEFAULT_CONF = {'ofill': '00AA7F',
