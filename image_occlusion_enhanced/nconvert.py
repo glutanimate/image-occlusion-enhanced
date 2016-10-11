@@ -25,48 +25,48 @@ from aqt.utils import tooltip
 from xml.dom import minidom
 
 from config import *
+from dialogs import ioAskUser
 from utils import img2path, fname2img
-
 
 class ImgOccNoteConverter(object):
     def __init__(self, browser):
         self.browser = browser
-        self.model = mw.col.models.byName(IO_MODEL_NAME)
         self.occl_id_last = None
         loadConfig(self)
 
     def convertNotes(self, nids):
-        io_nids = self.filterByModel(nids)
+        (io_nids, skipped) = self.filterByModel(nids)
         for nid in io_nids:
             note = mw.col.getNote(nid)
             (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
             occl_tp = self.getOcclTypeAndMnodes(note)
+            occl_id = uniq_id + '-' + occl_tp
+            if occl_id == self.occl_id_last:
+                print "Skipping note that has already been converted"
+                continue
+            self.occl_id_last = occl_id
             family_nids = self.findByNoteId(uniq_id)
-            self.idAndCorrelateNotes(family_nids, uniq_id, occl_tp)
-            # print "note:", note
-            # print "uniq_id", uniq_id
-            # print "note_nr", note_nr
-            # print "occl_tp", occl_tp
-            # print "mnode_indexes", self.mnode_indexes
-            # print "family nids", family_nids
+            self.idAndCorrelateNotes(family_nids, occl_id)
+        tooltip("<b>%i</b> notes updated, <b>%i</b> skipped" % (len(io_nids), skipped))
 
     def filterByModel(self, nids):
         io_nids = []
+        skipped = 0
         for nid in nids:
             note = mw.col.getNote(nid)
-            if note.model() == self.model:
-                if not note[self.ioflds['id']]:
-                    print "Unconverted IO note:", nid
-                    io_nids.append(nid)
-                elif note.hasTag(".io-converted"):
-                    print "Note has been already been converted."
-                    continue
-                else:
-                    print "Skipping proper IO note:", nid
-                    continue
+            if note.model() != self.model:
+                print "Skipping note with wrong note type:", nid
+                skipped +=1
+                continue
             else:
-                print "Not an IO note:", nid
-        return io_nids
+                if not note[self.ioflds['id']]:
+                    print "Found IO note in need of update:", nid
+                    io_nids.append(nid)
+                else:
+                    print "Skipping IO note that is already editable:", nid
+                    skipped +=1
+                
+        return (io_nids, skipped)
 
     def findByNoteId(self, note_id):
         query = "'%s':'*%s*'" % ( self.ioflds['om'], note_id )
@@ -81,18 +81,13 @@ class ImgOccNoteConverter(object):
         note_nr = path.split(' ')[1].split('.')[0]
         return (uniq_id, note_nr)
 
-    def idAndCorrelateNotes(self, nids, uniq_id, occl_tp):
+    def idAndCorrelateNotes(self, nids, occl_id):
         nids_by_nr = {}
-        occl_id = uniq_id + '-' + occl_tp
-        if occl_id == self.occl_id_last:
-            print "Skipping notes that have alread been converted"
-            return
         self.occl_id_last = occl_id
         for nid in nids:
             note = mw.col.getNote(nid)
             (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
             nids_by_nr[int(note_nr)] = nid
-        pass
 
         print "occl_id", occl_id
         print "nids_by_nr", nids_by_nr
@@ -110,7 +105,6 @@ class ImgOccNoteConverter(object):
             self.mnode.childNodes[midx].setAttribute("id", new_mnode_id)
             note[self.ioflds['id']] = new_mnode_id
             note.flush()
-
 
         new_svg = self.svg_node.toxml()
         print "new_svg"
@@ -188,6 +182,29 @@ def onIoConvert(self):
     if not selected:
         tooltip("No cards selected.", period=2000)
         return
+    question = u"""\
+    This is a purely <b>experimental</b> feature that is meant to update older \
+    IO notes to be compatible with the new editing feature-set in IO Enhanced. \
+    Clicking on 'Yes' below will prompt the add-on to go through all selected \
+    notes and change their Note ID and mask files in a way that should make it \
+    possible to edit them in the future. \
+    <br><br>Please note that this will only work for notes \
+    that have already been switched to the <i>Image Occlusion Enhanced</i> note type.\
+    If you are coming from IO 2.0 or an older version of IO Enhanced you will \
+    first have to switch the note type of your notes manually by going to <i>Edit → \
+    Change Note Type.</i><br><br> \
+    <b>WARNING</b>: There is no guarantee that this feature will actually succeed in \
+    updating your notes properly. To convert legacy notes the add-on will have to \
+    make a few assumptions which in some rare instances might turn out to be wrong \
+    and lead to broken notes. <br>A checkpoint will be set to revert to if needed, \
+    but even with that safety measure in place you should still only use this \
+    function if you know what you are doing.\
+    <br><br><b>Continue anyway?</b><br><i>(Depending on the number of notes this might \
+    take a while)</i>
+    """
+    ret = ioAskUser(question, "Please confirm action", self, defaultno=True)
+    if not ret:
+        return False
     mw.progress.start()
     mw.checkpoint("Image Occlusion Note Conversions")
     self.model.beginReset()
@@ -197,12 +214,11 @@ def onIoConvert(self):
     mw.col.reset()
     mw.reset()
     mw.progress.finish()
-    tooltip("Performed IO Note Conversion")
 
 def setupMenu(self):
     menu = self.form.menuEdit
     menu.addSeparator()
-    a = menu.addAction('Convert to IO Enhanced notes (experimental)')
+    a = menu.addAction('Convert to Editable IO &Enhanced Notes')
     self.connect(a, SIGNAL("triggered()"), lambda b=self: onIoConvert(b))
 
 addHook("browser.setupMenus", setupMenu)

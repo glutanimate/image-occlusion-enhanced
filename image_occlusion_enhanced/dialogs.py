@@ -424,10 +424,10 @@ class ImgOccOpts(QDialog):
         for key in self.lnedit.keys():
             self.lnedit[key].setText(IO_FLDS[key])
             self.lnedit[key].setModified(True)
-        self.changeButtonColor(self.ofill_btn, self.sconf_d['ofill'])
-        self.changeButtonColor(self.qfill_btn, self.sconf_d['qfill'])
-        self.ofill = self.sconf_d['ofill']
-        self.qfill = self.sconf_d['qfill']
+        self.changeButtonColor(self.ofill_btn, self.sconf_dflt['ofill'])
+        self.changeButtonColor(self.qfill_btn, self.sconf_dflt['qfill'])
+        self.ofill = self.sconf_dflt['ofill']
+        self.qfill = self.sconf_dflt['qfill']
 
     def renameFields(self):
         """Check for modified names and rename fields accordingly"""

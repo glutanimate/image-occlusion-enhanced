@@ -87,17 +87,22 @@ def loadConfig(self):
 
     ioflds = mw.col.conf['imgocc']['flds']
     ioflds_priv = []
-    ioflds_prsv = []
     for i in IO_FIDS_PRIV:
         ioflds_priv.append(ioflds[i])
 
-    for i in IO_FIDS_PRSV:
-        ioflds_prsv.append(ioflds[i])
+    self.model = mw.col.models.byName(IO_MODEL_NAME)
+    if not self.model:
+        self.model = template.add_io_model(mw.col)
 
+    self.mflds = self.model['flds']
 
-    self.sconf_d = default_conf_syncd
+    self.ioflds_prsv = []
+    for fld in self.mflds:
+        if fld['sticky']:
+            self.ioflds_prsv.append(fld['name'])
+
+    self.sconf_dflt = default_conf_syncd
     self.sconf = mw.col.conf['imgocc']
     self.lconf = mw.pm.profile["imgocc"]
     self.ioflds = ioflds
     self.ioflds_priv = ioflds_priv
-    self.ioflds_prsv = ioflds_prsv

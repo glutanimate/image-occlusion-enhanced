@@ -74,7 +74,6 @@ class ImgOccNoteGenerator(object):
         self.did = did
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
         self.stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
-        self.model = mw.col.models.byName(IO_MODEL_NAME)
         loadConfig(self)
         
     def generateNotes(self):
@@ -365,6 +364,7 @@ class ImgOccNoteGenerator(object):
                                 img, note_id, nid=None):
         fields = self.fields
         model = self.model
+        mflds = self.mflds
         fields[self.ioflds['im']] = img
         if omask_path:
             # Occlusions updated
@@ -376,8 +376,6 @@ class ImgOccNoteGenerator(object):
             fields[self.ioflds['id']] = note_id
 
         self.model['did'] = self.did
-        mflds = model['flds']
-
         if nid:
             note = mw.col.getNote(nid)
         else:

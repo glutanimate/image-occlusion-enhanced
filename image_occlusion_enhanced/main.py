@@ -58,12 +58,6 @@ class ImgOccAdd(object):
         self.ed = ed
         self.mode = mode
         self.opref = {} # original io session preference
-        self.model = mw.col.models.byName(IO_MODEL_NAME)
-        if not self.model:
-            self.model = template.add_io_model(mw.col)
-        self.mflds = self.model['flds']
-
-        # load preferences
         loadConfig(self)
 
     def selImage(self):
@@ -116,7 +110,7 @@ class ImgOccAdd(object):
                 return image_path
 
         # retrieve last used image directory
-        prev_image_dir = mw.pm.profile["imgocc"]["dir"]
+        prev_image_dir = self.lconf["dir"]
         if not prev_image_dir or not os.path.isdir(prev_image_dir):
             prev_image_dir = IO_HOME
 
@@ -130,7 +124,7 @@ class ImgOccAdd(object):
             tooltip("Not a valid image file.")
             return None
         else:
-            mw.pm.profile["imgocc"]["dir"] = os.path.dirname(image_path)
+            self.lconf["dir"] = os.path.dirname(image_path)
             return image_path
 
     def callImgOccEdit(self):
@@ -140,8 +134,7 @@ class ImgOccAdd(object):
         opref = self.opref
         onote = self.ed.note
         mode = self.mode
-        model = mw.col.models.byName(IO_MODEL_NAME)
-        flds = model['flds']
+        flds = self.mflds
 
         deck = mw.col.decks.nameOrNone(opref["did"])
         try:
@@ -161,7 +154,7 @@ class ImgOccAdd(object):
         url.addQueryItem('bkgd_url', bkgd_url)
 
         if mode != "add":
-            for i in self.mflds:
+            for i in flds:
                 fn = i["name"]
                 if fn in self.ioflds_priv:
                     continue
