@@ -376,7 +376,8 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
-    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, img, note_id, nid=None):
+    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, 
+                                img, note_id, nid=None):
         fields = self.fields
         model = self.model
         fields[self.ioflds['im']] = img

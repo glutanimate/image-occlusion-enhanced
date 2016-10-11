@@ -34,6 +34,7 @@ from config import *
 from ngen import *
 from dialogs import ImgOccEdit, ImgOccOpts, ioHelp
 from resources import *
+import nconvert
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
