@@ -32,9 +32,9 @@ from xml.dom import minidom
 from Imaging.PIL import Image 
 import uuid
 import shutil
-import base64
 
 from dialogs import ioHelp, ioAskUser
+from utils import fname2img
 from config import *
 import template
 
@@ -50,21 +50,6 @@ import template
 # note_nr:      Third part of the note_id
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
-
-def imageProp(image_path):
-    image = Image.open(image_path)
-    width, height = image.size
-    return width, height
-
-def svgToBase64(svg_path):
-    doc = minidom.parse(svg_path)
-    svg_node = doc.documentElement
-    svg_content = svg_node.toxml()
-    svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
-    return svg_b64
-
-def fname2img(path):
-    return '<img src="%s" />' % os.path.split(path)[1]
 
 def genByKey(key, old_occl_tp=None):
     if key in ["Don't Change"]:
@@ -186,8 +171,8 @@ class ImgOccNoteGenerator(object):
         self.mnode_ids = {}
         mask_doc = minidom.parseString(self.new_svg)
         svg_node = mask_doc.documentElement
-        layer_notes = self._layerNotesFrom(svg_node)
-        mlayer_node = layer_notes[-1] # treat topmost layer as masks layer
+        layer_nodes = self.layerNodesFrom(svg_node)
+        mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
         for i, node in enumerate(mlayer_node.childNodes):
             # minidom doesn't offer a childElements method and childNodes
             # also returns whitespace found in the mlayer_node as a child node. 
@@ -334,8 +319,8 @@ class ImgOccNoteGenerator(object):
     def _createMask(self, side, mask_node_index):
         mask_doc = minidom.parseString(self.new_svg)
         svg_node = mask_doc.documentElement
-        layer_notes = self._layerNotesFrom(svg_node)
-        mlayer_node = layer_notes[-1] # treat topmost layer as masks layer
+        layer_nodes = self.layerNodesFrom(svg_node)
+        mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
         #This methods get implemented different by subclasses
         self._createMaskAtLayernode(side, mask_node_index, mlayer_node)
         return svg_node.toxml()
@@ -359,14 +344,14 @@ class ImgOccNoteGenerator(object):
                     node.removeAttribute(i)
             map(self._removeAttribsRecursively, node.childNodes)
 
-    def _layerNotesFrom(self, svg_node):
+    def layerNodesFrom(self, svg_node):
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
-        layer_notes = [node for node in svg_node.childNodes 
+        layer_nodes = [node for node in svg_node.childNodes 
                             if node.nodeType == node.ELEMENT_NODE]
-        assert (len(layer_notes) >= 1)
-        assert (layer_notes[0].nodeName == 'g')
-        return layer_notes
+        assert (len(layer_nodes) >= 1)
+        assert (layer_nodes[0].nodeName == 'g')
+        return layer_nodes
 
     def _saveMask(self, mask, note_id, mtype):
         logging.debug("!saving %s, %s", note_id, mtype)

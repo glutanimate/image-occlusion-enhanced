@@ -26,15 +26,14 @@ from aqt.addcards import AddCards
 from aqt.utils import tooltip, showWarning, saveGeom, restoreGeom
 from anki.hooks import wrap, addHook
 
-import re
 import tempfile
-import urlparse, urllib
 
 from config import *
 from ngen import *
 from dialogs import ImgOccEdit, ImgOccOpts, ioHelp
 from resources import *
 import nconvert
+from utils import imageProp, svgToBase64, img2path, path2url
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -53,22 +52,6 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('initTool', 'rect'),
                        ('text[font_family]', svg_edit_fonts),
                        ('extensions', svg_edit_ext)]
-
-def path2url(path):
-    return urlparse.urljoin(
-      'file:', urllib.pathname2url(path.encode('utf-8')))
-
-def img2path(img):
-    imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
-    imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
-    fname = imgregex.search(img)
-    if not fname:
-        return None
-    fpath = os.path.join(mw.col.media.dir(),fname.group(2))
-    if not os.path.isfile(fpath):
-        return None
-    else:
-        return fpath
 
 class ImgOccAdd(object):
     def __init__(self, ed, mode):
