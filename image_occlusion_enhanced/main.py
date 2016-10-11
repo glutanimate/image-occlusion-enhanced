@@ -73,17 +73,22 @@ class ImgOccAdd(object):
         opref["tags"] = self.ed.tags.text()
         
         if self.mode != "add":
+            note_id = None
             # can only get the deck of the current note/card via a db call:
             opref["did"] = mw.col.db.scalar(
                     "select did from cards where id = ?", note.cards()[0].id)
             note_id = note[self.ioflds['id']]
+            note_id_grps = note_id.split('-')
+            if note_id == None or len(note_id_grps) != 3:
+                tooltip("Editing unavailable: Invalid Image Occlusion Note ID")
+                return
             opref["note_id"] = note_id
-            opref["uniq_id"] = note_id.split('-')[0]
-            opref["occl_tp"] = note_id.split('-')[1]
+            opref["uniq_id"] = note_id_grps[0]
+            opref["occl_tp"] = note_id_grps[1]
             opref["image"] = img2path(note[self.ioflds['im']])
             opref["omask"] = img2path(note[self.ioflds['om']])
-            if None in opref:
-                showWarning("IO card not configured properly for editing")
+            if  None in [opref["omask"], opref["image"]]:
+                tooltip("Editing unavailable: Missing Image or Original Mask")
                 return
             image_path = opref["image"] 
         else:
