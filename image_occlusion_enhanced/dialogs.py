@@ -29,9 +29,9 @@ class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
     def __init__(self, mw):
         QDialog.__init__(self, parent=None)
+        self.visible = False
         self.mode = "add"
         loadConfig(self)
-        self.visible = False
         self.setupUi()
         restoreGeom(self, "imgoccedit")
 
@@ -163,6 +163,12 @@ class ImgOccEdit(QDialog):
                 QtCore.SIGNAL('activated()'), 
                 lambda f=i-1:self.focusField(f))
         ## Other hotkeys
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Return"), self), 
+            QtCore.SIGNAL('activated()'), lambda: self.addAO(True))
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Alt+Return"), self), 
+            QtCore.SIGNAL('activated()'), lambda: self.addAA(True))
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+Return"), self), 
+            QtCore.SIGNAL('activated()'), lambda: self.addOA(True))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Tab"), self), 
             QtCore.SIGNAL('activated()'), self.switchTabs)
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+r"), self), 
@@ -181,15 +187,15 @@ class ImgOccEdit(QDialog):
 
     def changeImage(self):
         mw.ImgOccAdd.onChangeImage()
-    def addAO(self): 
-        mw.ImgOccAdd.onAddNotesButton("ao")
-    def addAA(self): 
-        mw.ImgOccAdd.onAddNotesButton("aa")
-    def addOA(self): 
-        mw.ImgOccAdd.onAddNotesButton("oa")
-    def new(self):
+    def addAO(self, close=False): 
+        mw.ImgOccAdd.onAddNotesButton("ao", close)
+    def addAA(self, close=False): 
+        mw.ImgOccAdd.onAddNotesButton("aa", close)
+    def addOA(self, close=False): 
+        mw.ImgOccAdd.onAddNotesButton("oa", close)
+    def new(self, close=False):
         choice = self.occl_tp_select.currentText()
-        mw.ImgOccAdd.onAddNotesButton(choice)
+        mw.ImgOccAdd.onAddNotesButton(choice, close)
     def edit_note(self):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onEditNotesButton(choice)

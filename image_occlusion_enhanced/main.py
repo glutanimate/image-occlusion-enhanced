@@ -192,7 +192,7 @@ class ImgOccAdd(object):
                     """ %(bkgd_url, width, height))
         self.image_path = image_path
 
-    def onAddNotesButton(self, choice):
+    def onAddNotesButton(self, choice, close):
         dialog = mw.ImgOccEdit
         svg_edit = dialog.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
@@ -221,6 +221,9 @@ class ImgOccAdd(object):
             self.ed.loadNote()
             deck = mw.col.decks.nameOrNone(did)
             self.ed.parentWindow.deckChooser.deck.setText(deck)
+
+        if close:
+            dialog.close()
 
         mw.reset()
 
