@@ -54,6 +54,7 @@ class ImgOccEdit(QDialog):
         self.deck_container = QWidget()
         self.deckChooser = deckchooser.DeckChooser(mw, 
                         self.deck_container, label=True)
+        self.deckChooser.deck.setFocusPolicy(Qt.ClickFocus)
 
         # Button row widgets
         self.bottom_label = QLabel()
