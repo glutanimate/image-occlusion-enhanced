@@ -341,7 +341,8 @@ class ImgOccNoteGenerator(object):
             for i in attrs:
                 if node.hasAttribute(i):
                     node.removeAttribute(i)
-            map(self._removeAttribsRecursively, node.childNodes)
+            for i in node.childNodes:
+                self._removeAttribsRecursively(i, attrs)
 
     def layerNodesFrom(self, svg_node):
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)

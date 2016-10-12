@@ -37,6 +37,8 @@
     + Need to remove or add a shape, update a field, or resize all masks? Now you can!
 - **Change Images on the Fly**
     + Simply switch to a different image to occlude right from the IO Editor
+- **Create Custom Labels**
+    + Your image is lacking a specific label? Now you can create it yourself!
 - **Completely Overhauled User Interface**
     + Tabs, multi-line entry fields, numerous new hotkey assignments
 - **New Occlusion Mode**
