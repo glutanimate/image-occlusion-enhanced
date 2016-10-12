@@ -179,13 +179,19 @@ class ImgOccNoteGenerator(object):
             # indexes of mlayer_node children that contain actual elements, 
             # i.e. mask nodes
             if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
+                mnode = mlayer_node.childNodes[i]
                 self.mnode_indexes.append(i)
-                self._removeAttribsRecursively(mlayer_node.childNodes[i], self.stripattr)
+                self._removeAttribsRecursively(mnode, self.stripattr)
+                if mnode.nodeName == "g":
+                    # remove IDs of grouped shapes to prevent duplicates down the line
+                    for node in mnode.childNodes:
+                        self._removeAttribsRecursively(node, ["id"])
                 if not edit:
                     self.mnode_ids[i] = "%s-%i" %(self.occl_id, len(self.mnode_indexes))
                     mlayer_node.childNodes[i].setAttribute("id", self.mnode_ids[i])
                 else:
                     self.mnode_ids[i] = mlayer_node.childNodes[i].attributes["id"].value
+
         return (svg_node, mlayer_node)
 
     def findByNoteId(self, note_id):
@@ -252,6 +258,7 @@ class ImgOccNoteGenerator(object):
         for nr, idx in enumerate(self.mnode_indexes):
             mnode_id = mnode_ids[idx]
             new_mnode_id = None
+            mnode = mlayer_node.childNodes[idx]
             if mnode_id not in exstg_mnode_note_ids:
                 if available_nrs:
                     # use gap in note_id numbering
@@ -269,7 +276,7 @@ class ImgOccNoteGenerator(object):
                 new_mnode_id = self.occl_id + '-' + mnode_id_nr
                 nids[new_mnode_id] = nids.pop(mnode_id)
             if new_mnode_id:
-                mlayer_node.childNodes[idx].setAttribute("id", new_mnode_id)
+                mnode.setAttribute("id", new_mnode_id)
                 self.mnode_ids[idx] = new_mnode_id
             
             logging.debug("=====================")
@@ -328,11 +335,11 @@ class ImgOccNoteGenerator(object):
         raise NotImplementedError
 
     def _setQuestionAttribs(self, node):
-        # set element class
-        node.setAttribute("class", "qshape")
-        # set element color
         if (node.nodeType == node.ELEMENT_NODE):
+            # set question class
+            node.setAttribute("class", "qshape")
             if node.hasAttribute("fill"):
+                # set question color
                 node.setAttribute("fill", self.qfill)
             map(self._setQuestionAttribs, node.childNodes)
 
