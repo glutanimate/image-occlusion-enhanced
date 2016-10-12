@@ -36,7 +36,6 @@ import shutil
 from dialogs import ioHelp, ioAskUser
 from utils import fname2img
 from config import *
-import template
 
 # Explanation of some of the variables:
 #

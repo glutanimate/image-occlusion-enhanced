@@ -48,8 +48,6 @@ IO_FIDS_PRIV = ['id', 'im', 'qm', 'am', 'om']
 # fields that are synced between an IO Editor session and Anki's Editor
 IO_FIDS_PRSV = ['sc']
 
-
-
 # variables for local preference handling
 sys_encoding = sys.getfilesystemencoding()
 IO_HOME = os.path.expanduser('~').decode(sys_encoding)
@@ -58,8 +56,10 @@ IO_HOME = os.path.expanduser('~').decode(sys_encoding)
 default_conf_local = {"dir": IO_HOME}
 default_conf_syncd = {'ofill': 'FFEBA2',
                       'qfill': 'FF7E7E',
-                      'version': 0.7,
+                      'version': 0.9,
                       'flds': IO_FLDS}
+
+import template
 
 def loadConfig(self):
     """load and/or create add-on preferences"""
@@ -75,7 +75,7 @@ def loadConfig(self):
             mw.col.conf['imgocc']['qfill'] = old_conf['mask_fill_color']
             # insert other upgrade actions here
 
-    if mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
+    elif mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
         print "updating synced config db from earlier IO release"
         # insert other update actions here
         mw.col.conf['imgocc']['flds'] = IO_FLDS

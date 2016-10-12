@@ -289,9 +289,12 @@ def onImgOccButton(ed, mode):
     io_model = mw.col.models.byName(IO_MODEL_NAME)
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
+        if "imgocc" in mw.col.conf:
+            dflt_fields = mw.col.conf['imgocc']['flds'].values()
+        else:
+            dflt_fields = IO_FLDS.values()
         # note type integrity check
-        if not all(x in io_model_fields 
-                            for x in mw.col.conf['imgocc']['flds'].values()):
+        if not all(x in io_model_fields for x in dflt_fields):
             showWarning('<b>Error:</b><br><br>Image Occlusion note type \
                 not configured properly.Please make sure you did not \
                 manually delete or rename any of the default fields.')

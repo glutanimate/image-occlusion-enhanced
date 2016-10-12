@@ -16,6 +16,7 @@ import logging, sys
 
 from PyQt4 import QtCore, QtGui
 from aqt.qt import *
+from anki.errors import AnkiError
 
 from aqt import mw, webview, deckchooser, tagedit
 from aqt.utils import saveGeom, restoreGeom
@@ -464,7 +465,12 @@ class ImgOccOpts(QDialog):
 
     def onAccept(self):
         """Apply changes on OK button press"""
-        (modified, flds) = self.renameFields()
+        modified = False
+        try:
+            (modified, flds) = self.renameFields()
+        except AnkiError:
+            print "Field rename action aborted"
+            return
         if modified and hasattr(mw, "ImgOccEdit"):
             self.resetIoEditor(flds)
         mw.col.conf['imgocc']['ofill'] = self.ofill
