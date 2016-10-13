@@ -30,7 +30,7 @@ from anki.notes import Note
 
 from xml.dom import minidom
 from Imaging.PIL import Image 
-import uuid
+from uuid import uuid
 import shutil
 
 from dialogs import ioHelp, ioAskUser
