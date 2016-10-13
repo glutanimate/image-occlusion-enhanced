@@ -3,8 +3,6 @@
 .gitattributes export-ignore
 .gitignore export-ignore
 ## duplicate documentation
-ANKIWEB.md export-ignore
-ANKIWEB.html export-ignore
 PAGE.md export-ignore
 README.md export-ignore
 ## build script
@@ -12,9 +10,7 @@ build_zip.sh export-ignore
 ## screenshots
 /screenshots export-ignore
 # Adjust GitHub linguist settings:
-image_occlusion_2/svg-edit/* linguist-vendored
-image_occlusion_2/Imaging/* linguist-vendored
-image_occlusion_2/etree/* linguist-vendored
-ANKIWEB.html linguist-documentation
-ANKIWEB.md linguist-documentation
+image_occlusion_enhanced/svg-edit/* linguist-vendored
+image_occlusion_enhanced/Imaging/* linguist-vendored
+image_occlusion_enhanced/uuid/* linguist-vendored
 PAGE.md linguist-documentation
