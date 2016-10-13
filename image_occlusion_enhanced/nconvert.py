@@ -13,8 +13,7 @@
 ####################################################
 
 """
-Experimental conversion between older IO note types
-and Image Occlusion Enhanced
+Makes older IO notes editable.
 """
 
 from PyQt4.QtCore import SIGNAL

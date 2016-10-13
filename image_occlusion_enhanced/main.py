@@ -12,6 +12,10 @@
 ##                                                ##
 ####################################################
 
+"""
+Sets up buttons and menus and calls other modules.
+"""
+
 import logging, sys
 import os
 
@@ -19,21 +23,21 @@ from PyQt4.QtGui import QFileDialog, QAction, QKeySequence
 from PyQt4.QtCore import QUrl
 from aqt.qt import *
 
-from aqt import mw, webview, deckchooser, tagedit
-from aqt.editcurrent import EditCurrent
+from aqt import mw
 from aqt.editor import Editor
 from aqt.addcards import AddCards
+from aqt.editcurrent import EditCurrent
 from aqt.utils import tooltip, showWarning, saveGeom, restoreGeom
 from anki.hooks import wrap, addHook
 
 import tempfile
 
 from config import *
+from resources import *
 from ngen import *
 from dialogs import ImgOccEdit, ImgOccOpts, ioHelp
-from resources import *
-import nconvert
 from utils import imageProp, svgToBase64, img2path, path2url
+import nconvert
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -47,10 +51,7 @@ svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,\
 ext-markers.js,ext-shapes.js,ext-eyedropper.js"
 svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
-                       ('initStroke[color]', '2D2D2D'),
-                       ('initStroke[width]', '1'),
                        ('initTool', 'rect'),
-                       ('text[font_family]', svg_edit_fonts),
                        ('extensions', svg_edit_ext)]
 
 class ImgOccAdd(object):
@@ -129,14 +130,19 @@ class ImgOccAdd(object):
 
     def callImgOccEdit(self):
         width, height = imageProp(self.image_path)
-        ofill = mw.col.conf['imgocc']['ofill']
+        ofill = self.sconf['ofill']
+        scol = self.sconf['scol']
+        swidth = self.sconf['swidth']
+        fsize = self.sconf['fsize']
+        font = self.sconf['font'] 
+
         bkgd_url = path2url(self.image_path)
         opref = self.opref
         onote = self.ed.note
         mode = self.mode
         flds = self.mflds
-
         deck = mw.col.decks.nameOrNone(opref["did"])
+
         try:
             mw.ImgOccEdit is not None
             mw.ImgOccEdit.resetWindow()
@@ -147,11 +153,16 @@ class ImgOccAdd(object):
             logging.debug("Launching new ImgOccEdit instance")
         dialog = mw.ImgOccEdit
         dialog.switchToMode(self.mode)
+
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
         url.addQueryItem('initFill[color]', ofill)
         url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
         url.addQueryItem('bkgd_url', bkgd_url)
+        url.addQueryItem('initStroke[color]', scol)
+        url.addQueryItem('initStroke[width]', str(swidth))
+        url.addQueryItem('text[font_size]', str(fsize))
+        url.addQueryItem('text[font_family]', "'%s', %s" % (font, svg_edit_fonts))
 
         if mode != "add":
             for i in flds:

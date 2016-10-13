@@ -12,6 +12,10 @@
 ##                                                ##
 ####################################################
 
+"""
+Handles the IO note type and card template
+"""
+
 from config import *
 
 # Default card template

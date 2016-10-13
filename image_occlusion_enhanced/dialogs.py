@@ -12,6 +12,10 @@
 ##                                                ##
 ####################################################
 
+"""
+Handles all major dialogs
+"""
+
 import logging, sys
 
 from PyQt4 import QtCore, QtGui
@@ -325,23 +329,52 @@ class ImgOccOpts(QDialog):
         loadConfig(self)
         self.ofill = self.sconf['ofill']
         self.qfill = self.sconf['qfill']
+        self.scol = self.sconf['scol']
+        self.swidth = self.sconf['swidth']
+        self.font = self.sconf['font']
+        self.fsize = self.sconf['fsize']
         self.setupUi()
-        self.changeButtonColor(self.ofill_btn, self.ofill)
-        self.changeButtonColor(self.qfill_btn, self.qfill)
+        self.setupValues(self.sconf)
+
+    def setupValues(self, config):
+        self.changeButtonColor(self.ofill_btn, config['ofill'])
+        self.changeButtonColor(self.qfill_btn, config['qfill'])
+        self.changeButtonColor(self.scol_btn, config['scol'])
+        self.swidth_sel.setValue(int(config['swidth']))
+        self.fsize_sel.setValue(int(config['fsize']))
+        self.swidth_sel.setValue(int(config['swidth']))
+        self.font_sel.setCurrentFont(QFont(config['font']))
 
     def setupUi(self):
         # Color buttons and other widgets
-        qfill_label = QLabel('Question shape')
-        ofill_label = QLabel('Initial shape')
+        qfill_label = QLabel('Question mask')
+        ofill_label = QLabel('Other masks')
+        scol_label = QLabel('Lines')
         colors_heading = QLabel("<b>Colors</b>")
         fields_heading = QLabel("<b>Custom Field Names</b>")
+        other_heading = QLabel("<b>Other Editor Settings</b>")
 
         self.qfill_btn = QPushButton()
         self.ofill_btn = QPushButton()
+        self.scol_btn = QPushButton()
         self.qfill_btn.connect(self.qfill_btn, SIGNAL("clicked()"), 
             lambda a="qfill", b=self.qfill_btn: self.getNewColor(a, b))
         self.ofill_btn.connect(self.ofill_btn, SIGNAL("clicked()"),
             lambda a="ofill", b=self.ofill_btn: self.getNewColor(a, b))
+        self.scol_btn.connect(self.scol_btn, SIGNAL("clicked()"),
+            lambda a="scol", b=self.scol_btn: self.getNewColor(a, b))
+
+        swidth_label = QLabel("Line width")
+        font_label = QLabel("Label font")
+        fsize_label = QLabel("Label size")
+
+        self.swidth_sel = QSpinBox()
+        self.swidth_sel.setMinimum(0)
+        self.swidth_sel.setMaximum(20)
+        self.font_sel = QFontComboBox()
+        self.fsize_sel = QSpinBox()
+        self.fsize_sel.setMinimum(5)
+        self.fsize_sel.setMaximum(300)
 
         frame = QFrame()
         frame.setFrameShape(QFrame.HLine)
@@ -359,25 +392,36 @@ class ImgOccOpts(QDialog):
         grid = QtGui.QGridLayout()
         grid.setSpacing(10)
 
-        grid.addWidget(colors_heading, 0, 0, 1, 6)
-        grid.addWidget(qfill_label, 1, 1, 1, 2)
-        grid.addWidget(self.qfill_btn, 1, 3, 1, 2)
-        grid.addWidget(ofill_label, 2, 1, 1, 2)
-        grid.addWidget(self.ofill_btn, 2, 3, 1, 2)
-        grid.addWidget(frame, 3, 0, 1, 6)
-        grid.addWidget(fields_heading, 4, 0, 1, 6)  
-        grid.addWidget(fields_description, 5, 0, 1, 6)
+        grid.addWidget(colors_heading, 0, 0, 1, 3)
+        grid.addWidget(qfill_label, 1, 0, 1, 1)
+        grid.addWidget(self.qfill_btn, 1, 1, 1, 2)
+        grid.addWidget(ofill_label, 2, 0, 1, 1)
+        grid.addWidget(self.ofill_btn, 2, 1, 1, 2)
+        grid.addWidget(scol_label, 3, 0, 1, 1)
+        grid.addWidget(self.scol_btn, 3, 1, 1, 2)
+
+        grid.addWidget(other_heading, 0, 3, 1, 3)
+        grid.addWidget(swidth_label, 1, 3, 1, 1)
+        grid.addWidget(self.swidth_sel, 1, 4, 1, 2)
+        grid.addWidget(font_label, 2, 3, 1, 1)
+        grid.addWidget(self.font_sel, 2, 4, 1, 2)
+        grid.addWidget(fsize_label, 3, 3, 1, 1)
+        grid.addWidget(self.fsize_sel, 3, 4, 1, 2)
+
+        grid.addWidget(frame, 4, 0, 1, 6)
+        grid.addWidget(fields_heading, 5, 0, 1, 6)  
+        grid.addWidget(fields_description, 6, 0, 1, 6)
 
         # Note type fields
-        row = 6
+        row = 7
         clm = 0
         self.lnedit = {}
         for key in IO_FLDS_IDS:
-            if row == 12: # switch to right columns
+            if row == 13: # switch to right columns
                 clm = 3
-                row = 6
-            default_name = IO_FLDS[key]
-            current_name = mw.col.conf['imgocc']['flds'][key]
+                row = 7
+            default_name = self.sconf_dflt['flds'][key]
+            current_name = self.sconf['flds'][key]
             l = QLabel(default_name)
             l.setTextInteractionFlags(Qt.TextSelectableByMouse)
             t = QLineEdit()
@@ -401,8 +445,8 @@ class ImgOccOpts(QDialog):
         l_main.addLayout(grid)
         l_main.addWidget(button_box)
         self.setLayout(l_main)
-        self.setMinimumWidth(640)
-        self.setMinimumHeight(520)
+        self.setMinimumWidth(800)
+        self.setMinimumHeight(540)
         self.setWindowTitle('Image Occlusion Enhanced Options')
 
     def getNewColor(self, clrvar, clrbtn):
@@ -414,8 +458,10 @@ class ImgOccOpts(QDialog):
             color = color.name()[1:]
             if clrvar == "qfill":
                 self.qfill = color
-            else:
+            elif clrvar == "ofill":
                 self.ofill = color
+            elif clrvar == "scol":
+                self.scol = color
             self.changeButtonColor(clrbtn, color)
 
     def changeButtonColor(self, button, color):
@@ -432,10 +478,10 @@ class ImgOccOpts(QDialog):
         for key in self.lnedit.keys():
             self.lnedit[key].setText(IO_FLDS[key])
             self.lnedit[key].setModified(True)
-        self.changeButtonColor(self.ofill_btn, self.sconf_dflt['ofill'])
-        self.changeButtonColor(self.qfill_btn, self.sconf_dflt['qfill'])
-        self.ofill = self.sconf_dflt['ofill']
-        self.qfill = self.sconf_dflt['qfill']
+        self.setupValues(self.sconf_dflt)
+        self.ofill = self.sconf_dflt["ofill"]
+        self.qfill = self.sconf_dflt["qfill"]
+        self.scol = self.sconf_dflt["scol"]
 
     def renameFields(self):
         """Check for modified names and rename fields accordingly"""
@@ -475,6 +521,10 @@ class ImgOccOpts(QDialog):
             self.resetIoEditor(flds)
         mw.col.conf['imgocc']['ofill'] = self.ofill
         mw.col.conf['imgocc']['qfill'] = self.qfill
+        mw.col.conf['imgocc']['scol'] = self.scol
+        mw.col.conf['imgocc']['swidth'] = self.swidth_sel.value()
+        mw.col.conf['imgocc']['fsize'] = self.fsize_sel.value()
+        mw.col.conf['imgocc']['font'] = self.font_sel.currentFont().family()
         mw.col.setMod()
         self.close()
 

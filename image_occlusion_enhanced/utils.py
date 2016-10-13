@@ -11,9 +11,11 @@
 ##           (https://github.com/tmbb)            ##
 ##                                                ##
 ####################################################
+
 """
-Various utilites that are used in multiple places
+Common reusable utilities
 """
+
 import os
 
 from aqt import mw

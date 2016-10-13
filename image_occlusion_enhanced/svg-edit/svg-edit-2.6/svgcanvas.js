@@ -2637,7 +2637,8 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				break;
 			case "line":
 				started = true;
-				var stroke_w = cur_shape.stroke_width == 0?2:cur_shape.stroke_width;
+				// var stroke_w = cur_shape.stroke_width == 0?2:cur_shape.stroke_width;
+				var stroke_w = curConfig.initStroke.width
 				addSvgElementFromJson({
 					"element": "line",
 					"curStyles": true,
@@ -2647,7 +2648,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"x2": x,
 						"y2": y,
 						"id": getNextId(),
-						"stroke": "#2D2D2D",
+						"stroke": "#" + curConfig.initStroke.color,
 						"stroke-width": stroke_w,
 						"stroke-dasharray": cur_shape.stroke_dasharray,
 						"stroke-linejoin": cur_shape.stroke_linejoin,

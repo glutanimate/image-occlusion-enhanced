@@ -20,6 +20,11 @@
 ##                                                ##
 ####################################################
 
+"""
+Generates the actual IO notes and writes them to
+the collection.
+"""
+
 import os
 import logging, sys
 
