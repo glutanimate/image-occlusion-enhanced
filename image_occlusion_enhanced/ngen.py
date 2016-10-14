@@ -104,8 +104,6 @@ class ImgOccNoteGenerator(object):
                                         img, note_id)
         
         parent = None
-        if not self.ed.addMode:
-            parent = self.ed.parentWindow # display tt on browser/editcurrent
         tooltip("%s %s <b>added</b>" % self.cardS(len(qmasks)), parent=parent)
         return state
 
