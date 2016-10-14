@@ -27,7 +27,7 @@ from aqt import mw
 from aqt.editor import Editor
 from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
-from aqt.utils import tooltip, showWarning, saveGeom, restoreGeom
+from aqt.utils import tooltip, saveGeom, restoreGeom
 from anki.hooks import wrap, addHook
 
 import tempfile
@@ -35,7 +35,7 @@ import tempfile
 from config import *
 from resources import *
 from ngen import *
-from dialogs import ImgOccEdit, ImgOccOpts, ioHelp
+from dialogs import ImgOccEdit, ImgOccOpts, ioHelp, ioError
 from utils import imageProp, svgToBase64, img2path, path2url
 import nconvert
 
@@ -278,9 +278,10 @@ class ImgOccAdd(object):
         # note type integrity check:
         io_model_fields = mw.col.models.fieldNames(self.model)
         if not all(x in io_model_fields for x in self.ioflds.values()):
-            showWarning('<b>Error:</b><br><br>Image Occlusion note type \
-                not configured properly.Please make sure you did not \
-                manually delete or rename any of the default fields.')
+            ioError("<b>Error</b>: Image Occlusion note type " \
+                "not configured properly.Please make sure you did not " \
+                "manually delete or rename any of the default fields.", 
+                help="notetype")
             return False
         for i in self.mflds:
             fn = i['name']
@@ -316,9 +317,10 @@ def onImgOccButton(ed, mode):
             dflt_fields = IO_FLDS.values()
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
-            showWarning('<b>Error:</b><br><br>Image Occlusion note type \
-                not configured properly.Please make sure you did not \
-                manually delete or rename any of the default fields.')
+            ioError("<b>Error</b>: Image Occlusion note type " \
+                "not configured properly.Please make sure you did not " \
+                "manually delete or rename any of the default fields.", 
+                help="notetype")
             return False
     if mode != "add" and ed.note.model() != io_model:
         tooltip("Can only edit notes with the %s note type" % IO_MODEL_NAME)

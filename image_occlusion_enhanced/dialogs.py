@@ -544,35 +544,61 @@ class ImgOccOpts(QDialog):
         """Dismiss changes on Close button press"""
         self.close()
 
-def ioAskUser(text, title="Image Occlusion Enhanced", parent=None, 
-                    help="", defaultno=False, msgfunc=None):
-    """Show a yes/no question. Return true if yes.
-                Based on anki/utils.py by Damien Elmes"""
-    if not parent:
-        parent = mw.app.activeWindow()
-    if not msgfunc:
-        msgfunc = QMessageBox.question
-    sb = QMessageBox.Yes | QMessageBox.No
+
+def ioError(text, title="Image Occlusion Enhanced Error", 
+                                    parent=None, help=None):
+    msgfunc = QMessageBox.critical
+    btns = None
     if help:
-        sb |= QMessageBox.Help
+        btns = QMessageBox.Help | QMessageBox.Ok
+    while 1:
+        r = ioInfo(text, title, parent, buttons=btns, msgfunc=msgfunc)
+        if r == QMessageBox.Help:
+            ioHelp(help, parent=parent)
+        else:
+            break
+    return r
+
+def ioAskUser(text, title="Image Occlusion Enhanced", parent=None, 
+                            help="", defaultno=False, msgfunc=None):
+    """Show a yes/no question. Return true if yes.
+    based on askUser by Damien Elmes"""
+
+    msgfunc = QMessageBox.question
+    btns = QMessageBox.Yes | QMessageBox.No
+    if help:
+        btns |= QMessageBox.Help
     while 1:
         if defaultno:
             default = QMessageBox.No
         else:
             default = QMessageBox.Yes
-        r = msgfunc(parent, title, text, sb, default)
+        r = ioInfo(text, title, parent, btns, default, msgfunc)
         if r == QMessageBox.Help:
             ioHelp(help, parent=parent)
         else:
             break
     return r == QMessageBox.Yes
 
+def ioInfo(text, title="Image Occlusion Enhanced", parent=None,
+                        buttons=None, default=None, msgfunc=None):
+    if not parent:
+        parent = mw.app.activeWindow()
+    if not buttons:
+        buttons = QMessageBox.Ok
+    if not default:
+        default = QMessageBox.Ok
+    if not msgfunc:
+        msgfunc = QMessageBox.information
+    return msgfunc(parent, title, text, buttons, default)
+
+
 def ioHelp(help, title=None, text=None, parent=None):
     """Display an info message or a predefined help section"""
     io_link_wiki = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
     io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o"
     help_text = {}
-    help_text["editing"] = """<center><b>Instructions for editing</b>: \
+    help_text["editing"] = """<b>Instructions for editing</b>: \
         <br><br> Each mask shape represents a card.\
         Removing any of the existing shapes will remove the corresponding card.\
         New shapes will generate new cards. You can change the occlusion type\
@@ -583,8 +609,14 @@ def ioHelp(help, title=None, text=None, parent=None):
         easily undone, so please make sure to check your changes twice before\
         applying them.</b><br><br>The only exception to this are purely textual\
         changes to fields like the header or footer of your notes. These can\
-        be fully reverted by using Ctrl+Z in the Browser or Reviewer view\
-        </center>"""
+        be fully reverted by using Ctrl+Z in the Browser or Reviewer view."""
+    help_text["notetype"] = """<b>Fixing a broken note type:</b>\
+        <br><br> The Image Occlusion Enhanced note type can't be edited \
+        arbitrarily. If you delete a field that's required by the add-on \
+        or rename it outside of the IO Options dialog you will be presented \
+        with an error message. <br><br>
+        To fix this issue please follow the instructions in <a href="%s">the \
+        wiki</a>.""" % (io_link_wiki + "/Troubleshooting#note-type")
     help_text["main"] = u"""<h2>Help and Support</h2>
         <p><a href="%s">Image Occlusion Enhanced Wiki</a></p>
         <p><a href="%s">Official Video Tutorial Series</a></p>
