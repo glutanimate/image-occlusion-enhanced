@@ -53,8 +53,6 @@ from config import *
 #               by all notes created in one IO session
 # note_nr:      Third part of the note_id
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
-
 def genByKey(key, old_occl_tp=None):
     """Get note generator based on occl_tp/user input"""
     if key in ["Don't Change"]:

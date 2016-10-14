@@ -16,6 +16,8 @@
 Makes older IO notes editable.
 """
 
+import logging, sys
+
 from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QKeySequence
 from anki.hooks import addHook
@@ -42,7 +44,7 @@ class ImgOccNoteConverter(object):
             occl_tp = self.getOcclTypeAndNodes(note)
             occl_id = uniq_id + '-' + occl_tp
             if occl_id == self.occl_id_last:
-                print "Skipping note that has already been converted"
+                logging.debug("Skipping note that has already been converted: %s", nid)
                 continue
             self.occl_id_last = occl_id
             family_nids = self.findByNoteId(uniq_id)
@@ -58,14 +60,14 @@ class ImgOccNoteConverter(object):
         for nid in nids:
             note = mw.col.getNote(nid)
             if note.model() != self.model:
-                print "Skipping note with wrong note type:", nid
+                logging.debug("Skipping note with wrong note type: %s", nid)
                 skipped +=1
                 continue
             elif note[self.ioflds['id']]:
-                print "Skipping IO note that is already editable:", nid
+                logging.debug("Skipping IO note that is already editable: %s", nid)
                 skipped +=1
                 continue
-            print "Found IO note in need of update:", nid
+            logging.debug("Found IO note in need of update: %s", nid)
             io_nids.append(nid)     
         return (io_nids, skipped)
 
@@ -73,7 +75,7 @@ class ImgOccNoteConverter(object):
         """Search collection for notes with given ID in their omask paths"""
         # need to use omask path because Note ID field is not yet set
         query = "'%s':'*%s*'" % ( self.ioflds['om'], note_id )
-        print "query:", query
+        logging.debug("query: %s", query)
         res = mw.col.findNotes(query)
         return res
 
@@ -94,33 +96,33 @@ class ImgOccNoteConverter(object):
             (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
             nids_by_nr[int(note_nr)] = nid
 
-        print "occl_id", occl_id
-        print "nids_by_nr", nids_by_nr
+        logging.debug("occl_id %s", occl_id)
+        logging.debug("nids_by_nr %s", nids_by_nr)
 
         for nr in sorted(nids_by_nr.keys()):
             midx = self.mnode_idxs[nr]
             nid = nids_by_nr[nr]
-            print "nr", nr
-            print "midx", midx
-            print "nid", nid
             note = mw.col.getNote(nid)
-            print "note", note
             new_mnode_id =  occl_id + '-' + str(nr+1)
-            print "new_mnode_id", new_mnode_id
             self.mnode.childNodes[midx].setAttribute("id", new_mnode_id)
             note[self.ioflds['id']] = new_mnode_id
             note.flush()
+            logging.debug("Adding ID for note nr %s", nr)
+            logging.debug("midx %s", midx)
+            logging.debug("nid %s", nid)
+            logging.debug("note %s", note)
+            logging.debug("new_mnode_id %s", new_mnode_id)
 
         new_svg = self.svg_node.toxml()
         omask_path = self._saveMask(new_svg, occl_id, "O")
-        print "omask_path", omask_path
+        logging.debug("omask_path %s", omask_path)
 
         for nid in nids_by_nr.values():
-            print "nid", nid
             note = mw.col.getNote(nid)
             note[self.ioflds['om']] = fname2img(omask_path)
             note.addTag(".io-converted")
             note.flush()
+            logging.debug("Setting om and tag for nid %s", nid)
 
     def getOcclTypeAndNodes(self, note):
         """Determine oclusion type and svg mask nodes"""
@@ -172,7 +174,7 @@ class ImgOccNoteConverter(object):
 
     def _saveMask(self, mask, note_id, mtype):
         """Write mask to file in media collection"""
-        print "!saving %s, %s" % (note_id, mtype)
+        logging.debug("!saving %s, %s", note_id, mtype)
         mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'w')
         mask_file.write(mask)

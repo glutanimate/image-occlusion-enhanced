@@ -28,8 +28,6 @@ from aqt.utils import saveGeom, restoreGeom
 from config import *
 from resources import *
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
-
 class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
     def __init__(self, mw):

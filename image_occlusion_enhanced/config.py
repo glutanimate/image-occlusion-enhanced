@@ -86,7 +86,7 @@ def loadConfig(self):
         mw.col.setMod()
 
     elif mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
-        print "updating synced config db from earlier IO release"
+        print "Updating synced config DB from earlier IO release"
         # insert other update actions here
         for key in default_conf_syncd.keys():
             if key not in mw.col.conf['imgocc']:
