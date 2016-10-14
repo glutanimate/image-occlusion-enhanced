@@ -2437,6 +2437,9 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		if(typeof last_mode == 'undefined') {
 		    last_mode = "";
 		}
+		if(typeof line_stroke == 'undefined') {
+		    line_stroke = "#" + curConfig.initStroke.color;
+		}
 		if (last_mode == "text") {
 			// using the text tool would normally change the fill and stroke
 			cur_shape.fill = "#" + curConfig.initFill.color
@@ -2446,7 +2449,9 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			// using the pencil tool would normally change the fill
 			cur_shape.fill = "#" + curConfig.initFill.color
 			last_mode = ""
-		};;
+		} else if (last_mode == "line" && current_mode == "line") {
+			line_stroke = cur_shape.stroke
+		};
 		switch (current_mode) {
 			case "select":
 				started = true;
@@ -2597,6 +2602,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				break;
 			case "image":
 				started = true;
+				last_mode = "image"
 				var newImage = addSvgElementFromJson({
 					"element": "image",
 					"attr": {
@@ -2617,6 +2623,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				// (for resizing purposes this could be important)
 			case "rect":
 				started = true;
+				last_mode = "rect";
 				start_x = x;
 				start_y = y;
 				addSvgElementFromJson({
@@ -2637,8 +2644,9 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				break;
 			case "line":
 				started = true;
-				// var stroke_w = cur_shape.stroke_width == 0?2:cur_shape.stroke_width;
-				var stroke_w = curConfig.initStroke.width
+				last_mode = "line"
+				// use current stroke width. if width 0, use initial width
+				var stroke_w = cur_shape.stroke_width == 0?curConfig.initStroke.width:cur_shape.stroke_width;
 				addSvgElementFromJson({
 					"element": "line",
 					"curStyles": true,
@@ -2648,7 +2656,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						"x2": x,
 						"y2": y,
 						"id": getNextId(),
-						"stroke": "#" + curConfig.initStroke.color,
+						"stroke": line_stroke,
 						"stroke-width": stroke_w,
 						"stroke-dasharray": cur_shape.stroke_dasharray,
 						"stroke-linejoin": cur_shape.stroke_linejoin,
@@ -2662,6 +2670,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				break;
 			case "circle":
 				started = true;
+				last_mode = "circle"
 				addSvgElementFromJson({
 					"element": "circle",
 					"curStyles": true,
@@ -2679,6 +2688,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				break;
 			case "ellipse":
 				started = true;
+				last_mode = "elipse"
 				addSvgElementFromJson({
 					"element": "ellipse",
 					"curStyles": true,
