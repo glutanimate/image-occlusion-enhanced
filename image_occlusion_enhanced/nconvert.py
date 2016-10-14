@@ -50,7 +50,7 @@ class ImgOccNoteConverter(object):
             family_nids = self.findByNoteId(uniq_id)
             self.idAndCorrelateNotes(family_nids, occl_id)
         tooltip("<b>%i</b> notes updated, <b>%i</b> skipped"
-                                         % (len(io_nids), skipped))
+                                            % (len(io_nids), skipped))
 
     def filterSelected(self, nids):
         """Filters out notes with the wrong note type and those that are
@@ -65,6 +65,10 @@ class ImgOccNoteConverter(object):
                 continue
             elif note[self.ioflds['id']]:
                 logging.debug("Skipping IO note that is already editable: %s", nid)
+                skipped +=1
+                continue
+            elif not note[self.ioflds['om']]:
+                logging.debug("Skipping IO note without original SVG mask: %s", nid)
                 skipped +=1
                 continue
             logging.debug("Found IO note in need of update: %s", nid)
@@ -211,7 +215,10 @@ def onIoConvert(self):
     <b>WARNING</b>: There is no guarantee that this feature will actually succeed in \
     updating your notes properly. To convert legacy notes the add-on will have to \
     make a few assumptions which in some rare instances might turn out to be wrong \
-    and lead to broken notes. <br>A checkpoint will be set to revert to if needed, \
+    and lead to broken notes. Notes that can't be parsed for the information needed \
+    to convert into an editable state (e.g. a valid "Original Mask" field) will usually \
+    be skipped by the add-on, but there might be some corner cases where that won't work. \
+    <br><br>A checkpoint will be set to revert to if needed, \
     but even with that safety measure in place you should still only use this \
     function if you know what you are doing.\
     <br><br><b>Continue anyway?</b><br><i>(Depending on the number of notes this might \
