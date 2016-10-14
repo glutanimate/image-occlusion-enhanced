@@ -107,6 +107,7 @@ def loadConfig(self):
         model = template.add_io_model(mw.col)
     mflds = model['flds']
     ioflds_prsv = []
+    # preserve fields if they are marked as sticky in the IO note type:
     for fld in mflds:
         if fld['sticky']:
             ioflds_prsv.append(fld['name'])

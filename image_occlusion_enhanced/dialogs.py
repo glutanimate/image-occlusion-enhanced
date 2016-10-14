@@ -43,7 +43,11 @@ class ImgOccEdit(QDialog):
             self.deckChooser.cleanup()
             saveGeom(self, "imgoccedit")
         self.visible = False
-        QWidget.closeEvent(self, event)
+        event.accept()
+
+    def reject(self):
+        # Override QDialog Esc key reject
+        pass
 
     def setupUi(self):
         """Set up ImgOccEdit UI"""
