@@ -57,7 +57,16 @@ class ImgOccEdit(QDialog):
         self.deck_container = QWidget()
         self.deckChooser = deckchooser.DeckChooser(mw, 
                         self.deck_container, label=True)
-        self.deckChooser.deck.setFocusPolicy(Qt.ClickFocus)
+
+        # workaround for tab focus order issue of the tags entry
+        # (this particular section is only needed when the quick deck
+        # buttons add-on is installed)
+        if self.deck_container.layout().children(): # multiple deck buttons
+            for i in range(self.deck_container.layout().children()[0].count()):
+                item = self.deck_container.layout().children()[0].itemAt(i)
+                # remove Tab focus manually:
+                item.widget().setFocusPolicy(Qt.ClickFocus)
+
 
         # Button row widgets
         self.bottom_label = QLabel()
@@ -140,12 +149,12 @@ class ImgOccEdit(QDialog):
 
         ## Main Tab Widget
         tab1 = QWidget()
-        tab2 = QWidget()
+        self.tab2 = QWidget()
         tab1.setLayout(vbox1)
-        tab2.setLayout(self.vbox2)
+        self.tab2.setLayout(self.vbox2)
         self.tab_widget = QtGui.QTabWidget() 
         self.tab_widget.addTab(tab1,"&Masks Editor")
-        self.tab_widget.addTab(tab2,"&Fields")
+        self.tab_widget.addTab(self.tab2,"&Fields")
         self.tab_widget.setTabToolTip(1, "Include additional information (optional)")
         self.tab_widget.setTabToolTip(0, "Create image occlusion masks (required)")
 
@@ -253,6 +262,9 @@ class ImgOccEdit(QDialog):
         self.tags_hbox.addWidget(self.tags_edit)
         self.vbox2.addLayout(self.tags_hbox)
         self.vbox2.addWidget(self.deck_container)
+        # switch Tab focus order of deckchooser and tags_edit (
+        # for some reason it's the wrong way around by default):
+        self.tab2.setTabOrder(self.tags_edit, self.deckChooser.deck)
 
     def switchToMode(self, mode):
         """Toggle between add and edit layouts"""
