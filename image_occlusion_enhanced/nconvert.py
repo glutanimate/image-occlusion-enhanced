@@ -80,11 +80,19 @@ class ImgOccNoteConverter(object):
         return res
 
     def getDataFromNamingScheme(self, note):
-        """Get IO 2.0 unique ID and note nr from qmask path"""
+        """Get unique ID and note nr from qmask path"""
         qmask = note[self.ioflds['qm']]
         path = img2path(qmask, True)
-        uniq_id = path.split('_')[0]
-        note_nr = path.split(' ')[1].split('.')[0]
+        grps = path.split('_')
+        if len(grps) != 2:
+            logging.debug("Extracting data using IO Enhanced naming scheme")
+            grps = path.split('-')
+            uniq_id = grps[0]
+            note_nr = int(grps[2]) - 1
+        else:
+            logging.debug("Extracting data using IO 2.0 naming scheme")
+            uniq_id = grps[0]
+            note_nr = path.split(' ')[1].split('.')[0]
         return (uniq_id, note_nr)
 
     def idAndCorrelateNotes(self, nids, occl_id):
@@ -98,6 +106,7 @@ class ImgOccNoteConverter(object):
 
         logging.debug("occl_id %s", occl_id)
         logging.debug("nids_by_nr %s", nids_by_nr)
+        logging.debug("mnode_idxs %s", self.mnode_idxs)
 
         for nr in sorted(nids_by_nr.keys()):
             midx = self.mnode_idxs[nr]

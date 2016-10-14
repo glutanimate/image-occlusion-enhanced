@@ -39,7 +39,7 @@ from dialogs import ImgOccEdit, ImgOccOpts, ioHelp, ioError
 from utils import imageProp, svgToBase64, img2path, path2url
 import nconvert
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
