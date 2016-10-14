@@ -51,7 +51,6 @@ svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,\
 ext-markers.js,ext-shapes.js,ext-eyedropper.js"
 svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
-                       ('initTool', 'rect'),
                        ('extensions', svg_edit_ext)]
 
 class ImgOccAdd(object):
@@ -168,6 +167,7 @@ class ImgOccAdd(object):
         url.addQueryItem('text[font_family]', "'%s', %s" % (font, svg_edit_fonts))
 
         if mode != "add":
+            url.addQueryItem('initTool', 'select'),
             for i in flds:
                 fn = i["name"]
                 if fn in self.ioflds_priv:
@@ -175,6 +175,8 @@ class ImgOccAdd(object):
                 dialog.tedit[fn].setPlainText(onote[fn].replace('<br />', '\n'))
             svg_b64 = svgToBase64(opref["omask"])
             url.addQueryItem('source', svg_b64)
+        else:
+            url.addQueryItem('initTool', 'rect'),
 
         dialog.svg_edit.setUrl(url)
         dialog.deckChooser.deck.setText(deck)
