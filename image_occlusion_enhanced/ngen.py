@@ -106,7 +106,7 @@ class ImgOccNoteGenerator(object):
         parent = None
         if not self.ed.addMode:
             parent = self.ed.parentWindow # display tt on browser/editcurrent
-        tooltip("Cards added: %s" % len(qmasks), period=1500, parent=parent)
+        tooltip("%s %s <b>added</b>" % self.cardS(len(qmasks)), parent=parent)
         return state
 
     def updateNotes(self):
@@ -127,6 +127,8 @@ class ImgOccNoteGenerator(object):
         if not ret:
             # confirmation window rejected
             return False
+        else:
+            (del_count, new_count) = ret
         
         self.new_svg = svg_node.toxml() # write changes to svg
         old_svg = self._getOriginalSvg() # load original svg
@@ -161,9 +163,23 @@ class ImgOccNoteGenerator(object):
             else:
                 self._saveMaskAndReturnNote(None, None, None,    
                                             img, note_id, nid)
-        parent = self.ed.parentWindow
-        tooltip("Cards updated: %s" % len(self.mnode_indexes), period=1500, parent=parent)
+        self.showUpdateTooltip(del_count, new_count)
         return state
+
+    def cardS(self, cnt):
+        s = "card"
+        if cnt > 1 or cnt == 0:
+            s = "cards"
+        return (cnt, s)
+
+    def showUpdateTooltip(self, del_count, new_count):
+        upd_count = max(0, len(self.mnode_indexes) - del_count - new_count)
+        ttip = "%s old %s <b>edited in place</b>" % self.cardS(upd_count)
+        if del_count > 0:
+            ttip += "<br>%s existing %s <b>deleted</b>" % self.cardS(del_count)
+        if new_count > 0:
+            ttip += "<br>%s new %s <b>created</b>" % self.cardS(new_count)
+        tooltip(ttip, parent=self.ed.parentWindow)
 
     def _getOriginalSvg(self):
         """Returns original SVG as a string"""
@@ -326,7 +342,7 @@ class ImgOccNoteGenerator(object):
 
         if deleted_nids:
             mw.col.remNotes(deleted_nids)
-        return True
+        return (del_count, new_count)
 
     def _addImageToCol(self):
         """Rename image based on ID and copy it to the media collection"""
