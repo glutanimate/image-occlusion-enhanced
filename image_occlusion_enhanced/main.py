@@ -62,6 +62,7 @@ class ImgOccAdd(object):
         loadConfig(self)
 
     def selImage(self):
+        """Select image and set up variables for the IO Editor"""
         note = self.ed.note
         opref = self.opref
 
@@ -96,6 +97,7 @@ class ImgOccAdd(object):
         self.callImgOccEdit()
 
     def getImage(self, parent=None, noclip=False):
+        """Get image from file selection or clipboard"""
         if noclip:
             clip = None
         else:
@@ -129,6 +131,7 @@ class ImgOccAdd(object):
             return image_path
 
     def callImgOccEdit(self):
+        """Set up variables, call and prepare ImgOccEdit"""
         width, height = imageProp(self.image_path)
         ofill = self.sconf['ofill']
         scol = self.sconf['scol']
@@ -191,6 +194,7 @@ class ImgOccAdd(object):
         
       
     def onChangeImage(self):
+        """Change canvas background image"""
         image_path = self.getImage()
         if not image_path:
             return
@@ -204,6 +208,7 @@ class ImgOccAdd(object):
         self.image_path = image_path
 
     def onAddNotesButton(self, choice, close):
+        """Get occlusion settings in and pass them to the note generator (add)"""
         dialog = mw.ImgOccEdit
         svg_edit = dialog.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
@@ -239,6 +244,7 @@ class ImgOccAdd(object):
         mw.reset()
 
     def onEditNotesButton(self, choice):
+        """Get occlusion settings and pass them to the note generator (edit)"""
         dialog = mw.ImgOccEdit
         svg_edit = dialog.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
@@ -267,6 +273,7 @@ class ImgOccAdd(object):
         mw.reset() # FIXME: causes glitches in editcurrent mode
 
     def getUserInputs(self, dialog):
+        """Get fields and tags from ImgOccEdit while checking note type"""
         fields = {}
         # note type integrity check:
         io_model_fields = mw.col.models.fieldNames(self.model)
@@ -286,6 +293,7 @@ class ImgOccAdd(object):
 
 
 def onIoSettings(mw):
+    """Call settings dialog if Editor not active"""
     if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
         tooltip("Please close Image Occlusion Editor\
             to access the Options.")
@@ -294,9 +302,11 @@ def onIoSettings(mw):
     dialog.exec_()
 
 def onIoHelp():
+    """Call main help dialog"""
     ioHelp("main")
 
 def onImgOccButton(ed, mode):
+    """Launch Image Occlusion Enhanced"""
     io_model = mw.col.models.byName(IO_MODEL_NAME)
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
@@ -317,7 +327,7 @@ def onImgOccButton(ed, mode):
     mw.ImgOccAdd.selImage()
 
 def onSetupEditorButtons(self):
-    # Add IO button to Editor  
+    """Add IO button to Editor"""  
     if isinstance(self.parentWindow, AddCards):
         btn = self._addButton("new_occlusion", 
                 lambda o=self: onImgOccButton(self, "add"),
@@ -334,13 +344,14 @@ def onSetupEditorButtons(self):
                 _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"), 
                 canDisable=False)
 
+    # secondary hotkey:
     press_action = QAction(self.parentWindow, triggered=btn.animateClick)
     press_action.setShortcut(QKeySequence(_("Alt+o")))
     btn.addAction(press_action)
 
 
 def onSetNote(self, node, hide=True, focus=False):
-    """simple hack that hides the ID field on IO notes"""
+    """Simple hack that hides the ID field on IO notes"""
     if (self.note and self.note.model()["name"] == IO_MODEL_NAME and
             self.note.model()['flds'][0]['name'] == IO_FLDS['id']):
         self.web.eval("""
@@ -349,7 +360,7 @@ def onSetNote(self, node, hide=True, focus=False):
                     'tr:first-child .fname, #f0, #i0', 'display: none;');
             """)
 
-# Set up menus
+# Set up menus and hooks
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
 mw.connect(options_action, SIGNAL("triggered()"), 
@@ -359,7 +370,5 @@ mw.connect(help_action, SIGNAL("triggered()"),
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
-
-# Set up hooks
 addHook('setupEditorButtons', onSetupEditorButtons)
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")

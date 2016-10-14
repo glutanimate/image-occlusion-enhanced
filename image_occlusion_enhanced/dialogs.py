@@ -209,7 +209,7 @@ class ImgOccEdit(QDialog):
     # Window state
 
     def resetFields(self):
-        """Reset all window fields. Needed for changes to the note type"""
+        """Reset all widgets. Needed for changes to the note type"""
         layout = self.vbox2
         for i in reversed(range(layout.count())): 
             item = layout.takeAt(i)
@@ -226,7 +226,7 @@ class ImgOccEdit(QDialog):
         self.tags_hbox.setParent(None)
 
     def resetWindow(self):
-        """Reset window state"""
+        """Fully reset window state"""
         self.resetAllFields()
         self.tab_widget.setCurrentIndex(0)
         self.occl_tp_select.setCurrentIndex(0)
@@ -234,7 +234,7 @@ class ImgOccEdit(QDialog):
         self.svg_edit.setFocus()
 
     def setupFields(self, flds):
-        """Setup window fields based on note type fields"""
+        """Setup dialog text edits based on note type fields"""
         self.tedit = {}
         self.flds = flds
         for i in flds:
@@ -307,6 +307,7 @@ class ImgOccEdit(QDialog):
         target.setFocus()
 
     def resetMainFields(self):
+        """Rest all fields aside from sticky ones"""
         for i in self.flds:
             fn = i['name']
             if fn in self.ioflds_priv or fn in self.ioflds_prsv:
@@ -314,6 +315,7 @@ class ImgOccEdit(QDialog):
             self.tedit[fn].setPlainText("")
 
     def resetAllFields(self):
+        """Reset all fields"""
         self.resetMainFields()
         for i in self.ioflds_prsv:
             self.tedit[i].setPlainText("")
@@ -337,6 +339,7 @@ class ImgOccOpts(QDialog):
         self.setupValues(self.sconf)
 
     def setupValues(self, config):
+        """Set up widget data based on provided config dict"""
         self.changeButtonColor(self.ofill_btn, config['ofill'])
         self.changeButtonColor(self.qfill_btn, config['qfill'])
         self.changeButtonColor(self.scol_btn, config['scol'])
@@ -346,7 +349,9 @@ class ImgOccOpts(QDialog):
         self.font_sel.setCurrentFont(QFont(config['font']))
 
     def setupUi(self):
-        # Color buttons and other widgets
+        """Set up widgets and layouts"""
+
+        # Top section
         qfill_label = QLabel('Question mask')
         ofill_label = QLabel('Other masks')
         scol_label = QLabel('Lines')
@@ -380,6 +385,8 @@ class ImgOccOpts(QDialog):
         frame.setFrameShape(QFrame.HLine)
         frame.setFrameShadow(QFrame.Sunken)
         
+        # Bottom section and grid assignment
+
         fields_text = ("Changing any of the entries below will rename "
         "the corresponding default field of the IO Enhanced note type. "
         "This is the only way you can rename any of the default fields. "
@@ -412,7 +419,7 @@ class ImgOccOpts(QDialog):
         grid.addWidget(fields_heading, 5, 0, 1, 6)  
         grid.addWidget(fields_description, 6, 0, 1, 6)
 
-        # Note type fields
+        # Field name entries
         row = 7
         clm = 0
         self.lnedit = {}
@@ -431,7 +438,7 @@ class ImgOccOpts(QDialog):
             self.lnedit[key] = t
             row = row+1
         
-        # Bottom button box
+        # Main button box
         button_box = QDialogButtonBox(QDialogButtonBox.Ok 
                                         | QDialogButtonBox.Cancel)
         defaults_btn = button_box.addButton("Restore &Defaults",

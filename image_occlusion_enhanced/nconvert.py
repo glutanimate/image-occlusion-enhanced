@@ -34,11 +34,12 @@ class ImgOccNoteConverter(object):
         loadConfig(self)
 
     def convertNotes(self, nids):
-        (io_nids, skipped) = self.filterByModel(nids)
+        """Main note conversion method"""
+        (io_nids, skipped) = self.filterSelected(nids)
         for nid in io_nids:
             note = mw.col.getNote(nid)
             (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
-            occl_tp = self.getOcclTypeAndMnodes(note)
+            occl_tp = self.getOcclTypeAndNodes(note)
             occl_id = uniq_id + '-' + occl_tp
             if occl_id == self.occl_id_last:
                 print "Skipping note that has already been converted"
@@ -46,9 +47,12 @@ class ImgOccNoteConverter(object):
             self.occl_id_last = occl_id
             family_nids = self.findByNoteId(uniq_id)
             self.idAndCorrelateNotes(family_nids, occl_id)
-        tooltip("<b>%i</b> notes updated, <b>%i</b> skipped" % (len(io_nids), skipped))
+        tooltip("<b>%i</b> notes updated, <b>%i</b> skipped"
+                                         % (len(io_nids), skipped))
 
-    def filterByModel(self, nids):
+    def filterSelected(self, nids):
+        """Filters out notes with the wrong note type and those that are
+        valid already"""
         io_nids = []
         skipped = 0
         for nid in nids:
@@ -57,23 +61,24 @@ class ImgOccNoteConverter(object):
                 print "Skipping note with wrong note type:", nid
                 skipped +=1
                 continue
-            else:
-                if not note[self.ioflds['id']]:
-                    print "Found IO note in need of update:", nid
-                    io_nids.append(nid)
-                else:
-                    print "Skipping IO note that is already editable:", nid
-                    skipped +=1
-                
+            elif note[self.ioflds['id']]:
+                print "Skipping IO note that is already editable:", nid
+                skipped +=1
+                continue
+            print "Found IO note in need of update:", nid
+            io_nids.append(nid)     
         return (io_nids, skipped)
 
     def findByNoteId(self, note_id):
+        """Search collection for notes with given ID in their omask paths"""
+        # need to use omask path because Note ID field is not yet set
         query = "'%s':'*%s*'" % ( self.ioflds['om'], note_id )
         print "query:", query
         res = mw.col.findNotes(query)
         return res
 
     def getDataFromNamingScheme(self, note):
+        """Get IO 2.0 unique ID and note nr from qmask path"""
         qmask = note[self.ioflds['qm']]
         path = img2path(qmask, True)
         uniq_id = path.split('_')[0]
@@ -81,6 +86,7 @@ class ImgOccNoteConverter(object):
         return (uniq_id, note_nr)
 
     def idAndCorrelateNotes(self, nids, occl_id):
+        """Update Note ID fields and omasks of all occlusion session siblings"""
         nids_by_nr = {}
         self.occl_id_last = occl_id
         for nid in nids:
@@ -106,8 +112,6 @@ class ImgOccNoteConverter(object):
             note.flush()
 
         new_svg = self.svg_node.toxml()
-        print "new_svg"
-        print new_svg
         omask_path = self._saveMask(new_svg, occl_id, "O")
         print "omask_path", omask_path
 
@@ -118,40 +122,38 @@ class ImgOccNoteConverter(object):
             note.addTag(".io-converted")
             note.flush()
 
-    def getOcclTypeAndMnodes(self, note):
+    def getOcclTypeAndNodes(self, note):
+        """Determine oclusion type and svg mask nodes"""
         nr_of_masks = {}
         mnode_idxs = {}
         svg_mlayer = {}
-        for i in ["qm", "om"]:
+        for i in ["qm", "om"]: # om second, so that end vars are correct
             svg_file = img2path(note[self.ioflds[i]], True)
-            (svg_node, svg_mlayer, midxs) = self.readSvgAndGetMlayer(svg_file)
-            nr_of_masks[i] = len(midxs)
-        self.svg_node = svg_node
-        self.mnode = svg_mlayer
-        self.mnode_idxs = midxs
+            svg_node= self.readSvg(svg_file)
+            svg_mlayer = self.layerNodesFrom(svg_node)[-1] # topmost layer
+            mnode_idxs = self.getMaskNodes(svg_mlayer)
+            nr_of_masks[i] = len(mnode_idxs)
+        # decide on occl_tp based on nr of mask nodes in omask vs qmask
         if nr_of_masks["om"] != nr_of_masks["qm"]:
             occl_tp = "oa"
         else:
             occl_tp = "ao"
-
         self.svg_node = svg_node
         self.mnode = svg_mlayer
-        self.mnode_idxs = midxs
-
+        self.mnode_idxs = mnode_idxs
         return occl_tp
 
-    def readSvgAndGetMlayer(self, svg_file):
+    def readSvg(self, svg_file):
+        """Read and fix malformatted IO 2.0 SVGs"""
         svg_doc = minidom.parse(svg_file)
         # ugly workaround for wrong namespace in older IO notes:
         svg_string = svg_doc.toxml().replace('ns0:', '').replace(':ns0','')
         svg_doc = minidom.parseString(svg_string)
         svg_node = svg_doc.documentElement
-        svg_mlayer = self.layerNodesFrom(svg_node)[-1]
-        mnode_indexes = self.getMaskNodes(svg_mlayer)
-
-        return (svg_node, svg_mlayer, mnode_indexes)
+        return svg_node
 
     def getMaskNodes(self, mlayer):
+        """Find mask nodes in masks layer"""
         mnode_indexes = []
         for i, node in enumerate(mlayer.childNodes):
             if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
@@ -159,6 +161,7 @@ class ImgOccNoteConverter(object):
         return mnode_indexes
 
     def layerNodesFrom(self, svg_node):
+        """Get layer nodes (topmost group nodes below the SVG node)"""
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
         layer_nodes = [node for node in svg_node.childNodes 
@@ -168,6 +171,7 @@ class ImgOccNoteConverter(object):
         return layer_nodes
 
     def _saveMask(self, mask, note_id, mtype):
+        """Write mask to file in media collection"""
         print "!saving %s, %s" % (note_id, mtype)
         mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'w')
@@ -176,6 +180,7 @@ class ImgOccNoteConverter(object):
         return mask_path
 
 def onIoConvert(self):
+    """Launch initial dialog, set up checkpoint, invoke converter"""
     mw = self.mw
     selected = self.selectedNotes()
     if not selected:
@@ -213,6 +218,8 @@ def onIoConvert(self):
     mw.col.reset()
     mw.reset()
     mw.progress.finish()
+
+# Set up menus and hooks
 
 def setupMenu(self):
     menu = self.form.menuEdit

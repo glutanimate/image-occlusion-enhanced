@@ -28,10 +28,12 @@ from xml.dom import minidom
 from Imaging.PIL import Image 
 
 def path2url(path):
+    """URL-encode local path"""
     return urlparse.urljoin(
       'file:', urllib.pathname2url(path.encode('utf-8')))
 
 def img2path(img, nameonly=False):
+    """Extract path or file name out of HTML img element"""
     imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
     imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
     fname = imgregex.search(img)
@@ -46,11 +48,13 @@ def img2path(img, nameonly=False):
         return fpath
 
 def imageProp(image_path):
+    """Get image width and height"""
     image = Image.open(image_path)
     width, height = image.size
     return width, height
 
 def svgToBase64(svg_path):
+    """Convert SVG string to base64"""
     doc = minidom.parse(svg_path)
     svg_node = doc.documentElement
     svg_content = svg_node.toxml()
@@ -58,4 +62,5 @@ def svgToBase64(svg_path):
     return svg_b64
 
 def fname2img(path):
+    """Return HTML img element for given path"""
     return '<img src="%s" />' % os.path.split(path)[1]

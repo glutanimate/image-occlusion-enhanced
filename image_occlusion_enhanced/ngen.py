@@ -56,6 +56,7 @@ from config import *
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 def genByKey(key, old_occl_tp=None):
+    """Get note generator based on occl_tp/user input"""
     if key in ["Don't Change"]:
         return genByKey(old_occl_tp, None)
     elif key in ["ao", "Hide All, Reveal One"]:
@@ -81,6 +82,7 @@ class ImgOccNoteGenerator(object):
         loadConfig(self)
         
     def generateNotes(self):
+        """Generate new notes"""
         state = "default"
         self.uniq_id = str(uuid.uuid4()).replace("-","") 
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
@@ -110,6 +112,7 @@ class ImgOccNoteGenerator(object):
         return state
 
     def updateNotes(self):
+        """Update existing notes"""
         state = "default"
         self.uniq_id = self.opref['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
@@ -165,11 +168,23 @@ class ImgOccNoteGenerator(object):
         return state
 
     def _getOriginalSvg(self):
+        """Returns original SVG as a string"""
         mask_doc = minidom.parse(self.opref["omask"])
         svg_node = mask_doc.documentElement
         return svg_node.toxml()
 
+    def layerNodesFrom(self, svg_node):
+        """Get layer nodes (topmost group nodes below the SVG node)"""
+        assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
+        assert (svg_node.nodeName == 'svg')
+        layer_nodes = [node for node in svg_node.childNodes 
+                            if node.nodeType == node.ELEMENT_NODE]
+        assert (len(layer_nodes) >= 1)
+        assert (layer_nodes[0].nodeName == 'g')
+        return layer_nodes
+
     def _getMnodesAndSetIds(self, edit=False):
+        """Find mask nodes in masks layer and read/set node IDs"""
         self.mnode_indexes = []
         self.mnode_ids = {}
         mask_doc = minidom.parseString(self.new_svg)
@@ -199,12 +214,14 @@ class ImgOccNoteGenerator(object):
         return (svg_node, mlayer_node)
 
     def findByNoteId(self, note_id):
+        """Search collection for notes with given ID"""
         query = "'%s':'%s*'" % ( self.ioflds['id'], note_id )
         logging.debug("query %s", query)
         res = mw.col.findNotes(query)
         return res
 
     def _findAllNotes(self):
+        """Get matching nids by ID"""
         old_occl_id = '%s-%s' % (self.uniq_id, self.opref["occl_tp"])
         res = self.findByNoteId(old_occl_id)
         self.nids = {}
@@ -216,6 +233,11 @@ class ImgOccNoteGenerator(object):
         logging.debug("nids %s", self.nids)
 
     def _deleteAndIdNotes(self, mlayer_node):
+        """
+        Determine which mask nodes have been deleted or newly created and, depending
+        on which, either delete their respective notes or ID them in correspondence
+        with the numbering of older nodes
+        """
         uniq_id = self.opref['uniq_id']
         mnode_ids = self.mnode_ids
         nids = self.nids
@@ -309,6 +331,7 @@ class ImgOccNoteGenerator(object):
         return True
 
     def _addImageToCol(self):
+        """Rename image based on ID and copy it to the media collection"""
         media_dir = mw.col.media.dir()
         fn = os.path.basename(self.image_path)
         name, ext = os.path.splitext(fn)
@@ -318,20 +341,18 @@ class ImgOccNoteGenerator(object):
         shutil.copyfile(self.image_path, new_path)
         return new_path
 
-    def _generateMaskSVGs(self, side):
-        masks = self._generateMaskSVGsFor(side)
-        return masks
-
     def _generateMaskSVGsFor(self, side):
+        """Generate a mask for each mask node"""
         masks = [self._createMask(side, node_index) for node_index in self.mnode_indexes]
         return masks
 
     def _createMask(self, side, mask_node_index):
+        """Call occl_tp-specific mask generator"""
         mask_doc = minidom.parseString(self.new_svg)
         svg_node = mask_doc.documentElement
         layer_nodes = self.layerNodesFrom(svg_node)
         mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
-        #This methods get implemented different by subclasses
+        #This method gets implemented differently by subclasses
         self._createMaskAtLayernode(side, mask_node_index, mlayer_node)
         return svg_node.toxml()
 
@@ -339,6 +360,7 @@ class ImgOccNoteGenerator(object):
         raise NotImplementedError
 
     def _setQuestionAttribs(self, node):
+        """Set question node color and class"""
         if (node.nodeType == node.ELEMENT_NODE):
             # set question class
             node.setAttribute("class", "qshape")
@@ -348,6 +370,7 @@ class ImgOccNoteGenerator(object):
             map(self._setQuestionAttribs, node.childNodes)
 
     def _removeAttribsRecursively(self, node, attrs):
+        """Remove provided attributes recursively from node and children"""
         if (node.nodeType == node.ELEMENT_NODE):
             for i in attrs:
                 if node.hasAttribute(i):
@@ -355,17 +378,10 @@ class ImgOccNoteGenerator(object):
             for i in node.childNodes:
                 self._removeAttribsRecursively(i, attrs)
 
-    def layerNodesFrom(self, svg_node):
-        assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
-        assert (svg_node.nodeName == 'svg')
-        layer_nodes = [node for node in svg_node.childNodes 
-                            if node.nodeType == node.ELEMENT_NODE]
-        assert (len(layer_nodes) >= 1)
-        assert (layer_nodes[0].nodeName == 'g')
-        return layer_nodes
-
     def _saveMask(self, mask, note_id, mtype):
+        """Write mask to file in media collection"""
         logging.debug("!saving %s, %s", note_id, mtype)
+        # media collection is the working directory:
         mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'w')
         mask_file.write(mask)
@@ -374,6 +390,7 @@ class ImgOccNoteGenerator(object):
 
     def _saveMaskAndReturnNote(self, omask_path, qmask, amask, 
                                 img, note_id, nid=None):
+        """Write actual note for given qmask and amask"""
         fields = self.fields
         model = self.model
         mflds = self.mflds
@@ -408,6 +425,8 @@ class ImgOccNoteGenerator(object):
             mw.col.addNote(note)
             logging.debug("!notecreate %s", note)
 
+
+# Different generator subclasses for different occlusion types:
 
 class IoGenHideAllRevealOne(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""
