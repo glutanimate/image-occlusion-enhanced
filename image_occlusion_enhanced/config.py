@@ -64,7 +64,8 @@ default_conf_syncd = {'ofill': 'FFEBA2',
                       'swidth': 1,
                       'font': 'Arial',
                       'fsize': 24,
-                      'version': 0.92,
+                      'version': 0.94,
+                      'skip': [],
                       'flds': IO_FLDS}
 
 import template

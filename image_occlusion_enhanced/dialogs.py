@@ -247,6 +247,7 @@ class ImgOccEdit(QDialog):
     def setupFields(self, flds):
         """Setup dialog text edits based on note type fields"""
         self.tedit = {}
+        self.tlabel = {}
         self.flds = flds
         for i in flds:
             if i['name'] in self.ioflds_priv:
@@ -260,6 +261,7 @@ class ImgOccEdit(QDialog):
             tedit.setMinimumHeight(40)
             label.setFixedWidth(70) 
             self.tedit[i["name"]] = tedit
+            self.tlabel[i["name"]] = label
             self.vbox2.addLayout(hbox)
         
         self.tags_hbox.addWidget(self.tags_label)
@@ -275,6 +277,9 @@ class ImgOccEdit(QDialog):
         self.mode = mode
         hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]
         hide_on_edit = [self.ao_btn, self.aa_btn, self.oa_btn]
+        for i in self.sconf["skip"]:
+            hide_on_edit.append(self.tedit[i])
+            hide_on_edit.append(self.tlabel[i])
         if mode == "add":
             for i in hide_on_add:
                 i.hide()
@@ -361,6 +366,7 @@ class ImgOccOpts(QDialog):
         self.fsize_sel.setValue(int(config['fsize']))
         self.swidth_sel.setValue(int(config['swidth']))
         self.font_sel.setCurrentFont(QFont(config['font']))
+        self.skipped.setText(','.join(config["skip"]))
 
     def setupUi(self):
         """Set up widgets and layouts"""
@@ -395,9 +401,9 @@ class ImgOccOpts(QDialog):
         self.fsize_sel.setMinimum(5)
         self.fsize_sel.setMaximum(300)
 
-        frame = QFrame()
-        frame.setFrameShape(QFrame.HLine)
-        frame.setFrameShadow(QFrame.Sunken)
+        # Horizontal lines
+        rule1 = self.create_horizontal_rule() 
+        rule2 = self.create_horizontal_rule()
         
         # Bottom section and grid assignment
 
@@ -429,7 +435,7 @@ class ImgOccOpts(QDialog):
         grid.addWidget(fsize_label, 3, 3, 1, 1)
         grid.addWidget(self.fsize_sel, 3, 4, 1, 2)
 
-        grid.addWidget(frame, 4, 0, 1, 6)
+        grid.addWidget(rule1, 4, 0, 1, 6)
         grid.addWidget(fields_heading, 5, 0, 1, 6)  
         grid.addWidget(fields_description, 6, 0, 1, 6)
 
@@ -451,6 +457,21 @@ class ImgOccOpts(QDialog):
             grid.addWidget(t, row, clm+1, 1, 2)
             self.lnedit[key] = t
             row = row+1
+
+
+        # Misc settings
+
+        misc_heading = QLabel("<b>Miscellaneous Settings</b>")
+
+        # Skipped fields:
+        skipped_description = QLabel("Comma-separated list of " \
+            "fields to hide in Editing mode (in order to preserve manual edits):")
+        self.skipped = QLineEdit()
+
+        grid.addWidget(rule2, row+1, 0, 1, 6)
+        grid.addWidget(misc_heading, row+2, 0, 1, 6)
+        grid.addWidget(skipped_description, row+3, 0, 1, 6)
+        grid.addWidget(self.skipped, row+4, 0, 1, 6)
         
         # Main button box
         button_box = QDialogButtonBox(QDialogButtonBox.Ok 
@@ -469,6 +490,15 @@ class ImgOccOpts(QDialog):
         self.setMinimumWidth(800)
         self.setMinimumHeight(540)
         self.setWindowTitle('Image Occlusion Enhanced Options')
+
+    def create_horizontal_rule(self):
+        """
+        Returns a QFrame that is a sunken, horizontal rule.
+        """
+        frame = QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.HLine)
+        frame.setFrameShadow(QtGui.QFrame.Sunken)
+        return frame
 
     def getNewColor(self, clrvar, clrbtn):
         """Set color via color selection dialog"""
@@ -546,6 +576,7 @@ class ImgOccOpts(QDialog):
         mw.col.conf['imgocc']['swidth'] = self.swidth_sel.value()
         mw.col.conf['imgocc']['fsize'] = self.fsize_sel.value()
         mw.col.conf['imgocc']['font'] = self.font_sel.currentFont().family()
+        mw.col.conf['imgocc']['skip'] = self.skipped.text().split(',')
         mw.col.setMod()
         self.close()
 

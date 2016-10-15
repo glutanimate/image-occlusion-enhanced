@@ -252,7 +252,7 @@ class ImgOccAdd(object):
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
 
-        r1 = self.getUserInputs(dialog)
+        r1 = self.getUserInputs(dialog, edit=True)
         if r1 == False:
             return False
         (fields, tags) = r1
@@ -274,7 +274,7 @@ class ImgOccAdd(object):
 
         mw.reset() # FIXME: causes glitches in editcurrent mode
 
-    def getUserInputs(self, dialog):
+    def getUserInputs(self, dialog, edit=False):
         """Get fields and tags from ImgOccEdit while checking note type"""
         fields = {}
         # note type integrity check:
@@ -288,6 +288,8 @@ class ImgOccAdd(object):
         for i in self.mflds:
             fn = i['name']
             if fn in self.ioflds_priv:
+                continue
+            if edit and fn in self.sconf["skipped"]:
                 continue
             text = dialog.tedit[fn].toPlainText().replace('\n', '<br />')
             fields[fn] = text
