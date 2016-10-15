@@ -61,7 +61,7 @@ default_conf_local = {"dir": IO_HOME}
 default_conf_syncd = {'ofill': 'FFEBA2',
                       'qfill': 'FF7E7E',
                       'scol': '2D2D2D',
-                      'swidth': 1,
+                      'swidth': 3,
                       'font': 'Arial',
                       'fsize': 24,
                       'version': 0.94,
