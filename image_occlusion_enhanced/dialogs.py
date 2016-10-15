@@ -278,8 +278,9 @@ class ImgOccEdit(QDialog):
         hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]
         hide_on_edit = [self.ao_btn, self.aa_btn, self.oa_btn]
         for i in self.sconf["skip"]:
-            hide_on_edit.append(self.tedit[i])
-            hide_on_edit.append(self.tlabel[i])
+            if i in self.tedit.keys():
+                hide_on_edit.append(self.tedit[i])
+                hide_on_edit.append(self.tlabel[i])
         if mode == "add":
             for i in hide_on_add:
                 i.hide()

@@ -289,7 +289,7 @@ class ImgOccAdd(object):
             fn = i['name']
             if fn in self.ioflds_priv:
                 continue
-            if edit and fn in self.sconf["skipped"]:
+            if edit and fn in self.sconf["skip"]:
                 continue
             text = dialog.tedit[fn].toPlainText().replace('\n', '<br />')
             fields[fn] = text
