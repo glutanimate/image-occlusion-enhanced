@@ -75,7 +75,7 @@ Please follow the installation instructions on [Ankiweb](https://ankiweb.net/sha
 - Extract the zip file
 - Launch Anki and open the add-on directory by going to *Tools* → *Add-ons* → *Open add-on directory*
 - If an earlier version of Image Occlusion is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
-- Having done that, proceed to copy `image_occlusion_2` and `Image Occlusion 2.py` from the extracted zip file into your add-on directory
+- Having done that, proceed to copy `image_occlusion_enhanced` and `Image Occlusion Enhanced.py` from the extracted zip file into your add-on directory
 - Restart Anki
 - *Image Occlusion Enhanced* should now be installed
 
