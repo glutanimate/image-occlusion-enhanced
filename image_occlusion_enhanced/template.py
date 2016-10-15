@@ -42,7 +42,7 @@ iocard_front = """\
 
 iocard_back = """\
 {{#%(src_img)s}}
-<div id="io-title">{{%(header)s}}</div>
+<div id="io-header">{{%(header)s}}</div>
 <div id="io-wrapper">
   <div id="io-overlay">{{%(ans)s}}</div>
   <div id="io-original">{{%(src_img)s}}</div>
@@ -159,16 +159,13 @@ left-aligned blocks below it */
 
 /* ADJUSTMENTS FOR MOBILE */
 
-.card .mobile {
+.card .mobile, #content .mobile {
   font-size: 100%;
+  margin: 0;
 }
 
 #io-extra-wrapper .mobile {
   width: 95%;
-}
-
-.android .card, .android #content {
-  margin: 0;
 }
 """
 
