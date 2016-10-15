@@ -64,7 +64,7 @@ default_conf_syncd = {'ofill': 'FFEBA2',
                       'swidth': 3,
                       'font': 'Arial',
                       'fsize': 24,
-                      'version': 0.94,
+                      'version': 0.95,
                       'skip': [],
                       'flds': IO_FLDS}
 
@@ -83,17 +83,18 @@ def loadConfig(self):
             mw.col.conf['imgocc']['ofill'] = old_conf['initFill[color]']
             mw.col.conf['imgocc']['qfill'] = old_conf['mask_fill_color']
             # insert other upgrade actions here
-
         mw.col.setMod()
 
     elif mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
         print "Updating synced config DB from earlier IO release"
+        template.update_template(mw.col)
         # insert other update actions here
         for key in default_conf_syncd.keys():
             if key not in mw.col.conf['imgocc']:
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
         mw.col.setMod()
+
 
     # Local preferences
     if not 'imgocc' in mw.pm.profile:

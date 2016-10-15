@@ -21,7 +21,7 @@ from config import *
 # Default card template
 iocard_front = """\
 {{#%(src_img)s}}
-<div id="io-title">{{%(header)s}}</div>
+<div id="io-header">{{%(header)s}}</div>
 <div id="io-wrapper">
   <div id="io-overlay">{{%(que)s}}</div>
   <div id="io-original">{{%(src_img)s}}</div>
@@ -37,8 +37,8 @@ iocard_front = """\
   'footer': IO_FLDS['ft'],
   'remarks': IO_FLDS['rk'],
   'sources': IO_FLDS['sc'],
-  'extra1': IO_FLDS['e1'],
-  'extra2': IO_FLDS['e2']}
+  'extraone': IO_FLDS['e1'],
+  'extratwo': IO_FLDS['e2']}
 
 iocard_back = """\
 {{#%(src_img)s}}
@@ -47,22 +47,30 @@ iocard_back = """\
   <div id="io-overlay">{{%(ans)s}}</div>
   <div id="io-original">{{%(src_img)s}}</div>
 </div>
-<div id="io-footer">
-  {{#%(footer)s}}
-    <div>{{%(footer)s}}</div>
-    <hr>
-  {{/%(footer)s}}
-  {{#%(remarks)s}}
-    <div>
-      <span class="io-field-descr">Remarks: </span>{{%(remarks)s}}
-    </div>
-  {{/%(remarks)s}}
-    </br>
-  {{#%(sources)s}}
-    <div>
-      <span class="io-field-descr">Sources: </span>{{%(sources)s}}
-    </div>
-  {{/%(sources)s}}
+{{#%(footer)s}}<div id="io-footer">{{%(footer)s}}</div>{{/%(footer)s}}
+<div id="io-extra-wrapper">
+  <div id="io-extra">
+    {{#%(remarks)s}}
+      <div class="io-extra-entry">
+        <div class="io-field-descr">%(remarks)s</div>{{%(remarks)s}}
+      </div>
+    {{/%(remarks)s}}
+    {{#%(sources)s}}
+      <div class="io-extra-entry">
+        <div class="io-field-descr">%(sources)s</div>{{%(sources)s}}
+      </div>
+    {{/%(sources)s}}
+    {{#%(extraone)s}}
+      <div class="io-extra-entry">
+        <div class="io-field-descr">%(extraone)s</div>{{%(extraone)s}}
+      </div>
+    {{/%(extraone)s}}
+    {{#%(extratwo)s}}
+      <div class="io-extra-entry">
+        <div class="io-field-descr">%(extratwo)s</div>{{%(extratwo)s}}
+      </div>
+    {{/%(extratwo)s}}
+  </div>
 </div>
 {{/%(src_img)s}}
 """ % \
@@ -74,10 +82,11 @@ iocard_back = """\
   'footer': IO_FLDS['ft'],
   'remarks': IO_FLDS['rk'],
   'sources': IO_FLDS['sc'],
-  'extra1': IO_FLDS['e1'],
-  'extra2': IO_FLDS['e2']}
+  'extraone': IO_FLDS['e1'],
+  'extratwo': IO_FLDS['e2']}
 
 iocard_css = """\
+/* GENERAL CARD STYLE */
 .card {
   font-family: "Helvetica LT Std", Helvetica, Arial, Sans;
   font-size: 150%;
@@ -86,19 +95,7 @@ iocard_css = """\
   background-color: white;
 }
 
-.io-field-descr{
-  font-weight: bold;
-}
-
-#io-title{
-  font-size: 1.1em;
-}
-
-#io-wrapper {
-  position:relative;
-  width: 100%;
-}
-
+/* OCCLUSION CSS START - don't edit this */
 #io-overlay {
   position:absolute;
   top:0;
@@ -113,15 +110,65 @@ iocard_css = """\
   z-index:2
 }
 
-#io-question{
-  margin-top: 0.8em;
+#io-wrapper {
+  position:relative;
+  width: 100%;
+}
+/* OCCLUSION CSS END */
+
+/* TEXT FIELD STYLES */
+#io-header{
+  font-size: 1.1em;
+  margin-bottom: 0.2em;
 }
 
 #io-footer{
-  margin-top: 0.8em;
   max-width: 80%;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 0.8em;
+  font-style: italic;
+}
+
+/* the wrapper is needed to center the
+left-aligned blocks below it */
+
+#io-extra-wrapper{
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.5em;
+}
+
+#io-extra{
+  text-align:center;
+  display: inline-block;
+}
+
+.io-extra-entry{
+  margin-top: 0.8em;
+  font-size: 0.9em;
+  text-align:left;
+}
+
+.io-field-descr{
+  margin-bottom: 0.2em;
+  font-weight: bold;
+  font-size: 1em;
+}
+
+/* ADJUSTMENTS FOR MOBILE */
+
+.card .mobile {
+  font-size: 100%;
+}
+
+#io-extra-wrapper .mobile {
+  width: 95%;
+}
+
+.android .card, .android #content {
+  margin: 0;
 }
 """
 
@@ -146,12 +193,14 @@ def add_io_model(col):
 
 
 def update_template(col):
+    print "Updating IO Enhanced card template"
     io_model = col.models.byName(IO_MODEL_NAME)
     # We are assuming that the template list contains only one element.
     # This will be true as long as no one has been trampling the model.
     template = io_model['tmpls'][0]
     template['qfmt'] = iocard_front
     template['afmt'] = iocard_back
-    template['css'] = iocard_css
+    io_model['css'] = iocard_css
+    col.models.save()
     return io_model
     
