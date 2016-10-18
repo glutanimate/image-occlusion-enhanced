@@ -627,7 +627,7 @@ def ioAskUser(text, title="Image Occlusion Enhanced", parent=None,
             default = QMessageBox.Yes
         r = ioInfo(text, title, parent, btns, default, msgfunc)
         if r == QMessageBox.Help:
-            ioHelp(help, parent=parent)
+            ioHelp(help)
         else:
             break
     return r == QMessageBox.Yes
