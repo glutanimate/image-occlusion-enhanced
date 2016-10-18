@@ -192,7 +192,8 @@ class ImgOccNoteGenerator(object):
         layer_nodes = [node for node in svg_node.childNodes 
                             if node.nodeType == node.ELEMENT_NODE]
         assert (len(layer_nodes) >= 1)
-        assert (layer_nodes[0].nodeName == 'g')
+        # last, i.e. top-most element, needs to be a layer:
+        assert (layer_nodes[-1].nodeName == 'g')
         return layer_nodes
 
     def _getMnodesAndSetIds(self, edit=False):

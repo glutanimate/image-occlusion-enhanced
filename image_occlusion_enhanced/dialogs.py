@@ -489,7 +489,7 @@ class ImgOccOpts(QDialog):
         l_main.addWidget(button_box)
         self.setLayout(l_main)
         self.setMinimumWidth(800)
-        self.setMinimumHeight(540)
+        self.setMinimumHeight(640)
         self.setWindowTitle('Image Occlusion Enhanced Options')
 
     def create_horizontal_rule(self):
