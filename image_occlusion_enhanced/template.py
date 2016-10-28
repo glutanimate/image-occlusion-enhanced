@@ -42,8 +42,18 @@ iocard_front = """\
 
 iocard_back = """\
 {{#%(src_img)s}}
+<script>
+  // Toggle answer mask on clicking the image
+  var toggle = function() {
+    var amask = document.getElementById('io-overlay');
+    if (amask.style.display === 'block' || amask.style.display === '')
+      amask.style.display = 'none';
+    else
+      amask.style.display = 'block'
+  }
+</script>
 <div id="io-header">{{%(header)s}}</div>
-<div id="io-wrapper">
+<div onclick="toggle();" id="io-wrapper">
   <div id="io-overlay">{{%(ans)s}}</div>
   <div id="io-original">{{%(src_img)s}}</div>
 </div>
