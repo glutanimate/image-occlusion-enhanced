@@ -100,19 +100,22 @@ def loadConfig(self):
     if not 'imgocc' in mw.pm.profile:
         mw.pm.profile["imgocc"] = default_conf_local
 
+    model = mw.col.models.byName(IO_MODEL_NAME)
+    if not model:
+        # create model and set up default field name config
+        model = template.add_io_model(mw.col)
+        mw.col.conf['imgocc']['flds'] = default_conf_syncd['flds']
+    mflds = model['flds']
+    # preserve fields if they are marked as sticky in the IO note type:
+    ioflds_prsv = []
+    for fld in mflds:
+        if fld['sticky']:
+            ioflds_prsv.append(fld['name'])
+
     ioflds = mw.col.conf['imgocc']['flds']
     ioflds_priv = []
     for i in IO_FIDS_PRIV:
         ioflds_priv.append(ioflds[i])
-    model = mw.col.models.byName(IO_MODEL_NAME)
-    if not model:
-        model = template.add_io_model(mw.col)
-    mflds = model['flds']
-    ioflds_prsv = []
-    # preserve fields if they are marked as sticky in the IO note type:
-    for fld in mflds:
-        if fld['sticky']:
-            ioflds_prsv.append(fld['name'])
 
     self.sconf_dflt = default_conf_syncd
     self.sconf = mw.col.conf['imgocc']
