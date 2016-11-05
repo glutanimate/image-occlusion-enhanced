@@ -268,9 +268,17 @@ class ImgOccAdd(object):
 
         mw.ImgOccEdit.close()
 
-        if r == "cacheReset":
-            # refresh webview image cache
+        if r == "reset":
+            # modifications to mask require media collection reset
+            ## refresh webview image cache
             QWebSettings.clearMemoryCaches()
+            ## write a dummy file to update collection.media modtime and force sync
+            media_dir = mw.col.media.dir()
+            fpath = os.path.join(media_dir, "syncdummy.txt")
+            if not os.path.isfile(fpath):
+                with open(fpath, "w") as f:
+                    f.write("io sync dummy")
+            os.remove(fpath)
 
         mw.reset() # FIXME: causes glitches in editcurrent mode
 

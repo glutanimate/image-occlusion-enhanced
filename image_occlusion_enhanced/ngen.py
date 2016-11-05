@@ -135,7 +135,7 @@ class ImgOccNoteGenerator(object):
             omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
             qmasks = self._generateMaskSVGsFor("Q")
             amasks = self._generateMaskSVGsFor("A")
-            state = "cacheReset"
+            state = "reset"
         
         old_img = fname2img(self.opref['image'])
         if fname2img(self.image_path) != old_img:
