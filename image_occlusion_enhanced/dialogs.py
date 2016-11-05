@@ -103,15 +103,12 @@ class ImgOccEdit(QDialog):
         dc_tt = "Preserve existing occlusion type"
         edit_tt = "Edit all cards using current mask shapes and field entries"
         new_tt = "Create new batch of cards without editing existing ones"
-        ao_tt = "Formerly known as nonoverlapping.<br>\
-            Generate cards where all labels are hidden and just one is revealed<br>\
-            on the back"
-        aa_tt = "A step between nonoverlapping and overlapping.<br>\
-            Generate cards where all labels are hidden on the front, but all \
-            revealed on the back"
-        oa_tt = "Formerly known as overlapping.<br>\
-            Generate cards where just one label is hidden on the front and all\
-            revealed on the back"
+        ao_tt = ("Generate cards with nonoverlapping information, where all<br>"
+                "labels are hidden on the front and just one is revealed on the back")
+        aa_tt = ("Generate cards with partial overlapping information, where<br>"
+                "all labels are hidden on the front and all are revealed on the back")
+        oa_tt = ("Generate cards with overlapping information, where just one<br>"
+                "label is hidden on the front and all are revealed on the back")
         close_tt = "Close Image Occlusion Editor without generating cards"
 
         image_btn.setToolTip(image_tt)
