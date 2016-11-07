@@ -9,13 +9,13 @@
 <!-- MarkdownTOC -->
 
 - [Screenshots](#screenshots)
-- [Changes compared to Image Occlusion 2.0](#changes-compared-to-image-occlusion-20)
+- [Changes Compared to Image Occlusion 2.0](#changes-compared-to-image-occlusion-20)
     - [Overview](#overview)
-    - [Detailed information](#detailed-information)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Development status](#development-status)
-- [Supporting the development of this add-on](#supporting-the-development-of-this-add-on)
+    - [Updated Information](#updated-information)
+- [Documentation](#documentation)
+- [Support](#support)
+- [Development Status](#development-status)
+- [Supporting the Development of This Add-on](#supporting-the-development-of-this-add-on)
 - [Credits](#credits)
 - [License and Warranty](#license-and-warranty)
 
@@ -29,7 +29,7 @@
     <img src="/screenshots/screenshot-io-reviewer.png?raw=true">
 </p>
 
-## Changes compared to Image Occlusion 2.0
+## Changes Compared to Image Occlusion 2.0
 
 ### Overview
 
@@ -59,53 +59,37 @@
 - **Stability Improvements**
     + Bug fixes everywhere
 
-### Detailed information
+### Updated Information
 
 Please make sure to check out the [Releases](https://github.com/Glutanimate/image-occlusion-enhanced/releases) tab or commit log for a more detailed listing of all current and future changes to the add-on.
 
-## Installation
+## Documentation
 
-**Installation from AnkiWeb**
+The installation and use of the add-on is detailed in the [Wiki section](https://github.com/Glutanimate/image-occlusion-enhanced/wiki). 
 
-Please follow the installation instructions on [Ankiweb](https://ankiweb.net/shared/info/1111933094).
+Some of the section have yet to be updated for the 1.0 release. I hope I'll be able to change this soon.
 
-**Manual installation**
+## Support
 
-- Grab the latest release of the add-on from [Releases](https://github.com/Glutanimate/image-occlusion-enhanced/releases)
-- Extract the zip file
-- Launch Anki and open the add-on directory by going to *Tools* → *Add-ons* → *Open add-on directory*
-- If an earlier version of Image Occlusion is installed you will have to remove it first by finding and deleting the `image_occlusion_2` folder and `Image Occlusion 2.py` file
-- Having done that, proceed to copy `image_occlusion_enhanced` and `Image Occlusion Enhanced.py` from the extracted zip file into your add-on directory
-- Restart Anki
-- *Image Occlusion Enhanced* should now be installed
+Please use the [official thread](https://anki.tenderapp.com/discussions/add-ons/8295-image-occlusion-enhanced-official-thread) on the Anki forums for any support questions related to the add-on.
 
-**Updates**
+## Development Status
 
-New versions and changelogs will be posted on the [GitHub Releases page](https://github.com/Glutanimate/image-occlusion-enhanced/releases) and later uploaded to AnkiWeb.
-
-## Usage
-
-See [here](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Usage).
-
-The documentation and tutorial videos have yet to be updated to reflect the large array of new features present in the 1.0 release. I hope I'll be able to change this soon.
-
-## Development status
-
-With the 1.0 release, *Image Occlusion Enhanced* should now be stable for the most part. However, it is still plagued by a number of longstanding issues that have less to do with the add-on itself and more with the libraries it is based on and runs in. This is particularly true for Anki/Qt on macOS, which has always suffered from compatibility issues with SVG-Edit.
+*Image Occlusion Enhanced* should now be stable for the most part. However, it's still plagued by a number of longstanding issues that have less to do with the add-on itself and more with Anki and the libraries it's based on. This is particularly true for macOS, which has always suffered from compatibility issues with SVG-Edit.
 
 For a list of known issues please check out the [issues page](https://github.com/Glutanimate/image-occlusion-enhanced/issues). Bug reports and suggestions are always welcome, but it might take me a while to get to them. If you know how to code please feel free to improve this project, file pull requests, etc.
 
-## Supporting the development of this add-on
+## Supporting the Development of This Add-on
 
 Quite a few people have offered to donate to this project over the last few months. I've always been very hesitant about accepting these donations. Both because of the operational overhead and because at that point I just felt like I hadn't contributed enough in terms of code to warrant these donations.
 
-Now that 1.0 is out, with large parts of the add-on rewritten, I feel like this has become less of a concern. For that reason and because I keep receiving these donation requests, I have now added a few PayPal links at the bottom of the [AnkiWeb add-on description](https://ankiweb.net/shared/info/1111933094); not a donation link (because this is not a registered non-profit), but a couple of links you can use if you want to buy me a coffee or a sandwich to say thanks. All funds collected through this will go into fueling my late-night coding and studying sessions :).
+With large parts of the add-on recently rewritten, I feel like this has become less of a concern. For that reason and because I keep receiving these donation requests, I have now added a few PayPal links at the bottom of the [AnkiWeb add-on description](https://ankiweb.net/shared/info/1111933094); not a donation link (because this is not a registered non-profit), but a couple of links you can use if you want to buy me a coffee or a sandwich to say thanks. All funds collected through this will go into fueling my late-night coding and studying sessions :).
 
 ## Credits
 
 *Image Occlusion Enhanced* is based on [Image Occlusion 2.0](https://github.com/tmbb/image-occlusion-2) by [Tiago Barroso](https://github.com/tmbb) and [Simple Picture Occlusion](https://github.com/steveaw/anki_addons) by [Steve AW](https://github.com/steveaw).
 
-All credit for the original add-ons goes to their respective authors. Without their work, *Image Occlusion Enhanced* would not exist.
+All credit for the original add-ons goes to their respective authors. Without their work *Image Occlusion Enhanced* would not exist.
 
 *Image Occlusion Enhanced* also ships with the following third-party open-source software:
 
