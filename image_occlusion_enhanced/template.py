@@ -53,11 +53,12 @@ iocard_back = """\
   }
 </script>
 <div id="io-header">{{%(header)s}}</div>
-<div onclick="toggle();" id="io-wrapper">
+<div id="io-wrapper">
   <div id="io-overlay">{{%(ans)s}}</div>
   <div id="io-original">{{%(src_img)s}}</div>
 </div>
 {{#%(footer)s}}<div id="io-footer">{{%(footer)s}}</div>{{/%(footer)s}}
+<button id="io-revl-btn" onclick="toggle();">Reveal All Masks</button>
 <div id="io-extra-wrapper">
   <div id="io-extra">
     {{#%(remarks)s}}
@@ -126,7 +127,7 @@ iocard_css = """\
 }
 /* OCCLUSION CSS END */
 
-/* TEXT FIELD STYLES */
+/* OTHER STYLES */
 #io-header{
   font-size: 1.1em;
   margin-bottom: 0.2em;
@@ -140,10 +141,10 @@ iocard_css = """\
   font-style: italic;
 }
 
-/* the wrapper is needed to center the
-left-aligned blocks below it */
 
 #io-extra-wrapper{
+  /* the wrapper is needed to center the
+  left-aligned blocks below it */
   width: 80%;
   margin-left: auto;
   margin-right: auto;
@@ -165,6 +166,10 @@ left-aligned blocks below it */
   margin-bottom: 0.2em;
   font-weight: bold;
   font-size: 1em;
+}
+
+#io-revl-btn {
+  font-size: 0.5em;
 }
 
 /* ADJUSTMENTS FOR MOBILE */
