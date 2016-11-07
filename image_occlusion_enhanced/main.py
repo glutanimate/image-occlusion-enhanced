@@ -66,7 +66,7 @@ class ImgOccAdd(object):
         opref = self.opref
 
         opref["tags"] = self.ed.tags.text()
-        
+
         if self.mode != "add":
             note_id = None
             # can only get the deck of the current note/card via a db call:
@@ -85,7 +85,7 @@ class ImgOccAdd(object):
             if  None in [opref["omask"], opref["image"]]:
                 tooltip("Editing unavailable: Missing Image or Original Mask")
                 return
-            image_path = opref["image"] 
+            image_path = opref["image"]
         else:
             opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
             image_path = self.getImage(parent=self.ed.parentWindow)
@@ -117,9 +117,9 @@ class ImgOccAdd(object):
             prev_image_dir = IO_HOME
 
         image_path = QFileDialog.getOpenFileName(parent,
-                     "Choose Image", prev_image_dir, 
+                     "Choose Image", prev_image_dir,
                      "Image Files (*.png *jpg *.jpeg *.gif)")
-        
+
         if not image_path:
             return None
         elif not os.path.isfile(image_path):
@@ -136,7 +136,7 @@ class ImgOccAdd(object):
         scol = self.sconf['scol']
         swidth = self.sconf['swidth']
         fsize = self.sconf['fsize']
-        font = self.sconf['font'] 
+        font = self.sconf['font']
 
         bkgd_url = path2url(self.image_path)
         opref = self.opref
@@ -193,8 +193,8 @@ class ImgOccAdd(object):
         else:
             # modal dialog when editing
             dialog.exec_()
-        
-      
+
+
     def onChangeImage(self):
         """Change canvas background image"""
         image_path = self.getImage()
@@ -215,7 +215,7 @@ class ImgOccAdd(object):
         svg_edit = dialog.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
-        
+
         r1 = self.getUserInputs(dialog)
         if r1 == False:
             return False
@@ -224,7 +224,7 @@ class ImgOccAdd(object):
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(self.ed, svg, self.image_path,
-                                    self.opref, tags, fields, did)        
+                                    self.opref, tags, fields, did)
         r = gen.generateNotes()
         if r == False:
             return False
@@ -235,7 +235,7 @@ class ImgOccAdd(object):
             self.ed.saveTags()
             for i in self.ioflds_prsv:
                 if i in self.ed.note:
-                    self.ed.note[i] = fields[i]            
+                    self.ed.note[i] = fields[i]
             self.ed.loadNote()
             deck = mw.col.decks.nameOrNone(did)
             self.ed.parentWindow.deckChooser.deck.setText(deck)
@@ -290,7 +290,7 @@ class ImgOccAdd(object):
         if not all(x in io_model_fields for x in self.ioflds.values()):
             ioError("<b>Error</b>: Image Occlusion note type " \
                 "not configured properly.Please make sure you did not " \
-                "manually delete or rename any of the default fields.", 
+                "manually delete or rename any of the default fields.",
                 help="notetype")
             return False
         for i in self.mflds:
@@ -331,7 +331,7 @@ def onImgOccButton(ed, mode):
         if not all(x in io_model_fields for x in dflt_fields):
             ioError("<b>Error</b>: Image Occlusion note type " \
                 "not configured properly.Please make sure you did not " \
-                "manually delete or rename any of the default fields.", 
+                "manually delete or rename any of the default fields.",
                 help="notetype")
             return False
     if mode != "add" and ed.note.model() != io_model:
@@ -341,21 +341,21 @@ def onImgOccButton(ed, mode):
     mw.ImgOccAdd.selImage()
 
 def onSetupEditorButtons(self):
-    """Add IO button to Editor"""  
+    """Add IO button to Editor"""
     if isinstance(self.parentWindow, AddCards):
-        btn = self._addButton("new_occlusion", 
+        btn = self._addButton("new_occlusion",
                 lambda o=self: onImgOccButton(self, "add"),
-                _("Alt+a"), _("Add Image Occlusion (Alt+A/Alt+O)"), 
+                _("Alt+a"), _("Add Image Occlusion (Alt+A/Alt+O)"),
                 canDisable=False)
     elif isinstance(self.parentWindow, EditCurrent):
         btn = self._addButton("edit_occlusion",
                 lambda o=self: onImgOccButton(self, "editcurrent"),
-                _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"), 
+                _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"),
                 canDisable=False)
     else:
         btn = self._addButton("edit_occlusion",
                 lambda o=self: onImgOccButton(self, "browser"),
-                _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"), 
+                _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"),
                 canDisable=False)
 
     # secondary hotkey:
@@ -377,7 +377,7 @@ def onSetNote(self, node, hide=True, focus=False):
 # Set up menus and hooks
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
-mw.connect(options_action, SIGNAL("triggered()"), 
+mw.connect(options_action, SIGNAL("triggered()"),
             lambda o=mw: onIoSettings(o))
 mw.connect(help_action, SIGNAL("triggered()"),
             onIoHelp)

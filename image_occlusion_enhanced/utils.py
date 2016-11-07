@@ -25,7 +25,7 @@ import urlparse, urllib
 import base64
 
 from xml.dom import minidom
-from Imaging.PIL import Image 
+from Imaging.PIL import Image
 
 def path2url(path):
     """URL-encode local path"""
@@ -35,7 +35,7 @@ def path2url(path):
 def img2path(img, nameonly=False):
     """Extract path or file name out of HTML img element"""
     imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
-    imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)  
+    imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)
     fname = imgregex.search(img)
     if not fname:
         return None

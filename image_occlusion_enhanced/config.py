@@ -41,7 +41,7 @@ IO_FLDS = {
     'om': u"Original Mask"
 }
 
-IO_FLDS_IDS = ["id", "hd", "im", "ft", "rk", "sc", 
+IO_FLDS_IDS = ["id", "hd", "im", "ft", "rk", "sc",
                 "e1", "e2", "qm", "am", "om"]
 
 # TODO: Use IDs instead of names to make these compatible with self.ioflds
@@ -76,7 +76,7 @@ def loadConfig(self):
     if not 'imgocc' in mw.col.conf:
         # create initial configuration
         mw.col.conf['imgocc'] = default_conf_syncd
-        
+
         # upgrade from earlier IO versions:
         if 'image_occlusion_conf' in mw.col.conf:
             old_conf = mw.col.conf['image_occlusion_conf']
@@ -120,7 +120,7 @@ def loadConfig(self):
     self.sconf_dflt = default_conf_syncd
     self.sconf = mw.col.conf['imgocc']
     self.lconf = mw.pm.profile["imgocc"]
-    
+
     self.ioflds = ioflds
     self.ioflds_priv = ioflds_priv
     self.ioflds_prsv = ioflds_prsv

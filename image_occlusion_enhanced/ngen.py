@@ -34,7 +34,7 @@ from aqt.utils import tooltip
 from anki.notes import Note
 
 from xml.dom import minidom
-from Imaging.PIL import Image 
+from Imaging.PIL import Image
 from uuid import uuid
 import shutil
 
@@ -49,7 +49,7 @@ from config import *
 # uniq_id:      Unique sequence of random characters. First part of the note_id
 # occl_tp:      Two-letter code that signifies occlusion type. Second part of
 #               the note_id
-# occl_id:      Combination of uniq_id + occl_tp - unique identifier shared 
+# occl_id:      Combination of uniq_id + occl_tp - unique identifier shared
 #               by all notes created in one IO session
 # note_nr:      Third part of the note_id
 
@@ -78,31 +78,31 @@ class ImgOccNoteGenerator(object):
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
         self.stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
         loadConfig(self)
-        
+
     def generateNotes(self):
         """Generate new notes"""
         state = "default"
-        self.uniq_id = str(uuid.uuid4()).replace("-","") 
+        self.uniq_id = str(uuid.uuid4()).replace("-","")
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
-        
+
         ( svg_node, layer_node ) = self._getMnodesAndSetIds()
         if not self.mnode_ids:
             tooltip("No cards to generate.<br>\
                 Are you sure you set your masks correctly?")
             return False
-        
+
         self.new_svg = svg_node.toxml() # write changes to svg
         omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
         qmasks = self._generateMaskSVGsFor("Q")
         amasks = self._generateMaskSVGsFor("A")
         img = fname2img(self._addImageToCol())
-        
+
         mw.checkpoint("Adding Image Occlusion Cards")
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
-            self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr], 
+            self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr],
                                         img, note_id)
-        
+
         parent = None
         tooltip("%s %s <b>added</b>" % self.cardS(len(qmasks)), parent=parent)
         return state
@@ -113,7 +113,7 @@ class ImgOccNoteGenerator(object):
         self.uniq_id = self.opref['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
         omask_path = None
-        
+
         self._findAllNotes()
         ( svg_node, mlayer_node ) = self._getMnodesAndSetIds(True)
         if not self.mnode_ids:
@@ -127,7 +127,7 @@ class ImgOccNoteGenerator(object):
             return False
         else:
             (del_count, new_count) = ret
-        
+
         self.new_svg = svg_node.toxml() # write changes to svg
         old_svg = self._getOriginalSvg() # load original svg
         if self.new_svg != old_svg or self.occl_tp != self.opref["occl_tp"]:
@@ -136,7 +136,7 @@ class ImgOccNoteGenerator(object):
             qmasks = self._generateMaskSVGsFor("Q")
             amasks = self._generateMaskSVGsFor("A")
             state = "reset"
-        
+
         old_img = fname2img(self.opref['image'])
         if fname2img(self.image_path) != old_img:
             # updated image
@@ -144,7 +144,7 @@ class ImgOccNoteGenerator(object):
             img = fname2img(col_image)
         else:
             img = old_img
-       
+
         logging.debug("mnode_indexes %s", self.mnode_indexes)
         for nr, idx in enumerate(self.mnode_indexes):
             logging.debug("=====================")
@@ -156,10 +156,10 @@ class ImgOccNoteGenerator(object):
             nid = self.nids[note_id]
             logging.debug("nid %s", nid)
             if omask_path:
-                self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr],    
+                self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr],
                                             img, note_id, nid)
             else:
-                self._saveMaskAndReturnNote(None, None, None,    
+                self._saveMaskAndReturnNote(None, None, None,
                                             img, note_id, nid)
         self.showUpdateTooltip(del_count, new_count)
         return state
@@ -189,7 +189,7 @@ class ImgOccNoteGenerator(object):
         """Get layer nodes (topmost group nodes below the SVG node)"""
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
-        layer_nodes = [node for node in svg_node.childNodes 
+        layer_nodes = [node for node in svg_node.childNodes
                             if node.nodeType == node.ELEMENT_NODE]
         assert (len(layer_nodes) >= 1)
         # last, i.e. top-most element, needs to be a layer:
@@ -206,9 +206,9 @@ class ImgOccNoteGenerator(object):
         mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
         for i, node in enumerate(mlayer_node.childNodes):
             # minidom doesn't offer a childElements method and childNodes
-            # also returns whitespace found in the mlayer_node as a child node. 
-            # For that reason we use self.mnode_indexes to register all 
-            # indexes of mlayer_node children that contain actual elements, 
+            # also returns whitespace found in the mlayer_node as a child node.
+            # For that reason we use self.mnode_indexes to register all
+            # indexes of mlayer_node children that contain actual elements,
             # i.e. mask nodes
             if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
                 mnode = mlayer_node.childNodes[i]
@@ -317,7 +317,7 @@ class ImgOccNoteGenerator(object):
             if new_mnode_id:
                 mnode.setAttribute("id", new_mnode_id)
                 self.mnode_ids[idx] = new_mnode_id
-            
+
             logging.debug("=====================")
             logging.debug("nr %s", nr)
             logging.debug("idx %s", idx)
@@ -401,7 +401,7 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
-    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, 
+    def _saveMaskAndReturnNote(self, omask_path, qmask, amask,
                                 img, note_id, nid=None):
         """Write actual note for given qmask and amask"""
         fields = self.fields
@@ -445,7 +445,7 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
         self.occl_tp = "ao"
-        ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
+        ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
                                         opref, tags, fields, did)
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
@@ -460,7 +460,7 @@ class IoGenHideAllRevealAll(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
         self.occl_tp = "aa"
-        ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
+        ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
                                         opref, tags, fields, did)
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
@@ -475,7 +475,7 @@ class IoGenHideOneRevealAll(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
         self.occl_tp = "oa"
-        ImgOccNoteGenerator.__init__(self, ed, svg, image_path, 
+        ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
                                         opref, tags, fields, did)
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):

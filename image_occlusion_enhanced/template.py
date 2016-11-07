@@ -215,4 +215,3 @@ def update_template(col):
     io_model['css'] = iocard_css
     col.models.save()
     return io_model
-    

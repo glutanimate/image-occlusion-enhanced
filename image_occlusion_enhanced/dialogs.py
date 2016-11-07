@@ -59,7 +59,7 @@ class ImgOccEdit(QDialog):
         self.tags_label = QLabel("Tags")
         self.tags_label.setFixedWidth(70)
         self.deck_container = QWidget()
-        self.deckChooser = deckchooser.DeckChooser(mw, 
+        self.deckChooser = deckchooser.DeckChooser(mw,
                         self.deck_container, label=True)
 
         # workaround for tab focus order issue of the tags entry
@@ -95,7 +95,7 @@ class ImgOccEdit(QDialog):
            QDialogButtonBox.ActionRole)
         self.oa_btn = button_box.addButton(u"Hide &One, Reveal All",
            QDialogButtonBox.ActionRole)
-        close_button = button_box.addButton("&Close", 
+        close_button = button_box.addButton("&Close",
             QDialogButtonBox.RejectRole)
 
         image_tt = "Switch to a different image while preserving all of \
@@ -153,7 +153,7 @@ class ImgOccEdit(QDialog):
         self.tab2 = QWidget()
         tab1.setLayout(vbox1)
         self.tab2.setLayout(self.vbox2)
-        self.tab_widget = QtGui.QTabWidget() 
+        self.tab_widget = QtGui.QTabWidget()
         self.tab_widget.addTab(tab1,"&Masks Editor")
         self.tab_widget.addTab(self.tab2,"&Fields")
         self.tab_widget.setTabToolTip(1, "Include additional information (optional)")
@@ -173,25 +173,25 @@ class ImgOccEdit(QDialog):
 
         ## Field focus hotkeys
         for i in range(1,10):
-            s = self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+%i" %i), self), 
-                QtCore.SIGNAL('activated()'), 
+            s = self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+%i" %i), self),
+                QtCore.SIGNAL('activated()'),
                 lambda f=i-1:self.focusField(f))
         ## Other hotkeys
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Return"), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Return"), self),
             QtCore.SIGNAL('activated()'), lambda: self.addAO(True))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Alt+Return"), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Alt+Return"), self),
             QtCore.SIGNAL('activated()'), lambda: self.addAA(True))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+Return"), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+Return"), self),
             QtCore.SIGNAL('activated()'), lambda: self.addOA(True))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Tab"), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Tab"), self),
             QtCore.SIGNAL('activated()'), self.switchTabs)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+r"), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+r"), self),
             QtCore.SIGNAL('activated()'), self.resetMainFields)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+r"), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+r"), self),
             QtCore.SIGNAL('activated()'), self.resetAllFields)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+t"), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+t"), self),
             QtCore.SIGNAL('activated()'), lambda:self.focusField(self.tags_edit))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+f"), self), 
+        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+f"), self),
             QtCore.SIGNAL('activated()'), self.fitImageCanvas)
 
 
@@ -201,11 +201,11 @@ class ImgOccEdit(QDialog):
 
     def changeImage(self):
         mw.ImgOccAdd.onChangeImage()
-    def addAO(self, close=False): 
+    def addAO(self, close=False):
         mw.ImgOccAdd.onAddNotesButton("ao", close)
-    def addAA(self, close=False): 
+    def addAA(self, close=False):
         mw.ImgOccAdd.onAddNotesButton("aa", close)
-    def addOA(self, close=False): 
+    def addOA(self, close=False):
         mw.ImgOccAdd.onAddNotesButton("oa", close)
     def new(self, close=False):
         choice = self.occl_tp_select.currentText()
@@ -219,7 +219,7 @@ class ImgOccEdit(QDialog):
     def resetFields(self):
         """Reset all widgets. Needed for changes to the note type"""
         layout = self.vbox2
-        for i in reversed(range(layout.count())): 
+        for i in reversed(range(layout.count())):
             item = layout.takeAt(i)
             layout.removeItem(item)
             if item.widget():
@@ -256,11 +256,11 @@ class ImgOccEdit(QDialog):
             hbox.addWidget(tedit)
             tedit.setTabChangesFocus(True)
             tedit.setMinimumHeight(40)
-            label.setFixedWidth(70) 
+            label.setFixedWidth(70)
             self.tedit[i["name"]] = tedit
             self.tlabel[i["name"]] = label
             self.vbox2.addLayout(hbox)
-        
+
         self.tags_hbox.addWidget(self.tags_label)
         self.tags_hbox.addWidget(self.tags_edit)
         self.vbox2.addLayout(self.tags_hbox)
@@ -384,7 +384,7 @@ class ImgOccOpts(QDialog):
         self.qfill_btn = QPushButton()
         self.ofill_btn = QPushButton()
         self.scol_btn = QPushButton()
-        self.qfill_btn.connect(self.qfill_btn, SIGNAL("clicked()"), 
+        self.qfill_btn.connect(self.qfill_btn, SIGNAL("clicked()"),
             lambda a="qfill", b=self.qfill_btn: self.getNewColor(a, b))
         self.ofill_btn.connect(self.ofill_btn, SIGNAL("clicked()"),
             lambda a="ofill", b=self.ofill_btn: self.getNewColor(a, b))
@@ -404,9 +404,9 @@ class ImgOccOpts(QDialog):
         self.fsize_sel.setMaximum(300)
 
         # Horizontal lines
-        rule1 = self.create_horizontal_rule() 
+        rule1 = self.create_horizontal_rule()
         rule2 = self.create_horizontal_rule()
-        
+
         # Bottom section and grid assignment
 
         fields_text = ("Changing any of the entries below will rename "
@@ -438,7 +438,7 @@ class ImgOccOpts(QDialog):
         grid.addWidget(self.fsize_sel, 3, 4, 1, 2)
 
         grid.addWidget(rule1, 4, 0, 1, 6)
-        grid.addWidget(fields_heading, 5, 0, 1, 6)  
+        grid.addWidget(fields_heading, 5, 0, 1, 6)
         grid.addWidget(fields_description, 6, 0, 1, 6)
 
         # Field name entries
@@ -474,9 +474,9 @@ class ImgOccOpts(QDialog):
         grid.addWidget(misc_heading, row+2, 0, 1, 6)
         grid.addWidget(skipped_description, row+3, 0, 1, 6)
         grid.addWidget(self.skipped, row+4, 0, 1, 6)
-        
+
         # Main button box
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok 
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok
                                         | QDialogButtonBox.Cancel)
         defaults_btn = button_box.addButton("Restore &Defaults",
            QDialogButtonBox.ResetRole)
@@ -594,7 +594,7 @@ class ImgOccOpts(QDialog):
         self.close()
 
 
-def ioError(text, title="Image Occlusion Enhanced Error", 
+def ioError(text, title="Image Occlusion Enhanced Error",
                                     parent=None, help=None):
     msgfunc = QMessageBox.critical
     btns = None
@@ -608,7 +608,7 @@ def ioError(text, title="Image Occlusion Enhanced Error",
             break
     return r
 
-def ioAskUser(text, title="Image Occlusion Enhanced", parent=None, 
+def ioAskUser(text, title="Image Occlusion Enhanced", parent=None,
                             help="", defaultno=False, msgfunc=None):
     """Show a yes/no question. Return true if yes.
     based on askUser by Damien Elmes"""

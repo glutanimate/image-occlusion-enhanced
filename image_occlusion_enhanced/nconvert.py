@@ -72,7 +72,7 @@ class ImgOccNoteConverter(object):
                 skipped +=1
                 continue
             logging.debug("Found IO note in need of update: %s", nid)
-            io_nids.append(nid)     
+            io_nids.append(nid)
         return (io_nids, skipped)
 
     def findByNoteId(self, note_id):
@@ -179,7 +179,7 @@ class ImgOccNoteConverter(object):
         """Get layer nodes (topmost group nodes below the SVG node)"""
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
-        layer_nodes = [node for node in svg_node.childNodes 
+        layer_nodes = [node for node in svg_node.childNodes
                             if node.nodeType == node.ELEMENT_NODE]
         assert (len(layer_nodes) >= 1)
         # last, i.e. top-most element, needs to be a layer:
