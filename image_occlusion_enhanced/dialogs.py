@@ -178,7 +178,7 @@ class ImgOccEdit(QDialog):
                 lambda f=i-1:self.focusField(f))
         ## Other hotkeys
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Return"), self),
-            QtCore.SIGNAL('activated()'), lambda: self.addAO(True))
+            QtCore.SIGNAL('activated()'), lambda: self.defaultAction(True))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Alt+Return"), self),
             QtCore.SIGNAL('activated()'), lambda: self.addAA(True))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+Return"), self),
@@ -201,6 +201,11 @@ class ImgOccEdit(QDialog):
 
     def changeImage(self):
         mw.ImgOccAdd.onChangeImage()
+    def defaultAction(self, close):
+        if self.mode == "add":
+            self.addAO(close)
+        else:
+            self.edit_note()
     def addAO(self, close=False):
         mw.ImgOccAdd.onAddNotesButton("ao", close)
     def addAA(self, close=False):
