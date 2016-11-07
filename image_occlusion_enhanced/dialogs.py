@@ -333,7 +333,7 @@ class ImgOccEdit(QDialog):
         target.setFocus()
 
     def resetMainFields(self):
-        """Rest all fields aside from sticky ones"""
+        """Reset all fields aside from sticky ones"""
         for i in self.flds:
             fn = i['name']
             if fn in self.ioflds_priv or fn in self.ioflds_prsv:
