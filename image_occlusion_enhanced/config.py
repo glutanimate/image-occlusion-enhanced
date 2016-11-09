@@ -6,10 +6,6 @@
 ##        Copyright (c) Glutanimate 2016          ##
 ##       (https://github.com/Glutanimate)         ##
 ##                                                ##
-##     Original Image Occlusion 2.0 add-on is     ##
-##         Copyright (c) 2012-2015 tmbb           ##
-##           (https://github.com/tmbb)            ##
-##                                                ##
 ####################################################
 
 """
@@ -64,7 +60,7 @@ default_conf_syncd = {'ofill': 'FFEBA2',
                       'swidth': 3,
                       'font': 'Arial',
                       'fsize': 24,
-                      'version': 0.95,
+                      'version': 1.00,
                       'skip': [IO_FLDS["e1"], IO_FLDS["e2"]],
                       'flds': IO_FLDS}
 

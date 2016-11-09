@@ -6,7 +6,7 @@
 ##        Copyright (c) Glutanimate 2016          ##
 ##       (https://github.com/Glutanimate)         ##
 ##                                                ##
-##     Original Image Occlusion 2.0 add-on is     ##
+##         Based on Image Occlusion 2.0           ##
 ##         Copyright (c) 2012-2015 tmbb           ##
 ##           (https://github.com/tmbb)            ##
 ##                                                ##
@@ -58,7 +58,7 @@ iocard_back = """\
   <div id="io-original">{{%(src_img)s}}</div>
 </div>
 {{#%(footer)s}}<div id="io-footer">{{%(footer)s}}</div>{{/%(footer)s}}
-<button id="io-revl-btn" onclick="toggle();">Reveal All Masks</button>
+<button id="io-revl-btn" onclick="toggle();">Toggle Masks</button>
 <div id="io-extra-wrapper">
   <div id="io-extra">
     {{#%(remarks)s}}

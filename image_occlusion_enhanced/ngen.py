@@ -6,17 +6,9 @@
 ##        Copyright (c) Glutanimate 2016          ##
 ##       (https://github.com/Glutanimate)         ##
 ##                                                ##
-##     Original Image Occlusion 2.0 add-on is     ##
-##         Copyright (c) 2012-2015 tmbb           ##
-##           (https://github.com/tmbb)            ##
-##                                                ##
-##  --------------------------------------------  ##
-##                                                ##
-##              ngen.py is based on               ##
-##           Simple Picture Occlusion             ##
-##                   which is                     ##
+##       Based on Simple Picture Occlusion        ##
 ##          Copyright (c) 2013 SteveAW            ##
-##             (steveawa@gmail.com)               ##
+##         (https://github.com/steveaw)           ##
 ##                                                ##
 ####################################################
 

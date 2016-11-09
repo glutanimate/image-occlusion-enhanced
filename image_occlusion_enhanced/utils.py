@@ -6,10 +6,6 @@
 ##        Copyright (c) Glutanimate 2016          ##
 ##       (https://github.com/Glutanimate)         ##
 ##                                                ##
-##     Original Image Occlusion 2.0 add-on is     ##
-##         Copyright (c) 2012-2015 tmbb           ##
-##           (https://github.com/tmbb)            ##
-##                                                ##
 ####################################################
 
 """
