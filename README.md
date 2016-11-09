@@ -23,11 +23,14 @@
 
 ## Screenshots
 
-<p align="center">
-    <img src="/screenshots/screenshot-io-editor-1.png?raw=true">
-    <img src="/screenshots/screenshot-io-editor-2.png?raw=true">
-    <img src="/screenshots/screenshot-io-reviewer.png?raw=true">
-</p>
+*Creating Cards With the Add-on:*
+
+<img src="/screenshots/screenshot-io-editor-1.png?raw=true">
+<img src="/screenshots/screenshot-io-editor-2.png?raw=true">
+
+*Reviewing Generated Cards:*
+
+<img src="/screenshots/screenshot-io-reviewer.png?raw=true">
 
 ## Changes Compared to Image Occlusion 2.0
 
