@@ -651,6 +651,8 @@ def ioHelp(help, title=None, text=None, parent=None):
     """Display an info message or a predefined help section"""
     io_link_wiki = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
     io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o"
+    io_link_thread = ("https://anki.tenderapp.com/discussions/add-ons/"
+                      "8295-image-occlusion-enhanced-official-thread")
     help_text = {}
     help_text["editing"] = """<b>Instructions for editing</b>: \
         <br><br> Each mask shape represents a card.\
@@ -663,7 +665,9 @@ def ioHelp(help, title=None, text=None, parent=None):
         easily undone, so please make sure to check your changes twice before\
         applying them.</b><br><br>The only exception to this are purely textual\
         changes to fields like the header or footer of your notes. These can\
-        be fully reverted by using Ctrl+Z in the Browser or Reviewer view."""
+        be fully reverted by using Ctrl+Z in the Browser or Reviewer view.<br><br>\
+        More information: <a href="%s">Wiki: Editing Notes</a>.\
+        """ % (io_link_wiki + "/Basic-Use#editing-cards")
     help_text["notetype"] = """<b>Fixing a broken note type:</b>\
         <br><br> The Image Occlusion Enhanced note type can't be edited \
         arbitrarily. If you delete a field that's required by the add-on \
@@ -674,6 +678,7 @@ def ioHelp(help, title=None, text=None, parent=None):
     help_text["main"] = u"""<h2>Help and Support</h2>
         <p><a href="%s">Image Occlusion Enhanced Wiki</a></p>
         <p><a href="%s">Official Video Tutorial Series</a></p>
+        <p><a href="%s">Support Thread</a></p>
         <h2>Credits and License</h2>
         <p style="font-size:12pt;"><em>Copyright © 2016 \
         <a href="https://github.com/Glutanimate">Glutanimate</a></em></p>
@@ -691,7 +696,7 @@ def ioHelp(help, title=None, text=None, parent=None):
         Copyright (c) 2009-2012 by SVG-edit authors. Licensed under the
         <a href="https://github.com/SVG-Edit/svgedit/blob/master/LICENSE">MIT license</a></p></li>
         </ul>
-        """ % (io_link_wiki, io_link_tut)
+        """ % (io_link_wiki, io_link_tut, io_link_thread)
     if help != "custom":
         text = help_text[help]
     if not title:
