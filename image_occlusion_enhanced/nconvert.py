@@ -37,43 +37,57 @@ class ImgOccNoteConverter(object):
 
     def convertNotes(self, nids):
         """Main note conversion method"""
-        (io_nids, skipped) = self.filterSelected(nids)
+        nids_by_nr = {}
+        skipped = 0
+        (io_nids, filtered) = self.filterSelected(nids)
         for nid in io_nids:
             note = mw.col.getNote(nid)
             (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
+            if uniq_id == False:
+                logging.debug("Skipping note that couldn't be parsed: %s", nid)
+                skipped += 1
+                continue
             occl_tp = self.getOcclTypeAndNodes(note)
             occl_id = uniq_id + '-' + occl_tp
             if occl_id == self.occl_id_last:
-                logging.debug("Skipping note that has already been converted: %s", nid)
+                logging.debug("Skipping note that we've just converted: %s", nid)
                 continue
             self.occl_id_last = occl_id
-            family_nids = self.findByNoteId(uniq_id)
-            self.idAndCorrelateNotes(family_nids, occl_id)
+            for nid in self.findByNoteId(uniq_id):
+                note = mw.col.getNote(nid)
+                (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
+                if uniq_id == False:
+                    logging.debug("Skipping note that couldn't be parsed: %s", nid)
+                    skipped += 1
+                    continue
+                nids_by_nr[int(note_nr)] = nid
+            self.idAndCorrelateNotes(nids_by_nr, occl_id)
+        converted = len(io_nids)
         tooltip("<b>%i</b> notes updated, <b>%i</b> skipped"
-                                            % (len(io_nids), skipped))
+                 % (converted - skipped, filtered + skipped))
 
     def filterSelected(self, nids):
         """Filters out notes with the wrong note type and those that are
         valid already"""
         io_nids = []
-        skipped = 0
+        filtered = 0
         for nid in nids:
             note = mw.col.getNote(nid)
             if note.model() != self.model:
                 logging.debug("Skipping note with wrong note type: %s", nid)
-                skipped +=1
+                filtered +=1
                 continue
             elif note[self.ioflds['id']]:
                 logging.debug("Skipping IO note that is already editable: %s", nid)
-                skipped +=1
+                filtered +=1
                 continue
             elif not note[self.ioflds['om']]:
                 logging.debug("Skipping IO note without original SVG mask: %s", nid)
-                skipped +=1
+                filtered +=1
                 continue
             logging.debug("Found IO note in need of update: %s", nid)
             io_nids.append(nid)
-        return (io_nids, skipped)
+        return (io_nids, filtered)
 
     def findByNoteId(self, note_id):
         """Search collection for notes with given ID in their omask paths"""
@@ -87,33 +101,35 @@ class ImgOccNoteConverter(object):
         """Get unique ID and note nr from qmask path"""
         qmask = note[self.ioflds['qm']]
         path = img2path(qmask, True)
+        if not path:
+            return (False, None)
         grps = path.split('_')
-        if len(grps) != 2:
-            logging.debug("Extracting data using IO Enhanced naming scheme")
-            grps = path.split('-')
-            uniq_id = grps[0]
-            note_nr = int(grps[2]) - 1
-        else:
-            logging.debug("Extracting data using IO 2.0 naming scheme")
-            uniq_id = grps[0]
-            note_nr = path.split(' ')[1].split('.')[0]
-        return (uniq_id, note_nr)
+        try:
+            if len(grps) == 2:
+                logging.debug("Extracting data using IO 2.0 naming scheme")
+                uniq_id = grps[0]
+                note_nr = path.split(' ')[1].split('.')[0]
+            else:
+                logging.debug("Extracting data using IO Enhanced naming scheme")
+                grps = path.split('-')
+                uniq_id = grps[0]
+                note_nr = int(grps[2]) - 1
+            return (uniq_id, note_nr)
+        except IndexError:
+            return (False, None)
+        
 
-    def idAndCorrelateNotes(self, nids, occl_id):
+    def idAndCorrelateNotes(self, nids_by_nr, occl_id):
         """Update Note ID fields and omasks of all occlusion session siblings"""
-        nids_by_nr = {}
-        self.occl_id_last = occl_id
-        for nid in nids:
-            note = mw.col.getNote(nid)
-            (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
-            nids_by_nr[int(note_nr)] = nid
-
         logging.debug("occl_id %s", occl_id)
         logging.debug("nids_by_nr %s", nids_by_nr)
         logging.debug("mnode_idxs %s", self.mnode_idxs)
 
         for nr in sorted(nids_by_nr.keys()):
-            midx = self.mnode_idxs[nr]
+            try:
+                midx = self.mnode_idxs[nr]
+            except IndexError:
+                continue
             nid = nids_by_nr[nr]
             note = mw.col.getNote(nid)
             new_mnode_id =  occl_id + '-' + str(nr+1)
