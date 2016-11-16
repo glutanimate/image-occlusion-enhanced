@@ -83,12 +83,12 @@ def loadConfig(self):
 
     elif mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
         print "Updating synced config DB from earlier IO release"
-        template.update_template(mw.col)
-        # insert other update actions here
         for key in default_conf_syncd.keys():
             if key not in mw.col.conf['imgocc']:
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
+        # insert other update actions here:
+        template.update_template(mw.col) # update card templates
         mw.col.setMod()
 
 

@@ -58,7 +58,7 @@
 - **Updated Options Interface**
     + More options, fewer bugs
 - **Fully Rewritten Note Generator**
-    + Faster, more extendible, and less bug-prone
+    + Faster, more extensible, and less bug-prone
 - **Performance Improvements**
     + Smaller memory footprint in general use
 - **Stability Improvements**
