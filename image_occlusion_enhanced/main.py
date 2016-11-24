@@ -215,6 +215,7 @@ class ImgOccAdd(object):
         svg_edit = dialog.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
+        svg = unicode(svg) # store svg as unicode string
 
         r1 = self.getUserInputs(dialog)
         if r1 == False:

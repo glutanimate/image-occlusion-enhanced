@@ -175,7 +175,8 @@ class ImgOccNoteConverter(object):
         svg_doc = minidom.parse(svg_file)
         # ugly workaround for wrong namespace in older IO notes:
         svg_string = svg_doc.toxml().replace('ns0:', '').replace(':ns0','')
-        svg_doc = minidom.parseString(svg_string)
+        svg_string = unicode(svg_string)
+        svg_doc = minidom.parseString(svg_string.encode('utf-8'))
         svg_node = svg_doc.documentElement
         return svg_node
 
@@ -203,7 +204,7 @@ class ImgOccNoteConverter(object):
         logging.debug("!saving %s, %s", note_id, mtype)
         mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'w')
-        mask_file.write(mask)
+        mask_file.write(mask.encode('utf-8'))
         mask_file.close()
         return mask_path
 

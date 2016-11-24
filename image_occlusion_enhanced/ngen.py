@@ -192,7 +192,7 @@ class ImgOccNoteGenerator(object):
         """Find mask nodes in masks layer and read/set node IDs"""
         self.mnode_indexes = []
         self.mnode_ids = {}
-        mask_doc = minidom.parseString(self.new_svg)
+        mask_doc = minidom.parseString(self.new_svg.encode('utf-8'))
         svg_node = mask_doc.documentElement
         layer_nodes = self.layerNodesFrom(svg_node)
         mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
@@ -353,7 +353,7 @@ class ImgOccNoteGenerator(object):
 
     def _createMask(self, side, mask_node_index):
         """Call occl_tp-specific mask generator"""
-        mask_doc = minidom.parseString(self.new_svg)
+        mask_doc = minidom.parseString(self.new_svg.encode('utf-8'))
         svg_node = mask_doc.documentElement
         layer_nodes = self.layerNodesFrom(svg_node)
         mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
@@ -389,7 +389,7 @@ class ImgOccNoteGenerator(object):
         # media collection is the working directory:
         mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'w')
-        mask_file.write(mask)
+        mask_file.write(mask.encode('utf8'))
         mask_file.close()
         return mask_path
 

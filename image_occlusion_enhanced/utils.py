@@ -53,7 +53,7 @@ def svgToBase64(svg_path):
     """Convert SVG string to base64"""
     doc = minidom.parse(svg_path)
     svg_node = doc.documentElement
-    svg_content = svg_node.toxml()
+    svg_content = unicode(svg_node.toxml()).encode('utf-8')
     svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
     return svg_b64
 
