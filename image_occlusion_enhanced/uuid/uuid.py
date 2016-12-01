@@ -410,19 +410,21 @@ _uuid_generate_random = _uuid_generate_time = _UuidCreate = None
 try:
     import ctypes, ctypes.util
 
-    # The uuid_generate_* routines are provided by libuuid on at least
-    # Linux and FreeBSD, and provided by libc on Mac OS X.
-    for libname in ['uuid', 'c']:
-        try:
-            lib = ctypes.CDLL(ctypes.util.find_library(libname))
-        except:
-            continue
-        if hasattr(lib, 'uuid_generate_random'):
-            _uuid_generate_random = lib.uuid_generate_random
-        if hasattr(lib, 'uuid_generate_time'):
-            _uuid_generate_time = lib.uuid_generate_time
-            if _uuid_generate_random is not None:
-                break  # found everything we were looking for
+    # workaround for python bug (https://bugs.python.org/issue17213k)
+    if os.name not in ['nt', 'ce']:
+        # The uuid_generate_* routines are provided by libuuid on at least
+        # Linux and FreeBSD, and provided by libc on Mac OS X.
+        for libname in ['uuid', 'c']:
+            try:
+                lib = ctypes.CDLL(ctypes.util.find_library(libname))
+            except:
+                continue
+            if hasattr(lib, 'uuid_generate_random'):
+                _uuid_generate_random = lib.uuid_generate_random
+            if hasattr(lib, 'uuid_generate_time'):
+                _uuid_generate_time = lib.uuid_generate_time
+                if _uuid_generate_random is not None:
+                    break  # found everything we were looking for
 
     # The uuid_generate_* functions are broken on MacOS X 10.5, as noted
     # in issue #8621 the function generates the same sequence of values
