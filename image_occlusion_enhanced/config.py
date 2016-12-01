@@ -88,7 +88,7 @@ def loadConfig(self):
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
         # insert other update actions here:
-        template.update_template(mw.col) # update card templates
+        # template.update_template(mw.col) # update card templates
         mw.col.setMod()
 
 
