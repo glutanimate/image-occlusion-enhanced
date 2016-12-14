@@ -49,14 +49,6 @@ def imageProp(image_path):
     width, height = image.size
     return width, height
 
-def svgToBase64(svg_path):
-    """Convert SVG string to base64"""
-    doc = minidom.parse(svg_path)
-    svg_node = doc.documentElement
-    svg_content = unicode(svg_node.toxml()).encode('utf-8')
-    svg_b64 = "data:image/svg+xml;base64," + base64.b64encode(svg_content)
-    return svg_b64
-
 def fname2img(path):
     """Return HTML img element for given path"""
     return '<img src="%s" />' % os.path.split(path)[1]

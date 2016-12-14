@@ -36,7 +36,7 @@ from config import *
 from resources import *
 from ngen import *
 from dialogs import ImgOccEdit, ImgOccOpts, ioHelp, ioError
-from utils import imageProp, svgToBase64, img2path, path2url
+from utils import imageProp, img2path, path2url
 import nconvert
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
@@ -173,8 +173,8 @@ class ImgOccAdd(object):
                 if fn in self.ioflds_priv:
                     continue
                 dialog.tedit[fn].setPlainText(onote[fn].replace('<br />', '\n'))
-            svg_b64 = svgToBase64(opref["omask"])
-            url.addQueryItem('source', svg_b64)
+            svg_url = path2url(opref["omask"])
+            url.addQueryItem('url', svg_url)
         else:
             url.addQueryItem('initTool', 'rect'),
 
