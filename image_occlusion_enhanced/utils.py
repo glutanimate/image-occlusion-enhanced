@@ -12,21 +12,21 @@
 Common reusable utilities
 """
 
-import os
+import os, re
 
 from aqt import mw
 
-import re
 import urlparse, urllib
-import base64
-
-from xml.dom import minidom
 from Imaging.PIL import Image
 
 def path2url(path):
     """URL-encode local path"""
     return urlparse.urljoin(
       'file:', urllib.pathname2url(path.encode('utf-8')))
+
+def fname2img(path):
+    """Return HTML img element for given path"""
+    return '<img src="%s" />' % os.path.split(path)[1]
 
 def img2path(img, nameonly=False):
     """Extract path or file name out of HTML img element"""
@@ -40,15 +40,10 @@ def img2path(img, nameonly=False):
     fpath = os.path.join(mw.col.media.dir(),fname.group(2))
     if not os.path.isfile(fpath):
         return None
-    else:
-        return fpath
+    return fpath
 
 def imageProp(image_path):
     """Get image width and height"""
     image = Image.open(image_path)
     width, height = image.size
     return width, height
-
-def fname2img(path):
-    """Return HTML img element for given path"""
-    return '<img src="%s" />' % os.path.split(path)[1]

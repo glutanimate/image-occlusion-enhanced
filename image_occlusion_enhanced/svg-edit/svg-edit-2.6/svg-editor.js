@@ -4097,8 +4097,7 @@
 
 					// Additional shortcuts
 					{key: ['esc', true, true], fn: svgCanvas.clearSelection}
-
-
+					
 				];
 
 				// Tooltips not directly associated with a single function
