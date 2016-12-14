@@ -4096,8 +4096,10 @@
 					{key: modKey+'v', fn: pasteInCenter},
 
 					// Additional shortcuts
-					{key: ['esc', true, true], fn: svgCanvas.clearSelection}
-					
+					{key: ['esc', true, true], fn: svgCanvas.clearSelection},
+					{key: 'ctrl+shift+L', fn: function(){$('#layerlist td.layername:contains("Labels"):last').trigger("mouseup")}},
+					{key: 'ctrl+shift+M', fn: function(){$('#layerlist td.layername:contains("Masks"):last').trigger("mouseup")}}
+
 				];
 
 				// Tooltips not directly associated with a single function
