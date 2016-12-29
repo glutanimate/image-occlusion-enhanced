@@ -2,7 +2,7 @@
 
 ## Overview
 
-*Image Occlusion Enhanced* is an add-on for the spaced repetition flashcard program [Anki](http://ankisrs.net/) that allows you to create flashcards which hide parts of an image and test your knowledge on the occluded information.
+*Image Occlusion Enhanced* is an add-on for the spaced repetition flashcard program [Anki](http://ankisrs.net/). It allows you to create flashcards that hide parts of an image to test your knowledge of that hidden information.
 
 ## Table of Contents
 
@@ -15,7 +15,6 @@
 - [Documentation](#documentation)
 - [Help](#help)
 - [Development Status](#development-status)
-- [Supporting the Development of This Add-on](#supporting-the-development-of-this-add-on)
 - [Credits](#credits)
 - [License and Warranty](#license-and-warranty)
 
@@ -81,14 +80,6 @@ Please use the [official forum thread](https://anki.tenderapp.com/discussions/ad
 *Image Occlusion Enhanced* should now be stable for the most part. However, there still exist a number of longstanding issues that have less to do with the add-on itself and more with Anki and the libraries it's based on. macOS, in particular, has always suffered from compatibility issues with SVG-Edit.
 
 For a list of known issues please check out the [Issues](https://github.com/Glutanimate/image-occlusion-enhanced/issues) page. Bug reports and suggestions are always welcome, but it might take me a while to get to them. If you know how to code please feel free to improve this project, file pull requests, etc.
-
-## Supporting the Development of This Add-on
-
-Quite a few people have offered to donate to this project over the last few months. I've always been very hesitant about accepting these contributions. Both because of the operational overhead and because I just felt like I hadn't contributed enough to warrant these donations, yet.
-
-With large parts of the add-on rewritten recently, I feel like this has become less of a concern. That's why I've decided to finally add a few PayPal links to the [description page on AnkiWeb](https://ankiweb.net/shared/info/1111933094). If you ever felt like buying me a coffee a sandwich: Now you can!
-
-All funds collected through this will go into fueling my late-night coding and studying sessions :).
 
 ## Credits
 
