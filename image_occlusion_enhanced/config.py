@@ -102,16 +102,16 @@ def loadConfig(self):
         model = template.add_io_model(mw.col)
         mw.col.conf['imgocc']['flds'] = default_conf_syncd['flds']
     mflds = model['flds']
-    # preserve fields if they are marked as sticky in the IO note type:
-    ioflds_prsv = []
-    for fld in mflds:
-        if fld['sticky']:
-            ioflds_prsv.append(fld['name'])
-
     ioflds = mw.col.conf['imgocc']['flds']
     ioflds_priv = []
     for i in IO_FIDS_PRIV:
         ioflds_priv.append(ioflds[i])
+    # preserve fields if they are marked as sticky in the IO note type:
+    ioflds_prsv = []
+    for fld in mflds:
+        fname = fld['name']
+        if fld['sticky'] and fname not in ioflds_priv:
+            ioflds_prsv.append(fname)
 
     self.sconf_dflt = default_conf_syncd
     self.sconf = mw.col.conf['imgocc']
