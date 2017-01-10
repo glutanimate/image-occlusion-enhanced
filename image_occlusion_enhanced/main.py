@@ -51,6 +51,7 @@ svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,\
 ext-markers.js,ext-shapes.js,ext-eyedropper.js"
 svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
+                       ('showRulers', 'false'),
                        ('extensions', svg_edit_ext)]
 
 class ImgOccAdd(object):
