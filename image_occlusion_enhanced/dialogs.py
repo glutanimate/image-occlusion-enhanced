@@ -81,6 +81,7 @@ class ImgOccEdit(QDialog):
         image_btn = QPushButton("Change &Image", clicked=self.changeImage)
         image_btn.setIcon(QIcon(":/icons/new_occlusion.png"))
         image_btn.setIconSize(QSize(16, 16))
+        image_btn.setAutoDefault(False)
 
         self.occl_tp_select = QComboBox()
         self.occl_tp_select.addItems(["Don't Change", "Hide All, Reveal One",
@@ -124,6 +125,10 @@ class ImgOccEdit(QDialog):
         self.occl_tp_select.setItemData(2, aa_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(3, oa_tt, Qt.ToolTipRole)
 
+        for btn in [image_btn, self.edit_btn, self.new_btn, self.ao_btn, 
+                    self.aa_btn, self.oa_btn, close_button]:
+            btn.setFocusPolicy(Qt.ClickFocus)
+
         self.connect(self.edit_btn, SIGNAL("clicked()"), self.edit_note)
         self.connect(self.new_btn, SIGNAL("clicked()"), self.new)
         self.connect(self.ao_btn, SIGNAL("clicked()"), self.addAO)
@@ -155,6 +160,7 @@ class ImgOccEdit(QDialog):
         tab1.setLayout(vbox1)
         self.tab2.setLayout(self.vbox2)
         self.tab_widget = QtGui.QTabWidget()
+        self.tab_widget.setFocusPolicy(Qt.ClickFocus)
         self.tab_widget.addTab(tab1,"&Masks Editor")
         self.tab_widget.addTab(self.tab2,"&Fields")
         self.tab_widget.setTabToolTip(1, "Include additional information (optional)")
