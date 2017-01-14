@@ -2069,6 +2069,10 @@
 						workarea.css('cursor', zoomInIcon);
 					}
 				})
+
+				Editor.setPanning = function(active) {
+					svgCanvas.spaceKey = keypan = active;
+				};
 			}());
 
 
