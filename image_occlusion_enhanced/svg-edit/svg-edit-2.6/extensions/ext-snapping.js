@@ -16,6 +16,11 @@ svgEditor.addExtension("toggle_snap", function() {
         events: {
           "click": function() {
               svgEditor.curConfig.gridSnapping = snapOn = !snapOn;
+              if (snapOn){
+                var res = svgCanvas.getResolution()
+                gridStep = Math.max(5, Math.round(res.w / 100))
+                svgEditor.curConfig.snappingStep = gridStep
+              };
               svgCanvas.setConfig(svgEditor.curConfig);
               $('#toggle_snap').toggleClass('push_button_pressed tool_button');
               svgEditor.updateCanvas();
