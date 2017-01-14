@@ -1,3 +1,13 @@
+/*
+ * ext-snapping.js
+ *
+ * Licensed under the GNU GPLv3
+ *
+ * Copyright(c) 2017 Glutanimate
+ *
+ * This file is part of Image Occlusion Enhanced for Anki
+ *
+ */
 
 svgEditor.addExtension("toggle_snap", function() {
     snapOn = svgEditor.curConfig.gridSnapping || false
