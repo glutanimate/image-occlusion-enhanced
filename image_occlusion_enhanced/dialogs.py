@@ -197,7 +197,7 @@ class ImgOccEdit(QDialog):
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+r"), self),
             QtCore.SIGNAL('activated()'), self.resetAllFields)
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+t"), self),
-            QtCore.SIGNAL('activated()'), lambda:self.focusField(self.tags_edit))
+            QtCore.SIGNAL('activated()'), self.focusTags)
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+f"), self),
             QtCore.SIGNAL('activated()'), self.fitImageCanvas)
 
@@ -338,6 +338,10 @@ class ImgOccEdit(QDialog):
         elif target_widget:
             target = target_widget
         target.setFocus()
+
+    def focusTags(self):
+        self.tab_widget.setCurrentIndex(1)
+        self.tags_edit.setFocus()
 
     def resetMainFields(self):
         """Reset all fields aside from sticky ones"""
