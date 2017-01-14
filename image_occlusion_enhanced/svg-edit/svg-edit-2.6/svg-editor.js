@@ -4069,6 +4069,7 @@
 					{key: 'shift+P', fn: selectNext},
 					{key: 'plus', fn: function(){zoomImage(1.25);}},
 					{key: 'minus', fn: function(){zoomImage(.75);}},
+					{key: '0', fn: function(){svgCanvas.zoomChanged('', 'canvas');}},
 					{key: [modKey+']', true], fn: function(){moveUpDownSelected('Up');}},
                                         {key: [modKey+'[', true], fn: function(){moveUpDownSelected('Down');}},
 					{key: ['up', true], fn: function(){moveSelected(0,-1);}},
