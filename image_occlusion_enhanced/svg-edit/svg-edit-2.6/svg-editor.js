@@ -2012,7 +2012,7 @@
 			// - removes the tool_button_current class from whatever tool currently has it
 			// - hides any flyouts
 			// - adds the tool_button_current class to the button passed in
-			var toolButtonClick = function(button, noHiding) {
+			var toolButtonClick = Editor.toolButtonClick = function(button, noHiding) {
 				if ($(button).hasClass('disabled')) return false;
 				if($(button).parent().hasClass('tools_flyout')) return true;
 				var fadeFlyouts = fadeFlyouts || 'normal';
