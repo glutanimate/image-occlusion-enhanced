@@ -26,6 +26,7 @@ svgEditor.addExtension('ext-panning', function() {'use strict';
 				click: function() {
 					svgCanvas.setMode('ext-panning');
 					svgEditor.toolButtonClick('#ext-panning')
+					$('#styleoverrides').text('#svgcanvas *{cursor:move;pointer-events:all}, #svgcanvas {cursor:default}');
 				}
 			}
 		}],
