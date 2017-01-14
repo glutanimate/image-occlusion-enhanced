@@ -6738,8 +6738,8 @@ this.setBBoxZoom = function(val, editor_w, editor_h) {
 			break;
 		case 'canvas':
 			var res = getResolution();
-			spacer = .98;
-			bb = {width:res.w, height:res.h ,x:8, y:8};
+			spacer = .97;
+			bb = {width:res.w, height:res.h , x:4, y:4};
 			break;
 		case 'content':
 			bb = getStrokedBBox();
