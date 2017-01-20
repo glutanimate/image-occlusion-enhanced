@@ -54,6 +54,8 @@ class ImgOccEdit(QDialog):
         """Set up ImgOccEdit UI"""
         # Main widgets aside from fields
         self.svg_edit = webview.AnkiWebView()
+        # required for local href links to work properly (e.g. context menu):
+        self.svg_edit.page().setLinkDelegationPolicy(QWebPage.DelegateExternalLinks)
         self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
         self.tags_hbox = QHBoxLayout()
         self.tags_edit = tagedit.TagEdit(self)
