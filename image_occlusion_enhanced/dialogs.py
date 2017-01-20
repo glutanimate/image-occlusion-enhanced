@@ -64,6 +64,7 @@ class ImgOccEdit(QDialog):
         self.deck_container = QWidget()
         self.deckChooser = deckchooser.DeckChooser(mw,
                         self.deck_container, label=True)
+        self.deckChooser.deck.setAutoDefault(False)
 
         # workaround for tab focus order issue of the tags entry
         # (this particular section is only needed when the quick deck
@@ -73,6 +74,7 @@ class ImgOccEdit(QDialog):
                 item = self.deck_container.layout().children()[0].itemAt(i)
                 # remove Tab focus manually:
                 item.widget().setFocusPolicy(Qt.ClickFocus)
+                item.widget().setAutoDefault(False)
 
 
         # Button row widgets
