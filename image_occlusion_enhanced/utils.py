@@ -26,7 +26,8 @@ def path2url(path):
 
 def fname2img(path):
     """Return HTML img element for given path"""
-    return '<img src="%s" />' % os.path.split(path)[1]
+    fname = os.path.split(path)[1]
+    return '<img src="%s" />' % fname
 
 def img2path(img, nameonly=False):
     """Extract path or file name out of HTML img element"""

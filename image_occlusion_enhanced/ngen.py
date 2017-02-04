@@ -28,7 +28,6 @@ from anki.notes import Note
 from xml.dom import minidom
 from Imaging.PIL import Image
 from uuid import uuid
-import shutil
 
 from dialogs import ioHelp, ioAskUser
 from utils import fname2img
@@ -59,6 +58,7 @@ def genByKey(key, old_occl_tp=None):
         return IoGenHideAllRevealOne
 
 class ImgOccNoteGenerator(object):
+
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
         self.ed = ed
         self.new_svg = svg
@@ -87,7 +87,8 @@ class ImgOccNoteGenerator(object):
         omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
         qmasks = self._generateMaskSVGsFor("Q")
         amasks = self._generateMaskSVGsFor("A")
-        img = fname2img(self._addImageToCol())
+        image_path = mw.col.media.addFile(self.image_path)
+        img = fname2img(image_path)
 
         mw.checkpoint("Adding Image Occlusion Cards")
         for nr, idx in enumerate(self.mnode_indexes):
@@ -129,13 +130,8 @@ class ImgOccNoteGenerator(object):
             amasks = self._generateMaskSVGsFor("A")
             state = "reset"
 
-        old_img = fname2img(self.opref['image'])
-        if fname2img(self.image_path) != old_img:
-            # updated image
-            col_image = self._addImageToCol()
-            img = fname2img(col_image)
-        else:
-            img = old_img
+        image_path = mw.col.media.addFile(self.image_path)
+        img = fname2img(image_path)
 
         logging.debug("mnode_indexes %s", self.mnode_indexes)
         for nr, idx in enumerate(self.mnode_indexes):
@@ -334,17 +330,6 @@ class ImgOccNoteGenerator(object):
         if deleted_nids:
             mw.col.remNotes(deleted_nids)
         return (del_count, new_count)
-
-    def _addImageToCol(self):
-        """Rename image based on ID and copy it to the media collection"""
-        media_dir = mw.col.media.dir()
-        fn = os.path.basename(self.image_path)
-        name, ext = os.path.splitext(fn)
-        short_name = name[:75] if len(name) > 75 else name
-        unique_fn = self.uniq_id + '_' + short_name + ext
-        new_path = os.path.join(media_dir, unique_fn)
-        shutil.copyfile(self.image_path, new_path)
-        return new_path
 
     def _generateMaskSVGsFor(self, side):
         """Generate a mask for each mask node"""
