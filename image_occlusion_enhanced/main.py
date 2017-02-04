@@ -27,6 +27,7 @@ from aqt import mw
 from aqt.editor import Editor
 from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
+from aqt.reviewer import Reviewer
 from aqt.utils import tooltip, saveGeom, restoreGeom
 from anki.hooks import wrap, addHook
 
@@ -377,6 +378,11 @@ def onSetNote(self, node, hide=True, focus=False):
                     'tr:first-child .fname, #f0, #i0', 'display: none;');
             """)
 
+def newKeyHandler(self, evt):
+    """Bind mask reveal to a hotkey"""
+    if (self.state == "answer" and evt.key() == Qt.Key_G):
+        self.web.eval('document.getElementById("io-revl-btn").click();')
+
 # Set up menus and hooks
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
@@ -389,3 +395,4 @@ mw.form.menuHelp.addAction(help_action)
 
 addHook('setupEditorButtons', onSetupEditorButtons)
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
+Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
