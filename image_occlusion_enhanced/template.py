@@ -174,12 +174,12 @@ iocard_css = """\
 
 /* ADJUSTMENTS FOR MOBILE */
 
-.card .mobile, #content .mobile {
-  font-size: 100%;
+.mobile .card, .mobile #content {
+  font-size: 120%;
   margin: 0;
 }
 
-#io-extra-wrapper .mobile {
+.mobile #io-extra-wrapper {
   width: 95%;
 }
 """
