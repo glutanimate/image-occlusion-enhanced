@@ -376,6 +376,9 @@ def onSetNote(self, node, hide=True, focus=False):
             // hide first fname, field, and snowflake (FrozenFields add-on)
                 document.styleSheets[0].addRule(
                     'tr:first-child .fname, #f0, #i0', 'display: none;');
+            // limit image display height
+                document.styleSheets[0].addRule(
+                    'img', 'max-width: 90%; max-height: 160px');
             """)
 
 def newKeyHandler(self, evt):
