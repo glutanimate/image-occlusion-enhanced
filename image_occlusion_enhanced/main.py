@@ -368,19 +368,22 @@ def onSetupEditorButtons(self):
     btn.addAction(press_action)
 
 
-def onSetNote(self, node, hide=True, focus=False):
-    """Modify how the editor is rendered for IO notes"""
-    if (self.note and self.note.model()["name"] == IO_MODEL_NAME and
-            self.note.model()['flds'][0]['name'] == IO_FLDS['id']):
+def onSetNote(self, note, hide=True, focus=False):
+    """Customize the editor when IO notes are active"""
+    if not (self.note and self.note.model()["name"] == IO_MODEL_NAME):
+        return
+    # simple hack to hide the ID field if it's the first one
+    if self.note.model()['flds'][0]['name'] == IO_FLDS['id']:
         self.web.eval("""
-            // Simple hack to hide ID field
             // hide first fname, field, and snowflake (FrozenFields add-on)
                 document.styleSheets[0].addRule(
                     'tr:first-child .fname, #f0, #i0', 'display: none;');
-            // Limit image display height
-                document.styleSheets[0].addRule(
-                    'img', 'max-width: 90%; max-height: 160px');
             """)
+    # Limit image display height
+    self.web.eval("""
+            document.styleSheets[0].addRule(
+                'img', 'max-width: 90%; max-height: 160px');
+        """)
 
 def newKeyHandler(self, evt):
     """Bind mask reveal to a hotkey"""
