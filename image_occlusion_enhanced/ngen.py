@@ -58,6 +58,9 @@ def genByKey(key, old_occl_tp=None):
         return IoGenHideAllRevealOne
 
 class ImgOccNoteGenerator(object):
+    """Generic note generator object"""
+
+    stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
 
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
         self.ed = ed
@@ -68,7 +71,6 @@ class ImgOccNoteGenerator(object):
         self.fields = fields
         self.did = did
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
-        self.stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
         loadConfig(self)
 
     def generateNotes(self):
@@ -95,9 +97,7 @@ class ImgOccNoteGenerator(object):
             note_id = self.mnode_ids[idx]
             self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr],
                                         img, note_id)
-
-        parent = None
-        tooltip("%s %s <b>added</b>" % self.cardS(len(qmasks)), parent=parent)
+        tooltip("%s %s <b>added</b>" % self._cardS(len(qmasks)), parent=None)
         return state
 
     def updateNotes(self):
@@ -149,22 +149,22 @@ class ImgOccNoteGenerator(object):
             else:
                 self._saveMaskAndReturnNote(None, None, None,
                                             img, note_id, nid)
-        self.showUpdateTooltip(del_count, new_count)
+        self._showUpdateTooltip(del_count, new_count)
         return state
 
-    def cardS(self, cnt):
+    def _cardS(self, cnt):
         s = "card"
         if cnt > 1 or cnt == 0:
             s = "cards"
         return (cnt, s)
 
-    def showUpdateTooltip(self, del_count, new_count):
+    def _showUpdateTooltip(self, del_count, new_count):
         upd_count = max(0, len(self.mnode_indexes) - del_count - new_count)
-        ttip = "%s old %s <b>edited in place</b>" % self.cardS(upd_count)
+        ttip = "%s old %s <b>edited in place</b>" % self._cardS(upd_count)
         if del_count > 0:
-            ttip += "<br>%s existing %s <b>deleted</b>" % self.cardS(del_count)
+            ttip += "<br>%s existing %s <b>deleted</b>" % self._cardS(del_count)
         if new_count > 0:
-            ttip += "<br>%s new %s <b>created</b>" % self.cardS(new_count)
+            ttip += "<br>%s new %s <b>created</b>" % self._cardS(new_count)
         tooltip(ttip, parent=self.ed.parentWindow)
 
     def _getOriginalSvg(self):
@@ -173,7 +173,7 @@ class ImgOccNoteGenerator(object):
         svg_node = mask_doc.documentElement
         return svg_node.toxml()
 
-    def layerNodesFrom(self, svg_node):
+    def _layerNodesFrom(self, svg_node):
         """Get layer nodes (topmost group nodes below the SVG node)"""
         assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
         assert (svg_node.nodeName == 'svg')
@@ -190,7 +190,7 @@ class ImgOccNoteGenerator(object):
         self.mnode_ids = {}
         mask_doc = minidom.parseString(self.new_svg.encode('utf-8'))
         svg_node = mask_doc.documentElement
-        layer_nodes = self.layerNodesFrom(svg_node)
+        layer_nodes = self._layerNodesFrom(svg_node)
         mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
         for i, node in enumerate(mlayer_node.childNodes):
             # minidom doesn't offer a childElements method and childNodes
@@ -214,7 +214,7 @@ class ImgOccNoteGenerator(object):
 
         return (svg_node, mlayer_node)
 
-    def findByNoteId(self, note_id):
+    def _findByNoteId(self, note_id):
         """Search collection for notes with given ID"""
         query = "'%s':'%s*'" % ( self.ioflds['id'], note_id )
         logging.debug("query %s", query)
@@ -224,7 +224,7 @@ class ImgOccNoteGenerator(object):
     def _findAllNotes(self):
         """Get matching nids by ID"""
         old_occl_id = '%s-%s' % (self.uniq_id, self.opref["occl_tp"])
-        res = self.findByNoteId(old_occl_id)
+        res = self._findByNoteId(old_occl_id)
         self.nids = {}
         for nid in res:
             note_id = mw.col.getNote(nid)[self.ioflds['id']]
@@ -340,7 +340,7 @@ class ImgOccNoteGenerator(object):
         """Call occl_tp-specific mask generator"""
         mask_doc = minidom.parseString(self.new_svg.encode('utf-8'))
         svg_node = mask_doc.documentElement
-        layer_nodes = self.layerNodesFrom(svg_node)
+        layer_nodes = self._layerNodesFrom(svg_node)
         mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
         #This method gets implemented differently by subclasses
         self._createMaskAtLayernode(side, mask_node_index, mlayer_node)
@@ -420,8 +420,8 @@ class ImgOccNoteGenerator(object):
 
 class IoGenHideAllRevealOne(ImgOccNoteGenerator):
     """Q: All hidden, A: One revealed ('nonoverlapping')"""
+    occl_tp = "ao"
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
-        self.occl_tp = "ao"
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
                                         opref, tags, fields, did)
 
@@ -435,8 +435,8 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
 
 class IoGenHideAllRevealAll(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
+    occl_tp = "aa"
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
-        self.occl_tp = "aa"
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
                                         opref, tags, fields, did)
 
@@ -450,8 +450,8 @@ class IoGenHideAllRevealAll(ImgOccNoteGenerator):
 
 class IoGenHideOneRevealAll(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
+    occl_tp = "oa"
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
-        self.occl_tp = "oa"
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
                                         opref, tags, fields, did)
 
