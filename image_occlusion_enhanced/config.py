@@ -37,8 +37,8 @@ IO_FLDS = {
     'om': u"Original Mask"
 }
 
-IO_FLDS_IDS = ["id", "hd", "im", "ft", "rk", "sc",
-                "e1", "e2", "qm", "am", "om"]
+IO_FLDS_IDS = ["id", "hd", "im", "qm",  "ft", "rk",
+                "sc", "e1", "e2", "am", "om"]
 
 # TODO: Use IDs instead of names to make these compatible with self.ioflds
 
