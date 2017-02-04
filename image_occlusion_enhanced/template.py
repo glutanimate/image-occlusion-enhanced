@@ -172,7 +172,7 @@ iocard_css = """\
   font-size: 0.5em;
 }
 
-/* ADJUSTMENTS FOR MOBILE */
+/* ADJUSTMENTS FOR MOBILE DEVICES */
 
 .mobile .card, .mobile #content {
   font-size: 120%;
@@ -181,6 +181,10 @@ iocard_css = """\
 
 .mobile #io-extra-wrapper {
   width: 95%;
+}
+
+.mobile #io-revl-btn {
+  font-size: 0.8em;
 }
 """
 
