@@ -390,7 +390,16 @@ def newKeyHandler(self, evt):
     if (self.state == "answer" and evt.key() == Qt.Key_G):
         self.web.eval('document.getElementById("io-revl-btn").click();')
 
-# Set up menus and hooks
+def onShowAnswer(self, _old):
+    """Retain scroll position across answering the card"""
+    if not self.card.model()["name"] == IO_MODEL_NAME:
+        return _old(self)
+    scroll_pos = self.web.page().mainFrame().scrollPosition()
+    ret = _old(self)
+    self.web.page().mainFrame().setScrollPosition(scroll_pos)
+    return ret
+
+# Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
 mw.connect(options_action, SIGNAL("triggered()"),
@@ -400,6 +409,8 @@ mw.connect(help_action, SIGNAL("triggered()"),
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
+# Set up hooks
 addHook('setupEditorButtons', onSetupEditorButtons)
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
 Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
+Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
