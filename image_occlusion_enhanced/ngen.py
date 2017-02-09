@@ -426,12 +426,11 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
                                         opref, tags, fields, did)
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
-        for i in self.mnode_indexes:
-            if i == mask_node_index:
-                if side == "Q":
-                    self._setQuestionAttribs(mlayer_node.childNodes[i])
-                if side == "A":
-                    mlayer_node.removeChild(mlayer_node.childNodes[i])
+        mask_node = mlayer_node.childNodes[mask_node_index]
+        if side == "Q":
+            self._setQuestionAttribs(mask_node)
+        elif side == "A":
+            mlayer_node.removeChild(mask_node)
 
 class IoGenHideAllRevealAll(ImgOccNoteGenerator):
     """Q: All hidden, A: All revealed"""
@@ -441,12 +440,15 @@ class IoGenHideAllRevealAll(ImgOccNoteGenerator):
                                         opref, tags, fields, did)
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
+        # need to start from behind as we're removing nodes as we go
         for i in reversed(self.mnode_indexes):
-            if side == "Q":
-                if i == mask_node_index:
-                    self._setQuestionAttribs(mlayer_node.childNodes[i])
+            mask_node = mlayer_node.childNodes[i]
+            if i == mask_node_index and side == "Q":
+                self._setQuestionAttribs(mask_node)
+            elif side == "Q":
+                pass
             else:
-                mlayer_node.removeChild(mlayer_node.childNodes[i])
+                mlayer_node.removeChild(mask_node)
 
 class IoGenHideOneRevealAll(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
@@ -457,8 +459,9 @@ class IoGenHideOneRevealAll(ImgOccNoteGenerator):
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         for i in reversed(self.mnode_indexes):
+            mask_node = mlayer_node.childNodes[i]
             if i == mask_node_index and side == "Q":
-                self._setQuestionAttribs(mlayer_node.childNodes[i])
-                mlayer_node.childNodes[i].setAttribute("class", "qshape")
+                self._setQuestionAttribs(mask_node)
+                mask_node.setAttribute("class", "qshape")
             else:
-                mlayer_node.removeChild(mlayer_node.childNodes[i])
+                mlayer_node.removeChild(mask_node)
