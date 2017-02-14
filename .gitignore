@@ -1,12 +1,9 @@
 *.pyc
 *.pyo
-image_occlusion_enhanced/.hidden
+.hidden
+.directory
 image_occlusion_enhanced/svg-edit/build
 image_occlusion_enhanced/svg-edit/Makefile
 image-occlusion.sublime-project
 image-occlusion.sublime-workspace
-.hidden
-ANKIWEB.md
-ANKIWEB.html
-.directory
 design-spec.md
