@@ -19,8 +19,6 @@ Sets up buttons and menus and calls other modules.
 import logging, sys
 import os
 
-from PyQt4.QtGui import QFileDialog, QAction, QKeySequence
-from PyQt4.QtCore import QUrl
 from aqt.qt import *
 
 from aqt import mw
@@ -28,7 +26,7 @@ from aqt.editor import Editor
 from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
 from aqt.reviewer import Reviewer
-from aqt.utils import tooltip, saveGeom, restoreGeom
+from aqt.utils import getFile, tooltip, saveGeom, restoreGeom
 from anki.hooks import wrap, addHook
 
 import tempfile
@@ -112,16 +110,16 @@ class ImgOccAdd(object):
                 # workaround for a clipboard bug
                 return self.getImage(noclip=True)
             else:
-                return image_path
+                return unicode(image_path)
 
         # retrieve last used image directory
         prev_image_dir = self.lconf["dir"]
         if not prev_image_dir or not os.path.isdir(prev_image_dir):
             prev_image_dir = IO_HOME
 
-        image_path = QFileDialog.getOpenFileName(parent,
-                     "Choose Image", prev_image_dir,
-                     "Image Files (*.png *jpg *.jpeg *.gif)")
+        image_path = getFile(parent, "Choose an Image", None, 
+                            "Image Files (*.png *jpg *.jpeg *.gif)",
+                            dir=prev_image_dir)
 
         if not image_path:
             return None
