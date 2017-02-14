@@ -117,9 +117,10 @@ class ImgOccAdd(object):
         if not prev_image_dir or not os.path.isdir(prev_image_dir):
             prev_image_dir = IO_HOME
 
-        image_path = getFile(parent, "Choose an Image", None, 
-                            "Image Files (*.png *jpg *.jpeg *.gif)",
-                            dir=prev_image_dir)
+        image_path = QFileDialog.getOpenFileName(parent,
+                             "Select an Image", prev_image_dir,
+                             "Image Files (*.png *jpg *.jpeg *.gif)")
+        image_path = unicode(image_path)
 
         if not image_path:
             return None
