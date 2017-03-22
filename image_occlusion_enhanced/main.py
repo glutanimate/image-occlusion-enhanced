@@ -61,7 +61,7 @@ class ImgOccAdd(object):
         self.opref = {} # original io session preference
         loadConfig(self)
 
-    def selImage(self):
+    def selImage(self, oldimg=None):
         """Select image and set up variables for the IO Editor"""
         note = self.ed.note
         opref = self.opref
@@ -83,7 +83,7 @@ class ImgOccAdd(object):
             opref["occl_tp"] = note_id_grps[1]
             opref["image"] = img2path(note[self.ioflds['im']])
             opref["omask"] = img2path(note[self.ioflds['om']])
-            if  None in [opref["omask"], opref["image"]]:
+            if None in [opref["omask"], opref["image"]]:
                 tooltip("Editing unavailable: Missing Image or Original Mask")
                 return
             image_path = opref["image"]
@@ -91,6 +91,7 @@ class ImgOccAdd(object):
             opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
             image_path = self.getImage(parent=self.ed.parentWindow)
             if not image_path:
+                self.image_path = oldimg
                 return
 
         self.image_path = image_path
@@ -340,8 +341,12 @@ def onImgOccButton(ed, mode):
     if mode != "add" and ed.note.model() != io_model:
         tooltip("Can only edit notes with the %s note type" % IO_MODEL_NAME)
         return
+    try:
+        oldimg = mw.ImgOccAdd.image_path
+    except AttributeError:
+        oldimg = None
     mw.ImgOccAdd = ImgOccAdd(ed, mode)
-    mw.ImgOccAdd.selImage()
+    mw.ImgOccAdd.selImage(oldimg)
 
 def onSetupEditorButtons(self):
     """Add IO button to Editor"""

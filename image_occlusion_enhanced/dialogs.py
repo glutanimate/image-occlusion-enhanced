@@ -172,7 +172,7 @@ class ImgOccEdit(QDialog):
 
         ## Main Window
         vbox_main = QVBoxLayout()
-        vbox_main.setMargin(5);
+        vbox_main.setMargin(5)
         vbox_main.addWidget(self.tab_widget)
         vbox_main.addLayout(bottom_hbox)
         self.setLayout(vbox_main)
