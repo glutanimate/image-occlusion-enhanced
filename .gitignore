@@ -7,3 +7,4 @@ image_occlusion_enhanced/svg-edit/Makefile
 image-occlusion.sublime-project
 image-occlusion.sublime-workspace
 design-spec.md
+image-occlusion-enhanced-*.zip
