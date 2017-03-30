@@ -701,15 +701,16 @@ def ioHelp(help, title=None, text=None, parent=None):
         <a href="https://github.com/steveaw">Steve AW</a></em></p>
         <p style="font-size:12pt;"><em>Copyright © 2016-2017 \
         <a href="https://github.com/Glutanimate">Aristotelis P.</a></em></p>
-        <p><em>Image Occlusion Enhanced</em> is licensed under the GNU AGPLv3 License.</p>
+        <p><em>Image Occlusion Enhanced</em> is licensed under the GNU AGPLv3.</p>
         <p>Third-party open-source software shipped with <em>Image Occlusion Enhanced</em>:</p>
-        <ul><li><p><a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> \
+        <ul><li><p><a href="https://github.com/SVG-Edit/svgedit">SVG Edit</a> 2.6. \
+        Copyright (c) 2009-2012 SVG-edit authors. Licensed under the MIT license</a></p></li>
+        <li><p><a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> \
         (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik \
         Lundh. Licensed under the <a href="http://www.pythonware.com/products/pil/license.htm">\
         PIL license</a></p></li>
-        <li><p><a href="https://github.com/SVG-Edit/svgedit">SVG Edit</a> 2.6. \
-        Copyright (c) 2009-2012 by SVG-edit authors. Licensed under the
-        <a href="https://github.com/SVG-Edit/svgedit/blob/master/LICENSE">MIT license</a></p></li>
+        <li><p><a href="https://github.com/shibukawa/imagesize_py">imagesize.py</a> v0.7.1. \
+        Copyright (c) 2016 Yoshiki Shibukawa. Licensed under the MIT license.</p></li>
         </ul>
         """ % (io_link_wiki, io_link_tut, io_link_thread)
     if help != "custom":

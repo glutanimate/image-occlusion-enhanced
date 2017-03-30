@@ -90,7 +90,7 @@ class ImgOccAdd(object):
         else:
             opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
             image_path = self.getImage(parent=self.ed.parentWindow)
-            if not image_path:
+            if not image_path: # invalid path, fall back to old image or None
                 self.image_path = oldimg
                 return
 
@@ -126,7 +126,7 @@ class ImgOccAdd(object):
         if not image_path:
             return None
         elif not os.path.isfile(image_path):
-            tooltip("Not a valid image file.")
+            tooltip("Invalid image file path")
             return None
         else:
             self.lconf["dir"] = os.path.dirname(image_path)
@@ -135,6 +135,9 @@ class ImgOccAdd(object):
     def callImgOccEdit(self):
         """Set up variables, call and prepare ImgOccEdit"""
         width, height = imageProp(self.image_path)
+        if not width:
+            tooltip("Not a valid image file.")
+            return False
         ofill = self.sconf['ofill']
         scol = self.sconf['scol']
         swidth = self.sconf['swidth']
@@ -202,8 +205,11 @@ class ImgOccAdd(object):
         """Change canvas background image"""
         image_path = self.getImage()
         if not image_path:
-            return
+            return False
         width, height = imageProp(image_path)
+        if not width:
+            tooltip("Not a valid image file.")
+            return False
         bkgd_url = path2url(image_path)
         mw.ImgOccEdit.svg_edit.eval("""
                         svgCanvas.setBackground('#FFF', '%s');
@@ -341,7 +347,7 @@ def onImgOccButton(ed, mode):
     if mode != "add" and ed.note.model() != io_model:
         tooltip("Can only edit notes with the %s note type" % IO_MODEL_NAME)
         return
-    try:
+    try: # allows us to fall back to old image if necessary
         oldimg = mw.ImgOccAdd.image_path
     except AttributeError:
         oldimg = None

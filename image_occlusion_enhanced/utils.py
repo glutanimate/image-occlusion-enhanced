@@ -17,7 +17,7 @@ import os, re
 from aqt import mw
 
 import urlparse, urllib
-from Imaging.PIL import Image
+from imagesize import imagesize
 
 def path2url(path):
     """URL-encode local path"""
@@ -45,6 +45,15 @@ def img2path(img, nameonly=False):
 
 def imageProp(image_path):
     """Get image width and height"""
-    image = Image.open(image_path)
-    width, height = image.size
+    try:
+        width, height = imagesize.get(image_path)
+        assert width > 0
+        assert height > 0
+    except (ValueError, AssertionError):
+        try:
+            from Imaging.PIL import Image # fall back to PIL
+            image = Image.open(image_path)
+            width, height = image.size
+        except IOError:
+            return None, None
     return width, height
