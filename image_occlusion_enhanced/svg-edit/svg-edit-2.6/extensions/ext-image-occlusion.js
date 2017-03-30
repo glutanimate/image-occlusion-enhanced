@@ -1,7 +1,7 @@
 /*
  * ext-image-occlusion.js
  *
- * Licensed under the GNU GPLv3
+ * Licensed under the GNU AGPLv3
  *
  * Copyright(c) 2012-2015 tmbb
  * Copyright(c) 2016-2017 Glutanimate

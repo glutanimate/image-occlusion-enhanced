@@ -1,7 +1,7 @@
 /*
  * ext-snapping.js
  *
- * Licensed under the GNU GPLv3
+ * Licensed under the GNU AGPLv3
  *
  * Copyright(c) 2017 Glutanimate
  *

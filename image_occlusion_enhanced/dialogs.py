@@ -696,12 +696,12 @@ def ioHelp(help, title=None, text=None, parent=None):
         <p><a href="%s">Support Thread</a></p>
         <h2>Credits and License</h2>
         <p style="font-size:12pt;"><em>Copyright © 2012-2015 \
-        <a href="https://github.com/tmbb">tmbb</a></em></p>
+        <a href="https://github.com/tmbb">Tiago Barroso</a></em></p>
         <p style="font-size:12pt;"><em>Copyright © 2013 \
         <a href="https://github.com/steveaw">Steve AW</a></em></p>
-        <p style="font-size:12pt;"><em>Copyright © 2016 \
-        <a href="https://github.com/Glutanimate">Glutanimate</a></em></p>
-        <p><em>Image Occlusion Enhanced</em> is licensed under the GNU GPLv3 License.</p>
+        <p style="font-size:12pt;"><em>Copyright © 2016-2017 \
+        <a href="https://github.com/Glutanimate">Aristotelis P.</a></em></p>
+        <p><em>Image Occlusion Enhanced</em> is licensed under the GNU AGPLv3 License.</p>
         <p>Third-party open-source software shipped with <em>Image Occlusion Enhanced</em>:</p>
         <ul><li><p><a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> \
         (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik \
