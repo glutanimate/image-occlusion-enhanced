@@ -71,10 +71,13 @@ class ImgOccEdit(QDialog):
         # buttons add-on is installed)
         if self.deck_container.layout().children(): # multiple deck buttons
             for i in range(self.deck_container.layout().children()[0].count()):
-                item = self.deck_container.layout().children()[0].itemAt(i)
-                # remove Tab focus manually:
-                item.widget().setFocusPolicy(Qt.ClickFocus)
-                item.widget().setAutoDefault(False)
+                try:
+                    item = self.deck_container.layout().children()[0].itemAt(i)
+                    # remove Tab focus manually:
+                    item.widget().setFocusPolicy(Qt.ClickFocus)
+                    item.widget().setAutoDefault(False)
+                except AttributeError:
+                    pass
 
 
         # Button row widgets
