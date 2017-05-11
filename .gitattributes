@@ -15,4 +15,6 @@ tools export-ignore
 image_occlusion_enhanced/svg-edit/* linguist-vendored
 image_occlusion_enhanced/Imaging/* linguist-vendored
 image_occlusion_enhanced/uuid/* linguist-vendored
+image_occlusion_enhanced/imagesize/* linguist-vendored
+tools/fixiocards/* linguist-vendored
 PAGE.md linguist-documentation
