@@ -89,18 +89,18 @@ class ImgOccEdit(QDialog):
         image_btn.setIcon(QIcon(":/icons/new_occlusion.png"))
         image_btn.setIconSize(QSize(16, 16))
         image_btn.setAutoDefault(False)
+        help_btn = QPushButton("&Help", clicked=self.onHelp)
+        help_btn.setAutoDefault(False)
 
         self.occl_tp_select = QComboBox()
         self.occl_tp_select.addItems(["Don't Change", "Hide All, Reveal One",
-            "Hide All, Reveal All", "Hide One, Reveal All"])
+             "Hide One, Reveal All"])
 
         self.edit_btn = button_box.addButton("&Edit Cards",
            QDialogButtonBox.ActionRole)
         self.new_btn = button_box.addButton("&Add New Cards",
            QDialogButtonBox.ActionRole)
         self.ao_btn = button_box.addButton(u"Hide &All, Reveal One",
-           QDialogButtonBox.ActionRole)
-        self.aa_btn = button_box.addButton(u"Hide All, &Reveal All",
            QDialogButtonBox.ActionRole)
         self.oa_btn = button_box.addButton(u"Hide &One, Reveal All",
            QDialogButtonBox.ActionRole)
@@ -113,33 +113,28 @@ class ImgOccEdit(QDialog):
         edit_tt = "Edit all cards using current mask shapes and field entries"
         new_tt = "Create new batch of cards without editing existing ones"
         ao_tt = ("Generate cards with nonoverlapping information, where all<br>"
-                "labels are hidden on the front and just one is revealed on the back")
-        aa_tt = ("Generate cards with partial overlapping information, where<br>"
-                "all labels are hidden on the front and all are revealed on the back")
-        oa_tt = ("Generate cards with overlapping information, where just one<br>"
-                "label is hidden on the front and all are revealed on the back")
+                "labels are hidden on the front and one revealed on the back")
+        oa_tt = ("Generate cards with overlapping information, where one<br>"
+                "label is hidden on the front and revealed on the back")
         close_tt = "Close Image Occlusion Editor without generating cards"
 
         image_btn.setToolTip(image_tt)
         self.edit_btn.setToolTip(edit_tt)
         self.new_btn.setToolTip(new_tt)
         self.ao_btn.setToolTip(ao_tt)
-        self.aa_btn.setToolTip(aa_tt)
         self.oa_btn.setToolTip(oa_tt)
         close_button.setToolTip(close_tt)
         self.occl_tp_select.setItemData(0, dc_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(1, ao_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(2, aa_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(3, oa_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(2, oa_tt, Qt.ToolTipRole)
 
         for btn in [image_btn, self.edit_btn, self.new_btn, self.ao_btn, 
-                    self.aa_btn, self.oa_btn, close_button]:
+                    self.oa_btn, close_button]:
             btn.setFocusPolicy(Qt.ClickFocus)
 
-        self.connect(self.edit_btn, SIGNAL("clicked()"), self.edit_note)
+        self.connect(self.edit_btn, SIGNAL("clicked()"), self.editNote)
         self.connect(self.new_btn, SIGNAL("clicked()"), self.new)
         self.connect(self.ao_btn, SIGNAL("clicked()"), self.addAO)
-        self.connect(self.aa_btn, SIGNAL("clicked()"), self.addAA)
         self.connect(self.oa_btn, SIGNAL("clicked()"), self.addOA)
         self.connect(close_button, SIGNAL("clicked()"), self.close)
 
@@ -148,7 +143,8 @@ class ImgOccEdit(QDialog):
         ## Button row
         bottom_hbox = QHBoxLayout()
         bottom_hbox.addWidget(image_btn)
-        bottom_hbox.insertStretch(1, stretch=1)
+        bottom_hbox.addWidget(help_btn)
+        bottom_hbox.insertStretch(2, stretch=1)
         bottom_hbox.addWidget(self.bottom_label)
         bottom_hbox.addWidget(self.occl_tp_select)
         bottom_hbox.addWidget(button_box)
@@ -193,8 +189,6 @@ class ImgOccEdit(QDialog):
         ## Other hotkeys
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Return"), self),
             QtCore.SIGNAL('activated()'), lambda: self.defaultAction(True))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Alt+Return"), self),
-            QtCore.SIGNAL('activated()'), lambda: self.addAA(True))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+Return"), self),
             QtCore.SIGNAL('activated()'), lambda: self.addOA(True))
         self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Tab"), self),
@@ -219,19 +213,23 @@ class ImgOccEdit(QDialog):
         if self.mode == "add":
             self.addAO(close)
         else:
-            self.edit_note()
+            self.editNote()
     def addAO(self, close=False):
         mw.ImgOccAdd.onAddNotesButton("ao", close)
-    def addAA(self, close=False):
-        mw.ImgOccAdd.onAddNotesButton("aa", close)
     def addOA(self, close=False):
         mw.ImgOccAdd.onAddNotesButton("oa", close)
     def new(self, close=False):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onAddNotesButton(choice, close)
-    def edit_note(self):
+    def editNote(self):
         choice = self.occl_tp_select.currentText()
         mw.ImgOccAdd.onEditNotesButton(choice)
+    def onHelp(self):
+        if self.mode == "add":
+            ioHelp("add")
+        else:
+            ioHelp("edit")
+        
 
     # Window state
 
@@ -291,7 +289,7 @@ class ImgOccEdit(QDialog):
     def switchToMode(self, mode):
         """Toggle between add and edit layouts"""
         hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]
-        hide_on_edit = [self.ao_btn, self.aa_btn, self.oa_btn]
+        hide_on_edit = [self.ao_btn, self.oa_btn]
         self.mode = mode
         for i in self.tedit.values():
             i.show()
@@ -665,61 +663,96 @@ def ioInfo(text, title="Image Occlusion Enhanced", parent=None,
     return msgfunc(parent, title, text, buttons, default)
 
 
+io_link_wiki = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
+io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o"
+io_link_thread = ("https://anki.tenderapp.com/discussions/add-ons/"
+                  "8295-image-occlusion-enhanced-official-thread")
+help_text = {}
+help_text["add"] = u"""
+    <p><strong>Basic Instructions</strong></p>
+    <ol>
+    <li>With the rectangle tool or any other shape tool selected, cover the areas of the image you want to be tested on</li>
+    <li>(Optional): Fill out additional information about your cards by switching to the <em>Fields</em> tab</li>
+    <li>Click on one of the <em>Add Cards</em> buttons at the bottom of the window to add the cards to your collection</li>
+    </ol>
+    <p><strong>Drawing Custom Labels</strong></p>
+    <ol>
+    <li>Draw up the layers sidepanel by clicking on the <em>Layers</em> button at the right edge of the editor</li>
+    <li>Switch to the <em>Labels</em> layer by left-clicking on it. You can also switch to the labels layer directly by using <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>.</li>
+    <li>Anything you draw in this layer – be it text, lines, or shapes – will appear above the image, but still below your masks. All of the painting tools in the left sidebar are at your disposal.</li>
+    <li>Switch back to the masks layer, either via the <em>Layers</em> sidepanel, or by using the <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> hotkey.</li>
+    </ol>
+    <p><strong>Grouping Shapes</strong></p>
+    <ol>
+    <li>Select multiple shapes, either by drawing a selection rectangle with the selection tool active (<kbd>S</kbd>), or by shift-clicking on multiple shapes</li>
+    <li>Either use the <kbd>G</kbd> hotkey or the <em>Group Elements</em> tool in the top-bar to group your items</li>
+    </ol>
+    <p>Grouped shapes will form a single card.</p>
+    <p><strong>More Information</strong></p>
+    <p>For more information please refer to the following resources:</p>
+    <ul>
+    <li><a href="{}">Image Occlusion Enhanced Wiki</a></li>
+    <li><a href="{}">YouTube Tutorials</a></li>
+    <li><a href="{}">Official support thread</a></li>
+    </ul>
+    """.format(io_link_wiki, io_link_tut, io_link_thread)
+help_text["edit"] = """<b>Instructions for editing</b>: \
+    <br><br> Each mask shape represents a card.\
+    Removing any of the existing shapes will remove the corresponding card.\
+    New shapes will generate new cards. You can change the occlusion type\
+    by using the dropdown box on the left.<br><br>If you click on the \
+    <i>Add new cards</i> button a completely new batch of cards will be \
+    generated, leaving your originals untouched.<br><br> \
+    <b>Actions performed in Image Occlusion's <i>Editing Mode</i> cannot be\
+    easily undone, so please make sure to check your changes twice before\
+    applying them.</b><br><br>The only exception to this are purely textual\
+    changes to fields like the header or footer of your notes. These can\
+    be fully reverted by using Ctrl+Z in the Browser or Reviewer view.<br><br>\
+    More information: <a href="%s">Wiki: Editing Notes</a>.\
+    """ % (io_link_wiki + "/Basic-Use#editing-cards")
+help_text["notetype"] = """<b>Fixing a broken note type:</b>\
+    <br><br> The Image Occlusion Enhanced note type can't be edited \
+    arbitrarily. If you delete a field that's required by the add-on \
+    or rename it outside of the IO Options dialog you will be presented \
+    with an error message. <br><br>
+    To fix this issue please follow the instructions in <a href="%s">the \
+    wiki</a>.""" % (io_link_wiki + "/Troubleshooting#note-type")
+help_text["main"] = u"""<h2>Help and Support</h2>
+    <p><a href="%s">Image Occlusion Enhanced Wiki</a></p>
+    <p><a href="%s">Official Video Tutorial Series</a></p>
+    <p><a href="%s">Support Thread</a></p>
+    <h2>Credits and License</h2>
+    <p style="font-size:12pt;"><em>Copyright © 2012-2015 \
+    <a href="https://github.com/tmbb">Tiago Barroso</a></em></p>
+    <p style="font-size:12pt;"><em>Copyright © 2013 \
+    <a href="https://github.com/steveaw">Steve AW</a></em></p>
+    <p style="font-size:12pt;"><em>Copyright © 2016-2017 \
+    <a href="https://github.com/Glutanimate">Aristotelis P.</a></em></p>
+    <p><em>Image Occlusion Enhanced</em> is licensed under the GNU AGPLv3.</p>
+    <p>Third-party open-source software shipped with <em>Image Occlusion Enhanced</em>:</p>
+    <ul><li><p><a href="https://github.com/SVG-Edit/svgedit">SVG Edit</a> 2.6. \
+    Copyright (c) 2009-2012 SVG-edit authors. Licensed under the MIT license</a></p></li>
+    <li><p><a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> \
+    (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik \
+    Lundh. Licensed under the <a href="http://www.pythonware.com/products/pil/license.htm">\
+    PIL license</a></p></li>
+    <li><p><a href="https://github.com/shibukawa/imagesize_py">imagesize.py</a> v0.7.1. \
+    Copyright (c) 2016 Yoshiki Shibukawa. Licensed under the MIT license.</p></li>
+    </ul>
+    """ % (io_link_wiki, io_link_tut, io_link_thread)
+
 def ioHelp(help, title=None, text=None, parent=None):
     """Display an info message or a predefined help section"""
-    io_link_wiki = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
-    io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o"
-    io_link_thread = ("https://anki.tenderapp.com/discussions/add-ons/"
-                      "8295-image-occlusion-enhanced-official-thread")
-    help_text = {}
-    help_text["editing"] = """<b>Instructions for editing</b>: \
-        <br><br> Each mask shape represents a card.\
-        Removing any of the existing shapes will remove the corresponding card.\
-        New shapes will generate new cards. You can change the occlusion type\
-        by using the dropdown box on the left.<br><br>If you click on the \
-        <i>Add new cards</i> button a completely new batch of cards will be \
-        generated, leaving your originals untouched.<br><br> \
-        <b>Actions performed in Image Occlusion's <i>Editing Mode</i> cannot be\
-        easily undone, so please make sure to check your changes twice before\
-        applying them.</b><br><br>The only exception to this are purely textual\
-        changes to fields like the header or footer of your notes. These can\
-        be fully reverted by using Ctrl+Z in the Browser or Reviewer view.<br><br>\
-        More information: <a href="%s">Wiki: Editing Notes</a>.\
-        """ % (io_link_wiki + "/Basic-Use#editing-cards")
-    help_text["notetype"] = """<b>Fixing a broken note type:</b>\
-        <br><br> The Image Occlusion Enhanced note type can't be edited \
-        arbitrarily. If you delete a field that's required by the add-on \
-        or rename it outside of the IO Options dialog you will be presented \
-        with an error message. <br><br>
-        To fix this issue please follow the instructions in <a href="%s">the \
-        wiki</a>.""" % (io_link_wiki + "/Troubleshooting#note-type")
-    help_text["main"] = u"""<h2>Help and Support</h2>
-        <p><a href="%s">Image Occlusion Enhanced Wiki</a></p>
-        <p><a href="%s">Official Video Tutorial Series</a></p>
-        <p><a href="%s">Support Thread</a></p>
-        <h2>Credits and License</h2>
-        <p style="font-size:12pt;"><em>Copyright © 2012-2015 \
-        <a href="https://github.com/tmbb">Tiago Barroso</a></em></p>
-        <p style="font-size:12pt;"><em>Copyright © 2013 \
-        <a href="https://github.com/steveaw">Steve AW</a></em></p>
-        <p style="font-size:12pt;"><em>Copyright © 2016-2017 \
-        <a href="https://github.com/Glutanimate">Aristotelis P.</a></em></p>
-        <p><em>Image Occlusion Enhanced</em> is licensed under the GNU AGPLv3.</p>
-        <p>Third-party open-source software shipped with <em>Image Occlusion Enhanced</em>:</p>
-        <ul><li><p><a href="https://github.com/SVG-Edit/svgedit">SVG Edit</a> 2.6. \
-        Copyright (c) 2009-2012 SVG-edit authors. Licensed under the MIT license</a></p></li>
-        <li><p><a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> \
-        (PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) 1995-2011 by Fredrik \
-        Lundh. Licensed under the <a href="http://www.pythonware.com/products/pil/license.htm">\
-        PIL license</a></p></li>
-        <li><p><a href="https://github.com/shibukawa/imagesize_py">imagesize.py</a> v0.7.1. \
-        Copyright (c) 2016 Yoshiki Shibukawa. Licensed under the MIT license.</p></li>
-        </ul>
-        """ % (io_link_wiki, io_link_tut, io_link_thread)
     if help != "custom":
         text = help_text[help]
     if not title:
         title = "Image Occlusion Enhanced Help"
     if not parent:
         parent = mw.app.activeWindow()
-    QMessageBox.about(parent, title, text)
+    mbox = QMessageBox(parent)
+    mbox.setAttribute(Qt.WA_DeleteOnClose)
+    mbox.setStandardButtons(QMessageBox.Ok)
+    mbox.setWindowTitle(title)
+    mbox.setText(text)
+    mbox.setWindowModality(Qt.NonModal)
+    mbox.show()

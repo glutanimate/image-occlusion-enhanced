@@ -49,8 +49,6 @@ def genByKey(key, old_occl_tp=None):
         return genByKey(old_occl_tp, None)
     elif key in ["ao", "Hide All, Reveal One"]:
         return IoGenHideAllRevealOne
-    elif key in ["aa", "Hide All, Reveal All"]:
-        return IoGenHideAllRevealAll
     elif key in ["oa", "Hide One, Reveal All"]:
         return IoGenHideOneRevealAll
     else:
@@ -323,7 +321,7 @@ class ImgOccNoteGenerator(object):
                  Please note that this action is irreversible.<br><br>\
                  Would you still like to proceed?" % (del_count, new_count)
             if not ioAskUser(q, title="Please confirm action",
-                                    parent=mw.ImgOccEdit, help="editing"):
+                                    parent=mw.ImgOccEdit, help="edit"):
                 return False
 
         if deleted_nids:
@@ -430,24 +428,6 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
             self._setQuestionAttribs(mask_node)
         elif side == "A":
             mlayer_node.removeChild(mask_node)
-
-class IoGenHideAllRevealAll(ImgOccNoteGenerator):
-    """Q: All hidden, A: All revealed"""
-    occl_tp = "aa"
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
-        ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
-                                        opref, tags, fields, did)
-
-    def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
-        # need to start from behind as we're removing nodes as we go
-        for i in reversed(self.mnode_indexes):
-            mask_node = mlayer_node.childNodes[i]
-            if i == mask_node_index and side == "Q":
-                self._setQuestionAttribs(mask_node)
-            elif side == "Q":
-                pass
-            else:
-                mlayer_node.removeChild(mask_node)
 
 class IoGenHideOneRevealAll(ImgOccNoteGenerator):
     """Q: One hidden, A: All revealed ('overlapping')"""
