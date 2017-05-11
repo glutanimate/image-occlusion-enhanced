@@ -348,7 +348,7 @@ class ImgOccNoteGenerator(object):
 
     def _setQuestionAttribs(self, node):
         """Set question node color and class"""
-        if (node.nodeType == node.ELEMENT_NODE):
+        if (node.nodeType == node.ELEMENT_NODE and node.tagName != "text"):
             # set question class
             node.setAttribute("class", "qshape")
             if node.hasAttribute("fill"):
