@@ -7,6 +7,8 @@ PAGE.md export-ignore
 README.md export-ignore
 ## build script
 build_zip.sh export-ignore
+## tools
+tools export-ignore
 ## screenshots
 /screenshots export-ignore
 # Adjust GitHub linguist settings:
