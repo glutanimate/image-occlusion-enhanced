@@ -55,47 +55,77 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('extensions', svg_edit_ext)]
 
 class ImgOccAdd(object):
-    def __init__(self, ed, mode):
-        self.ed = ed
-        self.mode = mode
+    def __init__(self, editor):
+        self.ed = editor
+        self.mode = "add"
         self.opref = {} # original io session preference
         loadConfig(self)
 
-    def selImage(self, oldimg=None):
-        """Select image and set up variables for the IO Editor"""
+    def occlude(self, mode, oldimg=None):
+        self.mode = mode
+
+        if mode == "add":
+            image_path = self.newImage() or oldimg
+        else:
+            mode, image_path = self.selImage()
+        if not image_path:
+            return False
+
+        self.mode = mode
+        self.image_path = image_path
+        self.callImgOccEdit(mode)
+
+
+    def newImage(self):
+        self.opref["tags"] = self.ed.tags.text()
+        self.opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
+        image_path = self.getImage(parent=self.ed.parentWindow)
+        return image_path
+
+    def selImage(self):
+        """Select image based on mode and set original field contents"""
         note = self.ed.note
         opref = self.opref
-
         opref["tags"] = self.ed.tags.text()
+        opref["did"] = mw.col.db.scalar(
+                "select did from cards where id = ?", note.cards()[0].id)
 
-        if self.mode != "add":
-            note_id = None
-            # can only get the deck of the current note/card via a db call:
-            opref["did"] = mw.col.db.scalar(
-                    "select did from cards where id = ?", note.cards()[0].id)
+        msg = None
+        if note.model() == mw.col.models.byName(IO_MODEL_NAME):
             note_id = note[self.ioflds['id']]
             note_id_grps = note_id.split('-')
-            if note_id == None or len(note_id_grps) != 3:
-                tooltip("Editing unavailable: Invalid Image Occlusion Note ID")
-                return
-            opref["note_id"] = note_id
-            opref["uniq_id"] = note_id_grps[0]
-            opref["occl_tp"] = note_id_grps[1]
-            opref["image"] = img2path(note[self.ioflds['im']])
-            opref["omask"] = img2path(note[self.ioflds['om']])
-            if None in [opref["omask"], opref["image"]]:
-                tooltip("Editing unavailable: Missing Image or Original Mask")
-                return
-            image_path = opref["image"]
-        else:
-            opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
-            image_path = self.getImage(parent=self.ed.parentWindow)
-            if not image_path: # invalid path, fall back to old image or None
-                self.image_path = oldimg
-                return
+            self.opref["note_id"] = note_id
+            self.opref["uniq_id"] = note_id_grps[0]
+            self.opref["occl_tp"] = note_id_grps[1]
+            self.opref["image"] = img2path(note[self.ioflds['im']])
+            self.opref["omask"] = img2path(note[self.ioflds['om']])
+            if opref["note_id"] == None or opref["note_id"].count("-") != 2:
+                msg = "Editing unavailable: Invalid image occlusion Note ID"
+            elif not opref["omask"] or not opref["image"]:
+                msg = "Editing unavailable: Missing image or original mask"
+            else:
+                return "edit", opref["image"]
 
-        self.image_path = image_path
-        self.callImgOccEdit()
+        image_path = self.findImage(note.fields)
+        if image_path:
+            tooltip("Non-editable note.<br>Starting IO in note adding mode instead.")
+        elif msg:
+            tooltip(msg)
+        else:
+            tooltip(("This note cannot be edited, nor is there<br>"
+                    "an image to use for an image occlusion."))
+        return "add", image_path
+
+
+    def findImage(self, fields):
+        """Parse fields for valid images"""
+        path = None
+        for fld in fields:
+            path = img2path(fld)
+            if path:
+                break
+        return path
+
 
     def getImage(self, parent=None, noclip=False):
         """Get image from file selection or clipboard"""
@@ -132,7 +162,8 @@ class ImgOccAdd(object):
             self.lconf["dir"] = os.path.dirname(image_path)
             return image_path
 
-    def callImgOccEdit(self):
+
+    def callImgOccEdit(self, mode):
         """Set up variables, call and prepare ImgOccEdit"""
         width, height = imageProp(self.image_path)
         if not width:
@@ -147,7 +178,6 @@ class ImgOccAdd(object):
         bkgd_url = path2url(self.image_path)
         opref = self.opref
         onote = self.ed.note
-        mode = self.mode
         flds = self.mflds
         deck = mw.col.decks.nameOrNone(opref["did"])
 
@@ -160,7 +190,7 @@ class ImgOccAdd(object):
             mw.ImgOccEdit.setupFields(flds)
             logging.debug("Launching new ImgOccEdit instance")
         dialog = mw.ImgOccEdit
-        dialog.switchToMode(self.mode)
+        dialog.switchToMode(mode)
 
         url = QUrl.fromLocalFile(svg_edit_path)
         url.setQueryItems(svg_edit_queryitems)
@@ -218,6 +248,7 @@ class ImgOccAdd(object):
                     """ %(bkgd_url, width, height))
         self.image_path = image_path
 
+
     def onAddNotesButton(self, choice, close):
         """Get occlusion settings in and pass them to the note generator (add)"""
         dialog = mw.ImgOccEdit
@@ -254,6 +285,7 @@ class ImgOccAdd(object):
             dialog.close()
 
         mw.reset()
+
 
     def onEditNotesButton(self, choice):
         """Get occlusion settings and pass them to the note generator (edit)"""
@@ -292,6 +324,7 @@ class ImgOccAdd(object):
 
         mw.reset() # FIXME: causes glitches in editcurrent mode
 
+
     def getUserInputs(self, dialog, edit=False):
         """Get fields and tags from ImgOccEdit while checking note type"""
         fields = {}
@@ -315,6 +348,7 @@ class ImgOccAdd(object):
         return (fields, tags)
 
 
+
 def onIoSettings(mw):
     """Call settings dialog if Editor not active"""
     if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
@@ -324,9 +358,11 @@ def onIoSettings(mw):
     dialog = ImgOccOpts(mw)
     dialog.exec_()
 
+
 def onIoHelp():
     """Call main help dialog"""
     ioHelp("main")
+
 
 def onImgOccButton(ed, mode):
     """Launch Image Occlusion Enhanced"""
@@ -344,15 +380,13 @@ def onImgOccButton(ed, mode):
                 "manually delete or rename any of the default fields.",
                 help="notetype")
             return False
-    if mode != "add" and ed.note.model() != io_model:
-        tooltip("Can only edit notes with the %s note type" % IO_MODEL_NAME)
-        return
     try: # allows us to fall back to old image if necessary
         oldimg = mw.ImgOccAdd.image_path
     except AttributeError:
         oldimg = None
-    mw.ImgOccAdd = ImgOccAdd(ed, mode)
-    mw.ImgOccAdd.selImage(oldimg)
+    mw.ImgOccAdd = ImgOccAdd(ed)
+    mw.ImgOccAdd.occlude(mode, oldimg)
+
 
 def onSetupEditorButtons(self):
     """Add IO button to Editor"""
@@ -395,10 +429,12 @@ def onSetNote(self, note, hide=True, focus=False):
                 'img', 'max-width: 90%; max-height: 160px');
         """)
 
+
 def newKeyHandler(self, evt):
     """Bind mask reveal to a hotkey"""
     if (self.state == "answer" and evt.key() == Qt.Key_G):
         self.web.eval('document.getElementById("io-revl-btn").click();')
+
 
 def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
@@ -408,6 +444,7 @@ def onShowAnswer(self, _old):
     ret = _old(self)
     self.web.page().mainFrame().setScrollPosition(scroll_pos)
     return ret
+
 
 # Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
