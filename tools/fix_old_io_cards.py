@@ -21,7 +21,7 @@ import re
 from fixiocards import ElementTree as etree
 
 from aqt import mw
-from aqt.utils import tooltip, askUser
+from aqt.utils import showInfo, askUser
 
 def get_image_occlusion_files(media_dir):
     files = os.listdir(media_dir)
@@ -55,8 +55,8 @@ def fix_files(files):
     return sum(fix_file(fname) for fname in files)
 
 question = """
-This will scan your entire media collection for malformatted image \
-occlusion masks and fix them. It is recommended that you create a \
+This will scan your entire media collection for malformatted Image \
+Occlusion 2.0 masks and fix them. It is recommended that you create a \
 <b>backup of your entire collection</b>, media included, before proceeding. \
 <br><br>
 <b>Are you sure you want to proceed?</b><br>
@@ -69,7 +69,11 @@ def on_fix_button():
     media_dir = mw.col.media.dir()
     files = get_image_occlusion_files(media_dir)
     fixed = fix_files(files)
-    tooltip("Done. {}/{} files needed fixing".format(fixed, len(files)))
+    showInfo("Done. {}/{} files needed fixing."
+        "<br><br>Please consider upgrading to "
+        "<a href='https://ankiweb.net/shared/info/1111933094'>"
+        "Image Occlusion Enhanced</a> to avoid issues like these "
+        "in the future".format(fixed, len(files)))
 
 menu = mw.form.menuTools
 menu.addSeparator()
