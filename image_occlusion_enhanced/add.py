@@ -66,7 +66,7 @@ class ImgOccAdd(object):
             return False
 
         self.mode = mode
-        self.image_path = image_path or o
+        self.image_path = image_path
 
         width, height = imageProp(image_path)
         if not width:
