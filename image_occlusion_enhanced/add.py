@@ -46,27 +46,34 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('extensions', svg_edit_ext)]
 
 class ImgOccAdd(object):
-    def __init__(self, editor):
+    def __init__(self, editor, oldimg):
         self.ed = editor
+        self.image_path = oldimg
         self.mode = "add"
         self.addcards = True
         self.opref = {} # original io session preference
         loadConfig(self)
 
-    def occlude(self, mode, oldimg=None):
-        self.mode = mode
+    def occlude(self, mode):
 
         if mode == "add":
-            image_path = self.newImage() or oldimg
+            image_path = self.newImage()
         else:
             mode, image_path = self.selImage()
             self.addcards = False
+
         if not image_path:
             return False
 
         self.mode = mode
-        self.image_path = image_path
-        self.callImgOccEdit(mode)
+        self.image_path = image_path or o
+
+        width, height = imageProp(image_path)
+        if not width:
+            tooltip("Not a valid image file.")
+            return False
+
+        self.callImgOccEdit(mode, width, height)
 
 
     def newImage(self):
@@ -150,18 +157,14 @@ class ImgOccAdd(object):
             return None
         elif not os.path.isfile(image_path):
             tooltip("Invalid image file path")
-            return None
+            return False
         else:
             self.lconf["dir"] = os.path.dirname(image_path)
             return image_path
 
 
-    def callImgOccEdit(self, mode):
+    def callImgOccEdit(self, mode, width, height):
         """Set up variables, call and prepare ImgOccEdit"""
-        width, height = imageProp(self.image_path)
-        if not width:
-            tooltip("Not a valid image file.")
-            return False
         ofill = self.sconf['ofill']
         scol = self.sconf['scol']
         swidth = self.sconf['swidth']

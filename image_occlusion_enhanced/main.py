@@ -72,8 +72,8 @@ def onImgOccButton(ed, mode):
         oldimg = mw.ImgOccAdd.image_path
     except AttributeError:
         oldimg = None
-    mw.ImgOccAdd = ImgOccAdd(ed)
-    mw.ImgOccAdd.occlude(mode, oldimg)
+    mw.ImgOccAdd = ImgOccAdd(ed, oldimg)
+    mw.ImgOccAdd.occlude(mode)
 
 
 def onSetupEditorButtons(self):
