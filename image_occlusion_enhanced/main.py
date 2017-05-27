@@ -81,23 +81,18 @@ def onSetupEditorButtons(self):
     if isinstance(self.parentWindow, AddCards):
         btn = self._addButton("new_occlusion",
                 lambda o=self: onImgOccButton(self, "add"),
-                _("Alt+a"), _("Add Image Occlusion (Alt+A/Alt+O)"),
+                _("Ctrl+Shift+A"), _("Add Image Occlusion (Ctrl+Shift+A)"),
                 canDisable=False)
     elif isinstance(self.parentWindow, EditCurrent):
         btn = self._addButton("edit_occlusion",
                 lambda o=self: onImgOccButton(self, "editcurrent"),
-                _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"),
+                _("Ctrl+Shift+A"), _("Edit Image Occlusion (Ctrl+Shift+A)"),
                 canDisable=False)
     else:
         btn = self._addButton("edit_occlusion",
                 lambda o=self: onImgOccButton(self, "browser"),
-                _("Alt+a"), _("Edit Image Occlusion (Alt+A/Alt+O)"),
+                _("Ctrl+Shift+A"), _("Edit Image Occlusion (Ctrl+Shift+A)"),
                 canDisable=False)
-
-    # secondary hotkey:
-    press_action = QAction(self.parentWindow, triggered=btn.animateClick)
-    press_action.setShortcut(QKeySequence(_("Alt+o")))
-    btn.addAction(press_action)
 
 
 def onSetNote(self, note, hide=True, focus=False):
