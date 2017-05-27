@@ -78,20 +78,26 @@ def onImgOccButton(ed, mode):
 
 def onSetupEditorButtons(self):
     """Add IO button to Editor"""
+    conf = mw.pm.profile.get("imgocc")
+    if not conf:
+        hotkey = IO_HOTKEY
+    else:
+        hotkey = conf.get("hotkey", IO_HOTKEY)
+
     if isinstance(self.parentWindow, AddCards):
         btn = self._addButton("new_occlusion",
                 lambda o=self: onImgOccButton(self, "add"),
-                _("Ctrl+Shift+O"), _("Add Image Occlusion (Ctrl+Shift+O)"),
+                _(hotkey), _(u"Add Image Occlusion ({})".format(hotkey)),
                 canDisable=False)
     elif isinstance(self.parentWindow, EditCurrent):
         btn = self._addButton("edit_occlusion",
                 lambda o=self: onImgOccButton(self, "editcurrent"),
-                _("Ctrl+Shift+O"), _("Edit Image Occlusion (Ctrl+Shift+O)"),
+                _(hotkey), _(u"Edit Image Occlusion ({})".format(hotkey)),
                 canDisable=False)
     else:
         btn = self._addButton("edit_occlusion",
                 lambda o=self: onImgOccButton(self, "browser"),
-                _("Ctrl+Shift+O"), _("Edit Image Occlusion (Ctrl+Shift+O)"),
+                _(hotkey), _(u"Edit Image Occlusion ({})".format(hotkey)),
                 canDisable=False)
 
 

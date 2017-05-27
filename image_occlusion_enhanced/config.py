@@ -18,7 +18,7 @@ import sys
 from aqt import mw
 
 global IO_FLDS, IO_FLDS_IDS
-global IO_MODEL_NAME, IO_CARD_NAME, IO_HOME
+global IO_MODEL_NAME, IO_CARD_NAME, IO_HOME, IO_HOTKEY
 
 IO_MODEL_NAME = "Image Occlusion Enhanced"
 IO_CARD_NAME = "IO Card"
@@ -51,16 +51,18 @@ IO_FIDS_PRSV = ['sc']
 # variables for local preference handling
 sys_encoding = sys.getfilesystemencoding()
 IO_HOME = os.path.expanduser('~').decode(sys_encoding)
+IO_HOTKEY = "Ctrl+Shift+O"
 
 # default configurations
-default_conf_local = {"dir": IO_HOME}
+default_conf_local = {"dir": IO_HOME,
+                      "hotkey": IO_HOTKEY}
 default_conf_syncd = {'ofill': 'FFEBA2',
                       'qfill': 'FF7E7E',
                       'scol': '2D2D2D',
                       'swidth': 3,
                       'font': 'Arial',
                       'fsize': 24,
-                      'version': 1.00,
+                      'version': 1.01,
                       'skip': [IO_FLDS["e1"], IO_FLDS["e2"]],
                       'flds': IO_FLDS}
 
@@ -82,10 +84,13 @@ def loadConfig(self):
         mw.col.setMod()
 
     elif mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
-        print "Updating synced config DB from earlier IO release"
+        print "Updating config DB from earlier IO release"
         for key in default_conf_syncd.keys():
             if key not in mw.col.conf['imgocc']:
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]
+        for key in default_conf_local.keys():
+            if key not in mw.col.conf['imgocc']:
+                mw.pm.profile["imgocc"][key] = default_conf_local[key]
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
         # insert other update actions here:
         # template.update_template(mw.col) # update card templates
@@ -114,6 +119,7 @@ def loadConfig(self):
             ioflds_prsv.append(fname)
 
     self.sconf_dflt = default_conf_syncd
+    self.lconf_dflt = default_conf_local
     self.sconf = mw.col.conf['imgocc']
     self.lconf = mw.pm.profile["imgocc"]
 
