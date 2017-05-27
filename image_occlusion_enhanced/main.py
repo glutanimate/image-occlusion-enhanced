@@ -81,17 +81,17 @@ def onSetupEditorButtons(self):
     if isinstance(self.parentWindow, AddCards):
         btn = self._addButton("new_occlusion",
                 lambda o=self: onImgOccButton(self, "add"),
-                _("Ctrl+Shift+A"), _("Add Image Occlusion (Ctrl+Shift+A)"),
+                _("Ctrl+Shift+O"), _("Add Image Occlusion (Ctrl+Shift+O)"),
                 canDisable=False)
     elif isinstance(self.parentWindow, EditCurrent):
         btn = self._addButton("edit_occlusion",
                 lambda o=self: onImgOccButton(self, "editcurrent"),
-                _("Ctrl+Shift+A"), _("Edit Image Occlusion (Ctrl+Shift+A)"),
+                _("Ctrl+Shift+O"), _("Edit Image Occlusion (Ctrl+Shift+O)"),
                 canDisable=False)
     else:
         btn = self._addButton("edit_occlusion",
                 lambda o=self: onImgOccButton(self, "browser"),
-                _("Ctrl+Shift+A"), _("Edit Image Occlusion (Ctrl+Shift+A)"),
+                _("Ctrl+Shift+O"), _("Edit Image Occlusion (Ctrl+Shift+O)"),
                 canDisable=False)
 
 
