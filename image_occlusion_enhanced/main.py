@@ -18,15 +18,16 @@ Sets up buttons and menus and calls other modules.
 
 import logging, sys
 
+from anki.lang import _
 from aqt.qt import *
 
 from aqt import mw
-from aqt.editor import Editor
+from aqt.editor import Editor, EditorWebView
 from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
 from aqt.reviewer import Reviewer
 from aqt.utils import tooltip
-from anki.hooks import wrap, addHook
+from anki.hooks import wrap, addHook, runHook
 
 from config import *
 from resources import *
@@ -52,7 +53,7 @@ def onIoHelp():
     ioHelp("main")
 
 
-def onImgOccButton(ed, mode):
+def onImgOccButton(ed, mode, image_path=None):
     """Launch Image Occlusion Enhanced"""
     io_model = mw.col.models.byName(IO_MODEL_NAME)
     if io_model:
@@ -73,7 +74,7 @@ def onImgOccButton(ed, mode):
     except AttributeError:
         oldimg = None
     mw.ImgOccAdd = ImgOccAdd(ed, oldimg)
-    mw.ImgOccAdd.occlude(mode)
+    mw.ImgOccAdd.occlude(mode, image_path)
 
 
 def onSetupEditorButtons(self):
@@ -99,6 +100,26 @@ def onSetupEditorButtons(self):
                 lambda o=self: onImgOccButton(self, "browser"),
                 _(hotkey), _(u"Edit Image Occlusion ({})".format(hotkey)),
                 canDisable=False)
+
+
+def contextMenuEvent(self, evt):
+    m = QMenu(self)
+    a = m.addAction(_("Cut"))
+    a.triggered.connect(self.onCut)
+    a = m.addAction(_("Copy"))
+    a.triggered.connect(self.onCopy)
+    a = m.addAction(_("Paste"))
+    a.triggered.connect(self.onPaste)
+    hit = self.page().currentFrame().hitTestContent(evt.pos())
+    url = hit.imageUrl()
+    if url.isValid():
+        a = m.addAction(_("Occlude Image"))
+        image_url = url.toString()
+        a.triggered.connect(
+            lambda u=image_url, s=self.editor: onImgOccButton(
+                s, "context", u))
+    runHook("EditorWebView.contextMenuEvent", self, m)
+    m.popup(QCursor.pos())
 
 
 def onSetNote(self, note, hide=True, focus=False):
@@ -147,6 +168,7 @@ mw.form.menuHelp.addAction(help_action)
 
 # Set up hooks
 addHook('setupEditorButtons', onSetupEditorButtons)
+EditorWebView.contextMenuEvent = contextMenuEvent
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
 Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
 Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")

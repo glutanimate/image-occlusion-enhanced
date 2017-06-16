@@ -46,7 +46,7 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('extensions', svg_edit_ext)]
 
 class ImgOccAdd(object):
-    def __init__(self, editor, oldimg):
+    def __init__(self, editor, oldimg=None):
         self.ed = editor
         self.image_path = oldimg
         self.mode = "add"
@@ -54,12 +54,12 @@ class ImgOccAdd(object):
         self.opref = {} # original io session preference
         loadConfig(self)
 
-    def occlude(self, mode):
+    def occlude(self, mode, image_path=None):
 
         if mode == "add":
             image_path = self.newImage()
         else:
-            mode, image_path = self.selImage()
+            mode, image_path = self.selImage(image_path)
             self.addcards = False
 
         if not image_path:
@@ -82,7 +82,7 @@ class ImgOccAdd(object):
         image_path = self.getImage(parent=self.ed.parentWindow)
         return image_path
 
-    def selImage(self):
+    def selImage(self, image_path=None):
         """Select image based on mode and set original field contents"""
         note = self.ed.note
         opref = self.opref
@@ -91,7 +91,7 @@ class ImgOccAdd(object):
                 "select did from cards where id = ?", note.cards()[0].id)
 
         msg = None
-        if note.model() == mw.col.models.byName(IO_MODEL_NAME):
+        if self.mode != "context" and note.model() == mw.col.models.byName(IO_MODEL_NAME):
             note_id = note[self.ioflds['id']]
             note_id_grps = note_id.split('-')
             self.opref["note_id"] = note_id
@@ -106,7 +106,8 @@ class ImgOccAdd(object):
             else:
                 return "edit", opref["image"]
 
-        image_path = self.findImage(note.fields)
+        if not image_path:
+            image_path = self.findImage(note.fields)
         if image_path:
             tooltip("Non-editable note.<br>Starting IO in note adding mode instead.")
         elif msg:
