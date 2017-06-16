@@ -223,9 +223,10 @@ class ImgOccAdd(object):
         dialog.tags_edit.setCol(mw.col)
         dialog.tags_edit.setText(opref["tags"])
 
-        for i in self.ioflds_prsv:
-            if i in onote:
-                dialog.tedit[i].setPlainText(onote[i])
+        if onote:
+            for i in self.ioflds_prsv:
+                if i in onote:
+                    dialog.tedit[i].setPlainText(onote[i])
 
         dialog.visible = True
         if self.mode == "add":
