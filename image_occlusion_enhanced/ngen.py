@@ -187,16 +187,31 @@ class ImgOccNoteGenerator(object):
         self.mnode_ids = {}
         mask_doc = minidom.parseString(self.new_svg.encode('utf-8'))
         svg_node = mask_doc.documentElement
+        cheight = float(svg_node.attributes["height"].value)
+        cwidth = float(svg_node.attributes["width"].value)
+        carea = cheight * cwidth
         layer_nodes = self._layerNodesFrom(svg_node)
         mlayer_node = layer_nodes[-1] # treat topmost layer as masks layer
-        for i, node in enumerate(mlayer_node.childNodes):
+
+        shift = 0
+        for i, mnode in enumerate(mlayer_node.childNodes):
             # minidom doesn't offer a childElements method and childNodes
             # also returns whitespace found in the mlayer_node as a child node.
             # For that reason we use self.mnode_indexes to register all
             # indexes of mlayer_node children that contain actual elements,
             # i.e. mask nodes
-            if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
-                mnode = mlayer_node.childNodes[i]
+            if (mnode.nodeType == mnode.ELEMENT_NODE) and (mnode.nodeName != 'title'):
+                i -= shift
+                if not edit and mnode.nodeName == "rect":
+                    # remove microscopical shapes (usually accidentally drawn)
+                    h_attr = mnode.attributes.get("height", 0)
+                    w_attr = mnode.attributes.get("width", 0)
+                    height = h_attr if not h_attr else float(mnode.attributes["height"].value)
+                    width = w_attr if not w_attr else float(mnode.attributes["width"].value)
+                    if not height or not width or 100*(height*width)/carea <= 0.01:
+                        mlayer_node.removeChild(mnode)
+                        shift += 1
+                        continue
                 self.mnode_indexes.append(i)
                 self._removeAttribsRecursively(mnode, self.stripattr)
                 if mnode.nodeName == "g":
@@ -205,9 +220,9 @@ class ImgOccNoteGenerator(object):
                         self._removeAttribsRecursively(node, ["id"])
                 if not edit:
                     self.mnode_ids[i] = "%s-%i" %(self.occl_id, len(self.mnode_indexes))
-                    mlayer_node.childNodes[i].setAttribute("id", self.mnode_ids[i])
+                    mnode.setAttribute("id", self.mnode_ids[i])
                 else:
-                    self.mnode_ids[i] = mlayer_node.childNodes[i].attributes["id"].value
+                    self.mnode_ids[i] = mnode.attributes["id"].value
 
         return (svg_node, mlayer_node)
 
@@ -374,6 +389,14 @@ class ImgOccNoteGenerator(object):
         mask_file.write(mask.encode('utf8'))
         mask_file.close()
         return mask_path
+
+    def removeBlanks(self, node):
+        for x in node.childNodes:
+            if x.nodeType == node.TEXT_NODE:
+                if x.nodeValue:
+                    x.nodeValue = x.nodeValue.strip()
+            elif x.nodeType == node.ELEMENT_NODE:
+                self.removeBlanks(x)
 
     def _saveMaskAndReturnNote(self, omask_path, qmask, amask,
                                 img, note_id, nid=None):
