@@ -53,8 +53,9 @@ def onIoHelp():
     ioHelp("main")
 
 
-def onImgOccButton(ed, mode, image_path=None):
+def onImgOccButton(self, origin=None, image_path=None):
     """Launch Image Occlusion Enhanced"""
+    origin = origin or getEdParentInstance(self.parentWindow)
     io_model = mw.col.models.byName(IO_MODEL_NAME)
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
@@ -73,8 +74,8 @@ def onImgOccButton(ed, mode, image_path=None):
         oldimg = mw.ImgOccAdd.image_path
     except AttributeError:
         oldimg = None
-    mw.ImgOccAdd = ImgOccAdd(ed, oldimg)
-    mw.ImgOccAdd.occlude(mode, image_path)
+    mw.ImgOccAdd = ImgOccAdd(self, origin, oldimg)
+    mw.ImgOccAdd.occlude(image_path)
 
 
 def onSetupEditorButtons(self):
@@ -85,21 +86,26 @@ def onSetupEditorButtons(self):
     else:
         hotkey = conf.get("hotkey", IO_HOTKEY)
 
-    if isinstance(self.parentWindow, AddCards):
-        btn = self._addButton("new_occlusion",
-                lambda o=self: onImgOccButton(self, "add"),
-                _(hotkey), _(u"Add Image Occlusion ({})".format(hotkey)),
-                canDisable=False)
-    elif isinstance(self.parentWindow, EditCurrent):
-        btn = self._addButton("edit_occlusion",
-                lambda o=self: onImgOccButton(self, "editcurrent"),
-                _(hotkey), _(u"Edit Image Occlusion ({})".format(hotkey)),
-                canDisable=False)
+    origin = getEdParentInstance(self.parentWindow)
+
+    if origin == "addcards":
+        tt = "Add Image Occlusion"
+        icon = "new_occlusion"
     else:
-        btn = self._addButton("edit_occlusion",
-                lambda o=self: onImgOccButton(self, "browser"),
-                _(hotkey), _(u"Edit Image Occlusion ({})".format(hotkey)),
-                canDisable=False)
+        tt = "Edit Image Occlusion"
+        icon = "new_occlusion"
+    
+    btn = self._addButton(icon, lambda o=self: onImgOccButton(self, origin),
+            _(hotkey), _(u"{} ({})".format(tt, hotkey)), canDisable=False)
+
+
+def getEdParentInstance(parent):
+    if isinstance(parent, AddCards):
+        return "addcards"
+    elif isinstance(parent, EditCurrent):
+        return "editcurrent"
+    else:
+        return "browser"
 
 
 def contextMenuEvent(self, evt):
@@ -114,10 +120,10 @@ def contextMenuEvent(self, evt):
     url = hit.imageUrl()
     if url.isValid():
         a = m.addAction(_("Occlude Image"))
-        image_url = url.toString()
+        image_url = url.toLocalFile()
         a.triggered.connect(
-            lambda u=image_url, s=self.editor: onImgOccButton(
-                s, "context", u))
+            lambda _, u=image_url, s=self.editor: onImgOccButton(
+                s, "editcurrent", u))
     runHook("EditorWebView.contextMenuEvent", self, m)
     m.popup(QCursor.pos())
 
@@ -170,5 +176,6 @@ mw.form.menuHelp.addAction(help_action)
 addHook('setupEditorButtons', onSetupEditorButtons)
 EditorWebView.contextMenuEvent = contextMenuEvent
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
+Editor.onImgOccButton = onImgOccButton
 Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
 Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
