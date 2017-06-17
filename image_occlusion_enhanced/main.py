@@ -100,6 +100,7 @@ def onSetupEditorButtons(self):
 
 
 def getEdParentInstance(parent):
+    """Determine parent instance of editor widget"""
     if isinstance(parent, AddCards):
         return "addcards"
     elif isinstance(parent, EditCurrent):
@@ -108,7 +109,22 @@ def getEdParentInstance(parent):
         return "browser"
 
 
+def openImage(path):
+    """Open path with default system app"""
+    import subprocess
+    try:
+        if sys.platform=='win32':
+            os.startfile(path)
+        elif sys.platform=='darwin':
+            subprocess.Popen(['open', path])
+        else:
+            subprocess.Popen(['xdg-open', path])
+    except OSError:
+        QDesktopServices.openUrl(QUrl("file://" + path))
+
+
 def contextMenuEvent(self, evt):
+    """Add custom context menu for images"""
     m = QMenu(self)
     a = m.addAction(_("Cut"))
     a.triggered.connect(self.onCut)
@@ -116,14 +132,18 @@ def contextMenuEvent(self, evt):
     a.triggered.connect(self.onCopy)
     a = m.addAction(_("Paste"))
     a.triggered.connect(self.onPaste)
+    ##################################################
     hit = self.page().currentFrame().hitTestContent(evt.pos())
     url = hit.imageUrl()
     if url.isValid():
-        a = m.addAction(_("Occlude Image"))
         image_url = url.toLocalFile()
+        a = m.addAction(_("Occlude Image"))
         a.triggered.connect(
             lambda _, u=image_url, s=self.editor: onImgOccButton(
                 s, "editcurrent", u))
+        a = m.addAction(_("Open Image"))
+        a.triggered.connect(lambda _, u=image_url: openImage(u))
+    ##################################################
     runHook("EditorWebView.contextMenuEvent", self, m)
     m.popup(QCursor.pos())
 
