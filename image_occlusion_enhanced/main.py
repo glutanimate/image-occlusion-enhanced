@@ -140,7 +140,7 @@ def contextMenuEvent(self, evt):
         a = m.addAction(_("Occlude Image"))
         a.triggered.connect(
             lambda _, u=image_url, s=self.editor: onImgOccButton(
-                s, "editcurrent", u))
+                s, image_path=u))
         a = m.addAction(_("Open Image"))
         a.triggered.connect(lambda _, u=image_url: openImage(u))
     ##################################################
