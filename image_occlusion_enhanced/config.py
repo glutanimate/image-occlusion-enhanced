@@ -54,15 +54,16 @@ IO_HOME = os.path.expanduser('~').decode(sys_encoding)
 IO_HOTKEY = "Ctrl+Shift+O"
 
 # default configurations
-default_conf_local = {"dir": IO_HOME,
-                      "hotkey": IO_HOTKEY}
-default_conf_syncd = {'ofill': 'FFEBA2',
+default_conf_local = {'version': 1.01,
+                      'dir': IO_HOME,
+                      'hotkey': IO_HOTKEY}
+default_conf_syncd = {'version': 1.01,
+                      'ofill': 'FFEBA2',
                       'qfill': 'FF7E7E',
                       'scol': '2D2D2D',
                       'swidth': 3,
                       'font': 'Arial',
                       'fsize': 24,
-                      'version': 1.01,
                       'skip': [IO_FLDS["e1"], IO_FLDS["e2"]],
                       'flds': IO_FLDS}
 
@@ -88,9 +89,6 @@ def loadConfig(self):
         for key in default_conf_syncd.keys():
             if key not in mw.col.conf['imgocc']:
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]
-        for key in default_conf_local.keys():
-            if key not in mw.col.conf['imgocc']:
-                mw.pm.profile["imgocc"][key] = default_conf_local[key]
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
         # insert other update actions here:
         # template.update_template(mw.col) # update card templates
@@ -100,6 +98,11 @@ def loadConfig(self):
     # Local preferences
     if not 'imgocc' in mw.pm.profile:
         mw.pm.profile["imgocc"] = default_conf_local
+    elif mw.pm.profile['imgocc'].get('version', 0) < default_conf_syncd['version']:
+        for key in default_conf_local.keys():
+            if key not in mw.col.conf['imgocc']:
+                mw.pm.profile["imgocc"][key] = default_conf_local[key]
+        mw.pm.profile['imgocc']['version'] = default_conf_local['version']
 
     model = mw.col.models.byName(IO_MODEL_NAME)
     if not model:
