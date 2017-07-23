@@ -322,9 +322,15 @@ class ImgOccOpts(QDialog):
                 continue
             name = self.lnedit[key].text()
             oldname = mw.col.conf['imgocc']['flds'][key]
-            if name is None or not name.strip() or name == oldname:
+            if (name is None or not name.strip() or name == oldname):
                 continue
-            idx = mw.col.models.fieldNames(model).index(oldname)
+            fnames = mw.col.models.fieldNames(model)
+            if (name in fnames and oldname not in fnames):
+                # case: imported cards, fields not corresponding to config
+                mw.col.conf['imgocc']['flds'][key] = name
+                modified = True
+                continue
+            idx = fnames.index(oldname)
             fld = flds[idx]
             if fld:
                 # rename note type fields

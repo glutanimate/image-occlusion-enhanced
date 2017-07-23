@@ -104,8 +104,8 @@ class ImgOccEdit(QDialog):
         close_button = button_box.addButton("&Close",
             QDialogButtonBox.RejectRole)
 
-        image_tt = "Switch to a different image while preserving all of \
-            the shapes and fields"
+        image_tt = ("Switch to a different image while preserving all of "
+            "the shapes and fields")
         dc_tt = "Preserve existing occlusion type"
         edit_tt = "Edit all cards using current mask shapes and field entries"
         new_tt = "Create new batch of cards without editing existing ones"
