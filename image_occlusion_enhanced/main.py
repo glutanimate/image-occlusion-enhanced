@@ -174,7 +174,7 @@ def newKeyHandler(self, evt):
 
 def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
-    if not self.card.model()["name"] == IO_MODEL_NAME:
+    if not self.card or not self.card.model()["name"] == IO_MODEL_NAME:
         return _old(self)
     scroll_pos = self.web.page().mainFrame().scrollPosition()
     ret = _old(self)
