@@ -236,7 +236,8 @@ class ImgOccAdd(object):
             dialog.show()
         else:
             # modal dialog when editing
-            dialog.exec_()
+            dialog.setWindowModality(Qt.WindowModal)
+            dialog.show()
 
 
     def onChangeImage(self):
@@ -297,13 +298,15 @@ class ImgOccAdd(object):
 
         mw.reset()
 
-
     def onEditNotesButton(self, choice):
+        dialog = mw.ImgOccEdit
+        dialog.svg_edit.evalWithCallback(
+            "svgCanvas.svgCanvasToString();",
+            lambda val,choice=choice: self._onEditNotesButton(choice, val))
+
+    def _onEditNotesButton(self, choice, svg):
         """Get occlusion settings and pass them to the note generator (edit)"""
         dialog = mw.ImgOccEdit
-        svg_edit = dialog.svg_edit
-        svg = svg_edit.page().mainFrame().evaluateJavaScript(
-            "svgCanvas.svgCanvasToString();")
 
         r1 = self.getUserInputs(dialog, edit=True)
         if r1 == False:
@@ -324,7 +327,7 @@ class ImgOccAdd(object):
         if r == "reset":
             # modifications to mask require media collection reset
             ## refresh webview image cache
-            QWebSettings.clearMemoryCaches()
+            dialog.svg_edit.page().profile().clearHttpCache()
             ## write a dummy file to update collection.media modtime and force sync
             media_dir = mw.col.media.dir()
             fpath = os.path.join(media_dir, "syncdummy.txt")
