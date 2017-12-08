@@ -24,12 +24,12 @@ from aqt.qt import *
 from aqt import mw
 from aqt.utils import getFile, tooltip
 
-from ngen import *
-from config import *
+from .ngen import *
+from .config import *
 
-from editor import ImgOccEdit
-from dialogs import ioError
-from utils import imageProp, img2path, path2url
+from .editor import ImgOccEdit
+from .dialogs import ioError
+from .utils import imageProp, img2path, path2url
 
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
@@ -149,7 +149,7 @@ class ImgOccAdd(object):
                 # workaround for a clipboard bug
                 return self.getNewImage(noclip=True)
             else:
-                return unicode(image_path)
+                return str(image_path)
 
         # retrieve last used image directory
         prev_image_dir = self.lconf["dir"]
@@ -159,7 +159,7 @@ class ImgOccAdd(object):
         image_path = QFileDialog.getOpenFileName(parent,
                              "Select an Image", prev_image_dir,
                              "Image Files (*.png *jpg *.jpeg *.gif)")
-        image_path = unicode(image_path)
+        image_path = str(image_path)
 
         if not image_path:
             return None
@@ -260,7 +260,7 @@ class ImgOccAdd(object):
         svg_edit = dialog.svg_edit
         svg = svg_edit.page().mainFrame().evaluateJavaScript(
             "svgCanvas.svgCanvasToString();")
-        svg = unicode(svg) # store svg as unicode string
+        svg = str(svg) # store svg as unicode string
 
         r1 = self.getUserInputs(dialog)
         if r1 == False:
@@ -335,7 +335,7 @@ class ImgOccAdd(object):
         fields = {}
         # note type integrity check:
         io_model_fields = mw.col.models.fieldNames(self.model)
-        if not all(x in io_model_fields for x in self.ioflds.values()):
+        if not all(x in io_model_fields for x in list(self.ioflds.values())):
             ioError("<b>Error</b>: Image Occlusion note type " \
                 "not configured properly.Please make sure you did not " \
                 "manually delete or rename any of the default fields.",

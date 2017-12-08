@@ -29,11 +29,11 @@ from aqt.reviewer import Reviewer
 from aqt.utils import tooltip
 from anki.hooks import wrap, addHook, runHook
 
-from config import *
-from resources import *
-from add import ImgOccAdd
-from options import ImgOccOpts
-from dialogs import ioHelp, ioError
+from .config import *
+from .resources import *
+from .add import ImgOccAdd
+from .options import ImgOccOpts
+from .dialogs import ioHelp, ioError
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -60,9 +60,9 @@ def onImgOccButton(self, origin=None, image_path=None):
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
         if "imgocc" in mw.col.conf:
-            dflt_fields = mw.col.conf['imgocc']['flds'].values()
+            dflt_fields = list(mw.col.conf['imgocc']['flds'].values())
         else:
-            dflt_fields = IO_FLDS.values()
+            dflt_fields = list(IO_FLDS.values())
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
             ioError("<b>Error</b>: Image Occlusion note type " \
@@ -96,7 +96,7 @@ def onSetupEditorButtons(self):
         icon = "new_occlusion"
     
     btn = self._addButton(icon, lambda o=self: onImgOccButton(self, origin),
-            _(hotkey), _(u"{} ({})".format(tt, hotkey)), canDisable=False)
+            _(hotkey), _("{} ({})".format(tt, hotkey)), canDisable=False)
 
 
 def getEdParentInstance(parent):

@@ -25,8 +25,8 @@ from anki.errors import AnkiError
 from aqt import mw, webview, deckchooser, tagedit
 from aqt.utils import saveGeom, restoreGeom
 
-from config import *
-from resources import *
+from .config import *
+from .resources import *
 
 
 def ioError(text, title="Image Occlusion Enhanced Error",
@@ -82,7 +82,7 @@ io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ
 io_link_thread = ("https://anki.tenderapp.com/discussions/add-ons/"
                   "8295-image-occlusion-enhanced-official-thread")
 help_text = {}
-help_text["add"] = u"""
+help_text["add"] = """
     <p><strong>Basic Instructions</strong></p>
     <ol>
     <li>With the rectangle tool or any other shape tool selected, cover the areas of the image you want to be tested on</li>
@@ -131,7 +131,7 @@ help_text["notetype"] = """<b>Fixing a broken note type:</b>\
     with an error message. <br><br>
     To fix this issue please follow the instructions in <a href="%s">the \
     wiki</a>.""" % (io_link_wiki + "/Troubleshooting#note-type")
-help_text["main"] = u"""<h2>Help and Support</h2>
+help_text["main"] = """<h2>Help and Support</h2>
     <p><a href="%s">Image Occlusion Enhanced Wiki</a></p>
     <p><a href="%s">Official Video Tutorial Series</a></p>
     <p><a href="%s">Support Thread</a></p>

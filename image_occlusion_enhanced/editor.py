@@ -22,8 +22,8 @@ from aqt.qt import *
 from aqt import mw, webview, deckchooser, tagedit
 from aqt.utils import saveGeom, restoreGeom
 
-from dialogs import ioHelp
-from config import *
+from .dialogs import ioHelp
+from .config import *
 
 class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
@@ -97,9 +97,9 @@ class ImgOccEdit(QDialog):
            QDialogButtonBox.ActionRole)
         self.new_btn = button_box.addButton("&Add New Cards",
            QDialogButtonBox.ActionRole)
-        self.ao_btn = button_box.addButton(u"Hide &All, Reveal One",
+        self.ao_btn = button_box.addButton("Hide &All, Reveal One",
            QDialogButtonBox.ActionRole)
-        self.oa_btn = button_box.addButton(u"Hide &One, Reveal All",
+        self.oa_btn = button_box.addButton("Hide &One, Reveal All",
            QDialogButtonBox.ActionRole)
         close_button = button_box.addButton("&Close",
             QDialogButtonBox.RejectRole)
@@ -233,7 +233,7 @@ class ImgOccEdit(QDialog):
     def resetFields(self):
         """Reset all widgets. Needed for changes to the note type"""
         layout = self.vbox2
-        for i in reversed(range(layout.count())):
+        for i in reversed(list(range(layout.count()))):
             item = layout.takeAt(i)
             layout.removeItem(item)
             if item.widget():
@@ -241,7 +241,7 @@ class ImgOccEdit(QDialog):
             elif item.layout():
                 sublayout = item.layout()
                 sublayout.setParent(None)
-                for i in reversed(range(sublayout.count())):
+                for i in reversed(list(range(sublayout.count()))):
                     subitem = sublayout.takeAt(i)
                     sublayout.removeItem(subitem)
                     subitem.widget().setParent(None)
@@ -288,9 +288,9 @@ class ImgOccEdit(QDialog):
         hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]
         hide_on_edit = [self.ao_btn, self.oa_btn]
         self.mode = mode
-        for i in self.tedit.values():
+        for i in list(self.tedit.values()):
             i.show()
-        for i in self.tlabel.values():
+        for i in list(self.tlabel.values()):
             i.show()
         if mode == "add":
             for i in hide_on_add:
@@ -306,7 +306,7 @@ class ImgOccEdit(QDialog):
             for i in hide_on_edit:
                 i.hide()
             for i in self.sconf['skip']:
-                if i in self.tedit.keys():
+                if i in list(self.tedit.keys()):
                     self.tedit[i].hide()
                     self.tlabel[i].hide()
             dl_txt = "Deck for <i>Add new cards</i>"
