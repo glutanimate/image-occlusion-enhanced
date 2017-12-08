@@ -14,8 +14,7 @@ Makes older IO notes editable.
 
 import logging, sys
 
-from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QKeySequence
+from aqt.qt import *
 from anki.hooks import addHook
 from aqt.utils import tooltip
 

@@ -50,7 +50,7 @@ IO_FIDS_PRSV = ['sc']
 
 # variables for local preference handling
 sys_encoding = sys.getfilesystemencoding()
-IO_HOME = os.path.expanduser('~').decode(sys_encoding)
+IO_HOME = os.path.expanduser('~')
 IO_HOTKEY = "Ctrl+Shift+O"
 
 # default configurations

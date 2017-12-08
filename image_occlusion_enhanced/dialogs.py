@@ -18,7 +18,6 @@ Handles all minor utility dialogs
 
 import logging, sys
 
-from PyQt4 import QtCore, QtGui
 from aqt.qt import *
 from anki.errors import AnkiError
 

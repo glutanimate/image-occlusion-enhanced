@@ -18,7 +18,6 @@ Main options dialog
 
 import logging, sys
 
-from PyQt4 import QtCore, QtGui
 from aqt.qt import *
 from aqt.utils import showInfo
 
