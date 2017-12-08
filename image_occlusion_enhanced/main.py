@@ -78,7 +78,7 @@ def onImgOccButton(self, origin=None, image_path=None):
     mw.ImgOccAdd.occlude(image_path)
 
 
-def onSetupEditorButtons(self):
+def onSetupEditorButtons(buttons, editor):
     """Add IO button to Editor"""
     conf = mw.pm.profile.get("imgocc")
     if not conf:
@@ -86,7 +86,7 @@ def onSetupEditorButtons(self):
     else:
         hotkey = conf.get("hotkey", IO_HOTKEY)
 
-    origin = getEdParentInstance(self.parentWindow)
+    origin = getEdParentInstance(editor.parentWindow)
 
     if origin == "addcards":
         tt = "Add Image Occlusion"
@@ -94,10 +94,11 @@ def onSetupEditorButtons(self):
     else:
         tt = "Edit Image Occlusion"
         icon = "new_occlusion"
-    
-    btn = self._addButton(icon, lambda o=self: onImgOccButton(self, origin),
-            _(hotkey), _("{} ({})".format(tt, hotkey)), canDisable=False)
 
+    buttons.append(editor.addButton(None, "io", lambda o=editor: onImgOccButton(o),
+                                    tip=_("{} ({})".format(tt, hotkey)),
+                                    keys=hotkey))
+    return buttons
 
 def getEdParentInstance(parent):
     """Determine parent instance of editor widget"""
@@ -185,10 +186,8 @@ def onShowAnswer(self, _old):
 # Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
-mw.connect(options_action, SIGNAL("triggered()"),
-            lambda o=mw: onIoSettings(o))
-mw.connect(help_action, SIGNAL("triggered()"),
-            onIoHelp)
+options_action.triggered.connect(lambda o=mw: onIoSettings(o))
+help_action.triggered.connect(onIoHelp)
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
@@ -197,5 +196,6 @@ addHook('setupEditorButtons', onSetupEditorButtons)
 EditorWebView.contextMenuEvent = contextMenuEvent
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
 Editor.onImgOccButton = onImgOccButton
-Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
-Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
+print("fixme: keyhandler/onShowAnswer")
+#Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
+#Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
