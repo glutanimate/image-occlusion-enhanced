@@ -26,7 +26,7 @@ from aqt.utils import tooltip
 from anki.notes import Note
 
 from xml.dom import minidom
-from .uuid import uuid
+import uuid
 
 from .dialogs import ioHelp, ioAskUser
 from .utils import fname2img
@@ -385,7 +385,7 @@ class ImgOccNoteGenerator(object):
         logging.debug("!saving %s, %s", note_id, mtype)
         # media collection is the working directory:
         mask_path = '%s-%s.svg' % (note_id, mtype)
-        mask_file = open(mask_path, 'w')
+        mask_file = open(mask_path, 'wb')
         mask_file.write(mask.encode('utf8'))
         mask_file.close()
         return mask_path
