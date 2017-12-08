@@ -16,7 +16,6 @@
 Image Occlusion editor dialog
 """
 
-from PyQt4 import QtCore, QtGui
 from aqt.qt import *
 
 from aqt import mw, webview, deckchooser, tagedit
@@ -24,6 +23,10 @@ from aqt.utils import saveGeom, restoreGeom
 
 from .dialogs import ioHelp
 from .config import *
+
+class ImgOccWebPage(webview.AnkiWebPage):
+    def acceptNavigationRequest(self, url, navType, isMainFrame):
+        return True
 
 class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
@@ -51,9 +54,9 @@ class ImgOccEdit(QDialog):
         """Set up ImgOccEdit UI"""
         # Main widgets aside from fields
         self.svg_edit = webview.AnkiWebView()
-        # required for local href links to work properly (e.g. context menu):
-        self.svg_edit.page().setLinkDelegationPolicy(QWebPage.DelegateExternalLinks)
-        self.svg_edit.setCanFocus(True) # focus necessary for hotkeys
+        self.svg_edit._page = ImgOccWebPage(self.svg_edit._onBridgeCmd)
+        self.svg_edit.setPage(self.svg_edit._page)
+
         self.tags_hbox = QHBoxLayout()
         self.tags_edit = tagedit.TagEdit(self)
         self.tags_label = QLabel("Tags")
@@ -79,7 +82,7 @@ class ImgOccEdit(QDialog):
 
         # Button row widgets
         self.bottom_label = QLabel()
-        button_box = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal, self)
+        button_box = QDialogButtonBox(Qt.Horizontal, self)
         button_box.setCenterButtons(False)
 
         image_btn = QPushButton("Change &Image", clicked=self.changeImage)
@@ -129,11 +132,11 @@ class ImgOccEdit(QDialog):
                     self.oa_btn, close_button]:
             btn.setFocusPolicy(Qt.ClickFocus)
 
-        self.connect(self.edit_btn, SIGNAL("clicked()"), self.editNote)
-        self.connect(self.new_btn, SIGNAL("clicked()"), self.new)
-        self.connect(self.ao_btn, SIGNAL("clicked()"), self.addAO)
-        self.connect(self.oa_btn, SIGNAL("clicked()"), self.addOA)
-        self.connect(close_button, SIGNAL("clicked()"), self.close)
+        self.edit_btn.clicked.connect(self.editNote)
+        self.new_btn.clicked.connect(self.new)
+        self.ao_btn.clicked.connect(self.addAO)
+        self.oa_btn.clicked.connect(self.addOA)
+        close_button.clicked.connect(self.close)
 
         # Set basic layout up
 
@@ -159,7 +162,7 @@ class ImgOccEdit(QDialog):
         self.tab2 = QWidget()
         tab1.setLayout(vbox1)
         self.tab2.setLayout(self.vbox2)
-        self.tab_widget = QtGui.QTabWidget()
+        self.tab_widget = QTabWidget()
         self.tab_widget.setFocusPolicy(Qt.ClickFocus)
         self.tab_widget.addTab(tab1,"&Masks Editor")
         self.tab_widget.addTab(self.tab2,"&Fields")
@@ -168,7 +171,6 @@ class ImgOccEdit(QDialog):
 
         ## Main Window
         vbox_main = QVBoxLayout()
-        vbox_main.setMargin(5)
         vbox_main.addWidget(self.tab_widget)
         vbox_main.addLayout(bottom_hbox)
         self.setLayout(vbox_main)
@@ -180,24 +182,15 @@ class ImgOccEdit(QDialog):
 
         ## Field focus hotkeys
         for i in range(1,10):
-            s = self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+%i" %i), self),
-                QtCore.SIGNAL('activated()'),
-                lambda f=i-1:self.focusField(f))
+            s = QShortcut(QKeySequence("Ctrl+%i" %i), self).activated.connect(lambda f=i-1:self.focusField(f))
         ## Other hotkeys
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Return"), self),
-            QtCore.SIGNAL('activated()'), lambda: self.defaultAction(True))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+Return"), self),
-            QtCore.SIGNAL('activated()'), lambda: self.addOA(True))
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Tab"), self),
-            QtCore.SIGNAL('activated()'), self.switchTabs)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+r"), self),
-            QtCore.SIGNAL('activated()'), self.resetMainFields)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+r"), self),
-            QtCore.SIGNAL('activated()'), self.resetAllFields)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+t"), self),
-            QtCore.SIGNAL('activated()'), self.focusTags)
-        self.connect(QtGui.QShortcut(QtGui.QKeySequence("Ctrl+f"), self),
-            QtCore.SIGNAL('activated()'), self.fitImageCanvas)
+        QShortcut(QKeySequence("Ctrl+Return"), self).activated.connect(lambda: self.defaultAction(True))
+        QShortcut(QKeySequence("Ctrl+Shift+Return"), self).activated.connect(lambda: self.addOA(True))
+        QShortcut(QKeySequence("Ctrl+Tab"), self).activated.connect(self.switchTabs)
+        QShortcut(QKeySequence("Ctrl+r"), self).activated.connect(self.resetMainFields)
+        QShortcut(QKeySequence("Ctrl+Shift+r"), self).activated.connect(self.resetAllFields)
+        QShortcut(QKeySequence("Ctrl+Shift+t"), self).activated.connect(self.focusTags)
+        QShortcut(QKeySequence("Ctrl+f"), self).activated.connect(self.fitImageCanvas)
 
 
     # Various actions that act on / interact with the ImgOccEdit UI:
