@@ -95,9 +95,12 @@ def onSetupEditorButtons(buttons, editor):
         tt = "Edit Image Occlusion"
         icon = "new_occlusion"
 
-    buttons.append(editor.addButton(None, "io", lambda o=editor: onImgOccButton(o),
-                                    tip=_("{} ({})".format(tt, hotkey)),
-                                    keys=hotkey))
+    b = editor.addButton(None, "I/O", lambda o=editor: onImgOccButton(o),
+                 tip=_("{} ({})".format(tt, hotkey)),
+                 keys=hotkey)
+    # replace with disables=False in previous call when next beta comes out
+    b = b.replace("linkb", "tmp")
+    buttons.append(b)
     return buttons
 
 def getEdParentInstance(parent):
