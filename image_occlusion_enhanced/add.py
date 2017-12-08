@@ -159,7 +159,8 @@ class ImgOccAdd(object):
         image_path = QFileDialog.getOpenFileName(parent,
                              "Select an Image", prev_image_dir,
                              "Image Files (*.png *jpg *.jpeg *.gif)")
-        image_path = str(image_path)
+        if image_path:
+            image_path = image_path[0]
 
         if not image_path:
             return None
@@ -197,27 +198,29 @@ class ImgOccAdd(object):
         dialog.switchToMode(self.mode)
 
         url = QUrl.fromLocalFile(svg_edit_path)
-        url.setQueryItems(svg_edit_queryitems)
-        url.addQueryItem('initFill[color]', ofill)
-        url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-        url.addQueryItem('bkgd_url', bkgd_url)
-        url.addQueryItem('initStroke[color]', scol)
-        url.addQueryItem('initStroke[width]', str(swidth))
-        url.addQueryItem('text[font_size]', str(fsize))
-        url.addQueryItem('text[font_family]', "'%s', %s" % (font, svg_edit_fonts))
+        items = QUrlQuery()
+        items.setQueryItems(svg_edit_queryitems)
+        items.addQueryItem('initFill[color]', ofill)
+        items.addQueryItem('dimensions', '{0},{1}'.format(width, height))
+        items.addQueryItem('bkgd_url', bkgd_url)
+        items.addQueryItem('initStroke[color]', scol)
+        items.addQueryItem('initStroke[width]', str(swidth))
+        items.addQueryItem('text[font_size]', str(fsize))
+        items.addQueryItem('text[font_family]', "'%s', %s" % (font, svg_edit_fonts))
 
         if self.mode != "add":
-            url.addQueryItem('initTool', 'select'),
+            items.addQueryItem('initTool', 'select'),
             for i in flds:
                 fn = i["name"]
                 if fn in self.ioflds_priv:
                     continue
                 dialog.tedit[fn].setPlainText(onote[fn].replace('<br />', '\n'))
             svg_url = path2url(opref["omask"])
-            url.addQueryItem('url', svg_url)
+            items.addQueryItem('url', svg_url)
         else:
-            url.addQueryItem('initTool', 'rect'),
+            items.addQueryItem('initTool', 'rect'),
 
+        url.setQuery(items)
         dialog.svg_edit.setUrl(url)
         dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
@@ -255,12 +258,15 @@ class ImgOccAdd(object):
 
 
     def onAddNotesButton(self, choice, close):
+        dialog = mw.ImgOccEdit
+        dialog.svg_edit.evalWithCallback(
+            "svgCanvas.svgCanvasToString();",
+            lambda val,choice=choice,close=close: self._onAddNotesButton(choice, close, val))
+
+    def _onAddNotesButton(self, choice, close, svg):
+
         """Get occlusion settings in and pass them to the note generator (add)"""
         dialog = mw.ImgOccEdit
-        svg_edit = dialog.svg_edit
-        svg = svg_edit.page().mainFrame().evaluateJavaScript(
-            "svgCanvas.svgCanvasToString();")
-        svg = str(svg) # store svg as unicode string
 
         r1 = self.getUserInputs(dialog)
         if r1 == False:
