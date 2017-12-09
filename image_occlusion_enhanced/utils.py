@@ -17,13 +17,13 @@ import os, re
 from aqt import mw
 
 from xml.dom import minidom
-import urlparse, urllib
-from imagesize import imagesize
+import urllib.parse, urllib.request, urllib.parse, urllib.error
+from .imagesize import imagesize
 
 def path2url(path):
     """URL-encode local path"""
-    return urlparse.urljoin(
-      'file:', urllib.pathname2url(path.encode('utf-8')))
+    return urllib.parse.urljoin(
+      'file:', urllib.request.pathname2url(path.encode('utf-8')))
 
 def fname2img(path):
     """Return HTML img element for given path"""
@@ -62,7 +62,7 @@ def imageProp(image_path):
         assert height > 0
     except (ValueError, AssertionError):
         try:
-            from Imaging.PIL import Image # fall back to PIL
+            from .Imaging.PIL import Image # fall back to PIL
             image = Image.open(image_path)
             width, height = image.size
         except IOError:

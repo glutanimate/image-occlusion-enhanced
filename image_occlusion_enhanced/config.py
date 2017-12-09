@@ -24,17 +24,17 @@ IO_MODEL_NAME = "Image Occlusion Enhanced"
 IO_CARD_NAME = "IO Card"
 
 IO_FLDS = {
-    'id': u"ID (hidden)",
-    'hd': u"Header",
-    'im': u"Image",
-    'ft': u"Footer",
-    'rk': u"Remarks",
-    'sc': u"Sources",
-    'e1': u"Extra 1",
-    'e2': u"Extra 2",
-    'qm': u"Question Mask",
-    'am': u"Answer Mask",
-    'om': u"Original Mask"
+    'id': "ID (hidden)",
+    'hd': "Header",
+    'im': "Image",
+    'ft': "Footer",
+    'rk': "Remarks",
+    'sc': "Sources",
+    'e1': "Extra 1",
+    'e2': "Extra 2",
+    'qm': "Question Mask",
+    'am': "Answer Mask",
+    'om': "Original Mask"
 }
 
 IO_FLDS_IDS = ["id", "hd", "im", "qm",  "ft", "rk",
@@ -50,7 +50,7 @@ IO_FIDS_PRSV = ['sc']
 
 # variables for local preference handling
 sys_encoding = sys.getfilesystemencoding()
-IO_HOME = os.path.expanduser('~').decode(sys_encoding)
+IO_HOME = os.path.expanduser('~')
 IO_HOTKEY = "Ctrl+Shift+O"
 
 # default configurations
@@ -67,7 +67,7 @@ default_conf_syncd = {'version': 1.01,
                       'skip': [IO_FLDS["e1"], IO_FLDS["e2"]],
                       'flds': IO_FLDS}
 
-import template
+from . import template
 
 def loadConfig(self):
     """load and/or create add-on preferences"""
@@ -85,8 +85,8 @@ def loadConfig(self):
         mw.col.setMod()
 
     elif mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
-        print "Updating config DB from earlier IO release"
-        for key in default_conf_syncd.keys():
+        print("Updating config DB from earlier IO release")
+        for key in list(default_conf_syncd.keys()):
             if key not in mw.col.conf['imgocc']:
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
@@ -99,7 +99,7 @@ def loadConfig(self):
     if not 'imgocc' in mw.pm.profile:
         mw.pm.profile["imgocc"] = default_conf_local
     elif mw.pm.profile['imgocc'].get('version', 0) < default_conf_syncd['version']:
-        for key in default_conf_local.keys():
+        for key in list(default_conf_local.keys()):
             if key not in mw.col.conf['imgocc']:
                 mw.pm.profile["imgocc"][key] = default_conf_local[key]
         mw.pm.profile['imgocc']['version'] = default_conf_local['version']

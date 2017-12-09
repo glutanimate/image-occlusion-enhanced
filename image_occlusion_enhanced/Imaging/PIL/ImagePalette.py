@@ -17,7 +17,7 @@
 #
 
 import array
-import Image, ImageColor
+from . import Image, ImageColor
 
 ##
 # Colour palette wrapper for palette mapped images.
@@ -28,11 +28,11 @@ class ImagePalette:
     def __init__(self, mode = "RGB", palette = None):
         self.mode = mode
         self.rawmode = None # if set, palette contains raw data
-        self.palette = palette or range(256)*len(self.mode)
+        self.palette = palette or list(range(256))*len(self.mode)
         self.colors = {}
         self.dirty = None
         if len(self.mode)*256 != len(self.palette):
-            raise ValueError, "wrong palette size"
+            raise ValueError("wrong palette size")
 
     def getdata(self):
         # experimental: get palette contents in format suitable
@@ -59,7 +59,7 @@ class ImagePalette:
             except KeyError:
                 # allocate new color slot
                 if Image.isStringType(self.palette):
-                    self.palette = map(int, self.palette)
+                    self.palette = list(map(int, self.palette))
                 index = len(self.colors)
                 if index >= 256:
                     raise ValueError("cannot allocate more than 256 colors")
@@ -119,7 +119,7 @@ def new(mode, data):
     return Image.core.new_palette(mode, data)
 
 def negative(mode="RGB"):
-    palette = range(256)
+    palette = list(range(256))
     palette.reverse()
     return ImagePalette(mode, palette * len(mode))
 
@@ -138,7 +138,7 @@ def sepia(white="#fff0c0"):
     return ImagePalette("RGB", r + g + b)
 
 def wedge(mode="RGB"):
-    return ImagePalette(mode, range(256) * len(mode))
+    return ImagePalette(mode, list(range(256)) * len(mode))
 
 def load(filename):
 
@@ -176,7 +176,7 @@ def load(filename):
             pass
 
     if not lut:
-        raise IOError, "cannot load palette"
+        raise IOError("cannot load palette")
 
     return lut # data, rawmode
 

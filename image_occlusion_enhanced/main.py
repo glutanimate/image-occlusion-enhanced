@@ -29,11 +29,11 @@ from aqt.reviewer import Reviewer
 from aqt.utils import tooltip
 from anki.hooks import wrap, addHook, runHook
 
-from config import *
-from resources import *
-from add import ImgOccAdd
-from options import ImgOccOpts
-from dialogs import ioHelp, ioError
+from .config import *
+from .resources import *
+from .add import ImgOccAdd
+from .options import ImgOccOpts
+from .dialogs import ioHelp, ioError
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -60,9 +60,9 @@ def onImgOccButton(self, origin=None, image_path=None):
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
         if "imgocc" in mw.col.conf:
-            dflt_fields = mw.col.conf['imgocc']['flds'].values()
+            dflt_fields = list(mw.col.conf['imgocc']['flds'].values())
         else:
-            dflt_fields = IO_FLDS.values()
+            dflt_fields = list(IO_FLDS.values())
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
             ioError("<b>Error</b>: Image Occlusion note type " \
@@ -78,7 +78,7 @@ def onImgOccButton(self, origin=None, image_path=None):
     mw.ImgOccAdd.occlude(image_path)
 
 
-def onSetupEditorButtons(self):
+def onSetupEditorButtons(buttons, editor):
     """Add IO button to Editor"""
     conf = mw.pm.profile.get("imgocc")
     if not conf:
@@ -86,7 +86,7 @@ def onSetupEditorButtons(self):
     else:
         hotkey = conf.get("hotkey", IO_HOTKEY)
 
-    origin = getEdParentInstance(self.parentWindow)
+    origin = getEdParentInstance(editor.parentWindow)
 
     if origin == "addcards":
         tt = "Add Image Occlusion"
@@ -94,10 +94,14 @@ def onSetupEditorButtons(self):
     else:
         tt = "Edit Image Occlusion"
         icon = "new_occlusion"
-    
-    btn = self._addButton(icon, lambda o=self: onImgOccButton(self, origin),
-            _(hotkey), _(u"{} ({})".format(tt, hotkey)), canDisable=False)
 
+    b = editor.addButton(None, "I/O", lambda o=editor: onImgOccButton(o),
+                 tip=_("{} ({})".format(tt, hotkey)),
+                 keys=hotkey)
+    # replace with disables=False in previous call when next beta comes out
+    b = b.replace("linkb", "tmp")
+    buttons.append(b)
+    return buttons
 
 def getEdParentInstance(parent):
     """Determine parent instance of editor widget"""
@@ -185,10 +189,8 @@ def onShowAnswer(self, _old):
 # Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
-mw.connect(options_action, SIGNAL("triggered()"),
-            lambda o=mw: onIoSettings(o))
-mw.connect(help_action, SIGNAL("triggered()"),
-            onIoHelp)
+options_action.triggered.connect(lambda o=mw: onIoSettings(o))
+help_action.triggered.connect(onIoHelp)
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
@@ -197,5 +199,6 @@ addHook('setupEditorButtons', onSetupEditorButtons)
 EditorWebView.contextMenuEvent = contextMenuEvent
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
 Editor.onImgOccButton = onImgOccButton
-Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
-Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
+print("fixme: keyhandler/onShowAnswer")
+#Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
+#Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")

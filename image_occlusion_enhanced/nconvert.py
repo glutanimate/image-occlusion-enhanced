@@ -14,16 +14,15 @@ Makes older IO notes editable.
 
 import logging, sys
 
-from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QKeySequence
+from aqt.qt import *
 from anki.hooks import addHook
 from aqt.utils import tooltip
 
 from xml.dom import minidom
 
-from config import *
-from dialogs import ioAskUser
-from utils import img2path, fname2img
+from .config import *
+from .dialogs import ioAskUser
+from .utils import img2path, fname2img
 
 class ImgOccNoteConverter(object):
     def __init__(self, browser):
@@ -142,7 +141,7 @@ class ImgOccNoteConverter(object):
         omask_path = self._saveMask(new_svg, occl_id, "O")
         logging.debug("omask_path %s", omask_path)
 
-        for nid in nids_by_nr.values():
+        for nid in list(nids_by_nr.values()):
             note = mw.col.getNote(nid)
             note[self.ioflds['om']] = fname2img(omask_path)
             note.addTag(".io-converted")
@@ -175,7 +174,7 @@ class ImgOccNoteConverter(object):
         svg_doc = minidom.parse(svg_file)
         # ugly workaround for wrong namespace in older IO notes:
         svg_string = svg_doc.toxml().replace('ns0:', '').replace(':ns0','')
-        svg_string = unicode(svg_string)
+        svg_string = str(svg_string)
         svg_doc = minidom.parseString(svg_string.encode('utf-8'))
         svg_node = svg_doc.documentElement
         return svg_node
@@ -215,7 +214,7 @@ def onIoConvert(self):
     if not selected:
         tooltip("No cards selected.", period=2000)
         return
-    question = u"""\
+    question = """\
     This is a purely <b>experimental</b> feature that is meant to update older \
     IO notes to be compatible with the new editing feature-set in IO Enhanced. \
     Clicking on 'Yes' below will prompt the add-on to go through all selected \

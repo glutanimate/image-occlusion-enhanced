@@ -28,7 +28,7 @@
 __version__ = "0.9"
 
 
-import Image, ImageFile, ImagePalette
+from . import Image, ImageFile, ImagePalette
 
 
 # --------------------------------------------------------------------
@@ -69,7 +69,7 @@ class GifImageFile(ImageFile.ImageFile):
         # Screen
         s = self.fp.read(13)
         if s[:6] not in ["GIF87a", "GIF89a"]:
-            raise SyntaxError, "not a GIF file"
+            raise SyntaxError("not a GIF file")
 
         self.info["version"] = s[:6]
 
@@ -106,7 +106,7 @@ class GifImageFile(ImageFile.ImageFile):
             self.__fp.seek(self.__rewind)
 
         if frame != self.__frame + 1:
-            raise ValueError, "cannot seek to frame %d" % frame
+            raise ValueError("cannot seek to frame %d" % frame)
         self.__frame = frame
 
         self.tile = []
@@ -201,7 +201,7 @@ class GifImageFile(ImageFile.ImageFile):
 
         if not self.tile:
             # self.__fp = None
-            raise EOFError, "no more images in GIF file"
+            raise EOFError("no more images in GIF file")
 
         self.mode = "L"
         if self.palette:

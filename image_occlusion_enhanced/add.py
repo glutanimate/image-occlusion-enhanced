@@ -24,12 +24,12 @@ from aqt.qt import *
 from aqt import mw
 from aqt.utils import getFile, tooltip
 
-from ngen import *
-from config import *
+from .ngen import *
+from .config import *
 
-from editor import ImgOccEdit
-from dialogs import ioError
-from utils import imageProp, img2path, path2url
+from .editor import ImgOccEdit
+from .dialogs import ioError
+from .utils import imageProp, img2path, path2url
 
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
@@ -149,7 +149,7 @@ class ImgOccAdd(object):
                 # workaround for a clipboard bug
                 return self.getNewImage(noclip=True)
             else:
-                return unicode(image_path)
+                return str(image_path)
 
         # retrieve last used image directory
         prev_image_dir = self.lconf["dir"]
@@ -159,7 +159,8 @@ class ImgOccAdd(object):
         image_path = QFileDialog.getOpenFileName(parent,
                              "Select an Image", prev_image_dir,
                              "Image Files (*.png *jpg *.jpeg *.gif)")
-        image_path = unicode(image_path)
+        if image_path:
+            image_path = image_path[0]
 
         if not image_path:
             return None
@@ -197,27 +198,29 @@ class ImgOccAdd(object):
         dialog.switchToMode(self.mode)
 
         url = QUrl.fromLocalFile(svg_edit_path)
-        url.setQueryItems(svg_edit_queryitems)
-        url.addQueryItem('initFill[color]', ofill)
-        url.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-        url.addQueryItem('bkgd_url', bkgd_url)
-        url.addQueryItem('initStroke[color]', scol)
-        url.addQueryItem('initStroke[width]', str(swidth))
-        url.addQueryItem('text[font_size]', str(fsize))
-        url.addQueryItem('text[font_family]', "'%s', %s" % (font, svg_edit_fonts))
+        items = QUrlQuery()
+        items.setQueryItems(svg_edit_queryitems)
+        items.addQueryItem('initFill[color]', ofill)
+        items.addQueryItem('dimensions', '{0},{1}'.format(width, height))
+        items.addQueryItem('bkgd_url', bkgd_url)
+        items.addQueryItem('initStroke[color]', scol)
+        items.addQueryItem('initStroke[width]', str(swidth))
+        items.addQueryItem('text[font_size]', str(fsize))
+        items.addQueryItem('text[font_family]', "'%s', %s" % (font, svg_edit_fonts))
 
         if self.mode != "add":
-            url.addQueryItem('initTool', 'select'),
+            items.addQueryItem('initTool', 'select'),
             for i in flds:
                 fn = i["name"]
                 if fn in self.ioflds_priv:
                     continue
                 dialog.tedit[fn].setPlainText(onote[fn].replace('<br />', '\n'))
             svg_url = path2url(opref["omask"])
-            url.addQueryItem('url', svg_url)
+            items.addQueryItem('url', svg_url)
         else:
-            url.addQueryItem('initTool', 'rect'),
+            items.addQueryItem('initTool', 'rect'),
 
+        url.setQuery(items)
         dialog.svg_edit.setUrl(url)
         dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
@@ -233,7 +236,8 @@ class ImgOccAdd(object):
             dialog.show()
         else:
             # modal dialog when editing
-            dialog.exec_()
+            dialog.setWindowModality(Qt.WindowModal)
+            dialog.show()
 
 
     def onChangeImage(self):
@@ -255,12 +259,15 @@ class ImgOccAdd(object):
 
 
     def onAddNotesButton(self, choice, close):
+        dialog = mw.ImgOccEdit
+        dialog.svg_edit.evalWithCallback(
+            "svgCanvas.svgCanvasToString();",
+            lambda val,choice=choice,close=close: self._onAddNotesButton(choice, close, val))
+
+    def _onAddNotesButton(self, choice, close, svg):
+
         """Get occlusion settings in and pass them to the note generator (add)"""
         dialog = mw.ImgOccEdit
-        svg_edit = dialog.svg_edit
-        svg = svg_edit.page().mainFrame().evaluateJavaScript(
-            "svgCanvas.svgCanvasToString();")
-        svg = unicode(svg) # store svg as unicode string
 
         r1 = self.getUserInputs(dialog)
         if r1 == False:
@@ -291,13 +298,15 @@ class ImgOccAdd(object):
 
         mw.reset()
 
-
     def onEditNotesButton(self, choice):
+        dialog = mw.ImgOccEdit
+        dialog.svg_edit.evalWithCallback(
+            "svgCanvas.svgCanvasToString();",
+            lambda val,choice=choice: self._onEditNotesButton(choice, val))
+
+    def _onEditNotesButton(self, choice, svg):
         """Get occlusion settings and pass them to the note generator (edit)"""
         dialog = mw.ImgOccEdit
-        svg_edit = dialog.svg_edit
-        svg = svg_edit.page().mainFrame().evaluateJavaScript(
-            "svgCanvas.svgCanvasToString();")
 
         r1 = self.getUserInputs(dialog, edit=True)
         if r1 == False:
@@ -318,7 +327,7 @@ class ImgOccAdd(object):
         if r == "reset":
             # modifications to mask require media collection reset
             ## refresh webview image cache
-            QWebSettings.clearMemoryCaches()
+            dialog.svg_edit.page().profile().clearHttpCache()
             ## write a dummy file to update collection.media modtime and force sync
             media_dir = mw.col.media.dir()
             fpath = os.path.join(media_dir, "syncdummy.txt")
@@ -335,7 +344,7 @@ class ImgOccAdd(object):
         fields = {}
         # note type integrity check:
         io_model_fields = mw.col.models.fieldNames(self.model)
-        if not all(x in io_model_fields for x in self.ioflds.values()):
+        if not all(x in io_model_fields for x in list(self.ioflds.values())):
             ioError("<b>Error</b>: Image Occlusion note type " \
                 "not configured properly.Please make sure you did not " \
                 "manually delete or rename any of the default fields.",

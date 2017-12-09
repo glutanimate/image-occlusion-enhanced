@@ -36,7 +36,7 @@ __version__ = "0.6"
 
 import array, struct
 import string
-import Image, ImageFile
+from . import Image, ImageFile
 
 def i16(c,o=0):
     return ord(c[o+1]) + (ord(c[o])<<8)
@@ -294,7 +294,7 @@ class JpegImageFile(ImageFile.ImageFile):
 
             i = i16(s)
 
-            if MARKER.has_key(i):
+            if i in MARKER:
                 name, description, handler = MARKER[i]
                 # print hex(i), name, description
                 if handler is not None:
@@ -362,7 +362,7 @@ class JpegImageFile(ImageFile.ImageFile):
         # Extract EXIF information.  This method is highly experimental,
         # and is likely to be replaced with something better in a future
         # version.
-        import TiffImagePlugin, StringIO
+        import TiffImagePlugin, io
         def fixup(value):
             if len(value) == 1:
                 return value[0]
@@ -373,13 +373,13 @@ class JpegImageFile(ImageFile.ImageFile):
             data = self.info["exif"]
         except KeyError:
             return None
-        file = StringIO.StringIO(data[6:])
+        file = io.StringIO(data[6:])
         head = file.read(8)
         exif = {}
         # process dictionary
         info = TiffImagePlugin.ImageFileDirectory(head)
         info.load(file)
-        for key, value in info.items():
+        for key, value in list(info.items()):
             exif[key] = fixup(value)
         # get exif extension
         try:
@@ -389,7 +389,7 @@ class JpegImageFile(ImageFile.ImageFile):
         else:
             info = TiffImagePlugin.ImageFileDirectory(head)
             info.load(file)
-            for key, value in info.items():
+            for key, value in list(info.items()):
                 exif[key] = fixup(value)
         # get gpsinfo extension
         try:
@@ -400,7 +400,7 @@ class JpegImageFile(ImageFile.ImageFile):
             info = TiffImagePlugin.ImageFileDirectory(head)
             info.load(file)
             exif[0x8825] = gps = {}
-            for key, value in info.items():
+            for key, value in list(info.items()):
                 gps[key] = fixup(value)
         return exif
 
@@ -459,9 +459,9 @@ def _save(im, fp, filename):
         # "progressive" is the official name, but older documentation
         # says "progression"
         # FIXME: issue a warning if the wrong form is used (post-1.1.7)
-        info.has_key("progressive") or info.has_key("progression"),
+        "progressive" in info or "progression" in info,
         info.get("smooth", 0),
-        info.has_key("optimize"),
+        "optimize" in info,
         info.get("streamtype", 0),
         dpi[0], dpi[1],
         subsampling,
