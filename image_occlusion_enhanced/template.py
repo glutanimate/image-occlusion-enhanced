@@ -16,7 +16,7 @@
 Handles the IO note type and card template
 """
 
-from config import *
+from .config import *
 
 # Default card template
 iocard_front = """\
@@ -209,7 +209,7 @@ def add_io_model(col):
 
 
 def update_template(col):
-    print "Updating IO Enhanced card template"
+    print("Updating IO Enhanced card template")
     io_model = col.models.byName(IO_MODEL_NAME)
     # We are assuming that the template list contains only one element.
     # This will be true as long as no one has been trampling the model.

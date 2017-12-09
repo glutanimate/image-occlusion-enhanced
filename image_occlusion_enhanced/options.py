@@ -18,14 +18,13 @@ Main options dialog
 
 import logging, sys
 
-from PyQt4 import QtCore, QtGui
 from aqt.qt import *
 from aqt.utils import showInfo
 
 from aqt import mw
 from anki.errors import AnkiError
 
-from config import *
+from .config import *
 
 class GrabKey(QDialog):
     """
@@ -267,7 +266,7 @@ class ImgOccOpts(QDialog):
     def updateHotkey(self, combo=None):
         """Update hotkey label and attribute"""
         key = combo or self.hotkey
-        label = u"<b>{}</b>".format(key)
+        label = "<b>{}</b>".format(key)
         self.key_grabbed.setText(label)
         if combo:
             self.hotkey = combo
@@ -304,7 +303,7 @@ class ImgOccOpts(QDialog):
     def restoreDefaults(self):
         """Restore colors and fields back to defaults"""
         self.hotkey = self.lconf_dflt["hotkey"]
-        for key in self.lnedit.keys():
+        for key in list(self.lnedit.keys()):
             self.lnedit[key].setText(IO_FLDS[key])
             self.lnedit[key].setModified(True)
         self.setupValues(self.sconf_dflt)
@@ -317,7 +316,7 @@ class ImgOccOpts(QDialog):
         modified = False
         model = mw.col.models.byName(IO_MODEL_NAME)
         flds = model['flds']
-        for key in self.lnedit.keys():
+        for key in list(self.lnedit.keys()):
             if not self.lnedit[key].isModified():
                 continue
             name = self.lnedit[key].text()
@@ -350,7 +349,7 @@ class ImgOccOpts(QDialog):
         try:
             (modified, flds) = self.renameFields()
         except AnkiError:
-            print "Field rename action aborted"
+            print("Field rename action aborted")
             return
         if modified and hasattr(mw, "ImgOccEdit"):
             self.resetIoEditor(flds)

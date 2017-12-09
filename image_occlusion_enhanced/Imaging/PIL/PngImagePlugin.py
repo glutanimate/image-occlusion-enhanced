@@ -96,7 +96,7 @@ class ChunkStream:
             len = i32(s)
 
         if not is_cid(cid):
-            raise SyntaxError, "broken PNG file (chunk %s)" % repr(cid)
+            raise SyntaxError("broken PNG file (chunk %s)" % repr(cid))
 
         return cid, pos, len
 
@@ -111,7 +111,7 @@ class ChunkStream:
         "Call the appropriate chunk handler"
 
         if Image.DEBUG:
-            print "STREAM", cid, pos, len
+            print("STREAM", cid, pos, len)
         return getattr(self, "chunk_" + cid)(pos, len)
 
     def crc(self, cid, data):
@@ -120,8 +120,8 @@ class ChunkStream:
         crc1 = Image.core.crc32(data, Image.core.crc32(cid))
         crc2 = i16(self.fp.read(2)), i16(self.fp.read(2))
         if crc1 != crc2:
-            raise SyntaxError, "broken PNG file"\
-                "(bad header checksum in %s)" % cid
+            raise SyntaxError("broken PNG file"\
+                "(bad header checksum in %s)" % cid)
 
     def crc_skip(self, cid, data):
         "Read checksum.  Used if the C module is not present"
@@ -191,8 +191,8 @@ class PngStream(ChunkStream):
         # Compressed profile    n bytes (zlib with deflate compression)
         i = string.find(s, chr(0))
         if Image.DEBUG:
-            print "iCCP profile name", s[:i]
-            print "Compression method", ord(s[i])
+            print("iCCP profile name", s[:i])
+            print("Compression method", ord(s[i]))
         comp_method = ord(s[i])
         if comp_method != 0:
             raise SyntaxError("Unknown compression method %s in iCCP chunk" % comp_method)
@@ -215,7 +215,7 @@ class PngStream(ChunkStream):
         if ord(s[12]):
             self.im_info["interlace"] = 1
         if ord(s[11]):
-            raise SyntaxError, "unknown filter category"
+            raise SyntaxError("unknown filter category")
         return s
 
     def chunk_IDAT(self, pos, len):
@@ -313,7 +313,7 @@ class PngImageFile(ImageFile.ImageFile):
     def _open(self):
 
         if self.fp.read(8) != _MAGIC:
-            raise SyntaxError, "not a PNG file"
+            raise SyntaxError("not a PNG file")
 
         #
         # Parse headers up to the first IDAT chunk
@@ -333,7 +333,7 @@ class PngImageFile(ImageFile.ImageFile):
                 break
             except AttributeError:
                 if Image.DEBUG:
-                    print cid, pos, len, "(unknown)"
+                    print(cid, pos, len, "(unknown)")
                 s = ImageFile._safe_read(self.fp, len)
 
             self.png.crc(cid, s)
@@ -469,7 +469,7 @@ def _save(im, fp, filename, chunk=putchunk, check=0):
         #
         # attempt to minimize storage requirements for palette images
 
-        if im.encoderinfo.has_key("bits"):
+        if "bits" in im.encoderinfo:
 
             # number of bits specified by user
             n = 1 << im.encoderinfo["bits"]
@@ -492,18 +492,18 @@ def _save(im, fp, filename, chunk=putchunk, check=0):
             mode = "%s;%d" % (mode, bits)
 
     # encoder options
-    if im.encoderinfo.has_key("dictionary"):
+    if "dictionary" in im.encoderinfo:
         dictionary = im.encoderinfo["dictionary"]
     else:
         dictionary = ""
 
-    im.encoderconfig = (im.encoderinfo.has_key("optimize"), dictionary)
+    im.encoderconfig = ("optimize" in im.encoderinfo, dictionary)
 
     # get the corresponding PNG mode
     try:
         rawmode, mode = _OUTMODES[mode]
     except KeyError:
-        raise IOError, "cannot write mode %s as PNG" % mode
+        raise IOError("cannot write mode %s as PNG" % mode)
 
     if check:
         return check
@@ -523,7 +523,7 @@ def _save(im, fp, filename, chunk=putchunk, check=0):
     if im.mode == "P":
         chunk(fp, "PLTE", im.im.getpalette("RGB"))
 
-    if im.encoderinfo.has_key("transparency"):
+    if "transparency" in im.encoderinfo:
         if im.mode == "P":
             transparency = max(0, min(255, im.encoderinfo["transparency"]))
             chunk(fp, "tRNS", chr(255) * transparency + chr(0))
@@ -553,7 +553,7 @@ def _save(im, fp, filename, chunk=putchunk, check=0):
             chunk(fp, cid, data)
 
     # ICC profile writing support -- 2008-06-06 Florian Hoech
-    if im.info.has_key("icc_profile"):
+    if "icc_profile" in im.info:
         # ICC profile
         # according to PNG spec, the iCCP chunk contains:
         # Profile name  1-79 bytes (character string)

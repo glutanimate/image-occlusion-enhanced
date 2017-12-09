@@ -54,6 +54,7 @@ var supportsXpath_ = (function() {
 
 // segList functions (for FF1.5 and 2.0)
 var supportsPathReplaceItem_ = (function() {
+	return false;
 	var path = document.createElementNS(svgns, 'path');
 	path.setAttribute('d','M0,0 10,10');
 	var seglist = path.pathSegList;
@@ -66,6 +67,7 @@ var supportsPathReplaceItem_ = (function() {
 })();
 
 var supportsPathInsertItemBefore_ = (function() {
+	return false;
 	var path = document.createElementNS(svgns,'path');
 	path.setAttribute('d','M0,0 10,10');
 	var seglist = path.pathSegList;

@@ -28,7 +28,7 @@ __version__ = "0.7"
 
 
 import string
-import Image, ImageFile, ImagePalette
+from . import Image, ImageFile, ImagePalette
 
 
 #
@@ -132,7 +132,7 @@ class BmpImageFile(ImageFile.ImageFile):
             if colors == 2:
                 indices = (0, 255)
             else:
-                indices = range(colors)
+                indices = list(range(colors))
             for i in indices:
                 rgb = read(lutsize)[:3]
                 if rgb != chr(i)*3:
