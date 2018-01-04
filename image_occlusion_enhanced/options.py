@@ -138,12 +138,12 @@ class ImgOccOpts(QDialog):
         self.qfill_btn = QPushButton()
         self.ofill_btn = QPushButton()
         self.scol_btn = QPushButton()
-        self.qfill_btn.connect(self.qfill_btn, SIGNAL("clicked()"),
-            lambda a="qfill", b=self.qfill_btn: self.getNewColor(a, b))
-        self.ofill_btn.connect(self.ofill_btn, SIGNAL("clicked()"),
-            lambda a="ofill", b=self.ofill_btn: self.getNewColor(a, b))
-        self.scol_btn.connect(self.scol_btn, SIGNAL("clicked()"),
-            lambda a="scol", b=self.scol_btn: self.getNewColor(a, b))
+        self.qfill_btn.clicked.connect(lambda a="qfill", 
+                                        b=self.qfill_btn: self.getNewColor(a, b))
+        self.ofill_btn.clicked.connect(lambda a="ofill", 
+                                        b=self.ofill_btn: self.getNewColor(a, b))
+        self.scol_btn.clicked.connect(lambda a="scol", 
+                                        b=self.scol_btn: self.getNewColor(a, b))
 
         swidth_label = QLabel("Line width")
         font_label = QLabel("Label font")
@@ -172,7 +172,7 @@ class ImgOccOpts(QDialog):
         fields_description = QLabel(fields_text)
         fields_description.setWordWrap(True)
 
-        grid = QtGui.QGridLayout()
+        grid = QGridLayout()
         grid.setSpacing(10)
 
         grid.addWidget(colors_heading, 0, 0, 1, 3)
@@ -241,7 +241,7 @@ class ImgOccOpts(QDialog):
                                         | QDialogButtonBox.Cancel)
         defaults_btn = button_box.addButton("Restore &Defaults",
            QDialogButtonBox.ResetRole)
-        self.connect(defaults_btn, SIGNAL("clicked()"), self.restoreDefaults)
+        defaults_btn.clicked.connect(self.restoreDefaults)
         button_box.accepted.connect(self.onAccept)
         button_box.rejected.connect(self.onReject)
 
@@ -258,9 +258,9 @@ class ImgOccOpts(QDialog):
         """
         Returns a QFrame that is a sunken, horizontal rule.
         """
-        frame = QtGui.QFrame()
-        frame.setFrameShape(QtGui.QFrame.HLine)
-        frame.setFrameShadow(QtGui.QFrame.Sunken)
+        frame = QFrame()
+        frame.setFrameShape(QFrame.HLine)
+        frame.setFrameShadow(QFrame.Sunken)
         return frame
 
     def updateHotkey(self, combo=None):
@@ -294,7 +294,7 @@ class ImgOccOpts(QDialog):
     def changeButtonColor(self, button, color):
         """Generate color preview pixmap and place it on button"""
         pixmap = QPixmap(128,18)
-        qcolour = QtGui.QColor(0, 0, 0)
+        qcolour = QColor(0, 0, 0)
         qcolour.setNamedColor('#' + color)
         pixmap.fill(qcolour)
         button.setIcon(QIcon(pixmap))
