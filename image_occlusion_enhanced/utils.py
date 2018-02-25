@@ -20,10 +20,18 @@ from xml.dom import minidom
 import urllib.parse, urllib.request, urllib.parse, urllib.error
 from .imagesize import imagesize
 
+# Anki 2.1 support
+from anki import version as anki_version
+anki21 = anki_version.startswith("2.1.")
+
 def path2url(path):
     """URL-encode local path"""
-    return urllib.parse.urljoin(
-      'file:', urllib.request.pathname2url(path.encode('utf-8')))
+    if anki21:
+        return urllib.parse.urljoin(
+          'file:', urllib.request.pathname2url(path))
+    else:
+        return urllib.parse.urljoin(
+          'file:', urllib.request.pathname2url(path.encode('utf-8')))
 
 def fname2img(path):
     """Return HTML img element for given path"""
