@@ -270,7 +270,7 @@ class ImgOccAdd(object):
         dialog = mw.ImgOccEdit
 
         r1 = self.getUserInputs(dialog)
-        if r1 == False:
+        if r1 is False:
             return False
         (fields, tags) = r1
         did = dialog.deckChooser.selectedId()
@@ -279,7 +279,7 @@ class ImgOccAdd(object):
         gen = noteGenerator(self.ed, svg, self.image_path,
                                     self.opref, tags, fields, did)
         r = gen.generateNotes()
-        if r == False:
+        if r is False:
             return False
 
         if self.origin == "addcards" and self.ed.note:
