@@ -16,7 +16,7 @@ all: zip
 
 clean: cleanbuild cleanzips
 
-zip: cleanbuild ui builddir buildzip
+zip: cleanbuild builddir buildzip
 
 release: cleanbuild builddir buildrelease
 
