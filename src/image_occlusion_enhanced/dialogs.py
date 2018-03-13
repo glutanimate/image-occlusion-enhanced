@@ -16,19 +16,14 @@
 Handles all minor utility dialogs
 """
 
-import logging, sys
-
 from aqt.qt import *
-from anki.errors import AnkiError
-
-from aqt import mw, webview, deckchooser, tagedit
-from aqt.utils import saveGeom, restoreGeom
+from aqt import mw
 
 from .config import *
 
 
 def ioError(text, title="Image Occlusion Enhanced Error",
-                                    parent=None, help=None):
+            parent=None, help=None):
     msgfunc = QMessageBox.critical
     btns = None
     if help:
@@ -41,8 +36,9 @@ def ioError(text, title="Image Occlusion Enhanced Error",
             break
     return r
 
+
 def ioAskUser(text, title="Image Occlusion Enhanced", parent=None,
-                            help="", defaultno=False, msgfunc=None):
+              help="", defaultno=False, msgfunc=None):
     """Show a yes/no question. Return true if yes.
     based on askUser by Damien Elmes"""
 
@@ -62,8 +58,9 @@ def ioAskUser(text, title="Image Occlusion Enhanced", parent=None,
             break
     return r == QMessageBox.Yes
 
+
 def ioInfo(text, title="Image Occlusion Enhanced", parent=None,
-                        buttons=None, default=None, msgfunc=None):
+           buttons=None, default=None, msgfunc=None):
     if not parent:
         parent = mw.app.activeWindow()
     if not buttons:
@@ -152,6 +149,7 @@ help_text["main"] = """<h2>Help and Support</h2>
     Copyright (c) 2016 Yoshiki Shibukawa. Licensed under the MIT license.</p></li>
     </ul>
     """ % (io_link_wiki, io_link_tut, io_link_thread)
+
 
 def ioHelp(help, title=None, text=None, parent=None):
     """Display an info message or a predefined help section"""

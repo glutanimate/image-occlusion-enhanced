@@ -12,45 +12,53 @@
 Common reusable utilities
 """
 
-import os, re
+import os
+import re
 
 from aqt import mw
 
 from xml.dom import minidom
-import urllib.parse, urllib.request, urllib.parse, urllib.error
+import urllib.parse
+import urllib.request
+import urllib.parse
+import urllib.error
 from .imagesize import imagesize
 
 # Anki 2.1 support
 from anki import version as anki_version
 anki21 = anki_version.startswith("2.1.")
 
+
 def path2url(path):
     """URL-encode local path"""
     if anki21:
         return urllib.parse.urljoin(
-          'file:', urllib.request.pathname2url(path))
+            'file:', urllib.request.pathname2url(path))
     else:
         return urllib.parse.urljoin(
-          'file:', urllib.request.pathname2url(path.encode('utf-8')))
+            'file:', urllib.request.pathname2url(path.encode('utf-8')))
+
 
 def fname2img(path):
     """Return HTML img element for given path"""
     fname = os.path.split(path)[1]
     return '<img src="%s" />' % fname
 
+
 def img2path(img, nameonly=False):
     """Extract path or file name out of HTML img element"""
     imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
-    imgregex = re.compile(imgpatt, flags=re.I|re.M|re.S)
+    imgregex = re.compile(imgpatt, flags=re.I | re.M | re.S)
     fname = imgregex.search(img)
     if not fname:
         return None
     if nameonly:
         return fname.group(2)
-    fpath = os.path.join(mw.col.media.dir(),fname.group(2))
+    fpath = os.path.join(mw.col.media.dir(), fname.group(2))
     if not os.path.isfile(fpath):
         return None
     return fpath
+
 
 def imageProp(image_path):
     """Get image width and height"""
@@ -70,12 +78,13 @@ def imageProp(image_path):
         assert height > 0
     except (ValueError, AssertionError):
         try:
-            from .Imaging.PIL import Image # fall back to PIL
+            from .Imaging.PIL import Image  # fall back to PIL
             image = Image.open(image_path)
             width, height = image.size
         except IOError:
             return None, None
     return width, height
+
 
 def _svg_convert_size(size):
     """

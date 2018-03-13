@@ -29,16 +29,16 @@ iocard_front = """\
 <div id="io-footer">{{%(footer)s}}</div>
 {{/%(src_img)s}}
 """ % \
- {'que': IO_FLDS['qm'],
-  'ans': IO_FLDS['am'],
-  'svg': IO_FLDS['om'],
-  'src_img': IO_FLDS['im'],
-  'header': IO_FLDS['hd'],
-  'footer': IO_FLDS['ft'],
-  'remarks': IO_FLDS['rk'],
-  'sources': IO_FLDS['sc'],
-  'extraone': IO_FLDS['e1'],
-  'extratwo': IO_FLDS['e2']}
+    {'que': IO_FLDS['qm'],
+     'ans': IO_FLDS['am'],
+     'svg': IO_FLDS['om'],
+     'src_img': IO_FLDS['im'],
+     'header': IO_FLDS['hd'],
+     'footer': IO_FLDS['ft'],
+     'remarks': IO_FLDS['rk'],
+     'sources': IO_FLDS['sc'],
+     'extraone': IO_FLDS['e1'],
+     'extratwo': IO_FLDS['e2']}
 
 iocard_back = """\
 {{#%(src_img)s}}
@@ -85,16 +85,16 @@ iocard_back = """\
 </div>
 {{/%(src_img)s}}
 """ % \
- {'que': IO_FLDS['qm'],
-  'ans': IO_FLDS['am'],
-  'svg': IO_FLDS['om'],
-  'src_img': IO_FLDS['im'],
-  'header': IO_FLDS['hd'],
-  'footer': IO_FLDS['ft'],
-  'remarks': IO_FLDS['rk'],
-  'sources': IO_FLDS['sc'],
-  'extraone': IO_FLDS['e1'],
-  'extratwo': IO_FLDS['e2']}
+    {'que': IO_FLDS['qm'],
+     'ans': IO_FLDS['am'],
+     'svg': IO_FLDS['om'],
+     'src_img': IO_FLDS['im'],
+     'header': IO_FLDS['hd'],
+     'footer': IO_FLDS['ft'],
+     'remarks': IO_FLDS['rk'],
+     'sources': IO_FLDS['sc'],
+     'extraone': IO_FLDS['e1'],
+     'extratwo': IO_FLDS['e2']}
 
 iocard_css = """\
 /* GENERAL CARD STYLE */
@@ -188,21 +188,22 @@ iocard_css = """\
 }
 """
 
+
 def add_io_model(col):
     models = col.models
     io_model = models.new(IO_MODEL_NAME)
     # Add fields:
     for i in IO_FLDS_IDS:
-      fld = models.newField(IO_FLDS[i])
-      if i == "note_id":
-        fld['size'] = 0
-      models.addField(io_model, fld)
+        fld = models.newField(IO_FLDS[i])
+        if i == "note_id":
+            fld['size'] = 0
+        models.addField(io_model, fld)
     # Add template
     template = models.newTemplate(IO_CARD_NAME)
     template['qfmt'] = iocard_front
     template['afmt'] = iocard_back
     io_model['css'] = iocard_css
-    io_model['sortf'] = 1 # set sortfield to header
+    io_model['sortf'] = 1  # set sortfield to header
     models.addTemplate(io_model, template)
     models.add(io_model)
     return io_model

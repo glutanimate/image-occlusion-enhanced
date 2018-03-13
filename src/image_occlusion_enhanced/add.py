@@ -22,7 +22,7 @@ import tempfile
 from aqt.qt import *
 
 from aqt import mw
-from aqt.utils import getFile, tooltip
+from aqt.utils import tooltip
 
 from .ngen import *
 from .config import *
@@ -36,7 +36,7 @@ svg_edit_dir = os.path.join(os.path.dirname(__file__),
                             'svg-edit',
                             'svg-edit-2.6')
 svg_edit_path = os.path.join(svg_edit_dir,
-                            'svg-editor.html')
+                             'svg-editor.html')
 svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,\
 ext-markers.js,ext-shapes.js,ext-eyedropper.js,ext-panning.js,\
 ext-snapping.js"
@@ -45,13 +45,14 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('showRulers', 'false'),
                        ('extensions', svg_edit_ext)]
 
+
 class ImgOccAdd(object):
     def __init__(self, editor, origin, oldimg=None):
         self.ed = editor
         self.image_path = oldimg
         self.mode = "add"
         self.origin = origin
-        self.opref = {} # original io session preference
+        self.opref = {}  # original io session preference
         loadConfig(self)
 
     def occlude(self, image_path=None):
@@ -74,11 +75,11 @@ class ImgOccAdd(object):
                 image_path = self.getImageFromFields(note.fields)
                 if image_path:
                     tooltip("Non-editable note.<br>"
-                        "Using image to create new IO note.")
+                            "Using image to create new IO note.")
 
         if not image_path:
             tooltip(("This note cannot be edited, nor is there<br>"
-                    "an image to use for an image occlusion."))
+                     "an image to use for an image occlusion."))
             return False
 
         self.setPreservedAttrs(note)
@@ -91,7 +92,6 @@ class ImgOccAdd(object):
 
         self.callImgOccEdit(width, height)
 
-
     def setPreservedAttrs(self, note):
         self.opref["tags"] = self.ed.tags.text()
         if self.origin == "addcards":
@@ -100,7 +100,6 @@ class ImgOccAdd(object):
             self.opref["did"] = mw.col.db.scalar(
                 "select did from cards where id = ?", note.cards()[0].id)
 
-
     def getIONoteData(self, note):
         """Select image based on mode and set original field contents"""
 
@@ -108,7 +107,7 @@ class ImgOccAdd(object):
         image_path = img2path(note[self.ioflds['im']])
         omask = img2path(note[self.ioflds['om']])
 
-        if note_id == None or note_id.count("-") != 2:
+        if note_id is None or note_id.count("-") != 2:
             msg = "Editing unavailable: Invalid image occlusion Note ID"
             return msg, None
         elif not omask or not image_path:
@@ -121,9 +120,8 @@ class ImgOccAdd(object):
         self.opref["occl_tp"] = note_id_grps[1]
         self.opref["image"] = image_path
         self.opref["omask"] = omask
-        
-        return None, image_path
 
+        return None, image_path
 
     def getImageFromFields(self, fields):
         """Parse fields for valid images"""
@@ -133,7 +131,6 @@ class ImgOccAdd(object):
             if image_path:
                 break
         return image_path
-
 
     def getNewImage(self, parent=None, noclip=False):
         """Get image from file selection or clipboard"""
@@ -157,8 +154,8 @@ class ImgOccAdd(object):
             prev_image_dir = IO_HOME
 
         image_path = QFileDialog.getOpenFileName(parent,
-                             "Select an Image", prev_image_dir,
-                             "Image Files (*.png *jpg *.jpeg *.gif)")
+                                                 "Select an Image", prev_image_dir,
+                                                 "Image Files (*.png *jpg *.jpeg *.gif)")
         if image_path:
             image_path = image_path[0]
 
@@ -170,7 +167,6 @@ class ImgOccAdd(object):
         else:
             self.lconf["dir"] = os.path.dirname(image_path)
             return image_path
-
 
     def callImgOccEdit(self, width, height):
         """Set up variables, call and prepare ImgOccEdit"""
@@ -206,7 +202,8 @@ class ImgOccAdd(object):
         items.addQueryItem('initStroke[color]', scol)
         items.addQueryItem('initStroke[width]', str(swidth))
         items.addQueryItem('text[font_size]', str(fsize))
-        items.addQueryItem('text[font_family]', "'%s', %s" % (font, svg_edit_fonts))
+        items.addQueryItem('text[font_family]', "'%s', %s" %
+                           (font, svg_edit_fonts))
 
         if self.mode != "add":
             items.addQueryItem('initTool', 'select'),
@@ -214,7 +211,8 @@ class ImgOccAdd(object):
                 fn = i["name"]
                 if fn in self.ioflds_priv:
                     continue
-                dialog.tedit[fn].setPlainText(onote[fn].replace('<br />', '\n'))
+                dialog.tedit[fn].setPlainText(
+                    onote[fn].replace('<br />', '\n'))
             svg_url = path2url(opref["omask"])
             items.addQueryItem('url', svg_url)
         else:
@@ -239,7 +237,6 @@ class ImgOccAdd(object):
             dialog.setWindowModality(Qt.WindowModal)
             dialog.show()
 
-
     def onChangeImage(self):
         """Change canvas background image"""
         image_path = self.getNewImage()
@@ -254,18 +251,16 @@ class ImgOccAdd(object):
                         svgCanvas.setBackground('#FFF', '%s');
                         svgCanvas.setResolution(%s, %s);
                         //svgCanvas.zoomChanged('', 'canvas');
-                    """ %(bkgd_url, width, height))
+                    """ % (bkgd_url, width, height))
         self.image_path = image_path
-
 
     def onAddNotesButton(self, choice, close):
         dialog = mw.ImgOccEdit
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.svgCanvasToString();",
-            lambda val,choice=choice,close=close: self._onAddNotesButton(choice, close, val))
+            lambda val, choice=choice, close=close: self._onAddNotesButton(choice, close, val))
 
     def _onAddNotesButton(self, choice, close, svg):
-
         """Get occlusion settings in and pass them to the note generator (add)"""
         dialog = mw.ImgOccEdit
 
@@ -277,7 +272,7 @@ class ImgOccAdd(object):
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(self.ed, svg, self.image_path,
-                                    self.opref, tags, fields, did)
+                            self.opref, tags, fields, did)
         r = gen.generateNotes()
         if r is False:
             return False
@@ -302,14 +297,14 @@ class ImgOccAdd(object):
         dialog = mw.ImgOccEdit
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.svgCanvasToString();",
-            lambda val,choice=choice: self._onEditNotesButton(choice, val))
+            lambda val, choice=choice: self._onEditNotesButton(choice, val))
 
     def _onEditNotesButton(self, choice, svg):
         """Get occlusion settings and pass them to the note generator (edit)"""
         dialog = mw.ImgOccEdit
 
         r1 = self.getUserInputs(dialog, edit=True)
-        if r1 == False:
+        if r1 is False:
             return False
         (fields, tags) = r1
         did = self.opref["did"]
@@ -317,18 +312,18 @@ class ImgOccAdd(object):
 
         noteGenerator = genByKey(choice, old_occl_tp)
         gen = noteGenerator(self.ed, svg, self.image_path,
-                                    self.opref, tags, fields, did)
+                            self.opref, tags, fields, did)
         r = gen.updateNotes()
-        if r == False:
+        if r is False:
             return False
 
         mw.ImgOccEdit.close()
 
         if r == "reset":
             # modifications to mask require media collection reset
-            ## refresh webview image cache
+            # refresh webview image cache
             dialog.svg_edit.page().profile().clearHttpCache()
-            ## write a dummy file to update collection.media modtime and force sync
+            # write a dummy file to update collection.media modtime and force sync
             media_dir = mw.col.media.dir()
             fpath = os.path.join(media_dir, "syncdummy.txt")
             if not os.path.isfile(fpath):
@@ -336,8 +331,7 @@ class ImgOccAdd(object):
                     f.write("io sync dummy")
             os.remove(fpath)
 
-        mw.reset() # FIXME: causes glitches in editcurrent mode
-
+        mw.reset()  # FIXME: causes glitches in editcurrent mode
 
     def getUserInputs(self, dialog, edit=False):
         """Get fields and tags from ImgOccEdit while checking note type"""
@@ -345,10 +339,10 @@ class ImgOccAdd(object):
         # note type integrity check:
         io_model_fields = mw.col.models.fieldNames(self.model)
         if not all(x in io_model_fields for x in list(self.ioflds.values())):
-            ioError("<b>Error</b>: Image Occlusion note type " \
-                "not configured properly.Please make sure you did not " \
-                "manually delete or rename any of the default fields.",
-                help="notetype")
+            ioError("<b>Error</b>: Image Occlusion note type "
+                    "not configured properly.Please make sure you did not "
+                    "manually delete or rename any of the default fields.",
+                    help="notetype")
             return False
         for i in self.mflds:
             fn = i['name']
