@@ -101,7 +101,7 @@ class GrabKey(QDialog):
 class ImgOccOpts(QDialog):
     """Main Image Occlusion Options dialog"""
 
-    def __init__(self, mw):
+    def __init__(self):
         QDialog.__init__(self, parent=mw)
         loadConfig(self)
         self.ofill = self.sconf['ofill']
