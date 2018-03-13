@@ -16,12 +16,15 @@
 Image Occlusion editor dialog
 """
 
+import os
+
 from aqt.qt import *
 
 from aqt import mw, webview, deckchooser, tagedit
 from aqt.utils import saveGeom, restoreGeom
 
 from .dialogs import ioHelp
+from .consts import *
 from .config import *
 
 class ImgOccWebPage(webview.AnkiWebPage):
@@ -86,7 +89,7 @@ class ImgOccEdit(QDialog):
         button_box.setCenterButtons(False)
 
         image_btn = QPushButton("Change &Image", clicked=self.changeImage)
-        image_btn.setIcon(QIcon(":/icons/new_occlusion.png"))
+        image_btn.setIcon(QIcon(os.path.join(ICONS_PATH, "add.png")))
         image_btn.setIconSize(QSize(16, 16))
         image_btn.setAutoDefault(False)
         help_btn = QPushButton("&Help", clicked=self.onHelp)

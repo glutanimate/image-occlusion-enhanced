@@ -25,7 +25,6 @@ from aqt import mw, webview, deckchooser, tagedit
 from aqt.utils import saveGeom, restoreGeom
 
 from .config import *
-from .resources import *
 
 
 def ioError(text, title="Image Occlusion Enhanced Error",

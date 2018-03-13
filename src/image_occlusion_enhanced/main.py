@@ -29,8 +29,8 @@ from aqt.reviewer import Reviewer
 from aqt.utils import tooltip
 from anki.hooks import wrap, addHook, runHook
 
+from .consts import *
 from .config import *
-from .resources import *
 from .add import ImgOccAdd
 from .options import ImgOccOpts
 from .dialogs import ioHelp, ioError
@@ -90,16 +90,18 @@ def onSetupEditorButtons(buttons, editor):
 
     if origin == "addcards":
         tt = "Add Image Occlusion"
-        icon = "new_occlusion"
+        icon_name = "add.png"
     else:
         tt = "Edit Image Occlusion"
-        icon = "new_occlusion"
+        icon_name = "edit.png"
+    
+    icon = os.path.join(ICONS_PATH, icon_name)
 
-    b = editor.addButton(None, "I/O", lambda o=editor: onImgOccButton(o),
-                 tip=_("{} ({})".format(tt, hotkey)),
-                 keys=hotkey)
-    # replace with disables=False in previous call when next beta comes out
-    b = b.replace("linkb", "tmp")
+    b = editor.addButton(icon, "I/O",
+                         lambda o=editor: onImgOccButton(o),
+                         tip=_("{} ({})".format(tt, hotkey)),
+                         keys=hotkey, disables=False)
+
     buttons.append(b)
     return buttons
 
