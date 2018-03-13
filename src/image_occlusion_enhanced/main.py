@@ -39,13 +39,13 @@ from .dialogs import ioHelp, ioError
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 
-def onIoSettings(mw):
+def onIoSettings():
     """Call settings dialog if Editor not active"""
     if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
         tooltip("Please close Image Occlusion Editor\
             to access the Options.")
         return
-    dialog = ImgOccOpts(mw)
+    dialog = ImgOccOpts()
     dialog.exec_()
 
 
@@ -193,7 +193,8 @@ def onShowAnswer(self, _old):
 # Set up menus
 options_action = QAction("Image &Occlusion Enhanced Options...", mw)
 help_action = QAction("Image &Occlusion Enhanced...", mw)
-options_action.triggered.connect(lambda _, o=mw: onIoSettings(o))
+options_action.triggered.connect(onIoSettings)
+mw.addonManager.setConfigAction(__name__, onIoSettings)
 help_action.triggered.connect(onIoHelp)
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
