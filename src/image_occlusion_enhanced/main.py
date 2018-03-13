@@ -16,7 +16,8 @@
 Sets up buttons and menus and calls other modules.
 """
 
-import logging, sys
+import logging
+import sys
 
 from anki.lang import _
 from aqt.qt import *
@@ -65,12 +66,12 @@ def onImgOccButton(self, origin=None, image_path=None):
             dflt_fields = list(IO_FLDS.values())
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
-            ioError("<b>Error</b>: Image Occlusion note type " \
-                "not configured properly.Please make sure you did not " \
-                "manually delete or rename any of the default fields.",
-                help="notetype")
+            ioError("<b>Error</b>: Image Occlusion note type "
+                    "not configured properly.Please make sure you did not "
+                    "manually delete or rename any of the default fields.",
+                    help="notetype")
             return False
-    try: # allows us to fall back to old image if necessary
+    try:  # allows us to fall back to old image if necessary
         oldimg = mw.ImgOccAdd.image_path
     except AttributeError:
         oldimg = None
@@ -94,7 +95,7 @@ def onSetupEditorButtons(buttons, editor):
     else:
         tt = "Edit Image Occlusion"
         icon_name = "edit.png"
-    
+
     icon = os.path.join(ICONS_PATH, icon_name)
 
     b = editor.addButton(icon, "I/O",
@@ -104,6 +105,7 @@ def onSetupEditorButtons(buttons, editor):
 
     buttons.append(b)
     return buttons
+
 
 def getEdParentInstance(parent):
     """Determine parent instance of editor widget"""
@@ -119,9 +121,9 @@ def openImage(path):
     """Open path with default system app"""
     import subprocess
     try:
-        if sys.platform=='win32':
+        if sys.platform == 'win32':
             os.startfile(path)
-        elif sys.platform=='darwin':
+        elif sys.platform == 'darwin':
             subprocess.Popen(['open', path])
         else:
             subprocess.Popen(['xdg-open', path])

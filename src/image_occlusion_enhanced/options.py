@@ -16,7 +16,7 @@
 Main options dialog
 """
 
-import logging, sys
+import logging
 
 from aqt.qt import *
 from aqt.utils import showInfo
@@ -26,14 +26,15 @@ from anki.errors import AnkiError
 
 from .config import *
 
+
 class GrabKey(QDialog):
     """
     Grab the key combination to paste the resized image
-    
+
     Largely based on ImageResizer by searene
     (https://github.com/searene/Anki-Addons)
     """
-    
+
     def __init__(self, parent):
         QDialog.__init__(self, parent=parent)
         self.parent = parent
@@ -57,7 +58,7 @@ class GrabKey(QDialog):
 
     def keyPressEvent(self, evt):
         self.active += 1
-        if evt.key() >0 and evt.key() < 127:
+        if evt.key() > 0 and evt.key() < 127:
             self.extra = chr(evt.key())
         elif evt.key() == Qt.Key_Control:
             self.ctrl = True
@@ -73,15 +74,15 @@ class GrabKey(QDialog):
             return
         if not (self.shift or self.ctrl or self.alt):
             showInfo("Please use at least one keyboard "
-                "modifier (Ctrl, Alt, Shift)")
+                     "modifier (Ctrl, Alt, Shift)")
             return
         if (self.shift and not (self.ctrl or self.alt)):
             showInfo("Shift needs to be combined with at "
-                "least one other modifier (Ctrl, Alt)")
+                     "least one other modifier (Ctrl, Alt)")
             return
         if not self.extra:
             showInfo("Please press at least one key "
-                "that is not a keyboard modifier (not Ctrl/Alt/Shift)")
+                     "that is not a keyboard modifier (not Ctrl/Alt/Shift)")
             return
 
         combo = []
@@ -99,6 +100,7 @@ class GrabKey(QDialog):
 
 class ImgOccOpts(QDialog):
     """Main Image Occlusion Options dialog"""
+
     def __init__(self, mw):
         QDialog.__init__(self, parent=mw)
         loadConfig(self)
@@ -138,12 +140,12 @@ class ImgOccOpts(QDialog):
         self.qfill_btn = QPushButton()
         self.ofill_btn = QPushButton()
         self.scol_btn = QPushButton()
-        self.qfill_btn.clicked.connect(lambda a="qfill", 
-                                        b=self.qfill_btn: self.getNewColor(a, b))
-        self.ofill_btn.clicked.connect(lambda a="ofill", 
-                                        b=self.ofill_btn: self.getNewColor(a, b))
-        self.scol_btn.clicked.connect(lambda a="scol", 
-                                        b=self.scol_btn: self.getNewColor(a, b))
+        self.qfill_btn.clicked.connect(lambda a="qfill",
+                                       b=self.qfill_btn: self.getNewColor(a, b))
+        self.ofill_btn.clicked.connect(lambda a="ofill",
+                                       b=self.ofill_btn: self.getNewColor(a, b))
+        self.scol_btn.clicked.connect(lambda a="scol",
+                                      b=self.scol_btn: self.getNewColor(a, b))
 
         swidth_label = QLabel("Line width")
         font_label = QLabel("Label font")
@@ -164,10 +166,10 @@ class ImgOccOpts(QDialog):
         # Bottom section and grid assignment
 
         fields_text = ("Changing any of the entries below will rename "
-        "the corresponding default field of the IO Enhanced note type. "
-        "This is the only way you can rename any of the default fields. "
-        "<br><br><i>Renaming these fields through Anki's regular dialogs "
-        "will cause the add-on to fail. So please don't do that.</i>")
+                       "the corresponding default field of the IO Enhanced note type. "
+                       "This is the only way you can rename any of the default fields. "
+                       "<br><br><i>Renaming these fields through Anki's regular dialogs "
+                       "will cause the add-on to fail. So please don't do that.</i>")
 
         fields_description = QLabel(fields_text)
         fields_description.setWordWrap(True)
@@ -200,26 +202,27 @@ class ImgOccOpts(QDialog):
         clm = 0
         self.lnedit = {}
         for key in IO_FLDS_IDS:
-            if row == 13: # switch to right columns
+            if row == 13:  # switch to right columns
                 clm = 3
                 row = 7
             default_name = self.sconf_dflt['flds'][key]
             current_name = self.sconf['flds'][key]
-            l = QLabel(default_name)
-            l.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            lb = QLabel(default_name)
+            lb.setTextInteractionFlags(Qt.TextSelectableByMouse)
             t = QLineEdit()
             t.setText(current_name)
-            grid.addWidget(l, row, clm, 1, 2)
-            grid.addWidget(t, row, clm+1, 1, 2)
+            grid.addWidget(lb, row, clm, 1, 2)
+            grid.addWidget(t, row, clm + 1, 1, 2)
             self.lnedit[key] = t
-            row = row+1
+            row += 1
 
         # Misc settings
         misc_heading = QLabel("<b>Miscellaneous Settings</b>")
 
         # Skipped fields:
-        skipped_description = QLabel("Comma-separated list of " \
-            "fields to hide in Editing mode (in order to preserve manual edits):")
+        skipped_description = QLabel("Comma-separated list of "
+                                     "fields to hide in Editing mode "
+                                     "(in order to preserve manual edits):")
         self.skipped = QLineEdit()
 
         # Hotkey:
@@ -228,19 +231,19 @@ class ImgOccOpts(QDialog):
         key_grab_btn = QPushButton('Change hotkey', self)
         key_grab_btn.clicked.connect(self.showGrabKey)
 
-        grid.addWidget(rule2, row+1, 0, 1, 6)
-        grid.addWidget(misc_heading, row+2, 0, 1, 6)
-        grid.addWidget(skipped_description, row+3, 0, 1, 6)
-        grid.addWidget(self.skipped, row+4, 0, 1, 6)
-        grid.addWidget(key_grab_label, row+5, 0, 1, 2)
-        grid.addWidget(self.key_grabbed, row+5, 2, 1, 1)
-        grid.addWidget(key_grab_btn, row+5, 3, 1, 3)
+        grid.addWidget(rule2, row + 1, 0, 1, 6)
+        grid.addWidget(misc_heading, row + 2, 0, 1, 6)
+        grid.addWidget(skipped_description, row + 3, 0, 1, 6)
+        grid.addWidget(self.skipped, row + 4, 0, 1, 6)
+        grid.addWidget(key_grab_label, row + 5, 0, 1, 2)
+        grid.addWidget(self.key_grabbed, row + 5, 2, 1, 1)
+        grid.addWidget(key_grab_btn, row + 5, 3, 1, 3)
 
         # Main button box
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok
-                                        | QDialogButtonBox.Cancel)
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok |
+                                      QDialogButtonBox.Cancel)
         defaults_btn = button_box.addButton("Restore &Defaults",
-           QDialogButtonBox.ResetRole)
+                                            QDialogButtonBox.ResetRole)
         defaults_btn.clicked.connect(self.restoreDefaults)
         button_box.accepted.connect(self.onAccept)
         button_box.rejected.connect(self.onReject)
@@ -293,7 +296,7 @@ class ImgOccOpts(QDialog):
 
     def changeButtonColor(self, button, color):
         """Generate color preview pixmap and place it on button"""
-        pixmap = QPixmap(128,18)
+        pixmap = QPixmap(128, 18)
         qcolour = QColor(0, 0, 0)
         qcolour.setNamedColor('#' + color)
         pixmap.fill(qcolour)

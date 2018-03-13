@@ -37,8 +37,8 @@ IO_FLDS = {
     'om': "Original Mask"
 }
 
-IO_FLDS_IDS = ["id", "hd", "im", "qm",  "ft", "rk",
-                "sc", "e1", "e2", "am", "om"]
+IO_FLDS_IDS = ["id", "hd", "im", "qm", "ft", "rk",
+               "sc", "e1", "e2", "am", "om"]
 
 # TODO: Use IDs instead of names to make these compatible with self.ioflds
 
@@ -69,10 +69,11 @@ default_conf_syncd = {'version': 1.01,
 
 from . import template
 
+
 def loadConfig(self):
     """load and/or create add-on preferences"""
     # Synced preferences
-    if not 'imgocc' in mw.col.conf:
+    if 'imgocc' not in mw.col.conf:
         # create initial configuration
         mw.col.conf['imgocc'] = default_conf_syncd
 
@@ -94,9 +95,8 @@ def loadConfig(self):
         # template.update_template(mw.col) # update card templates
         mw.col.setMod()
 
-
     # Local preferences
-    if not 'imgocc' in mw.pm.profile:
+    if 'imgocc' not in mw.pm.profile:
         mw.pm.profile["imgocc"] = default_conf_local
     elif mw.pm.profile['imgocc'].get('version', 0) < default_conf_syncd['version']:
         for key in list(default_conf_local.keys()):
