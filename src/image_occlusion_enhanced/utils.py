@@ -22,16 +22,13 @@ import urllib.parse
 import urllib.request
 import urllib.parse
 import urllib.error
+from .consts import *
 from .imagesize import imagesize
-
-# Anki 2.1 support
-from anki import version as anki_version
-anki21 = anki_version.startswith("2.1.")
 
 
 def path2url(path):
     """URL-encode local path"""
-    if anki21:
+    if ANKI21:
         return urllib.parse.urljoin(
             'file:', urllib.request.pathname2url(path))
     else:
