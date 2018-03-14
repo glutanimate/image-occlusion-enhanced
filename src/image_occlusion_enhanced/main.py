@@ -141,16 +141,22 @@ def contextMenuEvent(self, evt):
     a = m.addAction(_("Paste"))
     a.triggered.connect(self.onPaste)
     ##################################################
-    hit = self.page().currentFrame().hitTestContent(evt.pos())
-    url = hit.imageUrl()
-    if url.isValid():
-        image_url = url.toLocalFile()
+    if not ANKI21:
+        hit = self.page().currentFrame().hitTestContent(evt.pos())
+        url = hit.imageUrl()
+        path = url.toLocalFile()
+    else:
+        # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
+        context_data = self.page().contextMenuData()
+        url = context_data.mediaUrl()
+        image_name = url.fileName()
+        path = os.path.join(mw.col.media.dir(), image_name)
+    if url.isValid() and path:
         a = m.addAction(_("Occlude Image"))
         a.triggered.connect(
-            lambda _, u=image_url, s=self.editor: onImgOccButton(
-                s, image_path=u))
+            lambda _, u=path, e=self.editor: onImgOccButton(e, image_path=u))
         a = m.addAction(_("Open Image"))
-        a.triggered.connect(lambda _, u=image_url: openImage(u))
+        a.triggered.connect(lambda _, u=path: openImage(u))
     ##################################################
     runHook("EditorWebView.contextMenuEvent", self, m)
     m.popup(QCursor.pos())
