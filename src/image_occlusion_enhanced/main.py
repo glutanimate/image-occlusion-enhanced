@@ -69,7 +69,7 @@ def onImgOccButton(self, origin=None, image_path=None):
             ioError("<b>Error</b>: Image Occlusion note type "
                     "not configured properly.Please make sure you did not "
                     "manually delete or rename any of the default fields.",
-                    help="notetype")
+                    help="notetype", parent=self.parentWindow)
             return False
     try:  # allows us to fall back to old image if necessary
         oldimg = mw.ImgOccAdd.image_path
