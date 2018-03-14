@@ -198,13 +198,21 @@ def newKeyHandler(self, evt):
         onHintHotkey()
 
 
+# Retain scroll position when answering
+
 def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
     if not self.card or not self.card.model()["name"] == IO_MODEL_NAME:
         return _old(self)
-    scroll_pos = self.web.page().mainFrame().scrollPosition()
-    ret = _old(self)
-    self.web.page().mainFrame().setScrollPosition(scroll_pos)
+    if not ANKI21:
+        scroll_pos = self.web.page().mainFrame().scrollPosition()
+        ret = _old(self)
+        self.web.page().mainFrame().setScrollPosition(scroll_pos)
+    else:
+        scroll_pos = self.web.page().scrollPosition()
+        ret = _old(self)
+        self.web.eval("window.scrollTo({}, {});".format(
+            scroll_pos.x(), scroll_pos.y()))
     return ret
 
 
@@ -217,15 +225,17 @@ help_action.triggered.connect(onIoHelp)
 mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
-# Set up hooks
+# Set up hooks and monkey patches
+
+# aqt.editor.Editor
 addHook('setupEditorButtons', onSetupEditorButtons)
 EditorWebView.contextMenuEvent = contextMenuEvent
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
 Editor.onImgOccButton = onImgOccButton
 
+# aqt.reviewer.Reviewer
+Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
 if not ANKI21:
     Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
 else:
     addHook("reviewStateShortcuts", onReviewerStateShortcuts)
-
-#Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
