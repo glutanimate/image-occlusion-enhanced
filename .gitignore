@@ -41,3 +41,4 @@ tools/test.py
 docs/help.md
 docs/contribs.ui
 designer/
+tests/
