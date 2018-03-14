@@ -140,12 +140,12 @@ class ImgOccOpts(QDialog):
         self.qfill_btn = QPushButton()
         self.ofill_btn = QPushButton()
         self.scol_btn = QPushButton()
-        self.qfill_btn.clicked.connect(lambda a="qfill",
-                                       b=self.qfill_btn: self.getNewColor(a, b))
-        self.ofill_btn.clicked.connect(lambda a="ofill",
-                                       b=self.ofill_btn: self.getNewColor(a, b))
-        self.scol_btn.clicked.connect(lambda a="scol",
-                                      b=self.scol_btn: self.getNewColor(a, b))
+        self.qfill_btn.clicked.connect(lambda _, t="qfill", b=self.qfill_btn:
+                                       self.getNewColor(t, b))
+        self.ofill_btn.clicked.connect(lambda _, t="ofill", b=self.ofill_btn:
+                                       self.getNewColor(t, b))
+        self.scol_btn.clicked.connect(lambda _, t="scol", b=self.scol_btn:
+                                      self.getNewColor(t, b))
 
         swidth_label = QLabel("Line width")
         font_label = QLabel("Label font")
