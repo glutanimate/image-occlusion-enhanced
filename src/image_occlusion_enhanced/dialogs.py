@@ -32,6 +32,7 @@ def ioError(text, title="Image Occlusion Enhanced Error",
         r = ioInfo(text, title, parent, buttons=btns, msgfunc=msgfunc)
         if r == QMessageBox.Help:
             ioHelp(help, parent=parent)
+            return False
         else:
             break
     return r
@@ -53,7 +54,8 @@ def ioAskUser(text, title="Image Occlusion Enhanced", parent=None,
             default = QMessageBox.Yes
         r = ioInfo(text, title, parent, btns, default, msgfunc)
         if r == QMessageBox.Help:
-            ioHelp(help)
+            ioHelp(help, parent=parent)
+            return False
         else:
             break
     return r == QMessageBox.Yes
@@ -158,7 +160,7 @@ def ioHelp(help, title=None, text=None, parent=None):
     if not title:
         title = "Image Occlusion Enhanced Help"
     if not parent:
-        parent = mw.app.activeWindow()
+        parent = mw
     mbox = QMessageBox(parent)
     mbox.setAttribute(Qt.WA_DeleteOnClose)
     mbox.setStandardButtons(QMessageBox.Ok)

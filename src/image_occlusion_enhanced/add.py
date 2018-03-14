@@ -342,7 +342,7 @@ class ImgOccAdd(object):
             ioError("<b>Error</b>: Image Occlusion note type "
                     "not configured properly.Please make sure you did not "
                     "manually delete or rename any of the default fields.",
-                    help="notetype")
+                    help="notetype", parent=dialog)
             return False
         for i in self.mflds:
             fn = i['name']
