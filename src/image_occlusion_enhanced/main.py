@@ -180,10 +180,22 @@ def onSetNote(self, note, hide=True, focus=False):
         """)
 
 
+# Mask toggle hotkey
+
+def onHintHotkey():
+    mw.web.eval("""
+        var ioBtn = document.getElementById("io-revl-btn");
+        if (ioBtn) {ioBtn.click();}
+    """)
+
+def onReviewerStateShortcuts(shortcuts):
+    """Add hint hotkey on Anki 2.1.x"""
+    shortcuts.append(("G", onHintHotkey))
+
 def newKeyHandler(self, evt):
-    """Bind mask reveal to a hotkey"""
+    """Add hint hotkey on Anki 2.0.x"""
     if (self.state == "answer" and evt.key() == Qt.Key_G):
-        self.web.eval('document.getElementById("io-revl-btn").click();')
+        onHintHotkey()
 
 
 def onShowAnswer(self, _old):
@@ -210,6 +222,10 @@ addHook('setupEditorButtons', onSetupEditorButtons)
 EditorWebView.contextMenuEvent = contextMenuEvent
 Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
 Editor.onImgOccButton = onImgOccButton
-print("fixme: keyhandler/onShowAnswer")
-#Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
+
+if not ANKI21:
+    Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
+else:
+    addHook("reviewStateShortcuts", onReviewerStateShortcuts)
+
 #Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
