@@ -321,8 +321,19 @@ class ImgOccAdd(object):
 
         if r == "reset":
             # modifications to mask require media collection reset
-            # refresh webview image cache
+            
+            # refresh image cache
             dialog.svg_edit.page().profile().clearHttpCache()
+            
+            # force EditCurrent and Browser editor instances reload to
+            # make use of refreshed image cache
+            if not self.origin == "addcards":
+                def onToHtmlCallback(html):
+                    self.ed.web.reload()
+                    self.ed.web.setHtml(html)
+                self.ed.web.page().toHtml(onToHtmlCallback)  # async execution
+                self.ed.loadNote()
+            
             # write a dummy file to update collection.media modtime and force sync
             media_dir = mw.col.media.dir()
             fpath = os.path.join(media_dir, "syncdummy.txt")
