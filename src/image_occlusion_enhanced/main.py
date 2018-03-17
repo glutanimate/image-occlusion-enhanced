@@ -162,22 +162,42 @@ def contextMenuEvent(self, evt):
     m.popup(QCursor.pos())
 
 
+io_editor_style = """
+<style>
+/* I/O: limit image display height */
+.ionote img {
+    max-width: 90%;
+    max-height: 160px;
+}
+/* I/O: hide first fname, field, and snowflake (FrozenFields add-on) */
+.ionote.ionote-id tr:first-child .fname, .ionote.ionote-id #f0, .ionote.ionote-id #i0 {
+    display: none;
+}
+</style>
+"""
+
+
 def onSetNote(self, note, hide=True, focus=False):
     """Customize the editor when IO notes are active"""
+    # Conditionally set body CSS  class
     if not (self.note and self.note.model()["name"] == IO_MODEL_NAME):
-        return
-    # simple hack to hide the ID field if it's the first one
-    if self.note.model()['flds'][0]['name'] == IO_FLDS['id']:
-        self.web.eval("""
-            // hide first fname, field, and snowflake (FrozenFields add-on)
-                document.styleSheets[0].addRule(
-                    'tr:first-child .fname, #f0, #i0', 'display: none;');
-            """)
-    # Limit image display height
-    self.web.eval("""
-            document.styleSheets[0].addRule(
-                'img', 'max-width: 90%; max-height: 160px');
-        """)
+        self.web.eval("""$("body").removeClass("ionote");""")
+    else:
+        # Only hide first field if it's the ID field
+        # TODO? identify ID field HTML element automatically
+        if self.note.model()['flds'][0]['name'] == IO_FLDS['id']:
+            self.web.eval("""$("body").addClass("ionote-id");""")
+        else:
+            self.web.eval("""$("body").removeClass("ionote-id");""")
+        self.web.eval("""$("body").addClass("ionote");""")
+
+
+def onProfileLoaded():
+    """Add our custom user styles to the editor DOM
+    Need to do this on profile load time to avoid interferences with
+    other add-ons that might potentially overwrite editor HTML"""
+    from aqt import editor
+    editor._html = editor._html + io_editor_style.replace("%", "%%")
 
 
 # Mask toggle hotkey
@@ -188,9 +208,11 @@ def onHintHotkey():
         if (ioBtn) {ioBtn.click();}
     """)
 
+
 def onReviewerStateShortcuts(shortcuts):
     """Add hint hotkey on Anki 2.1.x"""
     shortcuts.append(("G", onHintHotkey))
+
 
 def newKeyHandler(self, evt):
     """Add hint hotkey on Anki 2.0.x"""
@@ -226,6 +248,9 @@ mw.form.menuTools.addAction(options_action)
 mw.form.menuHelp.addAction(help_action)
 
 # Set up hooks and monkey patches
+
+# Add-on setup at profile-load time
+addHook("profileLoaded", onProfileLoaded)
 
 # aqt.editor.Editor
 addHook('setupEditorButtons', onSetupEditorButtons)
