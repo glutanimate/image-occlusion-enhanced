@@ -209,14 +209,36 @@ def add_io_model(col):
     return io_model
 
 
-def update_template(col):
-    print("Updating IO Enhanced card template")
+def reset_template(col):
+    print("Resetting IO Enhanced card template to defaults")
     io_model = col.models.byName(IO_MODEL_NAME)
-    # We are assuming that the template list contains only one element.
-    # This will be true as long as no one has been trampling the model.
     template = io_model['tmpls'][0]
     template['qfmt'] = iocard_front
     template['afmt'] = iocard_back
     io_model['css'] = iocard_css
+    col.models.save()
+    return io_model
+
+
+def update_template(col, old_version):
+    print("Updating IO Enhanced card template")
+
+    additions = [[], [], []]
+
+    for version, components in additions_by_version:
+        if old_version >= version:
+            continue
+        for lst, addition in zip(additions, components):
+            lst.append(addition)
+
+    io_model = col.models.byName(IO_MODEL_NAME)
+
+    if not io_model:
+        return add_io_model(col)
+
+    template = io_model['tmpls'][0]
+    template['qfmt'] += "\n".join(additions[0])
+    template['afmt'] += "\n".join(additions[1])
+    io_model['css'] += "\n".join(additions[2])
     col.models.save()
     return io_model
