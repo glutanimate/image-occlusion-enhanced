@@ -42,3 +42,5 @@ docs/help.md
 docs/contribs.ui
 designer/
 tests/
+# Other
+src/image_occlusion_enhanced/svg-edit/svg-edit-master
