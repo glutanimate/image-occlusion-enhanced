@@ -54,10 +54,11 @@ IO_HOME = os.path.expanduser('~')
 IO_HOTKEY = "Ctrl+Shift+O"
 
 # default configurations
-default_conf_local = {'version': 1.01,
+# TODO: update version number before release
+default_conf_local = {'version': 1.25,
                       'dir': IO_HOME,
                       'hotkey': IO_HOTKEY}
-default_conf_syncd = {'version': 1.01,
+default_conf_syncd = {'version': 1.25,
                       'ofill': 'FFEBA2',
                       'qfill': 'FF7E7E',
                       'scol': '2D2D2D',
@@ -70,14 +71,13 @@ default_conf_syncd = {'version': 1.01,
 from . import template
 
 
-def loadConfig(self):
-    """load and/or create add-on preferences"""
+def getSyncedConfig():
     # Synced preferences
     if 'imgocc' not in mw.col.conf:
         # create initial configuration
         mw.col.conf['imgocc'] = default_conf_syncd
 
-        # upgrade from earlier IO versions:
+        # upgrade from IO 2.0:
         if 'image_occlusion_conf' in mw.col.conf:
             old_conf = mw.col.conf['image_occlusion_conf']
             mw.col.conf['imgocc']['ofill'] = old_conf['initFill[color]']
@@ -90,11 +90,16 @@ def loadConfig(self):
         for key in list(default_conf_syncd.keys()):
             if key not in mw.col.conf['imgocc']:
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]
+        old_version = mw.col.conf['imgocc']['version']
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
         # insert other update actions here:
-        # template.update_template(mw.col) # update card templates
+        template.update_template(mw.col, old_version)  # update card templates
         mw.col.setMod()
 
+    return mw.col.conf['imgocc']
+
+
+def getLocalConfig():
     # Local preferences
     if 'imgocc' not in mw.pm.profile:
         mw.pm.profile["imgocc"] = default_conf_local
@@ -104,6 +109,10 @@ def loadConfig(self):
                 mw.pm.profile["imgocc"][key] = default_conf_local[key]
         mw.pm.profile['imgocc']['version'] = default_conf_local['version']
 
+    return mw.pm.profile["imgocc"]
+
+
+def getModelConfig():
     model = mw.col.models.byName(IO_MODEL_NAME)
     if not model:
         # create model and set up default field name config
@@ -121,13 +130,17 @@ def loadConfig(self):
         if fld['sticky'] and fname not in ioflds_priv:
             ioflds_prsv.append(fname)
 
+    return model, mflds, ioflds, ioflds_priv, ioflds_prsv
+
+
+def loadConfig(self):
+    """load and/or create add-on preferences"""
+    # FIXME: return config dictionary instead of this hacky
+    # instantiation of instance variables
     self.sconf_dflt = default_conf_syncd
     self.lconf_dflt = default_conf_local
-    self.sconf = mw.col.conf['imgocc']
-    self.lconf = mw.pm.profile["imgocc"]
+    self.sconf = getSyncedConfig()
+    self.lconf = getLocalConfig()
 
-    self.ioflds = ioflds
-    self.ioflds_priv = ioflds_priv
-    self.ioflds_prsv = ioflds_prsv
-    self.model = model
-    self.mflds = mflds
+    (self.model, self.mflds, self.ioflds,
+     self.ioflds_priv, self.ioflds_prsv) = getModelConfig()
