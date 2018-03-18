@@ -18,7 +18,8 @@ Handles the IO note type and card template
 
 from .config import *
 
-# Default card template
+# DEFAULT CARD TEMPLATES
+
 iocard_front = """\
 {{#%(src_img)s}}
 <div id="io-header">{{%(header)s}}</div>
@@ -27,6 +28,21 @@ iocard_front = """\
   <div id="io-original">{{%(src_img)s}}</div>
 </div>
 <div id="io-footer">{{%(footer)s}}</div>
+
+<script>
+// Prevent original image from loading before mask
+aFade = 50, qFade = 0;
+var mask = document.querySelector('#io-overlay>img');
+function loaded() {
+    var original = document.querySelector('#io-original');
+    original.style.visibility = "visible";
+}
+if (mask === null || mask.complete) {
+    loaded();
+} else {
+    mask.addEventListener('load', loaded);
+}
+</script>
 {{/%(src_img)s}}
 """ % \
     {'que': IO_FLDS['qm'],
@@ -42,16 +58,6 @@ iocard_front = """\
 
 iocard_back = """\
 {{#%(src_img)s}}
-<script>
-  // Toggle answer mask on clicking the image
-  var toggle = function() {
-    var amask = document.getElementById('io-overlay');
-    if (amask.style.display === 'block' || amask.style.display === '')
-      amask.style.display = 'none';
-    else
-      amask.style.display = 'block'
-  }
-</script>
 <div id="io-header">{{%(header)s}}</div>
 <div id="io-wrapper">
   <div id="io-overlay">{{%(ans)s}}</div>
@@ -83,6 +89,30 @@ iocard_back = """\
     {{/%(extratwo)s}}
   </div>
 </div>
+
+<script>
+// Toggle answer mask on clicking the image
+var toggle = function() {
+  var amask = document.getElementById('io-overlay');
+  if (amask.style.display === 'block' || amask.style.display === '')
+    amask.style.display = 'none';
+  else
+    amask.style.display = 'block'
+}
+
+// Prevent original image from loading before mask
+aFade = 50, qFade = 0;
+var mask = document.querySelector('#io-overlay>img');
+function loaded() {
+    var original = document.querySelector('#io-original');
+    original.style.visibility = "visible";
+}
+if (mask === null || mask.complete) {
+    loaded();
+} else {
+    mask.addEventListener('load', loaded);
+}
+</script>
 {{/%(src_img)s}}
 """ % \
     {'que': IO_FLDS['qm'],
@@ -118,7 +148,8 @@ iocard_css = """\
   position:relative;
   top:0;
   width:100%;
-  z-index:2
+  z-index:2;
+  visibility: hidden;
 }
 
 #io-wrapper {
@@ -140,7 +171,6 @@ iocard_css = """\
   margin-top: 0.8em;
   font-style: italic;
 }
-
 
 #io-extra-wrapper{
   /* the wrapper is needed to center the
@@ -187,6 +217,43 @@ iocard_css = """\
   font-size: 0.8em;
 }
 """
+
+# INCREMENTAL UPDATES
+
+html_overlay_onload = """\
+<script>
+// Prevent original image from loading before mask
+aFade = 50, qFade = 0;
+var mask = document.querySelector('#io-overlay>img');
+function loaded() {
+    var original = document.querySelector('#io-original');
+    original.style.visibility = "visible";
+}
+if (mask.complete) {
+    loaded();
+} else {
+    mask.addEventListener('load', loaded);
+}
+</script>\
+"""
+
+css_original_hide = """\
+/* Anki 2.1 additions */
+#io-original {
+   visibility: hidden;
+}\
+"""
+
+# Tuple structure:
+# (<version addition was introduced in>,
+# (<qfmt_addition>, <afmt_addition>, <css_addition>))
+# versions need to be ordered by semantic versioning
+additions_by_version = (
+    (
+        1.30,
+        (html_overlay_onload, html_overlay_onload, css_original_hide)
+    )
+)
 
 
 def add_io_model(col):
