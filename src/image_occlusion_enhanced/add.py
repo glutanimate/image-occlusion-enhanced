@@ -34,7 +34,7 @@ from .utils import imageProp, img2path, path2url
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
                             'svg-edit',
-                            'svg-edit-2.6')
+                            'editor')
 svg_edit_path = os.path.join(svg_edit_dir,
                              'svg-editor.html')
 svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,\
