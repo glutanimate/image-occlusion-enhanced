@@ -90,10 +90,7 @@ def getSyncedConfig():
         for key in list(default_conf_syncd.keys()):
             if key not in mw.col.conf['imgocc']:
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]
-        old_version = mw.col.conf['imgocc']['version']
         mw.col.conf['imgocc']['version'] = default_conf_syncd['version']
-        # insert other update actions here:
-        template.update_template(mw.col, old_version)  # update card templates
         mw.col.setMod()
 
     return mw.col.conf['imgocc']
@@ -112,12 +109,21 @@ def getLocalConfig():
     return mw.pm.profile["imgocc"]
 
 
-def getModelConfig():
+def getOrCreateModel():
     model = mw.col.models.byName(IO_MODEL_NAME)
     if not model:
         # create model and set up default field name config
         model = template.add_io_model(mw.col)
         mw.col.conf['imgocc']['flds'] = default_conf_syncd['flds']
+        return model
+    model_version = mw.col.conf['imgocc']['version']
+    if model_version < default_conf_syncd['version']:
+        return template.update_template(mw.col, model_version)
+    return model
+
+
+def getModelConfig():
+    model = getOrCreateModel()
     mflds = model['flds']
     ioflds = mw.col.conf['imgocc']['flds']
     ioflds_priv = []

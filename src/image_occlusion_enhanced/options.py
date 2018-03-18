@@ -317,7 +317,7 @@ class ImgOccOpts(QDialog):
     def renameFields(self):
         """Check for modified names and rename fields accordingly"""
         modified = False
-        model = mw.col.models.byName(IO_MODEL_NAME)
+        model = getOrCreateModel()
         flds = model['flds']
         for key in list(self.lnedit.keys()):
             if not self.lnedit[key].isModified():

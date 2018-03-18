@@ -58,7 +58,7 @@ class ImgOccAdd(object):
     def occlude(self, image_path=None):
 
         note = self.ed.note
-        isIO = (note and note.model() == mw.col.models.byName(IO_MODEL_NAME))
+        isIO = (note and note.model() == getOrCreateModel())
 
         if not image_path:
             if self.origin == "addcards":

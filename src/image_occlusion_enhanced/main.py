@@ -57,7 +57,7 @@ def onIoHelp():
 def onImgOccButton(self, origin=None, image_path=None):
     """Launch Image Occlusion Enhanced"""
     origin = origin or getEdParentInstance(self.parentWindow)
-    io_model = mw.col.models.byName(IO_MODEL_NAME)
+    io_model = getOrCreateModel()
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
         if "imgocc" in mw.col.conf:
@@ -198,6 +198,11 @@ def onProfileLoaded():
     other add-ons that might potentially overwrite editor HTML"""
     from aqt import editor
     editor._html = editor._html + io_editor_style.replace("%", "%%")
+    # Setup add-on config and templates, update if necessary
+    getSyncedConfig()
+    getLocalConfig()
+    getOrCreateModel()
+
 
 
 # Mask toggle hotkey
