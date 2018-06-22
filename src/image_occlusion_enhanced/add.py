@@ -28,7 +28,7 @@ from .ngen import *
 from .config import *
 
 from .editor import ImgOccEdit
-from .dialogs import ioError
+from .dialogs import ioError, ioHelp
 from .utils import imageProp, img2path, path2url
 
 # SVG-Edit configuration
@@ -236,6 +236,9 @@ class ImgOccAdd(object):
             # modal dialog when editing
             dialog.setWindowModality(Qt.WindowModal)
             dialog.show()
+            # Handle obsolete "aa" occlusion mode:
+            if self.opref["occl_tp"] == "aa":
+                ioHelp("obsolete_aa", parent=dialog)
 
     def onChangeImage(self):
         """Change canvas background image"""

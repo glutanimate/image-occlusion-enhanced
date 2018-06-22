@@ -74,10 +74,12 @@ def ioInfo(text, title="Image Occlusion Enhanced", parent=None,
     return msgfunc(parent, title, text, buttons, default)
 
 
-io_link_wiki = "https://github.com/Glutanimate/image-occlusion-enhanced/wiki"
+io_link_wiki = "https://github.com/glutanimate/image-occlusion-enhanced/wiki"
 io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o"
 io_link_thread = ("https://anki.tenderapp.com/discussions/add-ons/"
                   "8295-image-occlusion-enhanced-official-thread")
+io_link_obsolete_aa = "https://github.com/glutanimate/image-occlusion-enhanced/wiki/ADD_LINK_HERE"
+
 help_text = {}
 help_text["add"] = """
     <p><strong>Basic Instructions</strong></p>
@@ -151,7 +153,15 @@ help_text["main"] = """<h2>Help and Support</h2>
     Copyright (c) 2016 Yoshiki Shibukawa. Licensed under the MIT license.</p></li>
     </ul>
     """ % (io_link_wiki, io_link_tut, io_link_thread)
-
+help_text["obsolete_aa"] = """<b>Important</b><br><br>
+    The "Hide All, Reveal All" image occlusion mode used by this card
+    is no longer supported by the add-on. You can still review it just like
+    you would with any other card, but if you proceed with editing the note,
+    it will automatically be converted to the "Hide All, Guess One" type.<br><br>
+    For more information on why this occlusion mode was removed and how to
+    replicate its functionality please see here:<br><br>
+    <a href="{}">Wiki: Hide All, Reveal All</a>
+    """.format(io_link_obsolete_aa)
 
 def ioHelp(help, title=None, text=None, parent=None):
     """Display an info message or a predefined help section"""
