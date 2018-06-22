@@ -98,16 +98,16 @@ class ImgOccEdit(QDialog):
         help_btn.setAutoDefault(False)
 
         self.occl_tp_select = QComboBox()
-        self.occl_tp_select.addItems(["Don't Change", "Hide All, Reveal One",
-                                      "Hide One, Reveal All"])
+        self.occl_tp_select.addItems(["Don't Change", "Hide All, Guess One",
+                                      "Hide One, Guess One"])
 
         self.edit_btn = button_box.addButton("&Edit Cards",
                                              QDialogButtonBox.ActionRole)
         self.new_btn = button_box.addButton("&Add New Cards",
                                             QDialogButtonBox.ActionRole)
-        self.ao_btn = button_box.addButton("Hide &All, Reveal One",
+        self.ao_btn = button_box.addButton("Hide &All, Guess One",
                                            QDialogButtonBox.ActionRole)
-        self.oa_btn = button_box.addButton("Hide &One, Reveal All",
+        self.oa_btn = button_box.addButton("Hide &One, Guess One",
                                            QDialogButtonBox.ActionRole)
         close_button = button_box.addButton("&Close",
                                             QDialogButtonBox.RejectRole)

@@ -67,7 +67,7 @@ def onImgOccButton(self, origin=None, image_path=None):
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
             ioError("<b>Error</b>: Image Occlusion note type "
-                    "not configured properly.Please make sure you did not "
+                    "not configured properly. Please make sure you did not "
                     "manually delete or rename any of the default fields.",
                     help="notetype", parent=self.parentWindow)
             return False

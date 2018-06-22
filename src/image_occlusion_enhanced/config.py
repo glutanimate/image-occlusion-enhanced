@@ -12,6 +12,8 @@
 Sets up configuration, including constants
 """
 
+# TODO: move constants to consts.py
+
 import os
 import sys
 

@@ -43,13 +43,14 @@ from .config import *
 # note_nr:      Third part of the note_id
 
 
+
 def genByKey(key, old_occl_tp=None):
     """Get note generator based on occl_tp/user input"""
     if key in ["Don't Change"]:
         return genByKey(old_occl_tp, None)
-    elif key in ["ao", "Hide All, Reveal One"]:
+    elif key in ["ao", "Hide All, Guess One"]:
         return IoGenHideAllRevealOne
-    elif key in ["oa", "Hide One, Reveal All"]:
+    elif key in ["oa", "Hide One, Guess One"]:
         return IoGenHideOneRevealAll
     else:
         return IoGenHideAllRevealOne
@@ -449,7 +450,10 @@ class ImgOccNoteGenerator(object):
 # Different generator subclasses for different occlusion types:
 
 class IoGenHideAllRevealOne(ImgOccNoteGenerator):
-    """Q: All hidden, A: One revealed ('nonoverlapping')"""
+    """
+    Q: All hidden, one prompted for. A: One revealed
+    ('nonoverlapping' / "Hide all, guess one")
+    """
     occl_tp = "ao"
 
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
@@ -465,7 +469,10 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
 
 
 class IoGenHideOneRevealAll(ImgOccNoteGenerator):
-    """Q: One hidden, A: All revealed ('overlapping')"""
+    """
+    Q: One hidden, one prompted for. A: All revealed
+    ("overlapping" / "Hide one, guess one")
+    """
     occl_tp = "oa"
 
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
