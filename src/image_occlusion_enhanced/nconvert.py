@@ -220,30 +220,8 @@ def onIoConvert(self):
     if not selected:
         tooltip("No cards selected.", period=2000)
         return
-    question = """\
-    This is a purely <b>experimental</b> feature that is meant to update older \
-    IO notes to be compatible with the new editing feature-set in IO Enhanced. \
-    Clicking on 'Yes' below will prompt the add-on to go through all selected \
-    notes and change their Note ID and mask files in a way that should make it \
-    possible to edit them in the future. \
-    <br><br>Please note that this will only work for notes \
-    that have already been switched to the <i>Image Occlusion Enhanced</i> note type.\
-    If you are coming from IO 2.0 or an older version of IO Enhanced you will \
-    first have to switch the note type of your notes manually by going to <i>Edit → \
-    Change Note Type.</i><br><br> \
-    <b>WARNING</b>: There is no guarantee that this feature will actually succeed in \
-    updating your notes properly. To convert legacy notes the add-on will have to \
-    make a few assumptions which in some rare instances might turn out to be wrong \
-    and lead to broken notes. Notes that can't be parsed for the information needed \
-    to convert into an editable state (e.g. a valid "Original Mask" field) will usually \
-    be skipped by the add-on, but there might be some corner cases where that won't work. \
-    <br><br>A checkpoint will be set to revert to if needed, \
-    but even with that safety measure in place you should still only use this \
-    function if you know what you are doing.\
-    <br><br><b>Continue anyway?</b><br><i>(Depending on the number of notes this might \
-    take a while)</i>
-    """
-    ret = ioAskUser(question, "Please confirm action", self, defaultno=True)
+    ret = ioAskUser("question_nconvert", title="Please confirm action",
+                    parent=self, defaultno=True)
     if not ret:
         return False
     mw.progress.start()
@@ -262,8 +240,8 @@ def onIoConvert(self):
 def setupMenu(self):
     menu = self.form.menuEdit
     menu.addSeparator()
-    a = menu.addAction('Convert to Editable IO &Enhanced Notes')
-    self.connect(a, SIGNAL("triggered()"), lambda b=self: onIoConvert(b))
+    a = menu.addAction("Convert to Editable IO &Enhanced Notes")
+    a.triggered.connect(lambda _, b=self: onIoConvert(b))
 
 
 addHook("browser.setupMenus", setupMenu)
