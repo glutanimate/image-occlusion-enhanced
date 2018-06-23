@@ -34,7 +34,7 @@ from .consts import *
 from .config import *
 from .add import ImgOccAdd
 from .options import ImgOccOpts
-from .dialogs import ioHelp, ioError
+from .dialogs import ioHelp, ioCritical
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -51,7 +51,7 @@ def onIoSettings():
 
 def onIoHelp():
     """Call main help dialog"""
-    ioHelp("main")
+    ioHelp("main", parent=self)
 
 
 def onImgOccButton(self, origin=None, image_path=None):
@@ -66,10 +66,8 @@ def onImgOccButton(self, origin=None, image_path=None):
             dflt_fields = list(IO_FLDS.values())
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
-            ioError("<b>Error</b>: Image Occlusion note type "
-                    "not configured properly. Please make sure you did not "
-                    "manually delete or rename any of the default fields.",
-                    help="notetype", parent=self.parentWindow)
+            ioCritical("model_error", help="notetype",
+                       parent=self.parentWindow)
             return False
     try:  # allows us to fall back to old image if necessary
         oldimg = mw.ImgOccAdd.image_path

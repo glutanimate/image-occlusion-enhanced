@@ -236,9 +236,9 @@ class ImgOccEdit(QDialog):
 
     def onHelp(self):
         if self.mode == "add":
-            ioHelp("add")
+            ioHelp("add", parent=self)
         else:
-            ioHelp("edit")
+            ioHelp("edit", parent=self)
 
     # Window state
 

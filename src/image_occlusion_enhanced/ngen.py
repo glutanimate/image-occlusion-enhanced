@@ -345,7 +345,7 @@ class ImgOccNoteGenerator(object):
                  <b>create %i new one(s)</b>.\
                  Please note that this action is irreversible.<br><br>\
                  Would you still like to proceed?" % (del_count, new_count)
-            if not ioAskUser(q, title="Please confirm action",
+            if not ioAskUser("custom", text=q, title="Please confirm action",
                              parent=mw.ImgOccEdit, help="edit"):
                 return False
 

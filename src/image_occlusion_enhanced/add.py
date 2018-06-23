@@ -28,7 +28,7 @@ from .ngen import *
 from .config import *
 
 from .editor import ImgOccEdit
-from .dialogs import ioError, ioHelp
+from .dialogs import ioCritical, ioInfo
 from .utils import imageProp, img2path, path2url
 
 # SVG-Edit configuration
@@ -238,7 +238,7 @@ class ImgOccAdd(object):
             dialog.show()
             # Handle obsolete "aa" occlusion mode:
             if self.opref["occl_tp"] == "aa":
-                ioHelp("obsolete_aa", parent=dialog)
+                ioInfo("obsolete_aa", parent=dialog)
 
     def onChangeImage(self):
         """Change canvas background image"""
@@ -353,10 +353,7 @@ class ImgOccAdd(object):
         # note type integrity check:
         io_model_fields = mw.col.models.fieldNames(self.model)
         if not all(x in io_model_fields for x in list(self.ioflds.values())):
-            ioError("<b>Error</b>: Image Occlusion note type "
-                    "not configured properly.Please make sure you did not "
-                    "manually delete or rename any of the default fields.",
-                    help="notetype", parent=dialog)
+            ioCritical("model_error", help="notetype", parent=dialog)
             return False
         for i in self.mflds:
             fn = i['name']
