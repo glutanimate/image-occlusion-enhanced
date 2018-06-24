@@ -231,10 +231,11 @@ class ImgOccAdd(object):
 
         dialog.visible = True
         if self.mode == "add":
+            dialog.setModal(False)
             dialog.show()
         else:
             # modal dialog when editing
-            dialog.setWindowModality(Qt.WindowModal)
+            dialog.setModal(True)
             dialog.show()
             # Handle obsolete "aa" occlusion mode:
             if self.opref["occl_tp"] == "aa":
