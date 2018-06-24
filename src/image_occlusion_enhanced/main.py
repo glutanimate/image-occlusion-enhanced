@@ -51,7 +51,7 @@ def onIoSettings():
 
 def onIoHelp():
     """Call main help dialog"""
-    ioHelp("main", parent=self)
+    ioHelp("main", parent=mw)
 
 
 def onImgOccButton(self, origin=None, image_path=None):

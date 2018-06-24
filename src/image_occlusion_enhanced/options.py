@@ -23,6 +23,7 @@ from aqt.utils import showInfo
 
 from aqt import mw
 from anki.errors import AnkiError
+from anki.hooks import addHook
 
 from .config import *
 
@@ -46,6 +47,7 @@ class GrabKey(QDialog):
         self.shift = False
         self.extra = None
         self.setupUI()
+        addHook("unloadProfile", self.close)
 
     def setupUI(self):
         mainLayout = QVBoxLayout()
@@ -113,6 +115,7 @@ class ImgOccOpts(QDialog):
         self.hotkey = self.lconf["hotkey"]
         self.setupUi()
         self.setupValues(self.sconf)
+        addHook("unloadProfile", self.close)
 
     def setupValues(self, config):
         """Set up widget data based on provided config dict"""
@@ -277,7 +280,7 @@ class ImgOccOpts(QDialog):
     def showGrabKey(self):
         """Invoke key grabber"""
         win = GrabKey(self)
-        win.show()
+        win.exec_()
 
     def getNewColor(self, clrvar, clrbtn):
         """Set color via color selection dialog"""

@@ -19,6 +19,8 @@ Handles all minor utility dialogs
 from aqt.qt import *
 from aqt import mw
 
+from anki.hooks import addHook
+
 from .config import *
 
 # Help and support resource links
@@ -224,4 +226,5 @@ def ioHelp(msgkey, title="Image Occlusion Enhanced Help",
     mbox.setWindowTitle(title)
     mbox.setText(text)
     mbox.setWindowModality(Qt.NonModal)
+    addHook("unloadProfile", mbox.close)
     mbox.show()

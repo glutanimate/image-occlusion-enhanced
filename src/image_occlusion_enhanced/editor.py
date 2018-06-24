@@ -22,6 +22,7 @@ from aqt.qt import *
 
 from aqt import mw, webview, deckchooser, tagedit
 from aqt.utils import saveGeom, restoreGeom
+from anki.hooks import addHook
 
 from .dialogs import ioHelp
 from .consts import *
@@ -44,6 +45,7 @@ class ImgOccEdit(QDialog):
         loadConfig(self)
         self.setupUi()
         restoreGeom(self, "imgoccedit")
+        addHook("unloadProfile", self.close)
 
     def closeEvent(self, event):
         if mw.pm.profile is not None:
