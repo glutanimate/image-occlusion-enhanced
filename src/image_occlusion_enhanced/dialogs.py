@@ -231,8 +231,7 @@ def ioHelp(msgkey, title="Image Occlusion Enhanced Help",
     def onProfileUnload():
         if not sip.isdeleted(mbox):
             mbox.close()
-    
+
     addHook("unloadProfile", onProfileUnload)
     mbox.finished.connect(lambda: remHook("unloadProfile", onProfileUnload))
     mbox.show()
-

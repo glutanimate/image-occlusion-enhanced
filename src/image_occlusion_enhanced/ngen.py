@@ -43,7 +43,6 @@ from .config import *
 # note_nr:      Third part of the note_id
 
 
-
 def genByKey(key, old_occl_tp=None):
     """Get note generator based on occl_tp/user input"""
     if key in ["Don't Change"]:

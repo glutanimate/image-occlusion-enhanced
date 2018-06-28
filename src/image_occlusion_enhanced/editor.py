@@ -33,6 +33,7 @@ class ImgOccWebPage(webview.AnkiWebPage):
     def acceptNavigationRequest(self, url, navType, isMainFrame):
         return True
 
+
 class ImgOccWebView(webview.AnkiWebView):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -97,7 +98,7 @@ class ImgOccEdit(QDialog):
         del(self.svg_edit_anim)  # might not be gc'd
         remHook("unloadProfile", self.onProfileUnload)
         QDialog.reject(self)
-    
+
     def onProfileUnload(self):
         if not sip.isdeleted(self):
             self.close()
@@ -252,7 +253,7 @@ class ImgOccEdit(QDialog):
         # Field focus hotkeys
         for i in range(1, 10):
             QShortcut(QKeySequence("Ctrl+%i" % i),
-                          self).activated.connect(lambda f=i-1: self.focusField(f))
+                      self).activated.connect(lambda f=i-1: self.focusField(f))
         # Other hotkeys
         QShortcut(QKeySequence("Ctrl+Return"),
                   self).activated.connect(lambda: self.defaultAction(True))
@@ -392,7 +393,6 @@ class ImgOccEdit(QDialog):
             self.svg_edit_anim.stop()
             self.svg_edit_loader.hide()
             self.svg_edit.show()
-
 
     # Other actions
 
