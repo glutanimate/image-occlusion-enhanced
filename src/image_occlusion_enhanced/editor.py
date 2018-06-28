@@ -22,7 +22,7 @@ from aqt.qt import *
 
 from aqt import mw, webview, deckchooser, tagedit, sip
 from aqt.utils import saveGeom, restoreGeom
-from anki.hooks import addHook
+from anki.hooks import addHook, remHook
 
 from .dialogs import ioHelp
 from .consts import *
@@ -86,7 +86,7 @@ class ImgOccEdit(QDialog):
         loadConfig(self)
         self.setupUi()
         restoreGeom(self, "imgoccedit")
-        addHook("unloadProfile", self.close)
+        addHook("unloadProfile", self.onProfileUnload)
 
     def closeEvent(self, event):
         if mw.pm.profile is not None:
@@ -94,7 +94,12 @@ class ImgOccEdit(QDialog):
             saveGeom(self, "imgoccedit")
         self.visible = False
         self.svg_edit = None
+        remHook("unloadProfile", self.onProfileUnload)
         QDialog.reject(self)
+    
+    def onProfileUnload(self):
+        if not sip.isdeleted(self):
+            self.close()
 
     def reject(self):
         # Override QDialog Esc key reject
