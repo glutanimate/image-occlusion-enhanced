@@ -35,7 +35,7 @@
 		 <g>
 		  <title>Layer 1</title>
 		  <rect ry="30" rx="30" x="2.5" y="2.5" width="97" height="97" id="svg_1" fill="#FFFFFF" stroke="#000000" stroke-width="5"/>
-		  <text x="52.668" y="65" fill="#000000" stroke="#000000" stroke-width="1" font-size="48" text-anchor="middle" xml:space="preserve" id="svg_2">FIT</text>
+		  <text x="52.668" y="65" fill="#000000" stroke="#000000" stroke-width="1" font-family="sans-serif" font-size="48" text-anchor="middle" xml:space="preserve" id="svg_2">FIT</text>
 		 </g>
 		</svg>
 	</g>
