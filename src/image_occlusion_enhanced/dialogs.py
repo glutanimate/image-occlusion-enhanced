@@ -19,7 +19,7 @@ Handles all minor utility dialogs
 from aqt.qt import *
 from aqt import mw
 
-from anki.hooks import addHook
+from anki.hooks import addHook, remHook
 
 from .config import *
 
@@ -157,6 +157,7 @@ take a while)</i>
 
 # Message dialog utility functions
 
+
 def ioCritical(msgkey, title="Image Occlusion Enhanced Error", text="",
                parent=None, help=None):
     msgfunc = QMessageBox.critical
@@ -226,5 +227,12 @@ def ioHelp(msgkey, title="Image Occlusion Enhanced Help",
     mbox.setWindowTitle(title)
     mbox.setText(text)
     mbox.setWindowModality(Qt.NonModal)
-    addHook("unloadProfile", mbox.close)
+
+    def onProfileUnload():
+        if not sip.isdeleted(mbox):
+            mbox.close()
+    
+    addHook("unloadProfile", onProfileUnload)
+    mbox.finished.connect(lambda: remHook("unloadProfile", onProfileUnload))
     mbox.show()
+

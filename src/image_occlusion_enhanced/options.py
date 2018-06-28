@@ -47,7 +47,6 @@ class GrabKey(QDialog):
         self.shift = False
         self.extra = None
         self.setupUI()
-        addHook("unloadProfile", self.close)
 
     def setupUI(self):
         mainLayout = QVBoxLayout()
@@ -115,7 +114,6 @@ class ImgOccOpts(QDialog):
         self.hotkey = self.lconf["hotkey"]
         self.setupUi()
         self.setupValues(self.sconf)
-        addHook("unloadProfile", self.close)
 
     def setupValues(self, config):
         """Set up widget data based on provided config dict"""
