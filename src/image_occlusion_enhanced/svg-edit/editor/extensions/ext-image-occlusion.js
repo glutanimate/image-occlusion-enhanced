@@ -26,8 +26,8 @@ svgEditor.addExtension("Image Occlusion (Anki)", function() {
           }
         }],
       // set zoom to "fit to canvas" after loading extension
-      callback: function() {
-        svgCanvas.zoomChanged('', 'canvas');
-      }
 		};
 });
+svgEditor.ready(function () {
+  pycmd("svgEditDone");
+})
