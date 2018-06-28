@@ -203,7 +203,6 @@ def onProfileLoaded():
     getOrCreateModel()
 
 
-
 # Mask toggle hotkey
 
 def onHintHotkey():

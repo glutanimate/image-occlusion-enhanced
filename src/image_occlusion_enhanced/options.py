@@ -23,7 +23,6 @@ from aqt.utils import showInfo
 
 from aqt import mw
 from anki.errors import AnkiError
-from anki.hooks import addHook
 
 from .config import *
 

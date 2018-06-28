@@ -241,8 +241,6 @@ class ImgOccAdd(object):
                 dialog.showSvgEdit(True)
                 dialog.fitImageCanvas()
 
-
-
         dialog.svg_edit.runOnLoaded(onSvgEditLoaded)
         dialog.visible = True
         dialog.show()
