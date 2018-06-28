@@ -228,7 +228,7 @@ class ImgOccAdd(object):
             dialog.setModal(False)
 
             def onSvgEditLoaded():
-                dialog.svg_edit.show()
+                dialog.showSvgEdit(True)
                 dialog.fitImageCanvas()
         else:
             # modal dialog when editing
@@ -238,7 +238,7 @@ class ImgOccAdd(object):
                 # Handle obsolete "aa" occlusion mode:
                 if self.opref["occl_tp"] == "aa":
                     ioInfo("obsolete_aa", parent=dialog)
-                dialog.svg_edit.show()
+                dialog.showSvgEdit(True)
                 dialog.fitImageCanvas()
 
 

@@ -94,6 +94,7 @@ class ImgOccEdit(QDialog):
             saveGeom(self, "imgoccedit")
         self.visible = False
         self.svg_edit = None
+        del(self.svg_edit_anim)  # might not be gc'd
         remHook("unloadProfile", self.onProfileUnload)
         QDialog.reject(self)
     
@@ -205,11 +206,22 @@ class ImgOccEdit(QDialog):
 
         # Tab 1
         vbox1 = QVBoxLayout()
+
+        svg_edit_loader = QLabel("Loading...")
+        svg_edit_loader.setAlignment(Qt.AlignCenter)
+        loader_icon = os.path.join(ICONS_PATH, "loader.gif")
+        anim = QMovie(loader_icon)
+        svg_edit_loader.setMovie(anim)
+        anim.start()
+        self.svg_edit_loader = svg_edit_loader
+        self.svg_edit_anim = anim
+
         vbox1.addWidget(self.svg_edit, stretch=1)
+        vbox1.addWidget(self.svg_edit_loader, stretch=1)
 
         # Tab 2
-        self.vbox2 = QVBoxLayout()
         # vbox2 fields are variable and added by setupFields() at a later point
+        self.vbox2 = QVBoxLayout()
 
         # Main Tab Widget
         tab1 = QWidget()
@@ -233,7 +245,7 @@ class ImgOccEdit(QDialog):
         self.setMinimumWidth(640)
         self.tab_widget.setCurrentIndex(0)
         self.svg_edit.setFocus()
-        self.svg_edit.hide()
+        self.showSvgEdit(False)
 
         # Define and connect key bindings
 
@@ -371,6 +383,17 @@ class ImgOccEdit(QDialog):
         self.setWindowTitle(ttl)
         self.bottom_label.setText(bl_txt)
 
+    def showSvgEdit(self, state):
+        if not state:
+            self.svg_edit.hide()
+            self.svg_edit_anim.start()
+            self.svg_edit_loader.show()
+        else:
+            self.svg_edit_anim.stop()
+            self.svg_edit_loader.hide()
+            self.svg_edit.show()
+
+
     # Other actions
 
     def switchTabs(self):
@@ -418,5 +441,5 @@ class ImgOccEdit(QDialog):
         self.svg_edit.eval("""
                            setTimeout(function(){
                                svgCanvas.zoomChanged('', 'canvas');
-                           }, 1)
+                           }, 5)
                            """)
