@@ -260,7 +260,6 @@ class ImgOccAdd(object):
         self.imgoccedit.svg_edit.eval("""
                         svgCanvas.setBackground('#FFF', '%s');
                         svgCanvas.setResolution(%s, %s);
-                        //svgCanvas.zoomChanged('', 'canvas');
                     """ % (bkgd_url, width, height))
         self.image_path = image_path
 

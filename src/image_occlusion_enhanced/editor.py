@@ -258,6 +258,7 @@ class ImgOccEdit(QDialog):
 
     def changeImage(self):
         self.imgoccadd.onChangeImage()
+        self.fitImageCanvas()
 
     def defaultAction(self, close):
         if self.mode == "add":
@@ -409,5 +410,8 @@ class ImgOccEdit(QDialog):
             self.tedit[i].setPlainText("")
 
     def fitImageCanvas(self):
-        command = "setTimeout(function(){ svgCanvas.zoomChanged('', 'canvas'); }, 1)"
-        self.svg_edit.eval(command)
+        self.svg_edit.eval("""
+                           setTimeout(function(){
+                               svgCanvas.zoomChanged('', 'canvas');
+                           }, 1)
+                           """)
