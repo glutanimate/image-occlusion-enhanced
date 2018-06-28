@@ -372,6 +372,8 @@ class ImgOccOpts(QDialog):
 
     def resetIoEditor(self, flds):
         """Reset existing instance of IO Editor"""
+        # TODO: either delete method or refactor into method that updates running
+        # instance of I/O (we no longer reuse old ImgOccEdit instances)
         dialog = mw.ImgOccEdit
         loadConfig(dialog)
         dialog.resetFields()

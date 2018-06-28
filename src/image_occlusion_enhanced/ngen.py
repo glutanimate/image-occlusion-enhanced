@@ -346,7 +346,7 @@ class ImgOccNoteGenerator(object):
                  Please note that this action is irreversible.<br><br>\
                  Would you still like to proceed?" % (del_count, new_count)
             if not ioAskUser("custom", text=q, title="Please confirm action",
-                             parent=mw.ImgOccEdit, help="edit"):
+                             parent=self.ed.ImgOccEdit, help="edit"):
                 return False
 
         if deleted_nids:
