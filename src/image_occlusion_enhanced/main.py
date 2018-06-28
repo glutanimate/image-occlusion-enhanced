@@ -121,12 +121,12 @@ def openImage(path):
     import subprocess
     try:
         if sys.platform == 'win32':
-            os.startfile(path)
+            subprocess.Popen(['explorer', path])
         elif sys.platform == 'darwin':
             subprocess.Popen(['open', path])
         else:
             subprocess.Popen(['xdg-open', path])
-    except OSError:
+    except OSError as e:
         QDesktopServices.openUrl(QUrl("file://" + path))
 
 
