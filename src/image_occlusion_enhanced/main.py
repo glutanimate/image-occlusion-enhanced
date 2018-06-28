@@ -41,6 +41,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 def onIoSettings():
     """Call settings dialog if Editor not active"""
+    # TODO: fix ImgOccEdit detection
     if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
         tooltip("Please close Image Occlusion Editor\
             to access the Options.")
@@ -70,11 +71,11 @@ def onImgOccButton(self, origin=None, image_path=None):
                        parent=self.parentWindow)
             return False
     try:  # allows us to fall back to old image if necessary
-        oldimg = mw.ImgOccAdd.image_path
+        oldimg = self.imgoccadd.image_path
     except AttributeError:
         oldimg = None
-    mw.ImgOccAdd = ImgOccAdd(self, origin, oldimg)
-    mw.ImgOccAdd.occlude(image_path)
+    self.imgoccadd = ImgOccAdd(self, origin, oldimg)
+    self.imgoccadd.occlude(image_path)
 
 
 def onSetupEditorButtons(buttons, editor):

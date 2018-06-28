@@ -20,7 +20,7 @@ import os
 
 from aqt.qt import *
 
-from aqt import mw, webview, deckchooser, tagedit
+from aqt import mw, webview, deckchooser, tagedit, sip
 from aqt.utils import saveGeom, restoreGeom
 from anki.hooks import addHook
 
@@ -33,14 +33,55 @@ class ImgOccWebPage(webview.AnkiWebPage):
     def acceptNavigationRequest(self, url, navType, isMainFrame):
         return True
 
+class ImgOccWebView(webview.AnkiWebView):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self._domDone = False
+
+    def _onBridgeCmd(self, cmd):
+        # ignore webchannel messages that arrive after underlying webview
+        # deleted
+        if sip.isdeleted(self):
+            return
+
+        if cmd == "domDone":
+            return
+
+        if cmd == "svgEditDone":
+            self._domDone = True
+            self._maybeRunActions()
+        else:
+            return self.onBridgeCmd(cmd)
+
+    def runOnLoaded(self, callback):
+        self._domDone = False
+        self._queueAction("callback", callback)
+
+    def _maybeRunActions(self):
+        while self._pendingActions and self._domDone:
+            name, args = self._pendingActions.pop(0)
+
+            if name == "eval":
+                self._evalWithCallback(*args)
+            elif name == "setHtml":
+                self._setHtml(*args)
+            elif name == "callback":
+                callback = args[0]
+                callback()
+            else:
+                raise Exception("unknown action: {}".format(name))
+
 
 class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
 
-    def __init__(self, mw):
-        QDialog.__init__(self, parent=None)
+    def __init__(self, imgoccadd, parent):
+        QDialog.__init__(self, parent=parent)
+        mw.setupDialogGC(self)
         self.setWindowFlags(Qt.Window)
         self.visible = False
+        self.imgoccadd = imgoccadd
+        self.parent = parent
         self.mode = "add"
         loadConfig(self)
         self.setupUi()
@@ -52,7 +93,8 @@ class ImgOccEdit(QDialog):
             self.deckChooser.cleanup()
             saveGeom(self, "imgoccedit")
         self.visible = False
-        event.accept()
+        self.svg_edit = None
+        QDialog.reject(self)
 
     def reject(self):
         # Override QDialog Esc key reject
@@ -61,7 +103,7 @@ class ImgOccEdit(QDialog):
     def setupUi(self):
         """Set up ImgOccEdit UI"""
         # Main widgets aside from fields
-        self.svg_edit = webview.AnkiWebView()
+        self.svg_edit = ImgOccWebView(parent=self)
         self.svg_edit._page = ImgOccWebPage(self.svg_edit._onBridgeCmd)
         self.svg_edit.setPage(self.svg_edit._page)
 
@@ -186,6 +228,7 @@ class ImgOccEdit(QDialog):
         self.setMinimumWidth(640)
         self.tab_widget.setCurrentIndex(0)
         self.svg_edit.setFocus()
+        self.svg_edit.hide()
 
         # Define and connect key bindings
 
@@ -214,7 +257,7 @@ class ImgOccEdit(QDialog):
     # Note actions
 
     def changeImage(self):
-        mw.ImgOccAdd.onChangeImage()
+        self.imgoccadd.onChangeImage()
 
     def defaultAction(self, close):
         if self.mode == "add":
@@ -223,18 +266,18 @@ class ImgOccEdit(QDialog):
             self.editNote()
 
     def addAO(self, close=False):
-        mw.ImgOccAdd.onAddNotesButton("ao", close)
+        self.imgoccadd.onAddNotesButton("ao", close)
 
     def addOA(self, close=False):
-        mw.ImgOccAdd.onAddNotesButton("oa", close)
+        self.imgoccadd.onAddNotesButton("oa", close)
 
     def new(self, close=False):
         choice = self.occl_tp_select.currentText()
-        mw.ImgOccAdd.onAddNotesButton(choice, close)
+        self.imgoccadd.onAddNotesButton(choice, close)
 
     def editNote(self):
         choice = self.occl_tp_select.currentText()
-        mw.ImgOccAdd.onEditNotesButton(choice)
+        self.imgoccadd.onEditNotesButton(choice)
 
     def onHelp(self):
         if self.mode == "add":
@@ -260,14 +303,6 @@ class ImgOccEdit(QDialog):
                     sublayout.removeItem(subitem)
                     subitem.widget().setParent(None)
         self.tags_hbox.setParent(None)
-
-    def resetWindow(self):
-        """Fully reset window state"""
-        self.resetAllFields()
-        self.tab_widget.setCurrentIndex(0)
-        self.occl_tp_select.setCurrentIndex(0)
-        self.tedit[self.ioflds["hd"]].setFocus()
-        self.svg_edit.setFocus()
 
     def setupFields(self, flds):
         """Setup dialog text edits based on note type fields"""
@@ -374,5 +409,5 @@ class ImgOccEdit(QDialog):
             self.tedit[i].setPlainText("")
 
     def fitImageCanvas(self):
-        command = "svgCanvas.zoomChanged('', 'canvas');"
+        command = "setTimeout(function(){ svgCanvas.zoomChanged('', 'canvas'); }, 1)"
         self.svg_edit.eval(command)

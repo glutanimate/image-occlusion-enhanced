@@ -182,16 +182,11 @@ class ImgOccAdd(object):
         flds = self.mflds
         deck = mw.col.decks.nameOrNone(opref["did"])
 
-        try:
-            mw.ImgOccEdit is not None
-            mw.ImgOccEdit.resetWindow()
-            # use existing IO instance when available
-        except AttributeError:
-            mw.ImgOccEdit = ImgOccEdit(mw)
-            mw.ImgOccEdit.setupFields(flds)
-            logging.debug("Launching new ImgOccEdit instance")
-        dialog = mw.ImgOccEdit
+        dialog = ImgOccEdit(self, self.ed.parentWindow)
+        dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
+        self.imgoccedit = dialog
+        logging.debug("Launching new ImgOccEdit instance")
 
         url = QUrl.fromLocalFile(svg_edit_path)
         items = QUrlQuery()
@@ -229,17 +224,28 @@ class ImgOccAdd(object):
                 if i in onote:
                     dialog.tedit[i].setPlainText(onote[i])
 
-        dialog.visible = True
         if self.mode == "add":
             dialog.setModal(False)
-            dialog.show()
+
+            def onSvgEditLoaded():
+                dialog.svg_edit.show()
+                dialog.fitImageCanvas()
         else:
             # modal dialog when editing
             dialog.setModal(True)
-            dialog.show()
-            # Handle obsolete "aa" occlusion mode:
-            if self.opref["occl_tp"] == "aa":
-                ioInfo("obsolete_aa", parent=dialog)
+
+            def onSvgEditLoaded():
+                # Handle obsolete "aa" occlusion mode:
+                if self.opref["occl_tp"] == "aa":
+                    ioInfo("obsolete_aa", parent=dialog)
+                dialog.svg_edit.show()
+                dialog.fitImageCanvas()
+
+
+
+        dialog.svg_edit.runOnLoaded(onSvgEditLoaded)
+        dialog.visible = True
+        dialog.show()
 
     def onChangeImage(self):
         """Change canvas background image"""
@@ -251,7 +257,7 @@ class ImgOccAdd(object):
             tooltip("Not a valid image file.")
             return False
         bkgd_url = path2url(image_path)
-        mw.ImgOccEdit.svg_edit.eval("""
+        self.imgoccedit.svg_edit.eval("""
                         svgCanvas.setBackground('#FFF', '%s');
                         svgCanvas.setResolution(%s, %s);
                         //svgCanvas.zoomChanged('', 'canvas');
@@ -259,14 +265,14 @@ class ImgOccAdd(object):
         self.image_path = image_path
 
     def onAddNotesButton(self, choice, close):
-        dialog = mw.ImgOccEdit
+        dialog = self.imgoccedit
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.svgCanvasToString();",
             lambda val, choice=choice, close=close: self._onAddNotesButton(choice, close, val))
 
     def _onAddNotesButton(self, choice, close, svg):
         """Get occlusion settings in and pass them to the note generator (add)"""
-        dialog = mw.ImgOccEdit
+        dialog = self.imgoccedit
 
         r1 = self.getUserInputs(dialog)
         if r1 is False:
@@ -298,14 +304,14 @@ class ImgOccAdd(object):
         mw.reset()
 
     def onEditNotesButton(self, choice):
-        dialog = mw.ImgOccEdit
+        dialog = self.imgoccedit
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.svgCanvasToString();",
             lambda val, choice=choice: self._onEditNotesButton(choice, val))
 
     def _onEditNotesButton(self, choice, svg):
         """Get occlusion settings and pass them to the note generator (edit)"""
-        dialog = mw.ImgOccEdit
+        dialog = self.imgoccedit
 
         r1 = self.getUserInputs(dialog, edit=True)
         if r1 is False:
@@ -321,14 +327,14 @@ class ImgOccAdd(object):
         if r is False:
             return False
 
-        mw.ImgOccEdit.close()
+        self.imgoccedit.close()
 
         if r == "reset":
             # modifications to mask require media collection reset
-            
+
             # refresh image cache
             dialog.svg_edit.page().profile().clearHttpCache()
-            
+
             # force EditCurrent and Browser editor instances reload to
             # make use of refreshed image cache
             if not self.origin == "addcards":
@@ -337,7 +343,7 @@ class ImgOccAdd(object):
                     self.ed.web.setHtml(html)
                 self.ed.web.page().toHtml(onToHtmlCallback)  # async execution
                 self.ed.loadNote()
-            
+
             # write a dummy file to update collection.media modtime and force sync
             media_dir = mw.col.media.dir()
             fpath = os.path.join(media_dir, "syncdummy.txt")
