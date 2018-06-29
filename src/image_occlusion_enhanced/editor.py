@@ -77,7 +77,7 @@ class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
 
     def __init__(self, imgoccadd, parent):
-        QDialog.__init__(self, parent=parent)
+        QDialog.__init__(self)
         mw.setupDialogGC(self)
         self.setWindowFlags(Qt.Window)
         self.visible = False
