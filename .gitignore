@@ -45,3 +45,5 @@ image_occlusion_enhanced/svg-edit/build
 image_occlusion_enhanced/svg-edit/Makefile
 designer/
 image-occlusion-enhanced-*.zip
+tests/
+src/image_occlusion_enhanced/svg-edit/svg-edit-master/

@@ -57,7 +57,7 @@ For a list of known issues please check out the [Issues](https://github.com/Glut
 
 *Copyright © 2013 [Steve AW](https://github.com/steveaw)*
 
-*Copyright © 2016-2017 [Aristotelis P.](https://glutanimate.com/)*
+*Copyright © 2016-2018 [Aristotelis P.](https://glutanimate.com/)*
 
 -----
 
