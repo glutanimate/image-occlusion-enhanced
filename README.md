@@ -6,11 +6,13 @@
 
 <!-- MarkdownTOC -->
 
-- [Screenshots](#screenshots)
-- [Changes Compared to Image Occlusion 2.0](#changes-compared-to-image-occlusion-20)
-- [Documentation](#documentation)
-- [Known Issues](#known-issues)
-- [Credits and License](#credits-and-license)
+- [Image Occlusion Enhanced](#image-occlusion-enhanced)
+    - [Table of Contents](#table-of-contents)
+    - [Screenshots](#screenshots)
+    - [Changes Compared to Image Occlusion 2.0](#changes-compared-to-image-occlusion-20)
+    - [Documentation](#documentation)
+    - [Known Issues](#known-issues)
+    - [Credits and License](#credits-and-license)
 
 <!-- /MarkdownTOC -->
 
@@ -58,6 +60,8 @@ For a list of known issues please check out the [Issues](https://github.com/Glut
 *Copyright © 2013 [Steve AW](https://github.com/steveaw)*
 
 *Copyright © 2016-2018 [Aristotelis P.](https://glutanimate.com/)*
+
+With code contributions from: Damien Elmes, Kyle Mills, James Kraus, Matt Restko
 
 -----
 
