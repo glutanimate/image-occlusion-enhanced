@@ -1,15 +1,47 @@
-*.pyc
+# Byte-compiled / optimized / DLL files
 *.pyo
+*.pyc
+__pycache__/
+# Anki
+src/*/meta.json
+# Build files
+build
+src/*/forms*
+*-anki2*.zip
+# Python
+.python-version
+.mypy_cache/
+.ropeproject
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+# IDEs
+*.sublime-project
+*.sublime-workspace
+.sublime-backup/
+.idea/
+.vscode/
+# Temp
+.gitold
+obsolete
+research
+# Linux FM
 .hidden
 .directory
+# Docs and tools
+.github
+docs/specs.md
+docs/todo.md
+docs/*.todo
+docs/description.html
+tools/test.py
+# Add-on specific
+docs/contribs.ui
 image_occlusion_enhanced/svg-edit/build
 image_occlusion_enhanced/svg-edit/Makefile
-image-occlusion.sublime-project
-image-occlusion.sublime-workspace
-design-spec.md
+designer/
 image-occlusion-enhanced-*.zip
-docs/todo.md
-docs/help.md
-docs/contribs.ui
-.vscode
-designer
