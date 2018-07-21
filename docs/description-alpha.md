@@ -20,6 +20,7 @@ Before we dive into the actual changelog I would just like to thank each and eve
 In particular I would like to thank the following awesome people who support me on Patreon / have supported me at some point during the development of Image Occlusion Enhanced for Anki 2.1:
 
 - Blacky 372
+- Sebastián Ortega
 - Edan Maor
 - Peter Benisch
 
@@ -56,7 +57,7 @@ There also some **changes to the workflow** in I/O v1.3.0 that you need to be aw
 
 **LIMITATIONS OF THIS ALPHA RELEASE**
 
-There are a number of known limitations to this alpha release that you need to aware of:
+There are a number of known limitations to this alpha release that you need to be aware of:
 
 - Due to compatibility issues between SVG-Edit and the new Chromium renderer in Anki 2.1 some of the features in the masks editor no longer work correctly. My hope is to address these in the following beta release:
     + [Pointer not changing to selection mode when clicking on shape](https://github.com/glutanimate/image-occlusion-enhanced/issues/54)
