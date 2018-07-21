@@ -6,7 +6,7 @@ Image Occlusion lets you create cards that **hide parts of an image** to test yo
 
 **COMPATIBILITY**
 
-This add-on only works with Anki's stable release branch (2.0.x ≥ 2.0.30). The 2.1 beta branch is **not supported** at this point in time.
+This version of Image Occlusion Enhanced only works with Anki's stable release branch (Anki 2.0.x, version 2.0.30 and up). If you are using Anki 2.1, make sure to check out the latest [development release of the add-on](https://ankiweb.net/shared/info/1374772155).
 
 **CHANGES COMPARED TO IO 2.0**
 
@@ -36,6 +36,10 @@ This section will always be updated with the latest changes to *Image Occlusion 
 2016-04-03: **v0.2.0** - Initial public release
 
 **LATEST CHANGES AND NEWS**
+
+*2018-06-30*
+
+An alpha version of Image Occlusion Enhanced for Anki 2.1 is now available [here](https://ankiweb.net/shared/info/1374772155).
 
 *2017-04-17*
 
