@@ -25,7 +25,7 @@ from aqt.utils import tooltip
 from anki.notes import Note
 
 from xml.dom import minidom
-from .uuid import uuid  # no longer part of 2.1 dist
+import uuid
 
 from .dialogs import ioAskUser
 from .utils import fname2img
