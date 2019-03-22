@@ -337,9 +337,10 @@ class ImgOccAdd(object):
             # in order to make use of refreshed image cache
             if not self.origin == "addcards":
                 def onToHtmlCallback(html):
-                    self.ed.web.reload()
-                    self.ed.web.setHtml(html)
-                    self.ed.loadNote()
+                    if self.ed.web:
+                        self.ed.web.reload()
+                        self.ed.web.setHtml(html)
+                        self.ed.loadNote()
                 self.ed.web.page().toHtml(onToHtmlCallback)  # async execution
 
             # write a dummy file to update collection.media modtime and
