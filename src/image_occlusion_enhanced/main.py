@@ -178,6 +178,8 @@ io_editor_style = """
 
 def onSetNote(self, note, hide=True, focus=False):
     """Customize the editor when IO notes are active"""
+    if self.web is None:  # editor is in cleanup
+        return
     # Conditionally set body CSS  class
     if not (self.note and self.note.model()["name"] == IO_MODEL_NAME):
         self.web.eval("""$("body").removeClass("ionote");""")
