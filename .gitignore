@@ -8,6 +8,7 @@ src/*/meta.json
 build
 src/*/forms*
 *-anki2*.zip
+*.ankiaddon
 # Python
 .python-version
 .mypy_cache/
