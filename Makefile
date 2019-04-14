@@ -51,12 +51,13 @@ buildrelease:
 	git archive --format tar $(VERSION) | tar -x -C build/dist/
 	cp -r build/dist/* build/dist21
 	rm -rf "build/dist/$(ADDONDIR)/forms5" "build/dist21/forms4"
-	cd build/dist &&  \
-		PYENV_VERSION=anki20tools ../../tools/build_ui.sh "$(ADDONDIR)" 4 &&\
-		cd src && \
-		zip -r "../../../$(ADDON)-release-$(VERSION)-anki20.zip" "$(ADDONDIR)" *.py
+	# cd build/dist &&  \
+	# 	PYENV_VERSION=anki20tools ../../tools/build_ui.sh "$(ADDONDIR)" 4 &&\
+	# 	cd src && \
+	# 	zip -r "../../../$(ADDON)-release-$(VERSION)-anki20.zip" "$(ADDONDIR)" *.py
 	cd build/dist21 &&  \
 		PYENV_VERSION=anki21tools ../../tools/build_ui.sh "$(ADDONDIR)" 5 &&\
 		cd src/"$(ADDONDIR)" && \
-		zip -r "../../../../$(ADDON)-release-$(VERSION)-anki21.zip" *
+		zip -r "../../../../$(ADDON)-release-$(VERSION)-anki21-ankiweb.zip" * && \
+		zip -r "../../../../$(ADDON)-release-$(VERSION)-anki21.ankiaddon" *
 	rm -rf build
