@@ -14,7 +14,7 @@
 
 > Flashcards from images – the easy way
 
-*Image Occlusion Enhanced* is an add-on for the spaced repetition flashcard app [Anki](https://apps.ankiweb.net/) that allows you to create image-based cloze tests.
+*Image Occlusion Enhanced* is an add-on for the spaced repetition flashcard app [Anki](https://apps.ankiweb.net/) that allows you to create image-based cloze-deletions.
 
 ### Table of Contents <!-- omit in toc -->
 
