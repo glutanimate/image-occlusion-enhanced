@@ -1,0 +1,16 @@
+{
+    "display_name": "Image Occlusion Enhanced",
+    "module_name": "image_occlusion_enhanced",
+    "repo_name": "image-occlusion-enhanced",
+    "ankiweb_id": "1374772155",
+    "author": "Glutanimate",
+    "contact": "https://glutanimate.com",
+    "homepage": "https://github.com/glutanimate/image-occlusion-enhanced",
+    "copyright_start": 2016,
+    "tags": "image-occlusion editor",
+    "conflicts": [],
+    "targets": [
+        "anki20",
+        "anki21"
+    ]
+}

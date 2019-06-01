@@ -1,14 +1,10 @@
+# Linux FM
+.hidden
+.directory
 # Byte-compiled / optimized / DLL files
 *.pyo
 *.pyc
 __pycache__/
-# Anki
-src/*/meta.json
-# Build files
-build
-src/*/forms*
-*-anki2*.zip
-*.ankiaddon
 # Python
 .python-version
 .mypy_cache/
@@ -20,31 +16,34 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+# Javascript
+node_modules
 # IDEs
 *.sublime-project
 *.sublime-workspace
 .sublime-backup/
 .idea/
 .vscode/
+# Build files
+build
+src/*/gui/forms/anki*
+src/*/gui/forms/LICENSE*
+src/*/gui/resources/anki*
+src/*/gui/resources/LICENSE*
+*-anki2*.zip
+# Dev tools
+.bumpversion.cfg
+labels.toml
 # Temp
 .gitold
 obsolete
 research
-# Linux FM
-.hidden
-.directory
-# Docs and tools
-.github
-docs/specs.md
-docs/todo.md
-docs/*.todo
-docs/description.html
-tools/test.py
-# Add-on specific
-docs/contribs.ui
-image_occlusion_enhanced/svg-edit/build
-image_occlusion_enhanced/svg-edit/Makefile
-designer/
-image-occlusion-enhanced-*.zip
-tests/
+# Docs
+todo
+# Assets
+resources/icons/optional
+# Anki
+src/*/meta.json
+src/*/manifest.json
+# Repo
 src/image_occlusion_enhanced/svg-edit/svg-edit-master/
