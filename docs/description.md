@@ -6,7 +6,7 @@ Image Occlusion lets you create cards that **hide parts of an image** to test yo
 
 ### IMPORTANT
 
-This is a test release of Image Occlusion Enhanced for the [Anki 2.1 Beta](https://apps.ankiweb.net/docs/beta.html). Please make sure to carefully read through this description and familiarize yourself with the official Anki 2.1 beta release notes before giving the add-on a try.
+This is a test release of Image Occlusion Enhanced for Anki 2.1. Please make sure to carefully read through this description and familiarize yourself with the official Anki 2.1 change notes notes before giving the add-on a try.
 
 The present AnkiWeb upload is temporary and will be removed in favor of the [regular add-on listing](https://ankiweb.net/shared/info/1111933094) once testing is complete.
 
