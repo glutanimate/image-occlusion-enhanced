@@ -1,4 +1,4 @@
-<p align="center"><img src="screenshots/logo.png"></p>
+<p align="center"><img src="screenshots/logo.png" width=381 height=224></p>
 
 <h2 align="center">Image Occlusion Enhanced for Anki</h2>
 
