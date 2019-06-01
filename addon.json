@@ -10,7 +10,6 @@
     "tags": "image-occlusion editor",
     "conflicts": [],
     "targets": [
-        "anki20",
         "anki21"
     ]
 }
