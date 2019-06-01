@@ -12,8 +12,8 @@ If you enjoy Image Occlusion Enhanced, please consider supporting my work on Pat
 
 ## [Unreleased]
 
-    
-## [v1.3.0-alpha4] - 2019-04-14
+
+## [1.3.0-alpha4] - 2019-04-14
 
 ### Added
 
@@ -23,14 +23,26 @@ If you enjoy Image Occlusion Enhanced, please consider supporting my work on Pat
 
 - Fixes error message when deleting current note in editing session (#87, thanks to @zjosua)
 - Fixes rare error message when closing card browser
-    
-## [v1.3.0-alpha2] - 2018-12-11
+
+## [1.3.0-alpha3] - 2018-12-24
+
+### Fixed
+
+- Another uuid-related fix
+
+## [1.3.0-alpha2] - 2018-12-11
+
+### Fixed
+
+- Quick hotfix for Anki 2.1.6 compatibility (now packages the UUID module which no longer seems to ship with Anki 2.1.6's Python distribution)
+
+## [1.3.0-alpha2] - 2018-12-11
 
 ### Fixed
 
 - Quick hotfix for Anki 2.1.6 compatibility (now packages the UUID module which no longer seems to ship with Anki 2.1.6's Python distribution)
     
-## [v1.3.0-alpha1] - 2018-06-29
+## [1.3.0-alpha1] - 2018-06-29
 
 ### Notes
 
@@ -93,7 +105,7 @@ There are a number of known limitations to this alpha release that you need to b
 
 Of course there also bound to be some unforeseen bugs and regressions in the alpha. If you experience any of these please make sure to either report them on the add-on's [bug tracker](https://github.com/glutanimate/image-occlusion-enhanced/issues) or in the [official support thread](https://anki.tenderapp.com/discussions/add-ons/8295-image-occlusion-enhanced-official-thread). 
     
-## [v1.2.2] - 2017-04-04
+## [1.2.2] - 2017-04-04
 
 ### Fixed
 
@@ -101,14 +113,14 @@ Of course there also bound to be some unforeseen bugs and regressions in the alp
 - Fixed: GIFs should be supported on Windows and macOS now
 - Fixed: incompatibility with upcoming release of "Quick not and deck buttons" add-on
     
-## [v1.2.1] - 2017-02-14
+## [1.2.1] - 2017-02-14
 
 ### Fixed
 
 - Fixed: Unicode TypeError on Windows
 
     
-## [v1.2.0] - 2017-02-14
+## [1.2.0] - 2017-02-14
 
 ### Added
 
@@ -131,14 +143,14 @@ Of course there also bound to be some unforeseen bugs and regressions in the alp
 Please note that the changes to the field order and card templates only apply to new installations of the add-on. I've decided against enforcing these changes on existing installations as that would undo any customizations you might have applied to the note type. If you'd like to update your cards with these changes, please follow [the instructions in the Wiki](https://github.com/Glutanimate/image-occlusion-enhanced/wiki/Troubleshooting#resetting-note-type-and-template-to-the-defaults) to reset your field order and card template to the (new) defaults.
 
     
-## [v1.1.1] - 2017-01-20
+## [1.1.1] - 2017-01-20
 
 ### Fixed
 
 - Clicking on a context menu entry would launch the web browser under some circumstances (thanks to PolymorphicVTach for the report)
 
     
-## [v1.1.0] - 2017-01-14
+## [1.1.0] - 2017-01-14
 
 ### Added
 
@@ -158,7 +170,7 @@ Please note that the changes to the field order and card templates only apply to
 - plus a number of smaller improvements and bug fixes
 
     
-## [v1.0.4] - 2016-12-14
+## [1.0.4] - 2016-12-14
 
 ### Added
 
@@ -168,28 +180,28 @@ Please note that the changes to the field order and card templates only apply to
 
 - fix an encoding issue when editing labels
 
-## [v1.0.3] - 2016-12-01
+## [1.0.3] - 2016-12-01
 
 ### Fixed
 
 - fix a runtime error that was occuring for some Windows users
 
     
-## [v1.0.2] - 2016-11-24
+## [1.0.2] - 2016-11-24
 
 ### Fixed
 
 - Fix unicode support in labels
 
     
-## [v1.0.1] - 2016-11-16
+## [1.0.1] - 2016-11-16
 
 ### Fixed
 
 - Restore proper window controls on Windows
 
     
-## [v1.0.0] - 2016-11-09
+## [1.0.0] - 2016-11-09
 
 The most comprehensive update to _Image Occlusion Enhanced_ since its inception:
 
@@ -224,7 +236,7 @@ The most comprehensive update to _Image Occlusion Enhanced_ since its inception:
   - Bug fixes everywhere
 
     
-## [v1.0.0-beta6] - 2016-11-07
+## [1.0.0-beta6] - 2016-11-07
 
 ### Added
 
@@ -235,7 +247,7 @@ The most comprehensive update to _Image Occlusion Enhanced_ since its inception:
 
 - **Other**: Set Extra fields to be note-specific by default
 
-## [v1.0.0-beta5] - 2016-11-05
+## [1.0.0-beta5] - 2016-11-05
 
 ### Added
 
@@ -251,7 +263,7 @@ The most comprehensive update to _Image Occlusion Enhanced_ since its inception:
 - **Other**: Updated tooltips for occlusion types (@dgbeecher)
 
     
-## [v1.0.0-beta4] - 2016-10-18
+## [1.0.0-beta4] - 2016-10-18
 
 ### Changed
 
@@ -265,7 +277,7 @@ The most comprehensive update to _Image Occlusion Enhanced_ since its inception:
 - Fixed a number of smaller issues (thanks to @dgbeecher for reporting these!)
 
     
-## [v1.0.0-beta3] - 2016-10-15
+## [1.0.0-beta3] - 2016-10-15
 
 ### Added
 
@@ -283,13 +295,13 @@ The most comprehensive update to _Image Occlusion Enhanced_ since its inception:
 - Lots of smaller bug fixes
 
 
-## [v1.0.0-beta2] - 2016-10-13
+## [1.0.0-beta2] - 2016-10-13
 
 ### Fixed
 
 - Possible fix for a module import error on macOS
 
-## [v1.0.0-beta1] - 2016-10-12
+## [1.0.0-beta1] - 2016-10-12
 
 A tremendous version jump, I know, but this is the most comprehensive update to Image Occlusion since the release of _Image Occlusion Enhanced_
 
@@ -323,7 +335,7 @@ A tremendous version jump, I know, but this is the most comprehensive update to 
 - **Stability Improvements**
   - Bug fixes everywhere
     
-## [v0.3.0] - 2016-09-28
+## [0.3.0] - 2016-09-28
 
 ### Changed
 
@@ -335,47 +347,47 @@ A tremendous version jump, I know, but this is the most comprehensive update to 
 - SVGEdit: added "Esc" hotkey to deselect current selection
 
     
-## [v0.2.6] - 2016-09-22
+## [0.2.6] - 2016-09-22
 
 ### Changed
 
 - improved IO note type sanity checks
 
-## [v0.2.5] - 2016-09-12
+## [0.2.5] - 2016-09-12
 
 ### Changed
 
 - New add-on name
 - Added link to new Wiki
  
-## [v0.2.4] - 2016-08-25
+## [0.2.4] - 2016-08-25
 
 ### Fixed
 
 - Several bug fixes and improvements
 
-## [v0.2.3] - 2016-05-19
+## [0.2.3] - 2016-05-19
 
 ### Changed
 
 - Update mask fill colour when upgrading from Image Occlusion 2.0
 
     
-## [v0.2.2] - 2016-04-16
+## [0.2.2] - 2016-04-16
 
 ### Added
 
 - added support for preserving occlusions and labels when creating new notes based on old one
 
     
-## [v0.2.1] - 2016-04-04
+## [0.2.1] - 2016-04-04
 
 ### Fixed
 
 - fixed an encoding error on Windows
 
     
-## [v0.2.0] - 2016-04-03
+## [0.2.0] - 2016-04-03
 
 ### Changed
 
@@ -383,7 +395,7 @@ A tremendous version jump, I know, but this is the most comprehensive update to 
 - fixes a number of issues with SVG-Edit
 
     
-## [v0.1.4] - 2016-04-01
+## [0.1.4] - 2016-04-01
 
 ### Changed
 
@@ -391,7 +403,7 @@ A tremendous version jump, I know, but this is the most comprehensive update to 
 - bug fix: support for special characters in file names on Windows
 
     
-## [v0.1.3] - 2016-04-01
+## [0.1.3] - 2016-04-01
 
 ### Changed
 
@@ -401,14 +413,14 @@ A tremendous version jump, I know, but this is the most comprehensive update to 
 - a few miscellaneous fixes
 
     
-## [v0.1.2] - 2016-03-29
+## [0.1.2] - 2016-03-29
 
 ### Fixed
 
 - More fixes.
 
     
-## [v0.1.1] - 2016-03-28
+## [0.1.1] - 2016-03-28
 
 ### Fixed
 
@@ -424,37 +436,38 @@ A tremendous version jump, I know, but this is the most comprehensive update to 
 
 
 [Unreleased]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha4...HEAD
-[v1.3.0-alpha4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha2...v1.3.0-alpha4
-[v1.3.0-alpha2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha1...v1.3.0-alpha2
-[v1.3.0-alpha1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.2.2...v1.3.0-alpha1
-[v1.2.2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.2.1...v1.2.2
-[v1.2.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.2.0...v1.2.1
-[v1.2.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.1.1...v1.2.0
-[v1.1.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.1.0...v1.1.1
-[v1.1.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.4...v1.1.0
-[v1.0.4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.3...v1.0.4
-[v1.0.3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.2...v1.0.3
-[v1.0.2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.1...v1.0.2
-[v1.0.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0...v1.0.1
-[v1.0.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta6...v1.0.0
-[v1.0.0-beta6]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta5...v1.0.0-beta6
-[v1.0.0-beta5]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta4...v1.0.0-beta5
-[v1.0.0-beta4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta3...v1.0.0-beta4
-[v1.0.0-beta3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta2...v1.0.0-beta3
-[v1.0.0-beta2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta1...v1.0.0-beta2
-[v1.0.0-beta1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.3.0...v1.0.0-beta1
-[v0.3.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.6...v0.3.0
-[v0.2.6]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.5...v0.2.6
-[v0.2.5]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.4...v0.2.5
-[v0.2.4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.3...v0.2.4
-[v0.2.3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.2...v0.2.3
-[v0.2.2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.1...v0.2.2
-[v0.2.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.0...v0.2.1
-[v0.2.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.4...v0.2.0
-[v0.1.4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.3...v0.1.4
-[v0.1.3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.2...v0.1.3
-[v0.1.2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.1...v0.1.2
-[v0.1.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.0...v0.1.1
+[1.3.0-alpha4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha3...v1.3.0-alpha4
+[1.3.0-alpha3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha2...v1.3.0-alpha3
+[1.3.0-alpha2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha1...v1.3.0-alpha2
+[1.3.0-alpha1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.2.2...v1.3.0-alpha1
+[1.2.2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.2.1...v1.2.2
+[1.2.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.1.1...v1.2.0
+[1.1.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.4...v1.1.0
+[1.0.4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.3...v1.0.4
+[1.0.3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta6...v1.0.0
+[1.0.0-beta6]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta5...v1.0.0-beta6
+[1.0.0-beta5]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta4...v1.0.0-beta5
+[1.0.0-beta4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta3...v1.0.0-beta4
+[1.0.0-beta3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta2...v1.0.0-beta3
+[1.0.0-beta2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.0.0-beta1...v1.0.0-beta2
+[1.0.0-beta1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.3.0...v1.0.0-beta1
+[0.3.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.6...v0.3.0
+[0.2.6]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.5...v0.2.6
+[0.2.5]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.4...v0.2.5
+[0.2.4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.3...v0.2.4
+[0.2.3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.2...v0.2.3
+[0.2.2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.4...v0.2.0
+[0.1.4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v0.1.0...v0.1.1
 
 -----
 
