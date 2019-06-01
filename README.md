@@ -48,35 +48,11 @@ The easiest way to install Image Occlusion Enhanced is through [AnkiWeb](https:/
 
 #### Manual installation <!-- omit in toc -->
 
-Please click on the entry corresponding to your Anki version:
-
-<details>
-
-<summary><i>Anki 2.1</i></summary>
-
 1. Make sure you have the [latest version](https://apps.ankiweb.net/#download) of Anki 2.1 installed. Earlier releases (e.g. found in various Linux distros) do not support `.ankiaddon` packages.
 2. Download the latest `.ankiaddon` package from the [releases tab](https://github.com/glutanimate/image-occlusion-enhanced/releases) (you might need to click on *Assets* below the description to reveal the download links)
 3. From Anki's main window, head to *Tools* → *Add-ons*
 4. Drag-and-drop the `.ankiaddon` package onto the add-ons list
 5. Restart Anki
-
-</details>
-
-<details>
-
-<summary><i>Anki 2.0</i></summary>
-
-1. Go to *Tools* → *Add-ons* → *Open add-ons folder*
-2. Find and delete the `Image Occlusion Enhanced.py` file if it already exists.
-3. See if you can find a `image_occlusion_enhanced` folder. If so:
-    1. If the folder contains a `meta.json` file, copy the file to a safe location. This will allow you to preserve your current settings.
-    2. Proceed to delete the `image_occlusion_enhanced` folder
-4. Download and extract the latest Anki 2.0 add-on release from the [releases tab](https://github.com/glutanimate/image-occlusion-enhanced/releases) (you might need to click on *Assets* below the description to reveal the download links)
-5. Move the extracted `Image Occlusion Enhanced.py` and `image_occlusion_enhanced` into the add-ons folder
-6. Optional: Place the `meta.json` file back into the directory if you created a copy beforehand.
-7. Restart Anki
-
-</details>
 
 ### Documentation
 
@@ -131,4 +107,7 @@ Image Occlusion Enhanced is free and open-source software. The add-on code that 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
 
 ----
-**:heart: My heartfelt thanks goes out to everyone who has supported this add-on through their [tips, contributions, or any other means](https://github.com/glutanimate/docs/blob/master/anki/add-ons/CONTRIBUTING.md#how-to-contribute-to-my-anki-add-ons) (you know who you are!). All of this would not have been possible without you. Thank you for being awesome!**
+<b>
+<div align="center">The continued development of this add-on is made possible <br>thanks to my <a href="https://www.patreon.com/glutanimate">Patreon</a> and <a href="https://ko-fi.com/X8X0L4YV">Ko-Fi</a> supporters.
+<br>You guys rock ❤️ !</div>
+</b>
