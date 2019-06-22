@@ -139,7 +139,10 @@ class ImgOccAdd(object):
         else:
             clip = QApplication.clipboard()
         if clip and clip.mimeData().imageData():
-            handle, image_path = tempfile.mkstemp(suffix='.png')
+            if mw.col.conf["imgocc"]["paste_png"]:
+                handle, image_path = tempfile.mkstemp(suffix='.png')
+            else:
+                handle, image_path = tempfile.mkstemp(suffix='.jpg')
             clip.image().save(image_path)
             clip.clear()
             if os.stat(image_path).st_size == 0:
