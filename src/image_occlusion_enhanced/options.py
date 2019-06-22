@@ -125,6 +125,7 @@ class ImgOccOpts(QDialog):
         self.swidth_sel.setValue(int(config['swidth']))
         self.font_sel.setCurrentFont(QFont(config['font']))
         self.skipped.setText(','.join(config["skip"]))
+        self.paste_png_cb.setChecked(config["paste_png"])
 
     def setupUi(self):
         """Set up widgets and layouts"""
@@ -231,6 +232,9 @@ class ImgOccOpts(QDialog):
         key_grab_btn = QPushButton('Change hotkey', self)
         key_grab_btn.clicked.connect(self.showGrabKey)
 
+        # Image paste format:
+        self.paste_png_cb = QCheckBox("Paste clipboard images as PNG")
+
         grid.addWidget(rule2, row + 1, 0, 1, 6)
         grid.addWidget(misc_heading, row + 2, 0, 1, 6)
         grid.addWidget(skipped_description, row + 3, 0, 1, 6)
@@ -238,6 +242,7 @@ class ImgOccOpts(QDialog):
         grid.addWidget(key_grab_label, row + 5, 0, 1, 2)
         grid.addWidget(self.key_grabbed, row + 5, 2, 1, 1)
         grid.addWidget(key_grab_btn, row + 5, 3, 1, 3)
+        grid.addWidget(self.paste_png_cb, row + 6, 0, 1, 6)
 
         # Main button box
         button_box = QDialogButtonBox(QDialogButtonBox.Ok |
@@ -364,6 +369,7 @@ class ImgOccOpts(QDialog):
         mw.col.conf['imgocc']['font'] = self.font_sel.currentFont().family()
         mw.col.conf['imgocc']['skip'] = self.skipped.text().split(',')
         mw.pm.profile["imgocc"]["hotkey"] = self.hotkey
+        mw.col.conf["imgocc"]["paste_png"] = self.paste_png_cb.isChecked()
         mw.col.setMod()
         self.close()
 
