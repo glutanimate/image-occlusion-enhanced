@@ -57,10 +57,10 @@ IO_HOTKEY = "Ctrl+Shift+O"
 
 # default configurations
 # TODO: update version number before release
-default_conf_local = {'version': 1.26,
+default_conf_local = {'version': 1.25,
                       'dir': IO_HOME,
                       'hotkey': IO_HOTKEY}
-default_conf_syncd = {'version': 1.26,
+default_conf_syncd = {'version': 1.25,
                       'ofill': 'FFEBA2',
                       'qfill': 'FF7E7E',
                       'scol': '2D2D2D',
@@ -68,8 +68,7 @@ default_conf_syncd = {'version': 1.26,
                       'font': 'Arial',
                       'fsize': 24,
                       'skip': [IO_FLDS["e1"], IO_FLDS["e2"]],
-                      'flds': IO_FLDS,
-                      'paste_png': False}
+                      'flds': IO_FLDS}
 
 from . import template
 
