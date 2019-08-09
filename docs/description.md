@@ -16,7 +16,7 @@ The present AnkiWeb upload is temporary and will be removed in favor of the [reg
 
 There are a number of known limitations to this alpha release that you need to be aware of:
 
-- Due to compatibility issues between SVG-Edit and the new Chromium renderer in Anki 2.1 some of the features in the masks editor no longer work correctly. My hope is to address these in the following beta release:
+- Due to compatibility issues between SVG-Edit and the new Chromium renderer in Anki 2.1, some of the features in the masks editor no longer work correctly. My hope is to address these in the following beta release:
     + [Pointer not changing to selection mode when clicking on shape](https://github.com/glutanimate/image-occlusion-enhanced/issues/54)
     + [Path tool no longer working](https://github.com/glutanimate/image-occlusion-enhanced/issues/56)
     + [https://github.com/glutanimate/image-occlusion-enhanced/issues/57](https://github.com/glutanimate/image-occlusion-enhanced/issues/57)
