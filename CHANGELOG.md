@@ -12,6 +12,10 @@ If you enjoy Image Occlusion Enhanced, please consider supporting my work on Pat
 
 ## [Unreleased]
 
+## [1.3.0-alpha5] - 2019-09-11
+
+### [Download](https://github.com/glutanimate/image-occlusion-enhanced/releases/tag/v1.3.0-alpha5)
+
 ### Fixed
 
 - Handle malformatted and unrecognized image formats more graciously (thanks to Audrey for the report)
