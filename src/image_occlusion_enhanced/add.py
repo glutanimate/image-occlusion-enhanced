@@ -22,7 +22,7 @@ import tempfile
 from aqt.qt import *
 
 from aqt import mw
-from aqt.utils import tooltip
+from aqt.utils import tooltip, showWarning
 
 from .ngen import *
 from .config import *
@@ -30,6 +30,8 @@ from .config import *
 from .editor import ImgOccEdit
 from .dialogs import ioCritical, ioInfo
 from .utils import imageProp, img2path, path2url
+
+from .consts import SUPPORTED_EXTENSIONS
 
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__),
@@ -85,9 +87,12 @@ class ImgOccAdd(object):
         self.setPreservedAttrs(note)
         self.image_path = image_path
 
-        width, height = imageProp(image_path)
-        if not width:
-            tooltip("Not a valid image file.")
+        try:
+            width, height = imageProp(image_path)
+        except ValueError as e:
+            showWarning(
+                f"<b>Unsupported image</b> in file <i>{image_path}</i>:"
+                f"<br><br>{str(e)}")
             return False
 
         self.callImgOccEdit(width, height)
@@ -153,9 +158,11 @@ class ImgOccAdd(object):
         if not prev_image_dir or not os.path.isdir(prev_image_dir):
             prev_image_dir = IO_HOME
 
-        image_path = QFileDialog.getOpenFileName(parent,
-                                                 "Select an Image", prev_image_dir,
-                                                 "Image Files (*.png *jpg *.jpeg *.gif)")
+        image_path = QFileDialog.getOpenFileName(
+            parent,
+            "Select an Image", prev_image_dir,
+            f"""Image Files ({" ".join("*." + ext for ext in SUPPORTED_EXTENSIONS)})"""
+        )
         if image_path:
             image_path = image_path[0]
 
@@ -250,9 +257,12 @@ class ImgOccAdd(object):
         image_path = self.getNewImage()
         if not image_path:
             return False
-        width, height = imageProp(image_path)
-        if not width:
-            tooltip("Not a valid image file.")
+        try:
+            width, height = imageProp(image_path)
+        except ValueError as e:
+            showWarning(
+                f"<b>Unsupported image</b> in file <i>{image_path}</i>:"
+                f"<br><br>{str(e)}")
             return False
         bkgd_url = path2url(image_path)
         self.imgoccedit.svg_edit.eval("""
