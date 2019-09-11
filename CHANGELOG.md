@@ -12,6 +12,9 @@ If you enjoy Image Occlusion Enhanced, please consider supporting my work on Pat
 
 ## [Unreleased]
 
+### Fixed
+
+- Handle malformatted and unrecognized image formats more graciously (thanks to Audrey for the report)
 
 ## [1.3.0-alpha4] - 2019-04-14
 
