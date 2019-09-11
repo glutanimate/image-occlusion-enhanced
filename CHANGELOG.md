@@ -442,7 +442,8 @@ A tremendous version jump, I know, but this is the most comprehensive update to 
 - Still needs a lot of testing!
 
 
-[Unreleased]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha4...HEAD
+[Unreleased]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha5...HEAD
+[1.3.0-alpha5]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha4...v1.3.0-alpha5
 [1.3.0-alpha4]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha3...v1.3.0-alpha4
 [1.3.0-alpha3]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha2...v1.3.0-alpha3
 [1.3.0-alpha2]: https://github.com/Glutanimate/image-occlusion-enhanced/compare/v1.3.0-alpha1...v1.3.0-alpha2
