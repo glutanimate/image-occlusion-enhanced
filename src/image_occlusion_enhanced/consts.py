@@ -22,3 +22,11 @@ else:
     ADDON_PATH = os.path.dirname(__file__).decode(SYS_ENCODING)
 
 ICONS_PATH = os.path.join(ADDON_PATH, "icons")
+
+SUPPORTED_BITMAP_FORMATS = ("jpeg", "png", "gif")
+SUPPORTED_VECTOR_FORMATS = ("svg", )
+SUPPORTED_EXTENSIONS = (
+    ("jpg", ) +
+    SUPPORTED_BITMAP_FORMATS +
+    SUPPORTED_VECTOR_FORMATS
+)

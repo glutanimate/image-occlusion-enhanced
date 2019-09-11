@@ -22,8 +22,12 @@ import urllib.parse
 import urllib.request
 import urllib.parse
 import urllib.error
+
+from ._vendor import imghdr
+from ._vendor.imagesize import imagesize
+
 from .consts import *
-from .imagesize import imagesize
+
 
 
 def path2url(path):
@@ -59,27 +63,33 @@ def img2path(img, nameonly=False):
 
 def imageProp(image_path):
     """Get image width and height"""
+    # Vector graphics
     if image_path.endswith(".svg"):
-        with open(image_path, 'r') as svg_file:
-            doc = svg_file.read()
-            mask_doc = minidom.parseString(doc.encode('utf-8'))
-            svg_node = mask_doc.documentElement
-            cheight = svg_node.attributes["height"].value
-            cwidth = svg_node.attributes["width"].value
-            height = _svg_convert_size(cheight)
-            width = _svg_convert_size(cwidth)
-        return width, height
-    try:
-        width, height = imagesize.get(image_path)
-        assert width > 0
-        assert height > 0
-    except (ValueError, AssertionError):
         try:
-            from .Imaging.PIL import Image  # fall back to PIL
-            image = Image.open(image_path)
-            width, height = image.size
-        except IOError:
-            return None, None
+            with open(image_path, 'r') as svg_file:
+                doc = svg_file.read()
+                mask_doc = minidom.parseString(doc.encode('utf-8'))
+        except Exception as e:
+            print(str(e))
+            raise ValueError("Invalid SVG file.")
+        
+        svg_node = mask_doc.documentElement
+        cheight = svg_node.attributes["height"].value
+        cwidth = svg_node.attributes["width"].value
+        height = _svg_convert_size(cheight)
+        width = _svg_convert_size(cwidth)
+        
+        return width, height
+    
+    # Bitmap graphics
+    img_fmt = imghdr.what(image_path)
+    if img_fmt not in SUPPORTED_BITMAP_FORMATS:
+        raise ValueError("Unrecognized raster image format.")
+    
+    width, height = imagesize.get(image_path)
+    if width < 0 or height < 0:
+        raise ValueError("Image has invalid dimensions.")
+
     return width, height
 
 
