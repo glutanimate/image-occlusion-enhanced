@@ -244,16 +244,16 @@ css_original_hide = """\
 }\
 """
 
-# Tuple structure:
+# List structure:
 # (<version addition was introduced in>,
 # (<qfmt_addition>, <afmt_addition>, <css_addition>))
 # versions need to be ordered by semantic versioning
-additions_by_version = (
+additions_by_version = [
     (
         1.30,
         (html_overlay_onload, html_overlay_onload, css_original_hide)
-    )
-)
+    ),
+]
 
 
 def add_io_model(col):
