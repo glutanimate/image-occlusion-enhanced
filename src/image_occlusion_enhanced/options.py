@@ -25,6 +25,7 @@ from aqt import mw
 from anki.errors import AnkiError
 
 from .config import *
+from .lang import _
 
 
 class GrabKey(QDialog):
@@ -51,10 +52,10 @@ class GrabKey(QDialog):
         mainLayout = QVBoxLayout()
         self.setLayout(mainLayout)
 
-        label = QLabel('Please press the new key combination')
+        label = QLabel(_('Please press the new key combination'))
         mainLayout.addWidget(label)
 
-        self.setWindowTitle('Grab key combination')
+        self.setWindowTitle(_('Grab key combination'))
 
     def keyPressEvent(self, evt):
         self.active += 1
@@ -73,16 +74,16 @@ class GrabKey(QDialog):
         if self.active != 0:
             return
         if not (self.shift or self.ctrl or self.alt):
-            showInfo("Please use at least one keyboard "
-                     "modifier (Ctrl, Alt, Shift)")
+            showInfo(_("Please use at least one keyboard "
+                       "modifier (Ctrl, Alt, Shift)"))
             return
         if (self.shift and not (self.ctrl or self.alt)):
-            showInfo("Shift needs to be combined with at "
-                     "least one other modifier (Ctrl, Alt)")
+            showInfo(_("Shift needs to be combined with at "
+                       "least one other modifier (Ctrl, Alt)"))
             return
         if not self.extra:
-            showInfo("Please press at least one key "
-                     "that is not a keyboard modifier (not Ctrl/Alt/Shift)")
+            showInfo(_("Please press at least one key "
+                       "that is not a keyboard modifier (not Ctrl/Alt/Shift)"))
             return
 
         combo = []
@@ -130,12 +131,12 @@ class ImgOccOpts(QDialog):
         """Set up widgets and layouts"""
 
         # Top section
-        qfill_label = QLabel('Question mask')
-        ofill_label = QLabel('Other masks')
-        scol_label = QLabel('Lines')
-        colors_heading = QLabel("<b>Colors</b>")
-        fields_heading = QLabel("<b>Custom Field Names</b>")
-        other_heading = QLabel("<b>Other Editor Settings</b>")
+        qfill_label = QLabel(_('Question mask'))
+        ofill_label = QLabel(_('Other masks'))
+        scol_label = QLabel(_('Lines'))
+        colors_heading = QLabel(_("<b>Colors</b>"))
+        fields_heading = QLabel(_("<b>Custom Field Names</b>"))
+        other_heading = QLabel(_("<b>Other Editor Settings</b>"))
 
         self.qfill_btn = QPushButton()
         self.ofill_btn = QPushButton()
@@ -147,9 +148,9 @@ class ImgOccOpts(QDialog):
         self.scol_btn.clicked.connect(lambda _, t="scol", b=self.scol_btn:
                                       self.getNewColor(t, b))
 
-        swidth_label = QLabel("Line width")
-        font_label = QLabel("Label font")
-        fsize_label = QLabel("Label size")
+        swidth_label = QLabel(_("Line width"))
+        font_label = QLabel(_("Label font"))
+        fsize_label = QLabel(_("Label size"))
 
         self.swidth_sel = QSpinBox()
         self.swidth_sel.setMinimum(0)
@@ -165,11 +166,12 @@ class ImgOccOpts(QDialog):
 
         # Bottom section and grid assignment
 
-        fields_text = ("Changing any of the entries below will rename "
-                       "the corresponding default field of the IO Enhanced note type. "
-                       "This is the only way you can rename any of the default fields. "
-                       "<br><br><i>Renaming these fields through Anki's regular dialogs "
-                       "will cause the add-on to fail. So please don't do that.</i>")
+        fields_text = (_("Changing any of the entries below will rename "
+                         "the corresponding default field of the IO Enhanced "
+                         "note type. This is the only way you can rename any "
+                         "of the default fields. <br><br><i>Renaming these "
+                         "fields through Anki's regular dialogs will cause "
+                         "the add-on to fail. So please don't do that.</i>"))
 
         fields_description = QLabel(fields_text)
         fields_description.setWordWrap(True)
@@ -217,18 +219,18 @@ class ImgOccOpts(QDialog):
             row += 1
 
         # Misc settings
-        misc_heading = QLabel("<b>Miscellaneous Settings</b>")
+        misc_heading = QLabel(_("<b>Miscellaneous Settings</b>"))
 
         # Skipped fields:
-        skipped_description = QLabel("Comma-separated list of "
-                                     "fields to hide in Editing mode "
-                                     "(in order to preserve manual edits):")
+        skipped_description = QLabel(_("Comma-separated list of "
+                                       "fields to hide in Editing mode "
+                                       "(in order to preserve manual edits):"))
         self.skipped = QLineEdit()
 
         # Hotkey:
-        key_grab_label = QLabel('Invoke IO with the following hotkey:')
+        key_grab_label = QLabel(_('Invoke IO with the following hotkey:'))
         self.key_grabbed = QLabel('')
-        key_grab_btn = QPushButton('Change hotkey', self)
+        key_grab_btn = QPushButton(_('Change hotkey'), self)
         key_grab_btn.clicked.connect(self.showGrabKey)
 
         grid.addWidget(rule2, row + 1, 0, 1, 6)
@@ -242,7 +244,7 @@ class ImgOccOpts(QDialog):
         # Main button box
         button_box = QDialogButtonBox(QDialogButtonBox.Ok |
                                       QDialogButtonBox.Cancel)
-        defaults_btn = button_box.addButton("Restore &Defaults",
+        defaults_btn = button_box.addButton(_("Restore &Defaults"),
                                             QDialogButtonBox.ResetRole)
         defaults_btn.clicked.connect(self.restoreDefaults)
         button_box.accepted.connect(self.onAccept)
@@ -255,7 +257,7 @@ class ImgOccOpts(QDialog):
         self.setLayout(l_main)
         self.setMinimumWidth(800)
         self.setMinimumHeight(640)
-        self.setWindowTitle('Image Occlusion Enhanced Options')
+        self.setWindowTitle(_('Image Occlusion Enhanced Options'))
 
     def create_horizontal_rule(self):
         """
@@ -340,7 +342,8 @@ class ImgOccOpts(QDialog):
                 # update imgocc field-id <-> field-name assignment
                 mw.col.conf['imgocc']['flds'][key] = name
                 modified = True
-                logging.debug("Renamed %s to %s", oldname, name)
+                logging.debug(_("Renamed %(old_name)s, %(new_name)s"),
+                {"old_name": oldname,"new_name": name})
         if modified:
             flds = model['flds']
 
@@ -352,7 +355,7 @@ class ImgOccOpts(QDialog):
         try:
             (modified, flds) = self.renameFields()
         except AnkiError:
-            print("Field rename action aborted")
+            print(_("Field rename action aborted"))
             return
         if modified and hasattr(mw, "ImgOccEdit"):
             self.resetIoEditor(flds)

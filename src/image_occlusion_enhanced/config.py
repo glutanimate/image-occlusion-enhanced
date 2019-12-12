@@ -19,6 +19,8 @@ import sys
 
 from aqt import mw
 
+from .lang import _
+
 global IO_FLDS, IO_FLDS_IDS
 global IO_MODEL_NAME, IO_CARD_NAME, IO_HOME, IO_HOTKEY
 
@@ -88,7 +90,7 @@ def getSyncedConfig():
         mw.col.setMod()
 
     elif mw.col.conf['imgocc']['version'] < default_conf_syncd['version']:
-        print("Updating config DB from earlier IO release")
+        print(_("Updating config DB from earlier IO release"))
         for key in list(default_conf_syncd.keys()):
             if key not in mw.col.conf['imgocc']:
                 mw.col.conf['imgocc'][key] = default_conf_syncd[key]

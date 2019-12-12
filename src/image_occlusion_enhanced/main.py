@@ -19,7 +19,7 @@ Sets up buttons and menus and calls other modules.
 import logging
 import sys
 
-from anki.lang import _
+from anki.lang import _ as __
 from aqt.qt import *
 
 from aqt import mw
@@ -35,6 +35,7 @@ from .config import *
 from .add import ImgOccAdd
 from .options import ImgOccOpts
 from .dialogs import ioHelp, ioCritical
+from .lang import _
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -43,8 +44,8 @@ def onIoSettings():
     """Call settings dialog if Editor not active"""
     # TODO: fix ImgOccEdit detection
     if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
-        tooltip("Please close Image Occlusion Editor\
-            to access the Options.")
+        tooltip(_("Please close Image Occlusion Editor"
+                  " to access the Options."))
         return
     dialog = ImgOccOpts()
     dialog.exec_()
@@ -89,17 +90,17 @@ def onSetupEditorButtons(buttons, editor):
     origin = getEdParentInstance(editor.parentWindow)
 
     if origin == "addcards":
-        tt = "Add Image Occlusion"
+        tt = _("Add Image Occlusion")
         icon_name = "add.png"
     else:
-        tt = "Edit Image Occlusion"
+        tt = _("Edit Image Occlusion")
         icon_name = "edit.png"
 
     icon = os.path.join(ICONS_PATH, icon_name)
 
-    b = editor.addButton(icon, "I/O",
+    b = editor.addButton(icon, _("I/O"),
                          lambda o=editor: onImgOccButton(o),
-                         tip=_("{} ({})".format(tt, hotkey)),
+                         tip="{} ({})".format(tt, hotkey),
                          keys=hotkey, disables=False)
 
     buttons.append(b)
@@ -133,11 +134,11 @@ def openImage(path):
 def contextMenuEvent(self, evt):
     """Add custom context menu for images"""
     m = QMenu(self)
-    a = m.addAction(_("Cut"))
+    a = m.addAction(__("Cut"))
     a.triggered.connect(self.onCut)
-    a = m.addAction(_("Copy"))
+    a = m.addAction(__("Copy"))
     a.triggered.connect(self.onCopy)
-    a = m.addAction(_("Paste"))
+    a = m.addAction(__("Paste"))
     a.triggered.connect(self.onPaste)
     ##################################################
     if not ANKI21:
@@ -244,8 +245,8 @@ def onShowAnswer(self, _old):
 
 
 # Set up menus
-options_action = QAction("Image &Occlusion Enhanced Options...", mw)
-help_action = QAction("Image &Occlusion Enhanced...", mw)
+options_action = QAction(_("Image &Occlusion Enhanced Options..."), mw)
+help_action = QAction(_("Image &Occlusion Enhanced..."), mw)
 options_action.triggered.connect(onIoSettings)
 mw.addonManager.setConfigAction(__name__, onIoSettings)
 help_action.triggered.connect(onIoHelp)
