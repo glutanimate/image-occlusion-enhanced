@@ -27,6 +27,7 @@ from anki.hooks import addHook, remHook
 from .dialogs import ioHelp
 from .consts import *
 from .config import *
+from .lang import _
 
 
 class ImgOccWebPage(webview.AnkiWebPage):
@@ -70,7 +71,8 @@ class ImgOccWebView(webview.AnkiWebView):
                 callback = args[0]
                 callback()
             else:
-                raise Exception("unknown action: {}".format(name))
+                raise Exception(_("unknown action: {action_name}").format(
+                    action_name=name))
 
 
 class ImgOccEdit(QDialog):
@@ -116,7 +118,7 @@ class ImgOccEdit(QDialog):
 
         self.tags_hbox = QHBoxLayout()
         self.tags_edit = tagedit.TagEdit(self)
-        self.tags_label = QLabel("Tags")
+        self.tags_label = QLabel(_("Tags"))
         self.tags_label.setFixedWidth(70)
         self.deck_container = QWidget()
         self.deckChooser = deckchooser.DeckChooser(mw,
@@ -141,38 +143,43 @@ class ImgOccEdit(QDialog):
         button_box = QDialogButtonBox(Qt.Horizontal, self)
         button_box.setCenterButtons(False)
 
-        image_btn = QPushButton("Change &Image", clicked=self.changeImage)
+        image_btn = QPushButton(_("Change &Image"), clicked=self.changeImage)
         image_btn.setIcon(QIcon(os.path.join(ICONS_PATH, "add.png")))
         image_btn.setIconSize(QSize(16, 16))
         image_btn.setAutoDefault(False)
-        help_btn = QPushButton("&Help", clicked=self.onHelp)
+        help_btn = QPushButton(_("&Help"), clicked=self.onHelp)
         help_btn.setAutoDefault(False)
 
         self.occl_tp_select = QComboBox()
-        self.occl_tp_select.addItems(["Don't Change", "Hide All, Guess One",
-                                      "Hide One, Guess One"])
+        self.occl_tp_select.addItem(_("Don't Change"), "Don't Change")
+        self.occl_tp_select.addItem(_("Hide All, Guess One"),
+                                    "Hide All, Guess One")
+        self.occl_tp_select.addItem(_("Hide One, Guess One"),
+                                    "Hide One, Guess One")
 
-        self.edit_btn = button_box.addButton("&Edit Cards",
+        self.edit_btn = button_box.addButton(_("&Edit Cards"),
                                              QDialogButtonBox.ActionRole)
-        self.new_btn = button_box.addButton("&Add New Cards",
+        self.new_btn = button_box.addButton(_("&Add New Cards"),
                                             QDialogButtonBox.ActionRole)
-        self.ao_btn = button_box.addButton("Hide &All, Guess One",
+        self.ao_btn = button_box.addButton(_("Hide &All, Guess One"),
                                            QDialogButtonBox.ActionRole)
-        self.oa_btn = button_box.addButton("Hide &One, Guess One",
+        self.oa_btn = button_box.addButton(_("Hide &One, Guess One"),
                                            QDialogButtonBox.ActionRole)
-        close_button = button_box.addButton("&Close",
+        close_button = button_box.addButton(_("&Close"),
                                             QDialogButtonBox.RejectRole)
 
-        image_tt = ("Switch to a different image while preserving all of "
-                    "the shapes and fields")
-        dc_tt = "Preserve existing occlusion type"
-        edit_tt = "Edit all cards using current mask shapes and field entries"
-        new_tt = "Create new batch of cards without editing existing ones"
-        ao_tt = ("Generate cards with nonoverlapping information, where all<br>"
-                 "labels are hidden on the front and one revealed on the back")
-        oa_tt = ("Generate cards with overlapping information, where one<br>"
-                 "label is hidden on the front and revealed on the back")
-        close_tt = "Close Image Occlusion Editor without generating cards"
+        image_tt = (_("Switch to a different image while preserving all of "
+                      "the shapes and fields"))
+        dc_tt = _("Preserve existing occlusion type")
+        edit_tt = _("Edit all cards using current mask shapes and field "
+                    "entries")
+        new_tt = _("Create new batch of cards without editing existing ones")
+        ao_tt = (_("Generate cards with nonoverlapping information, where all"
+                   "<br>labels are hidden on the front and one revealed on the"
+                   " back"))
+        oa_tt = (_("Generate cards with overlapping information, where one<br>"
+                   "label is hidden on the front and revealed on the back"))
+        close_tt = _("Close Image Occlusion Editor without generating cards")
 
         image_btn.setToolTip(image_tt)
         self.edit_btn.setToolTip(edit_tt)
@@ -208,7 +215,7 @@ class ImgOccEdit(QDialog):
         # Tab 1
         vbox1 = QVBoxLayout()
 
-        svg_edit_loader = QLabel("Loading...")
+        svg_edit_loader = QLabel(_("Loading..."))
         svg_edit_loader.setAlignment(Qt.AlignCenter)
         loader_icon = os.path.join(ICONS_PATH, "loader.gif")
         anim = QMovie(loader_icon)
@@ -231,12 +238,12 @@ class ImgOccEdit(QDialog):
         self.tab2.setLayout(self.vbox2)
         self.tab_widget = QTabWidget()
         self.tab_widget.setFocusPolicy(Qt.ClickFocus)
-        self.tab_widget.addTab(tab1, "&Masks Editor")
-        self.tab_widget.addTab(self.tab2, "&Fields")
+        self.tab_widget.addTab(tab1, _("&Masks Editor"))
+        self.tab_widget.addTab(self.tab2, _("&Fields"))
         self.tab_widget.setTabToolTip(
-            1, "Include additional information (optional)")
+            1, _("Include additional information (optional)"))
         self.tab_widget.setTabToolTip(
-            0, "Create image occlusion masks (required)")
+            0, _("Create image occlusion masks (required)"))
 
         # Main Window
         vbox_main = QVBoxLayout()
@@ -291,11 +298,11 @@ class ImgOccEdit(QDialog):
         self.imgoccadd.onAddNotesButton("oa", close)
 
     def new(self, close=False):
-        choice = self.occl_tp_select.currentText()
+        choice = self.occl_tp_select.currentData()
         self.imgoccadd.onAddNotesButton(choice, close)
 
     def editNote(self):
-        choice = self.occl_tp_select.currentText()
+        choice = self.occl_tp_select.currentData()
         self.imgoccadd.onEditNotesButton(choice)
 
     def onHelp(self):
@@ -365,9 +372,9 @@ class ImgOccEdit(QDialog):
                 i.hide()
             for i in hide_on_edit:
                 i.show()
-            dl_txt = "Deck"
-            ttl = "Image Occlusion Enhanced - Add Mode"
-            bl_txt = "Add Cards:"
+            dl_txt = _("Deck")
+            ttl = _("Image Occlusion Enhanced - Add Mode")
+            bl_txt = _("Add Cards:")
         else:
             for i in hide_on_add:
                 i.show()
@@ -377,9 +384,9 @@ class ImgOccEdit(QDialog):
                 if i in list(self.tedit.keys()):
                     self.tedit[i].hide()
                     self.tlabel[i].hide()
-            dl_txt = "Deck for <i>Add new cards</i>"
-            ttl = "Image Occlusion Enhanced - Editing Mode"
-            bl_txt = "Type:"
+            dl_txt = _("Deck for <i>Add new cards</i>")
+            ttl = _("Image Occlusion Enhanced - Editing Mode")
+            bl_txt = _("Type:")
         self.deckChooser.deckLabel.setText(dl_txt)
         self.setWindowTitle(ttl)
         self.bottom_label.setText(bl_txt)
