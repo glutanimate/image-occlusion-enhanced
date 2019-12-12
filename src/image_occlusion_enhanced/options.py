@@ -125,6 +125,8 @@ class ImgOccOpts(QDialog):
         self.swidth_sel.setValue(int(config['swidth']))
         self.font_sel.setCurrentFont(QFont(config['font']))
         self.skipped.setText(','.join(config["skip"]))
+        self.default_tool_cb.setCurrentIndex(
+            self.default_tool_cb.findData(config['default_tool']))
 
     def setupUi(self):
         """Set up widgets and layouts"""
@@ -238,6 +240,29 @@ class ImgOccOpts(QDialog):
         grid.addWidget(key_grab_label, row + 5, 0, 1, 2)
         grid.addWidget(self.key_grabbed, row + 5, 2, 1, 1)
         grid.addWidget(key_grab_btn, row + 5, 3, 1, 3)
+
+        # Default Tool:
+        default_tool_label = QLabel('Default Tool')
+        self.default_tool_cb = QComboBox()
+        # Displayed names and values of of the combobox entries:
+        default_tool_choices = {
+            'Select Tool': 'select',
+            'Pencil Tool': 'fhpath',
+            'Line Tool': 'line',
+            'Path Tool': 'path',
+            'Text Tool': 'text',
+            'Image Tool': 'image',
+            'Free-Hand Rectangle Tool': 'fhrect',
+            'Square Tool': 'square',
+            'Rectangle Tool': 'rect',
+            'Ellipse Tool': 'ellipse',
+            'Circle Tool': 'circle',
+            'Free-Hand Ellipse Tool': 'fhellipse',
+        }
+        for name, value in default_tool_choices.items():
+            self.default_tool_cb.addItem(name, value)
+        grid.addWidget(default_tool_label, row + 6, 0, 1, 2)
+        grid.addWidget(self.default_tool_cb, row + 6, 3, 1, 3)
 
         # Main button box
         button_box = QDialogButtonBox(QDialogButtonBox.Ok |
@@ -362,6 +387,7 @@ class ImgOccOpts(QDialog):
         mw.col.conf['imgocc']['swidth'] = self.swidth_sel.value()
         mw.col.conf['imgocc']['fsize'] = self.fsize_sel.value()
         mw.col.conf['imgocc']['font'] = self.font_sel.currentFont().family()
+        mw.col.conf['imgocc']['default_tool'] = self.default_tool_cb.currentData()
         mw.col.conf['imgocc']['skip'] = self.skipped.text().split(',')
         mw.pm.profile["imgocc"]["hotkey"] = self.hotkey
         mw.col.setMod()

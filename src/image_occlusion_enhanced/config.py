@@ -57,15 +57,16 @@ IO_HOTKEY = "Ctrl+Shift+O"
 
 # default configurations
 # TODO: update version number before release
-default_conf_local = {'version': 1.25,
+default_conf_local = {'version': 1.26,
                       'dir': IO_HOME,
                       'hotkey': IO_HOTKEY}
-default_conf_syncd = {'version': 1.25,
+default_conf_syncd = {'version': 1.26,
                       'ofill': 'FFEBA2',
                       'qfill': 'FF7E7E',
                       'scol': '2D2D2D',
                       'swidth': 3,
                       'font': 'Arial',
+                      'default_tool': 'rect',
                       'fsize': 24,
                       'skip': [IO_FLDS["e1"], IO_FLDS["e2"]],
                       'flds': IO_FLDS}
