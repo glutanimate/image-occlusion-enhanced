@@ -20,7 +20,7 @@ import os
 
 from aqt.qt import *
 
-from aqt import mw, webview, deckchooser, tagedit, sip
+from aqt import mw, webview, deckchooser, tagedit, sip, dialogs
 from aqt.utils import saveGeom, restoreGeom
 from anki.hooks import addHook, remHook
 
@@ -89,14 +89,42 @@ class ImgOccEdit(QDialog):
         restoreGeom(self, "imgoccedit")
         addHook("unloadProfile", self.onProfileUnload)
 
+    def closeWithCallback(self, callback):
+        def ifCanClose():
+            self._close()
+            callback()
+
+        self.askIfClose(ifCanClose)
+
+    def askIfClose(self, callback):
+        from aqt.utils import askUser
+        from anki.lang import _
+
+        def js_callback(size):
+            canClose = not size or size == 0 \
+                or (size > 0 and
+                    askUser(_("Close and lose current input?"),
+                            defaultno=True))
+            if canClose:
+                callback()
+
+        self.svg_edit.evalWithCallback('svgCanvas.undoMgr.getUndoStackSize()',
+                                       js_callback)
+
     def closeEvent(self, event):
+        event.ignore()
+        self.askIfClose(lambda: self._close())
+
+    def _close(self):
         if mw.pm.profile is not None:
             self.deckChooser.cleanup()
             saveGeom(self, "imgoccedit")
         self.visible = False
         self.svg_edit = None
-        del(self.svg_edit_anim)  # might not be gc'd
+        if hasattr(self, "svg_edit_anim"):
+            del(self.svg_edit_anim)  # might not be gc'd
         remHook("unloadProfile", self.onProfileUnload)
+        dialogs.markClosed("ImgOccEdit")
         QDialog.reject(self)
 
     def onProfileUnload(self):

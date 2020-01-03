@@ -21,7 +21,7 @@ import tempfile
 
 from aqt.qt import *
 
-from aqt import mw
+from aqt import mw, dialogs
 from aqt.utils import tooltip, showWarning
 
 from .ngen import *
@@ -189,7 +189,7 @@ class ImgOccAdd(object):
         flds = self.mflds
         deck = mw.col.decks.nameOrNone(opref["did"])
 
-        dialog = ImgOccEdit(self, self.ed.parentWindow)
+        dialog = dialogs.open('ImgOccEdit', self, self.ed.parentWindow)
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
@@ -247,6 +247,11 @@ class ImgOccAdd(object):
                     ioInfo("obsolete_aa", parent=dialog)
                 dialog.showSvgEdit(True)
                 dialog.fitImageCanvas()
+                # The only thing undo does in edit mode is removing all
+                # occlusions. If the undo stack is not empty at the beginning
+                # there will always be a confirmation popup before the user
+                # can close the dialog.
+                dialog.svg_edit.eval("svgCanvas.undoMgr.resetUndoStack()")
 
         dialog.svg_edit.runOnLoaded(onSvgEditLoaded)
         dialog.visible = True
