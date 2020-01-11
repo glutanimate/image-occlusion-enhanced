@@ -247,11 +247,6 @@ class ImgOccAdd(object):
                     ioInfo("obsolete_aa", parent=dialog)
                 dialog.showSvgEdit(True)
                 dialog.fitImageCanvas()
-                # The only thing undo does in edit mode is removing all
-                # occlusions. If the undo stack is not empty at the beginning
-                # there will always be a confirmation popup before the user
-                # can close the dialog.
-                dialog.svg_edit.eval("svgCanvas.undoMgr.resetUndoStack()")
 
         dialog.svg_edit.runOnLoaded(onSvgEditLoaded)
         dialog.visible = True

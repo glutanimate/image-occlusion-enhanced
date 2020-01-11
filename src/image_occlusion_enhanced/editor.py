@@ -88,6 +88,12 @@ class ImgOccEdit(QDialog):
         self.setupUi()
         restoreGeom(self, "imgoccedit")
         addHook("unloadProfile", self.onProfileUnload)
+        # Used for determining whether or not to ask for confirmation before
+        # the dialog is closed.
+        js = """let lastStackTop = svgCanvas.undoMgr.getUndoStackSize() > 0 ?
+          svgCanvas.undoMgr.undoStack[svgCanvas.undoMgr.getUndoStackSize() - 1]
+        : undefined;"""
+        self.svg_edit.eval(js)
 
     def closeWithCallback(self, callback):
         def ifCanClose():
@@ -100,16 +106,20 @@ class ImgOccEdit(QDialog):
         from aqt.utils import askUser
         from anki.lang import _
 
-        def js_callback(size):
-            canClose = not size or size == 0 \
-                or (size > 0 and
-                    askUser(_("Close and lose current input?"),
-                            defaultno=True))
-            if canClose:
+        def js_callback(can_close):
+            can_close = can_close or \
+                askUser(_("Close and lose current input?"), defaultno=True)
+            if can_close:
                 callback()
 
-        self.svg_edit.evalWithCallback('svgCanvas.undoMgr.getUndoStackSize()',
-                                       js_callback)
+        # If there are no undo items it's safe to close the dialog.
+        # Otherwise, if the element on top of the undo stack is the same
+        # (comparison by reference) as the last time cards were saved it's
+        # also safe to close the dialog because there are no unsaved changes.
+        js = """svgCanvas.undoMgr.getUndoStackSize() <= 0 ||
+          svgCanvas.undoMgr.undoStack[svgCanvas.undoMgr.getUndoStackSize() - 1]
+            === lastStackTop"""
+        self.svg_edit.evalWithCallback(js, js_callback)
 
     def closeEvent(self, event):
         event.ignore()
@@ -126,6 +136,15 @@ class ImgOccEdit(QDialog):
         remHook("unloadProfile", self.onProfileUnload)
         dialogs.markClosed("ImgOccEdit")
         QDialog.reject(self)
+
+    def _updateLastStackTop(self):
+        """Store the element that was on top of the svg-edit undo stack
+        the last time the user created cards."""
+
+        js = """lastStackTop = svgCanvas.undoMgr.getUndoStackSize() > 0 ?
+          svgCanvas.undoMgr.undoStack[svgCanvas.undoMgr.getUndoStackSize() - 1]
+        : undefined;"""
+        self.svg_edit.eval(js)
 
     def onProfileUnload(self):
         if not sip.isdeleted(self):
@@ -313,16 +332,20 @@ class ImgOccEdit(QDialog):
             self.editNote()
 
     def addAO(self, close=False):
+        self._updateLastStackTop()
         self.imgoccadd.onAddNotesButton("ao", close)
 
     def addOA(self, close=False):
+        self._updateLastStackTop()
         self.imgoccadd.onAddNotesButton("oa", close)
 
     def new(self, close=False):
+        self._updateLastStackTop()
         choice = self.occl_tp_select.currentText()
         self.imgoccadd.onAddNotesButton(choice, close)
 
     def editNote(self):
+        self._updateLastStackTop()
         choice = self.occl_tp_select.currentText()
         self.imgoccadd.onEditNotesButton(choice)
 
