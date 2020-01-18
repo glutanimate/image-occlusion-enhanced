@@ -82,7 +82,7 @@ More information: <a href="{io_link_wiki}">Wiki: Editing Notes</a>.
 """).format(io_link_wiki=io_link_wiki + "/Basic-Use#editing-cards")
 
 dialog_msg["notetype"] = _("""
-<b>Fixing a broken note type:</b
+<b>Fixing a broken note type:</b>
 <br><br> The Image Occlusion Enhanced note type can't be edited
 arbitrarily. If you delete a field that's required by the add-on
 or rename it outside of the IO Options dialog you will be presented
