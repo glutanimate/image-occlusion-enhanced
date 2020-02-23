@@ -20,7 +20,7 @@
 # - use Anki's code and variables whenever possible
 # - remove unneeded functions and variables
 #
-# Modifications were made on 2019-12-13.
+# Modifications were made on 2020-02-23.
 # Link to original file at time of creation:
 # https://github.com/dae/anki/blob/241b7ea005e2360ea8c1e0a1dd91d8b4dda4bf0e/anki/lang.py
 
@@ -82,8 +82,6 @@ compatMap = {
     "vi": "vi_VN",
 }
 
-threadLocal = threading.local()
-
 # global defaults
 currentLang = None
 currentTranslation = None
@@ -91,10 +89,7 @@ currentTranslation = None
 
 def localTranslation():
     "Return the translation local to this thread, or the default."
-    if getattr(threadLocal, 'currentTranslation', None):
-        return threadLocal.currentTranslation
-    else:
-        return currentTranslation
+    return currentTranslation
 
 
 def _(str):
@@ -110,18 +105,14 @@ def langDir():
     return os.path.abspath(os.path.join(filedir, "locale"))
 
 
-def setLang(lang, local=True):
+def setLang(lang):
     lang = mungeCode(lang)
     trans = gettext.translation(
         'anki-image-occlusion-enhanced', langDir(), languages=[lang],
         fallback=True)
-    if local:
-        threadLocal.currentLang = lang
-        threadLocal.currentTranslation = trans
-    else:
-        global currentLang, currentTranslation
-        currentLang = lang
-        currentTranslation = trans
+    global currentLang, currentTranslation
+    currentLang = lang
+    currentTranslation = trans
 
 
 def mungeCode(code):
@@ -133,4 +124,4 @@ def mungeCode(code):
 
 
 if not currentTranslation:
-    setLang(anki.lang.getLang(), local=False)
+    setLang(anki.lang.getLang())
