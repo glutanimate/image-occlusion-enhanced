@@ -233,7 +233,7 @@ class ImgOccNoteGenerator(object):
 
     def _findByNoteId(self, note_id):
         """Search collection for notes with given ID"""
-        query = "'%s':'%s*'" % (self.ioflds['id'], note_id)
+        query = '"%s:%s*"' % (self.ioflds['id'], note_id)
         logging.debug("query %s", query)
         res = mw.col.findNotes(query)
         return res

@@ -92,7 +92,7 @@ class ImgOccNoteConverter(object):
     def findByNoteId(self, note_id):
         """Search collection for notes with given ID in their omask paths"""
         # need to use omask path because Note ID field is not yet set
-        query = "'%s':'*%s*'" % (self.ioflds['om'], note_id)
+        query = '"%s:*%s*"' % (self.ioflds['om'], note_id)
         logging.debug("query: %s", query)
         res = mw.col.findNotes(query)
         return res
