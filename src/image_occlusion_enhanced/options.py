@@ -323,15 +323,13 @@ class ImgOccOpts(QDialog):
             if not self.lnedit[key].isModified():
                 continue
             name = self.lnedit[key].text()
-            oldname = mw.col.get_config('imgocc')['flds'][key]
+            oldname = mw.col.conf['imgocc']['flds'][key]
             if (name is None or not name.strip() or name == oldname):
                 continue
             fnames = mw.col.models.fieldNames(model)
             if (name in fnames and oldname not in fnames):
                 # case: imported cards, fields not corresponding to config
-                conf = mw.col.get_config('imgocc')
-                conf['flds'][key] = name
-                mw.col.set_config('imgocc', conf)
+                mw.col.conf['imgocc']['flds'][key] = name
                 modified = True
                 continue
             idx = fnames.index(oldname)
@@ -340,9 +338,7 @@ class ImgOccOpts(QDialog):
                 # rename note type fields
                 mw.col.models.renameField(model, fld, name)
                 # update imgocc field-id <-> field-name assignment
-                conf = mw.col.get_config('imgocc')
-                conf['flds'][key] = name
-                mw.col.set_config('imgocc', conf)
+                mw.col.conf['imgocc']['flds'][key] = name
                 modified = True
                 logging.debug("Renamed %s to %s", oldname, name)
         if modified:
@@ -360,16 +356,15 @@ class ImgOccOpts(QDialog):
             return
         if modified and hasattr(mw, "ImgOccEdit"):
             self.resetIoEditor(flds)
-        conf = mw.col.get_config('imgocc')
-        conf['ofill'] = self.ofill
-        conf['qfill'] = self.qfill
-        conf['scol'] = self.scol
-        conf['swidth'] = self.swidth_sel.value()
-        conf['fsize'] = self.fsize_sel.value()
-        conf['font'] = self.font_sel.currentFont().family()
-        conf['skip'] = self.skipped.text().split(',')
-        mw.col.set_config('imgocc', conf)
+        mw.col.conf['imgocc']['ofill'] = self.ofill
+        mw.col.conf['imgocc']['qfill'] = self.qfill
+        mw.col.conf['imgocc']['scol'] = self.scol
+        mw.col.conf['imgocc']['swidth'] = self.swidth_sel.value()
+        mw.col.conf['imgocc']['fsize'] = self.fsize_sel.value()
+        mw.col.conf['imgocc']['font'] = self.font_sel.currentFont().family()
+        mw.col.conf['imgocc']['skip'] = self.skipped.text().split(',')
         mw.pm.profile["imgocc"]["hotkey"] = self.hotkey
+        mw.col.setMod()
         self.close()
 
     def resetIoEditor(self, flds):
