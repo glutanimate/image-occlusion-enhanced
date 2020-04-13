@@ -68,7 +68,7 @@ class ImgOccNoteGenerator(object):
         self.tags = tags
         self.fields = fields
         self.did = did
-        self.qfill = '#' + mw.col.get_config('imgocc')['qfill']
+        self.qfill = '#' + mw.col.conf['imgocc']['qfill']
         loadConfig(self)
 
     def generateNotes(self):
