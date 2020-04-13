@@ -62,7 +62,7 @@ def onImgOccButton(self, origin=None, image_path=None):
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
         if "imgocc" in mw.col.conf:
-            dflt_fields = list(mw.col.get_config('imgocc')['flds'].values())
+            dflt_fields = list(mw.col.conf['imgocc']['flds'].values())
         else:
             dflt_fields = list(IO_FLDS.values())
         # note type integrity check
