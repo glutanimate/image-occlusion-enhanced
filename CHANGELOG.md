@@ -12,6 +12,10 @@ If you enjoy Image Occlusion Enhanced, please consider supporting my work on Pat
 
 ## [Unreleased]
 
+## [1.3.0-alpha6] - 2020-04-28
+
+### [Download](https://github.com/glutanimate/image-occlusion-enhanced/releases/tag/v1.3.0-alpha6)
+
 ### Fixed
 
 - Fixed note editing support on Anki 2.1.24+ (thanks to @zjosua for the fix!)
