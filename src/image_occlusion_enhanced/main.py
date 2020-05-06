@@ -23,6 +23,7 @@ from anki.lang import _
 from aqt.qt import *
 
 from aqt import mw
+from aqt import dialogs
 from aqt.editor import Editor, EditorWebView
 from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
@@ -35,6 +36,7 @@ from .config import *
 from .add import ImgOccAdd
 from .options import ImgOccOpts
 from .dialogs import ioHelp, ioCritical
+from .editor import ImgOccEdit
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -269,3 +271,6 @@ if not ANKI21:
     Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
 else:
     addHook("reviewStateShortcuts", onReviewerStateShortcuts)
+
+# Set up dialog
+dialogs._dialogs['ImgOccEdit'] = [ImgOccEdit, None]

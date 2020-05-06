@@ -21,7 +21,7 @@ import tempfile
 
 from aqt.qt import *
 
-from aqt import mw
+from aqt import mw, dialogs
 from aqt.utils import tooltip, showWarning
 
 from .ngen import *
@@ -189,7 +189,7 @@ class ImgOccAdd(object):
         flds = self.mflds
         deck = mw.col.decks.nameOrNone(opref["did"])
 
-        dialog = ImgOccEdit(self, self.ed.parentWindow)
+        dialog = dialogs.open('ImgOccEdit', self, self.ed.parentWindow)
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
