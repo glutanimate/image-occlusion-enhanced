@@ -239,7 +239,9 @@ class ImgOccAdd(object):
             svg_url = path2url(opref["omask"])
             items.addQueryItem('url', svg_url)
         else:
-            items.addQueryItem('initTool', 'rect'),
+            # Get the default tool
+            tool = self.sconf['default_tool']
+            items.addQueryItem('initTool', tool),
 
         url.setQuery(items)
         dialog.svg_edit.setUrl(url)
