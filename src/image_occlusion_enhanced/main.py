@@ -140,16 +140,11 @@ def contextMenuEvent(self, evt):
     a = m.addAction(_("Paste"))
     a.triggered.connect(self.onPaste)
     ##################################################
-    if not ANKI21:
-        hit = self.page().currentFrame().hitTestContent(evt.pos())
-        url = hit.imageUrl()
-        path = url.toLocalFile()
-    else:
-        # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
-        context_data = self.page().contextMenuData()
-        url = context_data.mediaUrl()
-        image_name = url.fileName()
-        path = os.path.join(mw.col.media.dir(), image_name)
+    # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
+    context_data = self.page().contextMenuData()
+    url = context_data.mediaUrl()
+    image_name = url.fileName()
+    path = os.path.join(mw.col.media.dir(), image_name)
     if url.isValid() and path:
         a = m.addAction(_("Occlude Image"))
         a.triggered.connect(
@@ -231,15 +226,10 @@ def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
     if not self.card or not self.card.model()["name"] == IO_MODEL_NAME:
         return _old(self)
-    if not ANKI21:
-        scroll_pos = self.web.page().mainFrame().scrollPosition()
-        ret = _old(self)
-        self.web.page().mainFrame().setScrollPosition(scroll_pos)
-    else:
-        scroll_pos = self.web.page().scrollPosition()
-        ret = _old(self)
-        self.web.eval("window.scrollTo({}, {});".format(
-            scroll_pos.x(), scroll_pos.y()))
+    scroll_pos = self.web.page().scrollPosition()
+    ret = _old(self)
+    self.web.eval("window.scrollTo({}, {});".format(
+        scroll_pos.x(), scroll_pos.y()))
     return ret
 
 
@@ -265,7 +255,4 @@ Editor.onImgOccButton = onImgOccButton
 
 # aqt.reviewer.Reviewer
 Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
-if not ANKI21:
-    Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
-else:
-    addHook("reviewStateShortcuts", onReviewerStateShortcuts)
+addHook("reviewStateShortcuts", onReviewerStateShortcuts)
