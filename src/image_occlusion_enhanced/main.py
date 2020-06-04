@@ -217,17 +217,11 @@ def onHintHotkey():
         if (ioBtn) {ioBtn.click();}
     """)
 
-
-def onReviewerStateShortcuts(shortcuts):
-    """Add hint hotkey on Anki 2.1.x"""
+def on_mw_state_shortcuts(state: str, shortcuts: list):
+    """Add hint hotkey when in Reviewer"""
+    if state != "review":
+        return
     shortcuts.append(("G", onHintHotkey))
-
-
-def newKeyHandler(self, evt):
-    """Add hint hotkey on Anki 2.0.x"""
-    if (self.state == "answer" and evt.key() == Qt.Key_G):
-        onHintHotkey()
-
 
 # Retain scroll position when answering
 
@@ -282,5 +276,12 @@ def setup_addon():
     Editor.onImgOccButton = onImgOccButton
 
     # aqt.reviewer.Reviewer
+    
     Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
-    addHook("reviewStateShortcuts", onReviewerStateShortcuts)
+        
+    try:
+        from aqt.gui_hooks import state_shortcuts_will_change
+        state_shortcuts_will_change.append(on_mw_state_shortcuts)
+    except (ImportError, ModuleNotFoundError):
+        addHook("reviewStateShortcuts",
+                lambda shortcuts: on_mw_state_shortcuts("review", shortcuts))
