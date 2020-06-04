@@ -3,8 +3,8 @@
 ##                                                ##
 ##           Image Occlusion Enhanced             ##
 ##                                                ##
-##      Copyright (c) Glutanimate 2016-2017       ##
-##       (https://github.com/Glutanimate)         ##
+##      Copyright (c) Glutanimate 2016-2020       ##
+##           (https://glutanimate.com)            ##
 ##                                                ##
 ####################################################
 
