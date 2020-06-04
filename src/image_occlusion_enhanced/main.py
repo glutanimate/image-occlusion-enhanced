@@ -180,21 +180,40 @@ io_editor_style = """
 """
 
 
-def onSetNote(self, note, hide=True, focus=False):
-    """Customize the editor when IO notes are active"""
-    if self.web is None:  # editor is in cleanup
-        return
+def js_note_loaded(note) -> str:
+    js = []
+    
     # Conditionally set body CSS  class
-    if not (self.note and self.note.model()["name"] == IO_MODEL_NAME):
-        self.web.eval("""$("body").removeClass("ionote");""")
+    if not (note and note.model()["name"] == IO_MODEL_NAME):
+        js.append("""$("body").removeClass("ionote");""")
     else:
         # Only hide first field if it's the ID field
         # TODO? identify ID field HTML element automatically
-        if self.note.model()['flds'][0]['name'] == IO_FLDS['id']:
-            self.web.eval("""$("body").addClass("ionote-id");""")
+        if note.model()['flds'][0]['name'] == IO_FLDS['id']:
+            js.append("""$("body").addClass("ionote-id");""")
         else:
-            self.web.eval("""$("body").removeClass("ionote-id");""")
-        self.web.eval("""$("body").addClass("ionote");""")
+            js.append("""$("body").removeClass("ionote-id");""")
+        js.append("""$("body").addClass("ionote");""")
+    
+    return "\n".join(js)
+
+
+def on_editor_will_load_note(js: str, note, editor):
+    """Customize the editor when IO notes are active"""
+    if not editor.web:
+        # editor is in cleanup TODO: evaluate if check still necessary
+        return js
+    js_additions = js_note_loaded(note)
+    return "\n".join([js, js_additions])
+
+def legacyOnSetNote(self, note, hide=True, focus=False):
+    """Legacy: Monkey-patch Editor.onSetNote
+    when 'editor_will_load_note' hook unavailable"""
+    if self.web is None:  # editor is in cleanup
+        return
+    js = js_note_loaded(self.note)
+    self.web.eval(js)
+    
 
 
 def onProfileLoaded():
@@ -272,7 +291,12 @@ def setup_addon():
     except (ImportError, ModuleNotFoundError):
         EditorWebView.contextMenuEvent = legacyEditorContextMenuEvent
     
-    Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
+    try:
+        from aqt.gui_hooks import editor_will_load_note
+        editor_will_load_note.append(on_editor_will_load_note)
+    except (ImportError, ModuleNotFoundError):
+        Editor.setNote = wrap(Editor.setNote, legacyOnSetNote, "after")
+    
     Editor.onImgOccButton = onImgOccButton
 
     # aqt.reviewer.Reviewer
