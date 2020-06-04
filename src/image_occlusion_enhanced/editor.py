@@ -87,7 +87,11 @@ class ImgOccEdit(QDialog):
         loadConfig(self)
         self.setupUi()
         restoreGeom(self, "imgoccedit")
-        addHook("unloadProfile", self.onProfileUnload)
+        try:
+            from aqt.gui_hooks import profile_will_close
+            profile_will_close.append(self.onProfileUnload)
+        except (ImportError, ModuleNotFoundError):
+            addHook("unloadProfile", self.onProfileUnload)
 
     def closeEvent(self, event):
         if mw.pm.profile is not None:
@@ -96,7 +100,11 @@ class ImgOccEdit(QDialog):
         self.visible = False
         self.svg_edit = None
         del(self.svg_edit_anim)  # might not be gc'd
-        remHook("unloadProfile", self.onProfileUnload)
+        try:
+            from aqt.gui_hooks import profile_will_close
+            profile_will_close.append(self.onProfileUnload)
+        except (ImportError, ModuleNotFoundError):
+            remHook("unloadProfile", self.onProfileUnload)
         QDialog.reject(self)
 
     def onProfileUnload(self):
