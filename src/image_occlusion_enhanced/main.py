@@ -299,7 +299,7 @@ def setup_addon():
         from aqt.gui_hooks import main_window_did_init
         main_window_did_init.append(on_main_window_did_init)
     except (ImportError, ModuleNotFoundError):
-        try:
+        try:  # 2.1.20+
             from aqt.gui_hooks import profile_did_open
             profile_did_open.append(on_profile_loaded_singleshot)
         except (ImportError, ModuleNotFoundError):
@@ -307,7 +307,7 @@ def setup_addon():
     
     # Add-on setup at profile load time
     
-    try:
+    try:  # 2.1.20+
         from aqt.gui_hooks import profile_did_open
         profile_did_open.append(on_profile_loaded)
     except (ImportError, ModuleNotFoundError):
@@ -315,19 +315,19 @@ def setup_addon():
 
     # aqt.editor.Editor
     
-    try:
+    try:  # 2.1.20+
         from aqt.gui_hooks import editor_did_init_buttons
         editor_did_init_buttons.append(onSetupEditorButtons)
     except (ImportError, ModuleNotFoundError):
         addHook("setupEditorButtons", onSetupEditorButtons)
     
-    try:
+    try:  # 2.1.20+
         from aqt.gui_hooks import editor_will_show_context_menu
         editor_will_show_context_menu.append(maybe_add_image_menu)
     except (ImportError, ModuleNotFoundError):
         EditorWebView.contextMenuEvent = legacyEditorContextMenuEvent
     
-    try:
+    try:  # 2.1.20+
         from aqt.gui_hooks import editor_will_load_note
         editor_will_load_note.append(on_editor_will_load_note)
     except (ImportError, ModuleNotFoundError):
@@ -339,7 +339,7 @@ def setup_addon():
     
     Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
         
-    try:
+    try:  # 2.1.20+
         from aqt.gui_hooks import state_shortcuts_will_change
         state_shortcuts_will_change.append(on_mw_state_shortcuts)
     except (ImportError, ModuleNotFoundError):
