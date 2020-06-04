@@ -215,14 +215,36 @@ def legacyOnSetNote(self, note, hide=True, focus=False):
     self.web.eval(js)
     
 
+def on_webview_will_set_content(web_content, context):
+    if not isinstance(context, Editor):
+        return
+    web_content.body += io_editor_style
 
-def onProfileLoaded():
-    """Add our custom user styles to the editor DOM
-    Need to do this on profile load time to avoid interferences with
-    other add-ons that might potentially overwrite editor HTML"""
-    from aqt import editor
-    editor._html = editor._html + io_editor_style.replace("%", "%%")
-    # Setup add-on config and templates, update if necessary
+def on_main_window_did_init():
+    """Add our custom user styles to the editor HTML
+    Need to delay this to avoid interferences with other add-ons that might
+    potentially overwrite editor HTML"""
+    try:  # 2.1.22+
+        from aqt.gui_hooks import webview_will_set_content
+        webview_will_set_content.append(on_webview_will_set_content)
+    except (ImportError, ModuleNotFoundError):
+        from aqt import editor
+        editor._html = editor._html + io_editor_style.replace("%", "%%")
+
+
+_profile_singleshot_run = False
+
+def on_profile_loaded_singleshot():
+    """Legacy single-shot function to delay execution of particular code paths
+    until Anki (and other add-ons) loaded"""
+    global _profile_singleshot_run
+    if _profile_singleshot_run:
+        return
+    on_main_window_did_init()
+    _profile_singleshot_run = True
+
+def on_profile_loaded():
+    """Setup add-on config and templates, update if necessary"""
     getSyncedConfig()
     getLocalConfig()
     getOrCreateModel()
@@ -243,6 +265,8 @@ def on_mw_state_shortcuts(state: str, shortcuts: list):
     shortcuts.append(("G", onHintHotkey))
 
 # Retain scroll position when answering
+
+# TODO: Handle in JS
 
 def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
@@ -269,13 +293,25 @@ def setup_addon():
     
     # Set up hooks and monkey patches
     
-    # Add-on setup at profile-load time
+    # Add-on setup at main window load time
+    
+    try:  # 2.1.28+
+        from aqt.gui_hooks import main_window_did_init
+        main_window_did_init.append(on_main_window_did_init)
+    except (ImportError, ModuleNotFoundError):
+        try:
+            from aqt.gui_hooks import profile_did_open
+            profile_did_open.append(on_profile_loaded_singleshot)
+        except (ImportError, ModuleNotFoundError):
+            addHook("profileLoaded", on_profile_loaded_singleshot)
+    
+    # Add-on setup at profile load time
     
     try:
         from aqt.gui_hooks import profile_did_open
-        profile_did_open.append(onProfileLoaded)
+        profile_did_open.append(on_profile_loaded)
     except (ImportError, ModuleNotFoundError):
-        addHook("profileLoaded", onProfileLoaded)
+        addHook("profileLoaded", on_profile_loaded)
 
     # aqt.editor.Editor
     
