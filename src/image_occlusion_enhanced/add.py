@@ -48,6 +48,7 @@ from .config import *
 from .editor import ImgOccEdit
 from .dialogs import ioCritical, ioInfo
 from .utils import imageProp, img2path, path2url
+from .lang import _
 
 from .consts import SUPPORTED_EXTENSIONS
 
@@ -94,12 +95,12 @@ class ImgOccAdd(object):
             else:
                 image_path = self.getImageFromFields(note.fields)
                 if image_path:
-                    tooltip("Non-editable note.<br>"
-                            "Using image to create new IO note.")
+                    tooltip(_("Non-editable note.<br>"
+                              "Using image to create new IO note."))
 
         if not image_path:
-            tooltip(("This note cannot be edited, nor is there<br>"
-                     "an image to use for an image occlusion."))
+            tooltip((_("This note cannot be edited, nor is there<br>"
+                       "an image to use for an image occlusion.")))
             return False
 
         self.setPreservedAttrs(note)
@@ -109,8 +110,9 @@ class ImgOccAdd(object):
             width, height = imageProp(image_path)
         except ValueError as e:
             showWarning(
-                f"<b>Unsupported image</b> in file <i>{image_path}</i>:"
-                f"<br><br>{str(e)}")
+                _("<b>Unsupported image</b> in file <i>{image_path}</i>:"
+                  "<br><br>{error}").format(
+                      image_path=image_path, error=str(e)))
             return False
 
         self.callImgOccEdit(width, height)
@@ -131,10 +133,10 @@ class ImgOccAdd(object):
         omask = img2path(note[self.ioflds['om']])
 
         if note_id is None or note_id.count("-") != 2:
-            msg = "Editing unavailable: Invalid image occlusion Note ID"
+            msg = _("Editing unavailable: Invalid image occlusion Note ID")
             return msg, None
         elif not omask or not image_path:
-            msg = "Editing unavailable: Missing image or original mask"
+            msg = _("Editing unavailable: Missing image or original mask")
             return msg, None
 
         note_id_grps = note_id.split('-')
@@ -180,9 +182,10 @@ class ImgOccAdd(object):
             prev_image_dir = IO_HOME
 
         image_path = QFileDialog.getOpenFileName(
-            parent,
-            "Select an Image", prev_image_dir,
-            f"""Image Files ({" ".join("*." + ext for ext in SUPPORTED_EXTENSIONS)})"""
+            parent, _("Select an Image"), prev_image_dir,
+            _("""Image Files ({file_glob_list})""").format(
+                file_glob_list=" ".join(
+                    "*." + ext for ext in SUPPORTED_EXTENSIONS))
         )
         if image_path:
             image_path = image_path[0]
@@ -190,7 +193,7 @@ class ImgOccAdd(object):
         if not image_path:
             return None
         elif not os.path.isfile(image_path):
-            tooltip("Invalid image file path")
+            tooltip(_("Invalid image file path"))
             return False
         else:
             self.lconf["dir"] = os.path.dirname(image_path)
@@ -214,7 +217,7 @@ class ImgOccAdd(object):
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
-        logging.debug("Launching new ImgOccEdit instance")
+        logging.debug(_("Launching new ImgOccEdit instance"))
 
         url = QUrl.fromLocalFile(svg_edit_path)
         items = QUrlQuery()
@@ -282,8 +285,9 @@ class ImgOccAdd(object):
             width, height = imageProp(image_path)
         except ValueError as e:
             showWarning(
-                f"<b>Unsupported image</b> in file <i>{image_path}</i>:"
-                f"<br><br>{str(e)}")
+                _("<b>Unsupported image</b> in file <i>{image_path}</i>:"
+                  "<br><br>{error}").format(
+                      image_path=image_path, error=str(e)))
             return False
         bkgd_url = path2url(image_path)
         self.imgoccedit.svg_edit.eval("""

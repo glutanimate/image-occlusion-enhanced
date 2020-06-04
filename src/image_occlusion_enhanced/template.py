@@ -35,6 +35,7 @@ Handles the IO note type and card template
 """
 
 from .config import *
+from .lang import _
 
 # DEFAULT CARD TEMPLATES
 
@@ -295,7 +296,7 @@ def add_io_model(col):
 
 
 def reset_template(col):
-    print("Resetting IO Enhanced card template to defaults")
+    print(_("Resetting IO Enhanced card template to defaults"))
     io_model = col.models.byName(IO_MODEL_NAME)
     template = io_model['tmpls'][0]
     template['qfmt'] = iocard_front
@@ -306,7 +307,7 @@ def reset_template(col):
 
 
 def update_template(col, old_version):
-    print("Updating IO Enhanced card template")
+    print(_("Updating IO Enhanced card template"))
 
     additions = [[], [], []]
 

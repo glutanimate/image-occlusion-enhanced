@@ -47,6 +47,7 @@ from ._vendor import imghdr
 from ._vendor.imagesize import imagesize
 
 from .consts import *
+from .lang import _
 
 
 
@@ -87,7 +88,7 @@ def imageProp(image_path):
                 mask_doc = minidom.parseString(doc.encode('utf-8'))
         except Exception as e:
             print(str(e))
-            raise ValueError("Invalid SVG file.")
+            raise ValueError(_("Invalid SVG file."))
         
         svg_node = mask_doc.documentElement
         cheight = svg_node.attributes["height"].value
@@ -100,11 +101,11 @@ def imageProp(image_path):
     # Bitmap graphics
     img_fmt = imghdr.what(image_path)
     if img_fmt not in SUPPORTED_BITMAP_FORMATS:
-        raise ValueError("Unrecognized raster image format.")
+        raise ValueError(_("Unrecognized raster image format."))
     
     width, height = imagesize.get(image_path)
     if width < 0 or height < 0:
-        raise ValueError("Image has invalid dimensions.")
+        raise ValueError(_("Image has invalid dimensions."))
 
     return width, height
 
