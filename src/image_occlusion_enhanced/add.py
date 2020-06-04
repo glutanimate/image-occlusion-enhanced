@@ -273,8 +273,12 @@ class ImgOccAdd(object):
 
     def onAddNotesButton(self, choice, close):
         dialog = self.imgoccedit
+        # If the user is in in-group editing mode (i.e. editing a shape that 
+        # is grouped with other shapes) svgCanvasToString() doesn't work and 
+        # the callback gets called with `None` (might be a bug in svg-edit).
+        # Calling leaveContext() first fixes this.
         dialog.svg_edit.evalWithCallback(
-            "svgCanvas.svgCanvasToString();",
+            "svgCanvas.leaveContext(); svgCanvas.svgCanvasToString();",
             lambda val, choice=choice, close=close: self._onAddNotesButton(choice, close, val))
 
     def _onAddNotesButton(self, choice, close, svg):
@@ -312,8 +316,10 @@ class ImgOccAdd(object):
 
     def onEditNotesButton(self, choice):
         dialog = self.imgoccedit
+        # See the comment above in addNotesButton() about 
+        # the call to `leaveContext()`.
         dialog.svg_edit.evalWithCallback(
-            "svgCanvas.svgCanvasToString();",
+            "svgCanvas.leaveContext(); svgCanvas.svgCanvasToString();",
             lambda val, choice=choice: self._onEditNotesButton(choice, val))
 
     def _onEditNotesButton(self, choice, svg):
