@@ -108,8 +108,8 @@ def langDir():
 def setLang(lang):
     lang = mungeCode(lang)
     trans = gettext.translation(
-        'anki-image-occlusion-enhanced', langDir(), languages=[lang],
-        fallback=True)
+        "anki-image-occlusion-enhanced", langDir(), languages=[lang], fallback=True
+    )
     global currentLang, currentTranslation
     currentLang = lang
     currentTranslation = trans

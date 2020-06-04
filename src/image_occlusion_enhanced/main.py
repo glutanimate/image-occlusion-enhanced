@@ -64,8 +64,7 @@ def onIoSettings():
     """Call settings dialog if Editor not active"""
     # TODO: fix ImgOccEdit detection
     if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
-        tooltip(_("Please close Image Occlusion Editor"
-                  " to access the Options."))
+        tooltip(_("Please close Image Occlusion Editor" " to access the Options."))
         return
     dialog = ImgOccOpts()
     dialog.exec_()
@@ -83,13 +82,12 @@ def onImgOccButton(self, origin=None, image_path=None):
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
         if "imgocc" in mw.col.conf:
-            dflt_fields = list(mw.col.conf['imgocc']['flds'].values())
+            dflt_fields = list(mw.col.conf["imgocc"]["flds"].values())
         else:
             dflt_fields = list(IO_FLDS.values())
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
-            ioCritical("model_error", help="notetype",
-                       parent=self.parentWindow)
+            ioCritical("model_error", help="notetype", parent=self.parentWindow)
             return False
     try:  # allows us to fall back to old image if necessary
         oldimg = self.imgoccadd.image_path
@@ -118,10 +116,14 @@ def onSetupEditorButtons(buttons, editor):
 
     icon = os.path.join(ICONS_PATH, icon_name)
 
-    b = editor.addButton(icon, _("I/O"),
-                         lambda o=editor: onImgOccButton(o),
-                         tip="{} ({})".format(tt, hotkey),
-                         keys=hotkey, disables=False)
+    b = editor.addButton(
+        icon,
+        _("I/O"),
+        lambda o=editor: onImgOccButton(o),
+        tip="{} ({})".format(tt, hotkey),
+        keys=hotkey,
+        disables=False,
+    )
 
     buttons.append(b)
     return buttons
@@ -140,13 +142,14 @@ def getEdParentInstance(parent):
 def openImage(path):
     """Open path with default system app"""
     import subprocess
+
     try:
-        if sys.platform == 'win32':
-            subprocess.Popen(['explorer', path])
-        elif sys.platform == 'darwin':
-            subprocess.Popen(['open', path])
+        if sys.platform == "win32":
+            subprocess.Popen(["explorer", path])
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", path])
         else:
-            subprocess.Popen(['xdg-open', path])
+            subprocess.Popen(["xdg-open", path])
     except OSError as e:
         QDesktopServices.openUrl(QUrl("file://" + path))
 
@@ -160,7 +163,8 @@ def maybe_add_image_menu(webview: AnkiWebView, menu: QMenu):
     if url.isValid() and path:
         a = menu.addAction(_("Occlude Image"))
         a.triggered.connect(
-            lambda _, u=path, e=webview.editor: onImgOccButton(e, image_path=u))
+            lambda _, u=path, e=webview.editor: onImgOccButton(e, image_path=u)
+        )
         a = menu.addAction(_("Open Image"))
         a.triggered.connect(lambda _, u=path: openImage(u))
 
@@ -182,8 +186,6 @@ def legacyEditorContextMenuEvent(self, evt):
     m.popup(QCursor.pos())
 
 
-
-
 io_editor_style = """
 <style>
 /* I/O: limit image display height */
@@ -201,19 +203,19 @@ io_editor_style = """
 
 def js_note_loaded(note) -> str:
     js = []
-    
+
     # Conditionally set body CSS  class
     if not (note and note.model()["name"] == IO_MODEL_NAME):
         js.append("""$("body").removeClass("ionote");""")
     else:
         # Only hide first field if it's the ID field
         # TODO? identify ID field HTML element automatically
-        if note.model()['flds'][0]['name'] == IO_FLDS['id']:
+        if note.model()["flds"][0]["name"] == IO_FLDS["id"]:
             js.append("""$("body").addClass("ionote-id");""")
         else:
             js.append("""$("body").removeClass("ionote-id");""")
         js.append("""$("body").addClass("ionote");""")
-    
+
     return "\n".join(js)
 
 
@@ -225,6 +227,7 @@ def on_editor_will_load_note(js: str, note, editor):
     js_additions = js_note_loaded(note)
     return "\n".join([js, js_additions])
 
+
 def legacyOnSetNote(self, note, hide=True, focus=False):
     """Legacy: Monkey-patch Editor.onSetNote
     when 'editor_will_load_note' hook unavailable"""
@@ -232,12 +235,13 @@ def legacyOnSetNote(self, note, hide=True, focus=False):
         return
     js = js_note_loaded(self.note)
     self.web.eval(js)
-    
+
 
 def on_webview_will_set_content(web_content, context):
     if not isinstance(context, Editor):
         return
     web_content.body += io_editor_style
+
 
 def on_main_window_did_init():
     """Add our custom user styles to the editor HTML
@@ -245,13 +249,16 @@ def on_main_window_did_init():
     potentially overwrite editor HTML"""
     try:  # 2.1.22+
         from aqt.gui_hooks import webview_will_set_content
+
         webview_will_set_content.append(on_webview_will_set_content)
     except (ImportError, ModuleNotFoundError):
         from aqt import editor
+
         editor._html = editor._html + io_editor_style.replace("%", "%%")
 
 
 _profile_singleshot_run = False
+
 
 def on_profile_loaded_singleshot():
     """Legacy single-shot function to delay execution of particular code paths
@@ -262,6 +269,7 @@ def on_profile_loaded_singleshot():
     on_main_window_did_init()
     _profile_singleshot_run = True
 
+
 def on_profile_loaded():
     """Setup add-on config and templates, update if necessary"""
     getSyncedConfig()
@@ -271,11 +279,15 @@ def on_profile_loaded():
 
 # Mask toggle hotkey
 
+
 def onHintHotkey():
-    mw.web.eval("""
+    mw.web.eval(
+        """
         var ioBtn = document.getElementById("io-revl-btn");
         if (ioBtn) {ioBtn.click();}
-    """)
+    """
+    )
+
 
 def on_mw_state_shortcuts(state: str, shortcuts: list):
     """Add hint hotkey when in Reviewer"""
@@ -283,9 +295,11 @@ def on_mw_state_shortcuts(state: str, shortcuts: list):
         return
     shortcuts.append(("G", onHintHotkey))
 
+
 # Retain scroll position when answering
 
 # TODO: Handle in JS
+
 
 def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
@@ -293,9 +307,9 @@ def onShowAnswer(self, _old):
         return _old(self)
     scroll_pos = self.web.page().scrollPosition()
     ret = _old(self)
-    self.web.eval("window.scrollTo({}, {});".format(
-        scroll_pos.x(), scroll_pos.y()))
+    self.web.eval("window.scrollTo({}, {});".format(scroll_pos.x(), scroll_pos.y()))
     return ret
+
 
 def setup_menus():
     options_action = QAction(_("Image &Occlusion Enhanced Options..."), mw)
@@ -306,60 +320,70 @@ def setup_menus():
     mw.form.menuTools.addAction(options_action)
     mw.form.menuHelp.addAction(help_action)
 
+
 def setup_addon():
     setup_menus()
-    
+
     # Set up hooks and monkey patches
-    
+
     # Add-on setup at main window load time
-    
+
     try:  # 2.1.28+
         from aqt.gui_hooks import main_window_did_init
+
         main_window_did_init.append(on_main_window_did_init)
     except (ImportError, ModuleNotFoundError):
         try:  # 2.1.20+
             from aqt.gui_hooks import profile_did_open
+
             profile_did_open.append(on_profile_loaded_singleshot)
         except (ImportError, ModuleNotFoundError):
             addHook("profileLoaded", on_profile_loaded_singleshot)
-    
+
     # Add-on setup at profile load time
-    
+
     try:  # 2.1.20+
         from aqt.gui_hooks import profile_did_open
+
         profile_did_open.append(on_profile_loaded)
     except (ImportError, ModuleNotFoundError):
         addHook("profileLoaded", on_profile_loaded)
 
     # aqt.editor.Editor
-    
+
     try:  # 2.1.20+
         from aqt.gui_hooks import editor_did_init_buttons
+
         editor_did_init_buttons.append(onSetupEditorButtons)
     except (ImportError, ModuleNotFoundError):
         addHook("setupEditorButtons", onSetupEditorButtons)
-    
+
     try:  # 2.1.20+
         from aqt.gui_hooks import editor_will_show_context_menu
+
         editor_will_show_context_menu.append(maybe_add_image_menu)
     except (ImportError, ModuleNotFoundError):
         EditorWebView.contextMenuEvent = legacyEditorContextMenuEvent
-    
+
     try:  # 2.1.20+
         from aqt.gui_hooks import editor_will_load_note
+
         editor_will_load_note.append(on_editor_will_load_note)
     except (ImportError, ModuleNotFoundError):
         Editor.setNote = wrap(Editor.setNote, legacyOnSetNote, "after")
-    
+
     Editor.onImgOccButton = onImgOccButton
 
     # aqt.reviewer.Reviewer
-    
+
     Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
-        
+
     try:  # 2.1.20+
         from aqt.gui_hooks import state_shortcuts_will_change
+
         state_shortcuts_will_change.append(on_mw_state_shortcuts)
     except (ImportError, ModuleNotFoundError):
-        addHook("reviewStateShortcuts",
-                lambda shortcuts: on_mw_state_shortcuts("review", shortcuts))
+        addHook(
+            "reviewStateShortcuts",
+            lambda shortcuts: on_mw_state_shortcuts("review", shortcuts),
+        )
