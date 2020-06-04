@@ -1,16 +1,34 @@
 # -*- coding: utf-8 -*-
-####################################################
-##                                                ##
-##           Image Occlusion Enhanced             ##
-##                                                ##
-##      Copyright (c) Glutanimate 2016-2017       ##
-##       (https://github.com/Glutanimate)         ##
-##                                                ##
-##       Based on Simple Picture Occlusion        ##
-##          Copyright (c) 2013 SteveAW            ##
-##         (https://github.com/steveaw)           ##
-##                                                ##
-####################################################
+
+# Image Occlusion Enhanced Add-on for Anki
+#
+# Copyright (C) 2016-2020  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2013 Steve AW <https://github.com/steveaw>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version, with the additions
+# listed at the end of the license file that accompanied this program.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# NOTE: This program is subject to certain additional terms pursuant to
+# Section 7 of the GNU Affero General Public License.  You should have
+# received a copy of these additional terms immediately following the
+# terms and conditions of the GNU Affero General Public License that
+# accompanied this program.
+#
+# If not, please request a copy through one of the means of contact
+# listed here: <https://glutanimate.com/contact/>.
+#
+# Any modifications to this file must keep this entire header intact.
 
 """
 Generates the actual IO notes and writes them to
@@ -235,7 +253,7 @@ class ImgOccNoteGenerator(object):
 
     def _findByNoteId(self, note_id):
         """Search collection for notes with given ID"""
-        query = "'%s':'%s*'" % (self.ioflds['id'], note_id)
+        query = '"%s:%s*"' % (self.ioflds['id'], note_id)
         logging.debug("query %s", query)
         res = mw.col.findNotes(query)
         return res
