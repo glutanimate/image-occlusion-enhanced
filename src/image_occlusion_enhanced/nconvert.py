@@ -244,4 +244,8 @@ def setupMenu(self):
     a.triggered.connect(lambda _, b=self: onIoConvert(b))
 
 
-addHook("browser.setupMenus", setupMenu)
+try:
+    from aqt.gui_hooks import browser_menus_did_init
+    browser_menus_did_init.append(setupMenu)
+except (ImportError, ModuleNotFoundError):
+    addHook("browser.setupMenus", setupMenu)

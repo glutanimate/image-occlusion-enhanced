@@ -232,6 +232,11 @@ def ioHelp(msgkey, title="Image Occlusion Enhanced Help",
         if not sip.isdeleted(mbox):
             mbox.close()
 
-    addHook("unloadProfile", onProfileUnload)
+    try:
+        from aqt.gui_hooks import profile_will_close
+        profile_will_close.append(onProfileUnload)
+    except (ImportError, ModuleNotFoundError):
+        addHook("unloadProfile", onProfileUnload)
+
     mbox.finished.connect(lambda: remHook("unloadProfile", onProfileUnload))
     mbox.show()
