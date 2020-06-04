@@ -47,3 +47,4 @@ src/*/meta.json
 src/*/manifest.json
 # Repo
 src/image_occlusion_enhanced/svg-edit/svg-edit-master/
+.pytest_cache/

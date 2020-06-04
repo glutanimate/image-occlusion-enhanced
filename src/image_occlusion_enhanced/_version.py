@@ -2,7 +2,7 @@
 
 # Image Occlusion Enhanced Add-on for Anki
 #
-# Copyright (C) 2016-2019  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2016-2020  Aristotelis P. <https://glutanimate.com/>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -33,4 +33,4 @@
 Version information
 """
 
-__version__ = "v1.3.0-alpha1"
+__version__ = "v1.3.0-alpha6"
