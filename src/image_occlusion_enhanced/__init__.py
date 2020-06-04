@@ -11,4 +11,7 @@ Copyright: (c) 2018 Glutanimate <https://glutanimate.com/>
 License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 """
 
-from . import main
+from .main import setup_addon
+
+setup_addon()
+

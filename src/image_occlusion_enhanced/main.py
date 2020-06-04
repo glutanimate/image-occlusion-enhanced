@@ -21,6 +21,7 @@ import sys
 
 from anki.lang import _
 from aqt.qt import *
+from aqt.qt import QMenu
 
 from aqt import mw
 from aqt.editor import Editor, EditorWebView
@@ -28,6 +29,7 @@ from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
 from aqt.reviewer import Reviewer
 from aqt.utils import tooltip
+from aqt.webview import AnkiWebView
 from anki.hooks import wrap, addHook, runHook
 
 from .consts import *
@@ -130,8 +132,23 @@ def openImage(path):
         QDesktopServices.openUrl(QUrl("file://" + path))
 
 
-def contextMenuEvent(self, evt):
-    """Add custom context menu for images"""
+def maybe_add_image_menu(webview: AnkiWebView, menu: QMenu):
+    # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
+    context_data = webview.page().contextMenuData()
+    url = context_data.mediaUrl()
+    image_name = url.fileName()
+    path = os.path.join(mw.col.media.dir(), image_name)
+    if url.isValid() and path:
+        a = menu.addAction(_("Occlude Image"))
+        a.triggered.connect(
+            lambda _, u=path, e=webview.editor: onImgOccButton(e, image_path=u))
+        a = menu.addAction(_("Open Image"))
+        a.triggered.connect(lambda _, u=path: openImage(u))
+
+
+def legacyEditorContextMenuEvent(self, evt):
+    """Legacy: Monkey-patch context menu to add our own entries on Anki releases
+    that do not support the 'EditorWebView.contextMenuEvent' hook"""
     m = QMenu(self)
     a = m.addAction(_("Cut"))
     a.triggered.connect(self.onCut)
@@ -140,20 +157,12 @@ def contextMenuEvent(self, evt):
     a = m.addAction(_("Paste"))
     a.triggered.connect(self.onPaste)
     ##################################################
-    # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
-    context_data = self.page().contextMenuData()
-    url = context_data.mediaUrl()
-    image_name = url.fileName()
-    path = os.path.join(mw.col.media.dir(), image_name)
-    if url.isValid() and path:
-        a = m.addAction(_("Occlude Image"))
-        a.triggered.connect(
-            lambda _, u=path, e=self.editor: onImgOccButton(e, image_path=u))
-        a = m.addAction(_("Open Image"))
-        a.triggered.connect(lambda _, u=path: openImage(u))
+    maybe_add_image_menu(self, m)
     ##################################################
     runHook("EditorWebView.contextMenuEvent", self, m)
     m.popup(QCursor.pos())
+
+
 
 
 io_editor_style = """
@@ -233,26 +242,45 @@ def onShowAnswer(self, _old):
     return ret
 
 
-# Set up menus
-options_action = QAction("Image &Occlusion Enhanced Options...", mw)
-help_action = QAction("Image &Occlusion Enhanced...", mw)
-options_action.triggered.connect(onIoSettings)
-mw.addonManager.setConfigAction(__name__, onIoSettings)
-help_action.triggered.connect(onIoHelp)
-mw.form.menuTools.addAction(options_action)
-mw.form.menuHelp.addAction(help_action)
+def setup_menus():
+    options_action = QAction("Image &Occlusion Enhanced Options...", mw)
+    help_action = QAction("Image &Occlusion Enhanced...", mw)
+    options_action.triggered.connect(onIoSettings)
+    mw.addonManager.setConfigAction(__name__, onIoSettings)
+    help_action.triggered.connect(onIoHelp)
+    mw.form.menuTools.addAction(options_action)
+    mw.form.menuHelp.addAction(help_action)
 
-# Set up hooks and monkey patches
+def setup_addon():
+    setup_menus()
+    
+    # Set up hooks and monkey patches
+    
+    # Add-on setup at profile-load time
+    
+    try:
+        from aqt.gui_hooks import profile_did_open
+        profile_did_open.append(onProfileLoaded)
+    except (ImportError, ModuleNotFoundError):
+        addHook("profileLoaded", onProfileLoaded)
 
-# Add-on setup at profile-load time
-addHook("profileLoaded", onProfileLoaded)
+    # aqt.editor.Editor
+    
+    try:
+        from aqt.gui_hooks import editor_did_init_buttons
+        editor_did_init_buttons.append(onSetupEditorButtons)
+    except (ImportError, ModuleNotFoundError):
+        addHook("setupEditorButtons", onSetupEditorButtons)
+    
+    try:
+        from aqt.gui_hooks import editor_will_show_context_menu
+        editor_will_show_context_menu.append(maybe_add_image_menu)
+    except (ImportError, ModuleNotFoundError):
+        EditorWebView.contextMenuEvent = legacyEditorContextMenuEvent
+    
+    Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
+    Editor.onImgOccButton = onImgOccButton
 
-# aqt.editor.Editor
-addHook('setupEditorButtons', onSetupEditorButtons)
-EditorWebView.contextMenuEvent = contextMenuEvent
-Editor.setNote = wrap(Editor.setNote, onSetNote, "after")
-Editor.onImgOccButton = onImgOccButton
-
-# aqt.reviewer.Reviewer
-Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
-addHook("reviewStateShortcuts", onReviewerStateShortcuts)
+    # aqt.reviewer.Reviewer
+    Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
+    addHook("reviewStateShortcuts", onReviewerStateShortcuts)
