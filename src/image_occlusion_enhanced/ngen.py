@@ -48,6 +48,7 @@ import uuid
 from .dialogs import ioAskUser
 from .utils import fname2img
 from .config import *
+from .lang import _, ngettext
 
 # Explanation of some of the variables:
 #
@@ -97,8 +98,8 @@ class ImgOccNoteGenerator(object):
 
         (svg_node, layer_node) = self._getMnodesAndSetIds()
         if not self.mnode_ids:
-            tooltip("No cards to generate.<br>\
-                Are you sure you set your masks correctly?")
+            tooltip(_("No cards to generate.<br>"
+                      "Are you sure you set your masks correctly?"))
             return False
 
         self.new_svg = svg_node.toxml()  # write changes to svg
@@ -108,12 +109,14 @@ class ImgOccNoteGenerator(object):
         image_path = mw.col.media.addFile(self.image_path)
         img = fname2img(image_path)
 
-        mw.checkpoint("Adding Image Occlusion Cards")
+        mw.checkpoint(_("Adding Image Occlusion Cards"))
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
             self._saveMaskAndReturnNote(omask_path, qmasks[nr], amasks[nr],
                                         img, note_id)
-        tooltip("%s %s <b>added</b>" % self._cardS(len(qmasks)), parent=None)
+        tooltip(ngettext("One card <b>added</b>",
+                         "{card_count} cards <b>added</b>",
+                         len(qmasks)).format(card_count=len(qmasks)), parent=None)
         return state
 
     def updateNotes(self):
@@ -126,10 +129,10 @@ class ImgOccNoteGenerator(object):
         self._findAllNotes()
         (svg_node, mlayer_node) = self._getMnodesAndSetIds(True)
         if not self.mnode_ids:
-            tooltip("No shapes left. You can't delete all cards.<br>\
-                Are you sure you set your masks correctly?")
+            tooltip(_("No shapes left. You can't delete all cards.<br>"
+                "Are you sure you set your masks correctly?"))
             return False
-        mw.checkpoint("Editing Image Occlusion Cards")
+        mw.checkpoint(_("Editing Image Occlusion Cards"))
         ret = self._deleteAndIdNotes(mlayer_node)
         if not ret:
             # confirmation window rejected
@@ -168,20 +171,19 @@ class ImgOccNoteGenerator(object):
         self._showUpdateTooltip(del_count, new_count)
         return state
 
-    def _cardS(self, cnt):
-        s = "card"
-        if cnt > 1 or cnt == 0:
-            s = "cards"
-        return (cnt, s)
-
     def _showUpdateTooltip(self, del_count, new_count):
         upd_count = max(0, len(self.mnode_indexes) - del_count - new_count)
-        ttip = "%s old %s <b>edited in place</b>" % self._cardS(upd_count)
+        ttip = ngettext("One old card <b>edited in place</b>",
+                        "{card_count} old cards <b>edited in place</b>",
+                        upd_count).format(card_count=upd_count)
         if del_count > 0:
-            ttip += "<br>%s existing %s <b>deleted</b>" % self._cardS(
-                del_count)
+            ttip += ngettext("<br>One existing card <b>deleted</b>",
+                             "<br>{card_count} existing cards <b>deleted</b>",
+                             upd_count).format(card_count=del_count)
         if new_count > 0:
-            ttip += "<br>%s new %s <b>created</b>" % self._cardS(new_count)
+            ttip += ngettext("<br>One new card <b>created</b>",
+                             "<br>{card_count} new cards <b>created</b>",
+                             new_count).format(card_count=new_count)
         tooltip(ttip, parent=self.ed.parentWindow)
 
     def _getOriginalSvg(self):
@@ -358,11 +360,13 @@ class ImgOccNoteGenerator(object):
         logging.debug("edited self.mnode_ids %s", self.mnode_ids)
 
         if del_count or new_count:
-            q = "This will <b>delete %i card(s)</b> and \
-                 <b>create %i new one(s)</b>.\
-                 Please note that this action is irreversible.<br><br>\
-                 Would you still like to proceed?" % (del_count, new_count)
-            if not ioAskUser("custom", text=q, title="Please confirm action",
+            q = _("This will <b>delete {del_count} card(s)</b> and "
+                  "<b>create {new_count} new one(s)</b>. "
+                  "Please note that this action is irreversible.<br><br>"
+                  "Would you still like to proceed?").format(
+                          del_count=del_count, new_count=new_count)
+            if not ioAskUser("custom", text=q, title=_(
+                             "Please confirm action"),
                              parent=self.ed.imgoccadd.imgoccedit, help="edit"):
                 # TODO: pass imgoccedit instance to ngen in order to avoid ↑ this
                 return False
@@ -411,7 +415,8 @@ class ImgOccNoteGenerator(object):
 
     def _saveMask(self, mask, note_id, mtype):
         """Write mask to file in media collection"""
-        logging.debug("!saving %s, %s", note_id, mtype)
+        logging.debug(_("!saving %(note_id)s, %(mtype)s"),
+                      {"note_id": note_id, "mtype": mtype})
         # media collection is the working directory:
         mask_path = '%s-%s.svg' % (note_id, mtype)
         mask_file = open(mask_path, 'wb')
@@ -459,10 +464,10 @@ class ImgOccNoteGenerator(object):
 
         if nid:
             note.flush()
-            logging.debug("!noteflush %s", note)
+            logging.debug(_("!noteflush %s"), note)
         else:
             mw.col.addNote(note)
-            logging.debug("!notecreate %s", note)
+            logging.debug(_("!notecreate %s"), note)
 
 
 # Different generator subclasses for different occlusion types:
