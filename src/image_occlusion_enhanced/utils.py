@@ -32,12 +32,8 @@ from .consts import *
 
 def path2url(path):
     """URL-encode local path"""
-    if ANKI21:
-        return urllib.parse.urljoin(
-            'file:', urllib.request.pathname2url(path))
-    else:
-        return urllib.parse.urljoin(
-            'file:', urllib.request.pathname2url(path.encode('utf-8')))
+    return urllib.parse.urljoin(
+        'file:', urllib.request.pathname2url(path))
 
 
 def fname2img(path):
