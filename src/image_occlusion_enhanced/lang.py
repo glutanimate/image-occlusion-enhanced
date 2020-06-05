@@ -124,4 +124,5 @@ def mungeCode(code):
 
 
 if not currentTranslation:
-    setLang(anki.lang.getLang())
+    # FIXME:
+    setLang(anki.lang.currentLang)
