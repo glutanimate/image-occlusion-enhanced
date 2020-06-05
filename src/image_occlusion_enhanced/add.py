@@ -231,29 +231,29 @@ class ImgOccAdd(object):
         logging.debug(_("Launching new ImgOccEdit instance"))
 
         url = QUrl.fromLocalFile(svg_edit_path)
-        items = QUrlQuery()
-        items.setQueryItems(svg_edit_queryitems)
-        items.addQueryItem("initFill[color]", ofill)
-        items.addQueryItem("dimensions", "{0},{1}".format(width, height))
-        items.addQueryItem("bkgd_url", bkgd_url)
-        items.addQueryItem("initStroke[color]", scol)
-        items.addQueryItem("initStroke[width]", str(swidth))
-        items.addQueryItem("text[font_size]", str(fsize))
-        items.addQueryItem("text[font_family]", "'%s', %s" % (font, svg_edit_fonts))
+        # items = QUrlQuery()
+        # items.setQueryItems(svg_edit_queryitems)
+        # items.addQueryItem("initFill[color]", ofill)
+        # items.addQueryItem("dimensions", "{0},{1}".format(width, height))
+        # items.addQueryItem("bkgd_url", bkgd_url)
+        # items.addQueryItem("initStroke[color]", scol)
+        # items.addQueryItem("initStroke[width]", str(swidth))
+        # items.addQueryItem("text[font_size]", str(fsize))
+        # items.addQueryItem("text[font_family]", "'%s', %s" % (font, svg_edit_fonts))
 
-        if self.mode != "add":
-            items.addQueryItem("initTool", "select"),
-            for i in flds:
-                fn = i["name"]
-                if fn in self.ioflds_priv:
-                    continue
-                dialog.tedit[fn].setPlainText(onote[fn].replace("<br />", "\n"))
-            svg_url = path2url(opref["omask"])
-            items.addQueryItem("url", svg_url)
-        else:
-            items.addQueryItem("initTool", "rect"),
+        # if self.mode != "add":
+        #     items.addQueryItem("initTool", "select"),
+        #     for i in flds:
+        #         fn = i["name"]
+        #         if fn in self.ioflds_priv:
+        #             continue
+        #         dialog.tedit[fn].setPlainText(onote[fn].replace("<br />", "\n"))
+        #     svg_url = path2url(opref["omask"])
+        #     items.addQueryItem("url", svg_url)
+        # else:
+        #     items.addQueryItem("initTool", "rect"),
 
-        url.setQuery(items)
+        # url.setQuery(items)
         dialog.svg_edit.setUrl(url)
         dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
@@ -284,6 +284,7 @@ class ImgOccAdd(object):
 
         dialog.svg_edit.runOnLoaded(onSvgEditLoaded)
         dialog.visible = True
+        dialog.showSvgEdit(True)
         dialog.show()
 
     def onChangeImage(self):

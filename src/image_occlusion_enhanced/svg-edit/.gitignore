@@ -1,0 +1,8 @@
+ignore
+node_modules
+
+build/
+
+svgedit-custom.css
+
+docs/jsdoc
