@@ -321,7 +321,7 @@ def setup_menus():
     mw.form.menuHelp.addAction(help_action)
 
 
-def setup_addon():
+def setup_main():
     setup_menus()
 
     # Set up hooks and monkey patches

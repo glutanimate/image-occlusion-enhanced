@@ -36,6 +36,13 @@ Global variables
 import sys
 import os
 
+from ._version import __version__
+
+try:
+    from .data.patrons import MEMBERS_CREDITED, MEMBERS_TOP
+except ImportError:
+    MEMBERS_CREDITED = MEMBERS_TOP = ()
+
 SYS_ENCODING = sys.getfilesystemencoding()
 
 ADDON_PATH = os.path.dirname(__file__)
@@ -45,3 +52,40 @@ ICONS_PATH = os.path.join(ADDON_PATH, "icons")
 SUPPORTED_BITMAP_FORMATS = ("jpeg", "png", "gif")
 SUPPORTED_VECTOR_FORMATS = ("svg",)
 SUPPORTED_EXTENSIONS = ("jpg",) + SUPPORTED_BITMAP_FORMATS + SUPPORTED_VECTOR_FORMATS
+
+
+class ADDON(object):
+    """Class storing general add-on properties
+    Property names need to be all-uppercase with no leading underscores
+    """
+
+    NAME = "Image Occlusion Enhanced"
+    MODULE = "image_occlusion_enhanced"
+    ID = "1374772155"
+    VERSION = __version__
+    LICENSE = "GNU AGPLv3"
+    AUTHORS = (
+        {
+            "name": "Aristotelis P. (Glutanimate)",
+            "years": "2016-2020",
+            "contact": "Glutanimate",
+        },
+        {"name": "Tiago Barroso", "years": "2012-1015", "contact": "tmbb@campus.ul.pt"},
+        {"name": "Steve AW", "years": "2013", "contact": "https://github.com/steveaw"},
+    )
+    AUTHOR_MAIL = "ankiglutanimate@gmail.com"
+    LIBRARIES = ()
+    CONTRIBUTORS = ()
+    SPONSORS = ()
+    MEMBERS_CREDITED = MEMBERS_CREDITED
+    MEMBERS_TOP = MEMBERS_TOP
+    LINKS = {
+        "patreon": "https://www.patreon.com/glutanimate",
+        "bepatron": "https://www.patreon.com/bePatron?u=7522179",
+        "coffee": "http://ko-fi.com/glutanimate",
+        "description": "https://ankiweb.net/shared/info/{}".format(ID),
+        "rate": "https://ankiweb.net/shared/review/{}".format(ID),
+        "twitter": "https://twitter.com/glutanimate",
+        "youtube": "https://www.youtube.com/c/glutanimate",
+        "help": "",
+    }
