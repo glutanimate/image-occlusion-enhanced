@@ -30,9 +30,9 @@ Handle translation.
 
 import os
 import gettext
-import threading
 
 import anki.lang
+from aqt import mw
 
 # TODO maybe remove the table and 'mungeCode' once Anki 2.1.16 is released and
 #  replace with calls to the API to reduce copied code
@@ -124,5 +124,9 @@ def mungeCode(code):
 
 
 if not currentTranslation:
-    # FIXME:
-    setLang(anki.lang.currentLang)
+    if hasattr(anki.lang, "getLang"):
+        # backwards compatibility Anki < 2.1.22
+        # (commit 6c9e9eb3300707f534af5b57e45a0cec7ed91401)
+        setLang(anki.lang.getLang())
+    else:
+        setLang(anki.lang.currentLang or mw.pm.meta["defaultLang"] or "en_US")
