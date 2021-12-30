@@ -202,12 +202,12 @@ def js_note_loaded(note) -> str:
     js = []
     
     # Conditionally set body CSS  class
-    if not (note and note.model()["name"] == IO_MODEL_NAME):
+    if not (note and note.note_type()["name"] == IO_MODEL_NAME):
         js.append("""$("body").removeClass("ionote");""")
     else:
         # Only hide first field if it's the ID field
         # TODO? identify ID field HTML element automatically
-        if note.model()['flds'][0]['name'] == IO_FLDS['id']:
+        if note.note_type()['flds'][0]['name'] == IO_FLDS['id']:
             js.append("""$("body").addClass("ionote-id");""")
         else:
             js.append("""$("body").removeClass("ionote-id");""")
@@ -288,7 +288,7 @@ def on_mw_state_shortcuts(state: str, shortcuts: list):
 
 def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
-    if not self.card or not self.card.model()["name"] == IO_MODEL_NAME:
+    if not self.card or not self.card.note_type()["name"] == IO_MODEL_NAME:
         return _old(self)
     scroll_pos = self.web.page().scrollPosition()
     ret = _old(self)
