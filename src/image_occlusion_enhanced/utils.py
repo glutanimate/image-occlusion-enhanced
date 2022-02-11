@@ -34,19 +34,16 @@ Common reusable utilities
 
 import os
 import re
+import urllib.error
+import urllib.parse
+import urllib.request
 from typing import Optional, Tuple
+from xml.dom import minidom
 
 from aqt import mw
 
-from xml.dom import minidom
-import urllib.parse
-import urllib.request
-import urllib.parse
-import urllib.error
-
 from ._vendor import imghdr
 from ._vendor.imagesize import imagesize
-
 from .consts import SUPPORTED_BITMAP_FORMATS
 
 
