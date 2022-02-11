@@ -47,8 +47,7 @@ import urllib.error
 from ._vendor import imghdr
 from ._vendor.imagesize import imagesize
 
-from .consts import *
-from .lang import _
+from .consts import SUPPORTED_BITMAP_FORMATS
 
 
 def path_to_url(path: str) -> str:
@@ -87,7 +86,7 @@ def get_image_dimensions(image_path: str) -> Tuple[int, int]:
                 mask_doc = minidom.parseString(doc.encode("utf-8"))
         except Exception as e:
             print(str(e))
-            raise ValueError(_("Invalid SVG file."))
+            raise ValueError("Invalid SVG file.")
 
         svg_node = mask_doc.documentElement
         cheight = svg_node.attributes["height"].value
@@ -100,11 +99,11 @@ def get_image_dimensions(image_path: str) -> Tuple[int, int]:
     # Bitmap graphics
     img_fmt = imghdr.what(image_path)
     if img_fmt not in SUPPORTED_BITMAP_FORMATS:
-        raise ValueError(_("Unrecognized raster image format."))
+        raise ValueError("Unrecognized raster image format.")
 
     width, height = imagesize.get(image_path)
     if width < 0 or height < 0:
-        raise ValueError(_("Image has invalid dimensions."))
+        raise ValueError("Image has invalid dimensions.")
 
     return width, height
 
