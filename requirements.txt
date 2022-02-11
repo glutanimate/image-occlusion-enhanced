@@ -1,3 +1,2 @@
-# Please note that these are only build dependencies. They are not
-# required to run compiled builds of the add-on within Anki
+# superseded by pyproject.toml, kept around for GitHub dependency graph
 aab
