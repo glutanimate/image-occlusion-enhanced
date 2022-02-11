@@ -126,7 +126,7 @@ class ImgOccAdd(object):
         self.callImgOccEdit(width, height)
 
     def setPreservedAttrs(self, note):
-        self.opref["tags"] = self.ed.tags.text()
+        self.opref["tags"] = ""  # FIXME
         if self.origin == "addcards":
             self.opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
         else:
@@ -343,15 +343,17 @@ class ImgOccAdd(object):
             return False
 
         if self.origin == "addcards" and self.ed.note:
+            # FIXME
+            pass
             # Update Editor with modified tags and sources field
-            self.ed.tags.setText(" ".join(tags))
-            self.ed.saveTags()
-            for i in self.ioflds_prsv:
-                if i in self.ed.note:
-                    self.ed.note[i] = fields[i]
-            self.ed.loadNote()
-            deck = mw.col.decks.nameOrNone(did)
-            self.ed.parentWindow.deckChooser.deck.setText(deck)
+            # self.ed.tags.setText(" ".join(tags))
+            # self.ed.saveTags()
+            # for i in self.ioflds_prsv:
+            #     if i in self.ed.note:
+            #         self.ed.note[i] = fields[i]
+            # self.ed.loadNote()
+            # deck = mw.col.decks.nameOrNone(did)
+            # self.ed.parentWindow.deckChooser.deck.setText(deck)
 
         if close:
             dialog.close()
