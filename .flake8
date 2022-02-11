@@ -1,0 +1,13 @@
+[flake8]
+# F403,405 – missing imports if imported through *
+# F408 – unable to detect import when using from x import y
+# E302, E303, E305 – too many blanklines, etc.
+# W293 – blank line with whitespace
+# N802 – lower-case function names
+# E266 – too many leading #
+# N906 – lower case local variables
+# E226 – missing space around arithmeti operators
+# E402 – module level import not at top
+# W503 – binary operator after line break (incomat with PEP8?)
+ignore = F405,F408,F403,E302,E303,E305,W293,N802,E266,N806,E226,E402,W503
+max-line-length = 88
