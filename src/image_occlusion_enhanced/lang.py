@@ -1,128 +1,43 @@
 # -*- coding: utf-8 -*-
-####################################################
-##                                                ##
-##           Image Occlusion Enhanced             ##
-##                                                ##
-##      Copyright (c) Glutanimate 2016-2019       ##
-##       (https://github.com/Glutanimate)         ##
-##                                                ##
-##         Based on Image Occlusion 2.0           ##
-##         Copyright (c) 2012-2015 tmbb           ##
-##           (https://github.com/tmbb)            ##
-##                                                ##
-####################################################
 
-# This source code file takes most of its contents from
-# Anki's original 'anki.lang' module with the following
-# changes:
-# - change location of language files and remove os specific handling
-# - get the initialization language from Anki's currently set language
-# - use Anki's code and variables whenever possible
-# - remove unneeded functions and variables
+# Image Occlusion Enhanced Add-on for Anki
 #
-# Modifications were made on 2020-02-23.
-# Link to original file at time of creation:
-# https://github.com/dae/anki/blob/241b7ea005e2360ea8c1e0a1dd91d8b4dda4bf0e/anki/lang.py
+# Copyright (C) 2016-2020  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2012-2015  Tiago Barroso <tmbb@campus.ul.pt>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version, with the additions
+# listed at the end of the license file that accompanied this program.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# NOTE: This program is subject to certain additional terms pursuant to
+# Section 7 of the GNU Affero General Public License.  You should have
+# received a copy of these additional terms immediately following the
+# terms and conditions of the GNU Affero General Public License that
+# accompanied this program.
+#
+# If not, please request a copy through one of the means of contact
+# listed here: <https://glutanimate.com/contact/>.
+#
+# Any modifications to this file must keep this entire header intact.
 
 """
-Handle translation.
+Handle translations. Currently uses stub implementations.
 """
 
-import os
-import gettext
-import threading
 
-import anki.lang
-
-# TODO maybe remove the table and 'mungeCode' once Anki 2.1.16 is released and
-#  replace with calls to the API to reduce copied code
-# compatibility with old versions
-compatMap = {
-    "af": "af_ZA",
-    "ar": "ar_SA",
-    "bg": "bg_BG",
-    "ca": "ca_ES",
-    "cs": "cs_CZ",
-    "da": "da_DK",
-    "de": "de_DE",
-    "el": "el_GR",
-    "en": "en_US",
-    "eo": "eo_UY",
-    "es": "es_ES",
-    "et": "et_EE",
-    "eu": "eu_ES",
-    "fa": "fa_IR",
-    "fi": "fi_FI",
-    "fr": "fr_FR",
-    "gl": "gl_ES",
-    "he": "he_IL",
-    "hr": "hr_HR",
-    "hu": "hu_HU",
-    "hy": "hy_AM",
-    "it": "it_IT",
-    "ja": "ja_JP",
-    "ko": "ko_KR",
-    "mn": "mn_MN",
-    "ms": "ms_MY",
-    "nl": "nl_NL",
-    "nb": "nb_NL",
-    "no": "nb_NL",
-    "oc": "oc_FR",
-    "pl": "pl_PL",
-    "pt": "pt_PT",
-    "ro": "ro_RO",
-    "ru": "ru_RU",
-    "sk": "sk_SK",
-    "sl": "sl_SI",
-    "sr": "sr_SP",
-    "sv": "sv_SE",
-    "th": "th_TH",
-    "tr": "tr_TR",
-    "uk": "uk_UA",
-    "vi": "vi_VN",
-}
-
-# global defaults
-currentLang = None
-currentTranslation = None
+def ngettext(single: str, plural: str, count: int) -> str:
+    return single if count == 1 else plural
 
 
-def localTranslation():
-    "Return the translation local to this thread, or the default."
-    return currentTranslation
-
-
-def _(str):
-    return localTranslation().gettext(str)
-
-
-def ngettext(single, plural, n):
-    return localTranslation().ngettext(single, plural, n)
-
-
-def langDir():
-    filedir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.abspath(os.path.join(filedir, "locale"))
-
-
-def setLang(lang):
-    lang = mungeCode(lang)
-    trans = gettext.translation(
-        "anki-image-occlusion-enhanced", langDir(), languages=[lang], fallback=True
-    )
-    global currentLang, currentTranslation
-    currentLang = lang
-    currentTranslation = trans
-
-
-def mungeCode(code):
-    code = code.replace("-", "_")
-    if code in compatMap:
-        code = compatMap[code]
-
-    return code
-
-
-if not currentTranslation:
-    # FIXME:
-    setLang(anki.lang.currentLang)
+def _(text: str) -> str:
+    return text
