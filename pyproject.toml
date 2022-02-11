@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "image-occlusion-enhanced"
+version = "2.0.0-dev.1"
+description = "Image Occlusion Enhanced Anki Add-on"
+authors = ["Glutanimate <glutanimate.com/contact>"]
+license = "AGPL-3.0-or-later-with-additional-terms"
+
+[tool.poetry.dependencies]
+python = "^3.9.7"
+
+[tool.poetry.dev-dependencies]
+aqt = "2.1.50b3"
+PyQt6 = "6.2.3"
+PyQt6-WebEngine-Qt6 = "6.2.2"
+aab  = { git = "https://github.com/glutanimate/anki-addon-builder.git", tag = "v0.1.5-beta.6" }
+black = "^22.1.0"
+pylint = "^2.12.2"
+mypy = "^0.931"
+isort = "^5.10.1"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
