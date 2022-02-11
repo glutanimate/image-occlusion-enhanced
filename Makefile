@@ -3,10 +3,12 @@ SHELL = /bin/bash
 SOURCE_FOLDER = src/
 TEST_FLAGS ?= -n4
 
+# Run code checkers
 check:
 	python -m mypy $(SOURCE_FOLDER)
 	python -m flake8 $(SOURCE_FOLDER)
 
+# Run code formatters
 format:
 	python -m isort --recursive $(SOURCE_FOLDER)
 	python -m black $(SOURCE_FOLDER)
