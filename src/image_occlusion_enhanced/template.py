@@ -35,6 +35,7 @@ Handles the IO note type and card template
 """
 
 from .config import *
+from .lang import _
 
 # DEFAULT CARD TEMPLATES
 
@@ -62,17 +63,18 @@ if (mask === null || mask.complete) {
 }
 </script>
 {{/%(src_img)s}}
-""" % \
-    {'que': IO_FLDS['qm'],
-     'ans': IO_FLDS['am'],
-     'svg': IO_FLDS['om'],
-     'src_img': IO_FLDS['im'],
-     'header': IO_FLDS['hd'],
-     'footer': IO_FLDS['ft'],
-     'remarks': IO_FLDS['rk'],
-     'sources': IO_FLDS['sc'],
-     'extraone': IO_FLDS['e1'],
-     'extratwo': IO_FLDS['e2']}
+""" % {
+    "que": IO_FLDS["qm"],
+    "ans": IO_FLDS["am"],
+    "svg": IO_FLDS["om"],
+    "src_img": IO_FLDS["im"],
+    "header": IO_FLDS["hd"],
+    "footer": IO_FLDS["ft"],
+    "remarks": IO_FLDS["rk"],
+    "sources": IO_FLDS["sc"],
+    "extraone": IO_FLDS["e1"],
+    "extratwo": IO_FLDS["e2"],
+}
 
 iocard_back = """\
 {{#%(src_img)s}}
@@ -132,17 +134,18 @@ if (mask === null || mask.complete) {
 }
 </script>
 {{/%(src_img)s}}
-""" % \
-    {'que': IO_FLDS['qm'],
-     'ans': IO_FLDS['am'],
-     'svg': IO_FLDS['om'],
-     'src_img': IO_FLDS['im'],
-     'header': IO_FLDS['hd'],
-     'footer': IO_FLDS['ft'],
-     'remarks': IO_FLDS['rk'],
-     'sources': IO_FLDS['sc'],
-     'extraone': IO_FLDS['e1'],
-     'extratwo': IO_FLDS['e2']}
+""" % {
+    "que": IO_FLDS["qm"],
+    "ans": IO_FLDS["am"],
+    "svg": IO_FLDS["om"],
+    "src_img": IO_FLDS["im"],
+    "header": IO_FLDS["hd"],
+    "footer": IO_FLDS["ft"],
+    "remarks": IO_FLDS["rk"],
+    "sources": IO_FLDS["sc"],
+    "extraone": IO_FLDS["e1"],
+    "extratwo": IO_FLDS["e2"],
+}
 
 iocard_css = """\
 /* GENERAL CARD STYLE */
@@ -267,10 +270,7 @@ css_original_hide = """\
 # (<qfmt_addition>, <afmt_addition>, <css_addition>))
 # versions need to be ordered by semantic versioning
 additions_by_version = [
-    (
-        1.30,
-        (html_overlay_onload, html_overlay_onload, css_original_hide)
-    ),
+    (1.30, (html_overlay_onload, html_overlay_onload, css_original_hide)),
 ]
 
 
@@ -281,32 +281,32 @@ def add_io_model(col):
     for i in IO_FLDS_IDS:
         fld = models.newField(IO_FLDS[i])
         if i == "note_id":
-            fld['size'] = 0
+            fld["size"] = 0
         models.addField(io_model, fld)
     # Add template
     template = models.newTemplate(IO_CARD_NAME)
-    template['qfmt'] = iocard_front
-    template['afmt'] = iocard_back
-    io_model['css'] = iocard_css
-    io_model['sortf'] = 1  # set sortfield to header
+    template["qfmt"] = iocard_front
+    template["afmt"] = iocard_back
+    io_model["css"] = iocard_css
+    io_model["sortf"] = 1  # set sortfield to header
     models.addTemplate(io_model, template)
     models.add(io_model)
     return io_model
 
 
 def reset_template(col):
-    print("Resetting IO Enhanced card template to defaults")
+    print(_("Resetting IO Enhanced card template to defaults"))
     io_model = col.models.byName(IO_MODEL_NAME)
-    template = io_model['tmpls'][0]
-    template['qfmt'] = iocard_front
-    template['afmt'] = iocard_back
-    io_model['css'] = iocard_css
+    template = io_model["tmpls"][0]
+    template["qfmt"] = iocard_front
+    template["afmt"] = iocard_back
+    io_model["css"] = iocard_css
     col.models.save()
     return io_model
 
 
 def update_template(col, old_version):
-    print("Updating IO Enhanced card template")
+    print(_("Updating IO Enhanced card template"))
 
     additions = [[], [], []]
 
@@ -321,9 +321,9 @@ def update_template(col, old_version):
     if not io_model:
         return add_io_model(col)
 
-    template = io_model['tmpls'][0]
-    template['qfmt'] += "\n".join(additions[0])
-    template['afmt'] += "\n".join(additions[1])
-    io_model['css'] += "\n".join(additions[2])
+    template = io_model["tmpls"][0]
+    template["qfmt"] += "\n".join(additions[0])
+    template["afmt"] += "\n".join(additions[1])
+    io_model["css"] += "\n".join(additions[2])
     col.models.save()
     return io_model

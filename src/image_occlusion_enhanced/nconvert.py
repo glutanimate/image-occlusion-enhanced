@@ -38,6 +38,7 @@ import logging
 from aqt.qt import *
 from anki.hooks import addHook
 from aqt.utils import tooltip
+from .lang import _
 
 from xml.dom import minidom
 
@@ -61,29 +62,34 @@ class ImgOccNoteConverter(object):
             note = mw.col.getNote(nid)
             (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
             if uniq_id == False:
-                logging.debug("Skipping note that couldn't be parsed: %s", nid)
+                logging.debug(_("Skipping note that couldn't be parsed: %s"), nid)
                 skipped += 1
                 continue
             occl_tp = self.getOcclTypeAndNodes(note)
-            occl_id = uniq_id + '-' + occl_tp
+            occl_id = uniq_id + "-" + occl_tp
             if occl_id == self.occl_id_last:
-                logging.debug(
-                    "Skipping note that we've just converted: %s", nid)
+                logging.debug(_("Skipping note that we've just converted: %s"), nid)
                 continue
             self.occl_id_last = occl_id
             for nid in self.findByNoteId(uniq_id):
                 note = mw.col.getNote(nid)
                 (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
                 if uniq_id == False:
-                    logging.debug(
-                        "Skipping note that couldn't be parsed: %s", nid)
+                    logging.debug(_("Skipping note that couldn't be parsed: %s"), nid)
                     skipped += 1
                     continue
                 nids_by_nr[int(note_nr)] = nid
             self.idAndCorrelateNotes(nids_by_nr, occl_id)
         converted = len(io_nids)
-        tooltip("<b>%i</b> notes updated, <b>%i</b> skipped"
-                % (converted - skipped, filtered + skipped))
+        tooltip(
+            _(
+                "<b>{number_notes_updated}</b> note(s) updated,"
+                " <b>{number_notes_skipped}</b> skipped"
+            ).format(
+                number_notes_updated=converted - skipped,
+                number_notes_skipped=filtered + skipped,
+            )
+        )
 
     def filterSelected(self, nids):
         """Filters out notes with the wrong note type and those that are
@@ -93,47 +99,44 @@ class ImgOccNoteConverter(object):
         for nid in nids:
             note = mw.col.getNote(nid)
             if note.model() != self.model:
-                logging.debug("Skipping note with wrong note type: %s", nid)
+                logging.debug(_("Skipping note with wrong note type: %s"), nid)
                 filtered += 1
                 continue
-            elif note[self.ioflds['id']]:
-                logging.debug(
-                    "Skipping IO note that is already editable: %s", nid)
+            elif note[self.ioflds["id"]]:
+                logging.debug(_("Skipping IO note that is already editable: %s"), nid)
                 filtered += 1
                 continue
-            elif not note[self.ioflds['om']]:
-                logging.debug(
-                    "Skipping IO note without original SVG mask: %s", nid)
+            elif not note[self.ioflds["om"]]:
+                logging.debug(_("Skipping IO note without original SVG mask: %s"), nid)
                 filtered += 1
                 continue
-            logging.debug("Found IO note in need of update: %s", nid)
+            logging.debug(_("Found IO note in need of update: %s"), nid)
             io_nids.append(nid)
         return (io_nids, filtered)
 
     def findByNoteId(self, note_id):
         """Search collection for notes with given ID in their omask paths"""
         # need to use omask path because Note ID field is not yet set
-        query = '"%s:*%s*"' % (self.ioflds['om'], note_id)
+        query = '"%s:*%s*"' % (self.ioflds["om"], note_id)
         logging.debug("query: %s", query)
         res = mw.col.findNotes(query)
         return res
 
     def getDataFromNamingScheme(self, note):
         """Get unique ID and note nr from qmask path"""
-        qmask = note[self.ioflds['qm']]
+        qmask = note[self.ioflds["qm"]]
         path = img2path(qmask, True)
         if not path:
             return (False, None)
-        grps = path.split('_')
+        grps = path.split("_")
         try:
             if len(grps) == 2:
-                logging.debug("Extracting data using IO 2.0 naming scheme")
+                logging.debug(_("Extracting data using IO 2.0 naming scheme"))
                 uniq_id = grps[0]
-                note_nr = path.split(' ')[1].split('.')[0]
+                note_nr = path.split(" ")[1].split(".")[0]
             else:
-                logging.debug(
-                    "Extracting data using IO Enhanced naming scheme")
-                grps = path.split('-')
+                logging.debug(_("Extracting data using IO Enhanced naming scheme"))
+                grps = path.split("-")
                 uniq_id = grps[0]
                 note_nr = int(grps[2]) - 1
             return (uniq_id, note_nr)
@@ -153,11 +156,11 @@ class ImgOccNoteConverter(object):
                 continue
             nid = nids_by_nr[nr]
             note = mw.col.getNote(nid)
-            new_mnode_id = occl_id + '-' + str(nr+1)
+            new_mnode_id = occl_id + "-" + str(nr + 1)
             self.mnode.childNodes[midx].setAttribute("id", new_mnode_id)
-            note[self.ioflds['id']] = new_mnode_id
+            note[self.ioflds["id"]] = new_mnode_id
             note.flush()
-            logging.debug("Adding ID for note nr %s", nr)
+            logging.debug(_("Adding ID for note nr %s"), nr)
             logging.debug("midx %s", midx)
             logging.debug("nid %s", nid)
             logging.debug("note %s", note)
@@ -169,10 +172,10 @@ class ImgOccNoteConverter(object):
 
         for nid in list(nids_by_nr.values()):
             note = mw.col.getNote(nid)
-            note[self.ioflds['om']] = fname2img(omask_path)
+            note[self.ioflds["om"]] = fname2img(omask_path)
             note.addTag(".io-converted")
             note.flush()
-            logging.debug("Setting om and tag for nid %s", nid)
+            logging.debug(_("Setting om and tag for nid %s"), nid)
 
     def getOcclTypeAndNodes(self, note):
         """Determine oclusion type and svg mask nodes"""
@@ -199,9 +202,9 @@ class ImgOccNoteConverter(object):
         """Read and fix malformatted IO 2.0 SVGs"""
         svg_doc = minidom.parse(svg_file)
         # ugly workaround for wrong namespace in older IO notes:
-        svg_string = svg_doc.toxml().replace('ns0:', '').replace(':ns0', '')
+        svg_string = svg_doc.toxml().replace("ns0:", "").replace(":ns0", "")
         svg_string = str(svg_string)
-        svg_doc = minidom.parseString(svg_string.encode('utf-8'))
+        svg_doc = minidom.parseString(svg_string.encode("utf-8"))
         svg_node = svg_doc.documentElement
         return svg_node
 
@@ -209,27 +212,30 @@ class ImgOccNoteConverter(object):
         """Find mask nodes in masks layer"""
         mnode_indexes = []
         for i, node in enumerate(mlayer.childNodes):
-            if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != 'title'):
+            if (node.nodeType == node.ELEMENT_NODE) and (node.nodeName != "title"):
                 mnode_indexes.append(i)
         return mnode_indexes
 
     def layerNodesFrom(self, svg_node):
         """Get layer nodes (topmost group nodes below the SVG node)"""
-        assert (svg_node.nodeType == svg_node.ELEMENT_NODE)
-        assert (svg_node.nodeName == 'svg')
-        layer_nodes = [node for node in svg_node.childNodes
-                       if node.nodeType == node.ELEMENT_NODE]
-        assert (len(layer_nodes) >= 1)
+        assert svg_node.nodeType == svg_node.ELEMENT_NODE
+        assert svg_node.nodeName == "svg"
+        layer_nodes = [
+            node for node in svg_node.childNodes if node.nodeType == node.ELEMENT_NODE
+        ]
+        assert len(layer_nodes) >= 1
         # last, i.e. top-most element, needs to be a layer:
-        assert (layer_nodes[-1].nodeName == 'g')
+        assert layer_nodes[-1].nodeName == "g"
         return layer_nodes
 
     def _saveMask(self, mask, note_id, mtype):
         """Write mask to file in media collection"""
-        logging.debug("!saving %s, %s", note_id, mtype)
-        mask_path = '%s-%s.svg' % (note_id, mtype)
-        mask_file = open(mask_path, 'w')
-        mask_file.write(mask.encode('utf-8'))
+        logging.debug(
+            _("!saving %(node_id)s, %(mtype)s"), {"node_id": node_id, "mtype": mtype}
+        )
+        mask_path = "%s-%s.svg" % (note_id, mtype)
+        mask_file = open(mask_path, "w")
+        mask_file.write(mask.encode("utf-8"))
         mask_file.close()
         return mask_path
 
@@ -239,14 +245,18 @@ def onIoConvert(self):
     mw = self.mw
     selected = self.selectedNotes()
     if not selected:
-        tooltip("No cards selected.", period=2000)
+        tooltip(_("No cards selected."), period=2000)
         return
-    ret = ioAskUser("question_nconvert", title="Please confirm action",
-                    parent=self, defaultno=True)
+    ret = ioAskUser(
+        "question_nconvert",
+        title=_("Please confirm action"),
+        parent=self,
+        defaultno=True,
+    )
     if not ret:
         return False
     mw.progress.start()
-    mw.checkpoint("Image Occlusion Note Conversions")
+    mw.checkpoint(_("Image Occlusion Note Conversions"))
     self.model.beginReset()
     conv = ImgOccNoteConverter(self)
     conv.convertNotes(selected)
@@ -255,18 +265,20 @@ def onIoConvert(self):
     mw.reset()
     mw.progress.finish()
 
+
 # Set up menus and hooks
 
 
 def setupMenu(self):
     menu = self.form.menuEdit
     menu.addSeparator()
-    a = menu.addAction("Convert to Editable IO &Enhanced Notes")
+    a = menu.addAction(_("Convert to Editable IO &Enhanced Notes"))
     a.triggered.connect(lambda _, b=self: onIoConvert(b))
 
 
 try:
     from aqt.gui_hooks import browser_menus_did_init
+
     browser_menus_did_init.append(setupMenu)
 except (ImportError, ModuleNotFoundError):
     addHook("browser.setupMenus", setupMenu)

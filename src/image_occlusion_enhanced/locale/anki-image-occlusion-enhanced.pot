@@ -1,0 +1,667 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-14 02:53+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: ../add.py:80
+msgid "Non-editable note.<br>Using image to create new IO note."
+msgstr ""
+
+#: ../add.py:84
+msgid ""
+"This note cannot be edited, nor is there<br>an image to use for an image "
+"occlusion."
+msgstr ""
+
+#: ../add.py:95 ../add.py:267
+#, python-brace-format
+msgid "<b>Unsupported image</b> in file <i>{image_path}</i>:<br><br>{error}"
+msgstr ""
+
+#: ../add.py:118
+msgid "Editing unavailable: Invalid image occlusion Note ID"
+msgstr ""
+
+#: ../add.py:121
+msgid "Editing unavailable: Missing image or original mask"
+msgstr ""
+
+#: ../add.py:164
+msgid "Select an Image"
+msgstr ""
+
+#: ../add.py:165
+#, python-brace-format
+msgid "Image Files ({file_glob_list})"
+msgstr ""
+
+#: ../add.py:175
+msgid "Invalid image file path"
+msgstr ""
+
+#: ../add.py:199
+msgid "Launching new ImgOccEdit instance"
+msgstr ""
+
+#: ../config.py:93
+msgid "Updating config DB from earlier IO release"
+msgstr ""
+
+#: ../dialogs.py:39
+#, python-brace-format
+msgid ""
+"\n"
+"<p><strong>Basic Instructions</strong></p>\n"
+"<ol>\n"
+"<li>With the rectangle tool or any other shape tool selected, cover the "
+"areas of the image you want to be tested on</li>\n"
+"<li>(Optional): Fill out additional information about your cards by "
+"switching to the <em>Fields</em> tab</li>\n"
+"<li>Click on one of the <em>Add Cards</em> buttons at the bottom of the "
+"window to add the cards to your collection</li>\n"
+"</ol>\n"
+"<p><strong>Drawing Custom Labels</strong></p>\n"
+"<ol>\n"
+"<li>Draw up the layers sidepanel by clicking on the <em>Layers</em> button "
+"at the right edge of the editor</li>\n"
+"<li>Switch to the <em>Labels</em> layer by left-clicking on it. You can also "
+"switch to the labels layer directly by using <kbd>Ctrl</kbd> + <kbd>Shift</"
+"kbd> + <kbd>L</kbd>.</li>\n"
+"<li>Anything you draw in this layer – be it text, lines, or shapes – will "
+"appear above the image, but still below your masks. All of the painting "
+"tools in the left sidebar are at your disposal.</li>\n"
+"<li>Switch back to the masks layer, either via the <em>Layers</em> "
+"sidepanel, or by using the <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> "
+"hotkey.</li>\n"
+"</ol>\n"
+"<p><strong>Grouping Shapes</strong></p>\n"
+"<ol>\n"
+"<li>Select multiple shapes, either by drawing a selection rectangle with the "
+"selection tool active (<kbd>S</kbd>), or by shift-clicking on multiple "
+"shapes</li>\n"
+"<li>Either use the <kbd>G</kbd> hotkey or the <em>Group Elements</em> tool "
+"in the top-bar to group your items</li>\n"
+"</ol>\n"
+"<p>Grouped shapes will form a single card.</p>\n"
+"<p><strong>More Information</strong></p>\n"
+"<p>For more information please refer to the following resources:</p>\n"
+"<ul>\n"
+"<li><a href=\"{io_link_wiki}\">Image Occlusion Enhanced Wiki</a></li>\n"
+"<li><a href=\"{io_link_tut}\">YouTube Tutorials</a></li>\n"
+"<li><a href=\"{io_link_thread}\">Official support thread</a></li>\n"
+"</ul>\n"
+msgstr ""
+
+#: ../dialogs.py:68
+#, python-brace-format
+msgid ""
+"\n"
+"<b>Instructions for editing</b>:\n"
+"<br><br> Each mask shape represents a card.\n"
+"Removing any of the existing shapes will remove the corresponding card.\n"
+"New shapes will generate new cards. You can change the occlusion type\n"
+"by using the dropdown box on the left.<br><br>If you click on the\n"
+"<i>Add new cards</i> button a completely new batch of cards will be\n"
+"generated, leaving your originals untouched.<br><br>\n"
+"<b>Actions performed in Image Occlusion's <i>Editing Mode</i> cannot be\n"
+"easily undone, so please make sure to check your changes twice before\n"
+"applying them.</b><br><br>The only exception to this are purely textual\n"
+"changes to fields like the header or footer of your notes. These can\n"
+"be fully reverted by using Ctrl+Z in the Browser or Reviewer view.<br><br>\n"
+"More information: <a href=\"{io_link_wiki}\">Wiki: Editing Notes</a>.\n"
+msgstr ""
+
+#: ../dialogs.py:84
+#, python-brace-format
+msgid ""
+"\n"
+"<b>Fixing a broken note type:</b>\n"
+"<br><br> The Image Occlusion Enhanced note type can't be edited\n"
+"arbitrarily. If you delete a field that's required by the add-on\n"
+"or rename it outside of the IO Options dialog you will be presented\n"
+"with an error message. <br><br> To fix this issue please follow the\n"
+"instructions in <a href=\"{io_link_wiki}\">the\n"
+"wiki</a>."
+msgstr ""
+
+#: ../dialogs.py:93
+#, python-brace-format
+msgid ""
+"\n"
+"<h2>Help and Support</h2>\n"
+"<p><a href=\"{io_link_wiki}\">Image Occlusion Enhanced Wiki</a></p>\n"
+"<p><a href=\"{io_link_tut}\">Official Video Tutorial Series</a></p>\n"
+"<p><a href=\"{io_link_thread}\">Support Thread</a></p>\n"
+"<h2>Credits and License</h2>\n"
+"<p style=\"font-size:12pt;\"><em>Copyright © 2012-2015\n"
+"<a href=\"https://github.com/tmbb\">Tiago Barroso</a></em></p>\n"
+"<p style=\"font-size:12pt;\"><em>Copyright © 2013\n"
+"<a href=\"https://github.com/steveaw\">Steve AW</a></em></p>\n"
+"<p style=\"font-size:12pt;\"><em>Copyright © 2016-2017\n"
+"<a href=\"https://github.com/Glutanimate\">Aristotelis P.</a></em></p>\n"
+"<p><em>Image Occlusion Enhanced</em> is licensed under the GNU AGPLv3.</p>\n"
+"<p>Third-party open-source software shipped with <em>Image Occlusion "
+"Enhanced</em>:</p>\n"
+"<ul><li><p><a href=\"https://github.com/SVG-Edit/svgedit\">SVG Edit</a> "
+"2.6.\n"
+"Copyright (c) 2009-2012 SVG-edit authors. Licensed under the MIT license</"
+"a></p></li>\n"
+"<li><p><a href=\"http://www.pythonware.com/products/pil/\">Python Imaging "
+"Library</a>\n"
+"(PIL) 1.1.7. Copyright (c) 1997-2011 by Secret Labs AB, Copyright (c) "
+"1995-2011 by Fredrik\n"
+"Lundh. Licensed under the <a href=\"http://www.pythonware.com/products/pil/"
+"license.htm\"\n"
+"PIL license</a></p></li>\n"
+"<li><p><a href=\"https://github.com/shibukawa/imagesize_py\">imagesize.py</"
+"a> v0.7.1.\n"
+"Copyright (c) 2016 Yoshiki Shibukawa. Licensed under the MIT license.</p></"
+"li>\n"
+"</ul>\n"
+msgstr ""
+
+#: ../dialogs.py:118
+#, python-brace-format
+msgid ""
+"\n"
+"<b>Important</b><br><br>\n"
+"The \"Hide All, Reveal All\" image occlusion mode used by this card\n"
+"is no longer supported by the add-on. You can still review it just like\n"
+"you would with any other card, but if you proceed with editing the note,\n"
+"it will automatically be converted to the \"Hide All, Guess One\" type."
+"<br><br>\n"
+"For more information on why this occlusion mode was removed and how to\n"
+"replicate its functionality please see here:<br><br>\n"
+"<a href=\"{io_link_obsolete_aa}\">Wiki: Hide All, Reveal All</a>\n"
+msgstr ""
+
+#: ../dialogs.py:130
+msgid ""
+"<b>Error</b>: Image Occlusion note type not configured properly. Please make "
+"sure you did not manually delete or rename any of the default fields."
+msgstr ""
+
+#: ../dialogs.py:135
+msgid ""
+"This is a purely <b>experimental</b> feature that is meant to update older\n"
+"IO notes to be compatible with the new editing feature-set in IO Enhanced.\n"
+"Clicking on 'Yes' below will prompt the add-on to go through all selected\n"
+"notes and change their Note ID and mask files in a way that should make it\n"
+"possible to edit them in the future.\n"
+"<br><br>Please note that this will only work for notes\n"
+"that have already been switched to the <i>Image Occlusion Enhanced</i> note "
+"type.\n"
+"If you are coming from IO 2.0 or an older version of IO Enhanced you will\n"
+"first have to switch the note type of your notes manually by going to "
+"<i>Edit →\n"
+"Change Note Type.</i><br><br>\n"
+"<b>WARNING</b>: There is no guarantee that this feature will actually "
+"succeed in\n"
+"updating your notes properly. To convert legacy notes the add-on will have "
+"to\n"
+"make a few assumptions which in some rare instances might turn out to be "
+"wrong\n"
+"and lead to broken notes. Notes that can't be parsed for the information "
+"needed\n"
+"to convert into an editable state (e.g. a valid \"Original Mask\" field) "
+"will usually\n"
+"be skipped by the add-on, but there might be some corner cases where that "
+"won't work.\n"
+"<br><br>A checkpoint will be set to revert to if needed,\n"
+"but even with that safety measure in place you should still only use this\n"
+"function if you know what you are doing.\n"
+"<br><br><b>Continue anyway?</b><br><i>(Depending on the number of notes this "
+"might\n"
+"take a while)</i>\n"
+msgstr ""
+
+#: ../dialogs.py:162
+msgid "Image Occlusion Enhanced Error"
+msgstr ""
+
+#: ../dialogs.py:180 ../dialogs.py:203
+msgid "Image Occlusion Enhanced"
+msgstr ""
+
+#: ../dialogs.py:218
+msgid "Image Occlusion Enhanced Help"
+msgstr ""
+
+#: ../editor.py:74
+#, python-brace-format
+msgid "unknown action: {action_name}"
+msgstr ""
+
+#: ../editor.py:121
+msgid "Tags"
+msgstr ""
+
+#: ../editor.py:146
+msgid "Change &Image"
+msgstr ""
+
+#: ../editor.py:150
+msgid "&Help"
+msgstr ""
+
+#: ../editor.py:154
+msgid "Don't Change"
+msgstr ""
+
+#: ../editor.py:155
+msgid "Hide All, Guess One"
+msgstr ""
+
+#: ../editor.py:157
+msgid "Hide One, Guess One"
+msgstr ""
+
+#: ../editor.py:160
+msgid "&Edit Cards"
+msgstr ""
+
+#: ../editor.py:162
+msgid "&Add New Cards"
+msgstr ""
+
+#: ../editor.py:164
+msgid "Hide &All, Guess One"
+msgstr ""
+
+#: ../editor.py:166
+msgid "Hide &One, Guess One"
+msgstr ""
+
+#: ../editor.py:168
+msgid "&Close"
+msgstr ""
+
+#: ../editor.py:171
+msgid ""
+"Switch to a different image while preserving all of the shapes and fields"
+msgstr ""
+
+#: ../editor.py:173
+msgid "Preserve existing occlusion type"
+msgstr ""
+
+#: ../editor.py:174
+msgid "Edit all cards using current mask shapes and field entries"
+msgstr ""
+
+#: ../editor.py:176
+msgid "Create new batch of cards without editing existing ones"
+msgstr ""
+
+#: ../editor.py:177
+msgid ""
+"Generate cards with nonoverlapping information, where all<br>labels are "
+"hidden on the front and one revealed on the back"
+msgstr ""
+
+#: ../editor.py:180
+msgid ""
+"Generate cards with overlapping information, where one<br>label is hidden on "
+"the front and revealed on the back"
+msgstr ""
+
+#: ../editor.py:182
+msgid "Close Image Occlusion Editor without generating cards"
+msgstr ""
+
+#: ../editor.py:218
+msgid "Loading..."
+msgstr ""
+
+#: ../editor.py:241
+msgid "&Masks Editor"
+msgstr ""
+
+#: ../editor.py:242
+msgid "&Fields"
+msgstr ""
+
+#: ../editor.py:244
+msgid "Include additional information (optional)"
+msgstr ""
+
+#: ../editor.py:246
+msgid "Create image occlusion masks (required)"
+msgstr ""
+
+#: ../editor.py:375
+msgid "Deck"
+msgstr ""
+
+#: ../editor.py:376
+msgid "Image Occlusion Enhanced - Add Mode"
+msgstr ""
+
+#: ../editor.py:377
+msgid "Add Cards:"
+msgstr ""
+
+#: ../editor.py:387
+msgid "Deck for <i>Add new cards</i>"
+msgstr ""
+
+#: ../editor.py:388
+msgid "Image Occlusion Enhanced - Editing Mode"
+msgstr ""
+
+#: ../editor.py:389
+msgid "Type:"
+msgstr ""
+
+#: ../main.py:47
+msgid "Please close Image Occlusion Editor to access the Options."
+msgstr ""
+
+#: ../main.py:93
+msgid "Add Image Occlusion"
+msgstr ""
+
+#: ../main.py:96
+msgid "Edit Image Occlusion"
+msgstr ""
+
+#: ../main.py:101
+msgid "I/O"
+msgstr ""
+
+#: ../main.py:155
+msgid "Occlude Image"
+msgstr ""
+
+#: ../main.py:158
+msgid "Open Image"
+msgstr ""
+
+#: ../main.py:248
+msgid "Image &Occlusion Enhanced Options..."
+msgstr ""
+
+#: ../main.py:249
+msgid "Image &Occlusion Enhanced..."
+msgstr ""
+
+#: ../nconvert.py:44 ../nconvert.py:60
+#, python-format
+msgid "Skipping note that couldn't be parsed: %s"
+msgstr ""
+
+#: ../nconvert.py:52
+#, python-format
+msgid "Skipping note that we've just converted: %s"
+msgstr ""
+
+#: ../nconvert.py:66
+#, python-brace-format
+msgid ""
+"<b>{number_notes_updated}</b> note(s) updated, <b>{number_notes_skipped}</b> "
+"skipped"
+msgstr ""
+
+#: ../nconvert.py:79
+#, python-format
+msgid "Skipping note with wrong note type: %s"
+msgstr ""
+
+#: ../nconvert.py:84
+#, python-format
+msgid "Skipping IO note that is already editable: %s"
+msgstr ""
+
+#: ../nconvert.py:89
+#, python-format
+msgid "Skipping IO note without original SVG mask: %s"
+msgstr ""
+
+#: ../nconvert.py:92
+#, python-format
+msgid "Found IO note in need of update: %s"
+msgstr ""
+
+#: ../nconvert.py:113
+msgid "Extracting data using IO 2.0 naming scheme"
+msgstr ""
+
+#: ../nconvert.py:118
+msgid "Extracting data using IO Enhanced naming scheme"
+msgstr ""
+
+#: ../nconvert.py:143
+#, python-format
+msgid "Adding ID for note nr %s"
+msgstr ""
+
+#: ../nconvert.py:158
+#, python-format
+msgid "Setting om and tag for nid %s"
+msgstr ""
+
+#: ../nconvert.py:212
+#, python-format
+msgid "!saving %(node_id)s, %(mtype)s"
+msgstr ""
+
+#: ../nconvert.py:226
+msgid "No cards selected."
+msgstr ""
+
+#: ../nconvert.py:228 ../ngen.py:351
+msgid "Please confirm action"
+msgstr ""
+
+#: ../nconvert.py:233
+msgid "Image Occlusion Note Conversions"
+msgstr ""
+
+#: ../nconvert.py:248
+msgid "Convert to Editable IO &Enhanced Notes"
+msgstr ""
+
+#: ../ngen.py:83
+msgid "No cards to generate.<br>Are you sure you set your masks correctly?"
+msgstr ""
+
+#: ../ngen.py:94
+msgid "Adding Image Occlusion Cards"
+msgstr ""
+
+#: ../ngen.py:99
+#, python-brace-format
+msgid "One card <b>added</b>"
+msgid_plural "{card_count} cards <b>added</b>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../ngen.py:114
+msgid ""
+"No shapes left. You can't delete all cards.<br>Are you sure you set your "
+"masks correctly?"
+msgstr ""
+
+#: ../ngen.py:117
+msgid "Editing Image Occlusion Cards"
+msgstr ""
+
+#: ../ngen.py:158
+#, python-brace-format
+msgid "One old card <b>edited in place</b>"
+msgid_plural "{card_count} old cards <b>edited in place</b>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../ngen.py:162
+#, python-brace-format
+msgid "<br>One existing card <b>deleted</b>"
+msgid_plural "<br>{card_count} existing cards <b>deleted</b>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../ngen.py:166
+#, python-brace-format
+msgid "<br>One new card <b>created</b>"
+msgid_plural "<br>{card_count} new cards <b>created</b>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../ngen.py:345
+#, python-brace-format
+msgid ""
+"This will <b>delete {del_count} card(s)</b> and <b>create {new_count} new "
+"one(s)</b>. Please note that this action is irreversible.<br><br>Would you "
+"still like to proceed?"
+msgstr ""
+
+#: ../ngen.py:400
+#, python-format
+msgid "!saving %(note_id)s, %(mtype)s"
+msgstr ""
+
+#: ../ngen.py:449
+#, python-format
+msgid "!noteflush %s"
+msgstr ""
+
+#: ../ngen.py:452
+#, python-format
+msgid "!notecreate %s"
+msgstr ""
+
+#: ../options.py:55
+msgid "Please press the new key combination"
+msgstr ""
+
+#: ../options.py:58
+msgid "Grab key combination"
+msgstr ""
+
+#: ../options.py:77
+msgid "Please use at least one keyboard modifier (Ctrl, Alt, Shift)"
+msgstr ""
+
+#: ../options.py:81
+msgid "Shift needs to be combined with at least one other modifier (Ctrl, Alt)"
+msgstr ""
+
+#: ../options.py:85
+msgid ""
+"Please press at least one key that is not a keyboard modifier (not Ctrl/Alt/"
+"Shift)"
+msgstr ""
+
+#: ../options.py:134
+msgid "Question mask"
+msgstr ""
+
+#: ../options.py:135
+msgid "Other masks"
+msgstr ""
+
+#: ../options.py:136
+msgid "Lines"
+msgstr ""
+
+#: ../options.py:137
+msgid "<b>Colors</b>"
+msgstr ""
+
+#: ../options.py:138
+msgid "<b>Custom Field Names</b>"
+msgstr ""
+
+#: ../options.py:139
+msgid "<b>Other Editor Settings</b>"
+msgstr ""
+
+#: ../options.py:151
+msgid "Line width"
+msgstr ""
+
+#: ../options.py:152
+msgid "Label font"
+msgstr ""
+
+#: ../options.py:153
+msgid "Label size"
+msgstr ""
+
+#: ../options.py:169
+msgid ""
+"Changing any of the entries below will rename the corresponding default "
+"field of the IO Enhanced note type. This is the only way you can rename any "
+"of the default fields. <br><br><i>Renaming these fields through Anki's "
+"regular dialogs will cause the add-on to fail. So please don't do that.</i>"
+msgstr ""
+
+#: ../options.py:222
+msgid "<b>Miscellaneous Settings</b>"
+msgstr ""
+
+#: ../options.py:225
+msgid ""
+"Comma-separated list of fields to hide in Editing mode (in order to preserve "
+"manual edits):"
+msgstr ""
+
+#: ../options.py:231
+msgid "Invoke IO with the following hotkey:"
+msgstr ""
+
+#: ../options.py:233
+msgid "Change hotkey"
+msgstr ""
+
+#: ../options.py:247
+msgid "Restore &Defaults"
+msgstr ""
+
+#: ../options.py:260
+msgid "Image Occlusion Enhanced Options"
+msgstr ""
+
+#: ../options.py:345
+#, python-format
+msgid "Renamed %(old_name)s, %(new_name)s"
+msgstr ""
+
+#: ../options.py:358
+msgid "Field rename action aborted"
+msgstr ""
+
+#: ../template.py:281
+msgid "Resetting IO Enhanced card template to defaults"
+msgstr ""
+
+#: ../template.py:292
+msgid "Updating IO Enhanced card template"
+msgstr ""
+
+#: ../utils.py:75
+msgid "Invalid SVG file."
+msgstr ""
+
+#: ../utils.py:88
+msgid "Unrecognized raster image format."
+msgstr ""
+
+#: ../utils.py:92
+msgid "Image has invalid dimensions."
+msgstr ""

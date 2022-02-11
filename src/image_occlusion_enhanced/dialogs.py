@@ -40,20 +40,26 @@ from aqt import mw
 from anki.hooks import addHook, remHook
 
 from .config import *
+from .lang import _
 
 # Help and support resource links
 
 io_link_wiki = "https://github.com/glutanimate/image-occlusion-enhanced/wiki"
 io_link_tut = "https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o"
-io_link_thread = ("https://anki.tenderapp.com/discussions/add-ons/"
-                  "8295-image-occlusion-enhanced-official-thread")
-io_link_obsolete_aa = "https://github.com/glutanimate/image-occlusion-enhanced/wiki/ADD_LINK_HERE"
+io_link_thread = (
+    "https://anki.tenderapp.com/discussions/add-ons/"
+    "8295-image-occlusion-enhanced-official-thread"
+)
+io_link_obsolete_aa = (
+    "https://github.com/glutanimate/image-occlusion-enhanced/wiki/ADD_LINK_HERE"
+)
 
 # Predefiend dialog messages
 
 dialog_msg = {}
 
-dialog_msg["add"] = """
+dialog_msg["add"] = _(
+    """
 <p><strong>Basic Instructions</strong></p>
 <ol>
 <li>With the rectangle tool or any other shape tool selected, cover the areas of the image you want to be tested on</li>
@@ -76,13 +82,17 @@ dialog_msg["add"] = """
 <p><strong>More Information</strong></p>
 <p>For more information please refer to the following resources:</p>
 <ul>
-<li><a href="{}">Image Occlusion Enhanced Wiki</a></li>
-<li><a href="{}">YouTube Tutorials</a></li>
-<li><a href="{}">Official support thread</a></li>
+<li><a href="{io_link_wiki}">Image Occlusion Enhanced Wiki</a></li>
+<li><a href="{io_link_tut}">YouTube Tutorials</a></li>
+<li><a href="{io_link_thread}">Official support thread</a></li>
 </ul>
-""".format(io_link_wiki, io_link_tut, io_link_thread)
+"""
+).format(
+    io_link_wiki=io_link_wiki, io_link_tut=io_link_tut, io_link_thread=io_link_thread
+)
 
-dialog_msg["edit"] = """
+dialog_msg["edit"] = _(
+    """
 <b>Instructions for editing</b>:
 <br><br> Each mask shape represents a card.
 Removing any of the existing shapes will remove the corresponding card.
@@ -95,23 +105,27 @@ easily undone, so please make sure to check your changes twice before
 applying them.</b><br><br>The only exception to this are purely textual
 changes to fields like the header or footer of your notes. These can
 be fully reverted by using Ctrl+Z in the Browser or Reviewer view.<br><br>
-More information: <a href="{}">Wiki: Editing Notes</a>.
-""".format(io_link_wiki + "/Basic-Use#editing-cards")
+More information: <a href="{io_link_wiki}">Wiki: Editing Notes</a>.
+"""
+).format(io_link_wiki=io_link_wiki + "/Basic-Use#editing-cards")
 
-dialog_msg["notetype"] = """
-<b>Fixing a broken note type:</b
+dialog_msg["notetype"] = _(
+    """
+<b>Fixing a broken note type:</b>
 <br><br> The Image Occlusion Enhanced note type can't be edited
 arbitrarily. If you delete a field that's required by the add-on
 or rename it outside of the IO Options dialog you will be presented
-with an error message. <br><br>
-To fix this issue please follow the instructions in <a href="{}">the
-wiki</a>.""".format(io_link_wiki + "/Troubleshooting#note-type")
+with an error message. <br><br> To fix this issue please follow the
+instructions in <a href="{io_link_wiki}">the
+wiki</a>."""
+).format(io_link_wiki=io_link_wiki + "/Troubleshooting#note-type")
 
-dialog_msg["main"] = """
+dialog_msg["main"] = _(
+    """
 <h2>Help and Support</h2>
-<p><a href="{}">Image Occlusion Enhanced Wiki</a></p>
-<p><a href="{}">Official Video Tutorial Series</a></p>
-<p><a href="{}">Support Thread</a></p>
+<p><a href="{io_link_wiki}">Image Occlusion Enhanced Wiki</a></p>
+<p><a href="{io_link_tut}">Official Video Tutorial Series</a></p>
+<p><a href="{io_link_thread}">Support Thread</a></p>
 <h2>Credits and License</h2>
 <p style="font-size:12pt;"><em>Copyright © 2012-2015
 <a href="https://github.com/tmbb">Tiago Barroso</a></em></p>
@@ -130,9 +144,13 @@ PIL license</a></p></li>
 <li><p><a href="https://github.com/shibukawa/imagesize_py">imagesize.py</a> v0.7.1.
 Copyright (c) 2016 Yoshiki Shibukawa. Licensed under the MIT license.</p></li>
 </ul>
-""".format(io_link_wiki, io_link_tut, io_link_thread)
+"""
+).format(
+    io_link_wiki=io_link_wiki, io_link_tut=io_link_tut, io_link_thread=io_link_thread
+)
 
-dialog_msg["obsolete_aa"] = """
+dialog_msg["obsolete_aa"] = _(
+    """
 <b>Important</b><br><br>
 The "Hide All, Reveal All" image occlusion mode used by this card
 is no longer supported by the add-on. You can still review it just like
@@ -140,16 +158,18 @@ you would with any other card, but if you proceed with editing the note,
 it will automatically be converted to the "Hide All, Guess One" type.<br><br>
 For more information on why this occlusion mode was removed and how to
 replicate its functionality please see here:<br><br>
-<a href="{}">Wiki: Hide All, Reveal All</a>
-""".format(io_link_obsolete_aa)
+<a href="{io_link_obsolete_aa}">Wiki: Hide All, Reveal All</a>
+"""
+).format(io_link_obsolete_aa=io_link_obsolete_aa)
 
-dialog_msg["model_error"] = (
+dialog_msg["model_error"] = _(
     "<b>Error</b>: Image Occlusion note type "
     "not configured properly. Please make sure you did not "
     "manually delete or rename any of the default fields."
 )
 
-dialog_msg["question_nconvert"] = """\
+dialog_msg["question_nconvert"] = _(
+    """\
 This is a purely <b>experimental</b> feature that is meant to update older
 IO notes to be compatible with the new editing feature-set in IO Enhanced.
 Clicking on 'Yes' below will prompt the add-on to go through all selected
@@ -172,20 +192,28 @@ function if you know what you are doing.
 <br><br><b>Continue anyway?</b><br><i>(Depending on the number of notes this might
 take a while)</i>
 """
+)
 
 # Message dialog utility functions
 
 
-def ioCritical(msgkey, title="Image Occlusion Enhanced Error", text="",
-               parent=None, help=None):
+def ioCritical(
+    msgkey, title=_("Image Occlusion Enhanced Error"), text="", parent=None, help=None
+):
     msgfunc = QMessageBox.critical
     if help:
         buttons = QMessageBox.Help | QMessageBox.Ok
     else:
         buttons = None
     while 1:
-        r = ioInfo(msgkey, title=title, text=text,
-                   parent=parent, buttons=buttons, msgfunc=msgfunc)
+        r = ioInfo(
+            msgkey,
+            title=title,
+            text=text,
+            parent=parent,
+            buttons=buttons,
+            msgfunc=msgfunc,
+        )
         if r == QMessageBox.Help:
             ioHelp(help, parent=parent)
             return False
@@ -194,8 +222,15 @@ def ioCritical(msgkey, title="Image Occlusion Enhanced Error", text="",
     return r
 
 
-def ioAskUser(msgkey, title="Image Occlusion Enhanced", parent=None, text="",
-              help="", defaultno=False, msgfunc=None):
+def ioAskUser(
+    msgkey,
+    title=_("Image Occlusion Enhanced"),
+    parent=None,
+    text="",
+    help="",
+    defaultno=False,
+    msgfunc=None,
+):
     """Show a yes/no question. Return true if yes.
     based on askUser by Damien Elmes"""
     msgfunc = QMessageBox.question
@@ -207,8 +242,15 @@ def ioAskUser(msgkey, title="Image Occlusion Enhanced", parent=None, text="",
             default = QMessageBox.No
         else:
             default = QMessageBox.Yes
-        r = ioInfo(msgkey, title=title, text=text, parent=parent,
-                   buttons=buttons, default=default, msgfunc=msgfunc)
+        r = ioInfo(
+            msgkey,
+            title=title,
+            text=text,
+            parent=parent,
+            buttons=buttons,
+            default=default,
+            msgfunc=msgfunc,
+        )
         if r == QMessageBox.Help:
             ioHelp(help, parent=parent)
             return False
@@ -217,8 +259,15 @@ def ioAskUser(msgkey, title="Image Occlusion Enhanced", parent=None, text="",
     return r == QMessageBox.Yes
 
 
-def ioInfo(msgkey, title="Image Occlusion Enhanced", text="", parent=None,
-           buttons=None, default=None, msgfunc=None):
+def ioInfo(
+    msgkey,
+    title=_("Image Occlusion Enhanced"),
+    text="",
+    parent=None,
+    buttons=None,
+    default=None,
+    msgfunc=None,
+):
     if not parent:
         parent = mw.app.activeWindow()
     if not buttons:
@@ -232,8 +281,7 @@ def ioInfo(msgkey, title="Image Occlusion Enhanced", text="", parent=None,
     return msgfunc(parent, title, text, buttons, default)
 
 
-def ioHelp(msgkey, title="Image Occlusion Enhanced Help",
-           text="", parent=None):
+def ioHelp(msgkey, title=_("Image Occlusion Enhanced Help"), text="", parent=None):
     """Display an info message or a predefined help section"""
     if not parent:
         parent = mw.app.activeWindow()
@@ -252,6 +300,7 @@ def ioHelp(msgkey, title="Image Occlusion Enhanced Help",
 
     try:
         from aqt.gui_hooks import profile_will_close
+
         profile_will_close.append(onProfileUnload)
     except (ImportError, ModuleNotFoundError):
         addHook("unloadProfile", onProfileUnload)

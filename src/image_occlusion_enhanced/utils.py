@@ -47,13 +47,12 @@ from ._vendor import imghdr
 from ._vendor.imagesize import imagesize
 
 from .consts import *
-
+from .lang import _
 
 
 def path2url(path):
     """URL-encode local path"""
-    return urllib.parse.urljoin(
-        'file:', urllib.request.pathname2url(path))
+    return urllib.parse.urljoin("file:", urllib.request.pathname2url(path))
 
 
 def fname2img(path):
@@ -82,29 +81,29 @@ def imageProp(image_path):
     # Vector graphics
     if image_path.endswith(".svg"):
         try:
-            with open(image_path, 'r') as svg_file:
+            with open(image_path, "r") as svg_file:
                 doc = svg_file.read()
-                mask_doc = minidom.parseString(doc.encode('utf-8'))
+                mask_doc = minidom.parseString(doc.encode("utf-8"))
         except Exception as e:
             print(str(e))
-            raise ValueError("Invalid SVG file.")
-        
+            raise ValueError(_("Invalid SVG file."))
+
         svg_node = mask_doc.documentElement
         cheight = svg_node.attributes["height"].value
         cwidth = svg_node.attributes["width"].value
         height = _svg_convert_size(cheight)
         width = _svg_convert_size(cwidth)
-        
+
         return width, height
-    
+
     # Bitmap graphics
     img_fmt = imghdr.what(image_path)
     if img_fmt not in SUPPORTED_BITMAP_FORMATS:
-        raise ValueError("Unrecognized raster image format.")
-    
+        raise ValueError(_("Unrecognized raster image format."))
+
     width, height = imagesize.get(image_path)
     if width < 0 or height < 0:
-        raise ValueError("Image has invalid dimensions.")
+        raise ValueError(_("Image has invalid dimensions."))
 
     return width, height
 
@@ -116,13 +115,7 @@ def _svg_convert_size(size):
     """
 
     # https://www.w3.org/TR/SVG/coords.html#Units
-    conversion_table = {
-        "pt": 1.25,
-        "pc": 15,
-        "mm": 3.543307,
-        "cm": 35.43307,
-        "in": 90
-    }
+    conversion_table = {"pt": 1.25, "pc": 15, "mm": 3.543307, "cm": 35.43307, "in": 90}
     if len(size) > 3:
         if size[-2:] in conversion_table:
             return round(float(size[:-2]) * conversion_table[size[-2:]])

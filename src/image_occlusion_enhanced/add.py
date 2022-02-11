@@ -48,22 +48,22 @@ from .config import *
 from .editor import ImgOccEdit
 from .dialogs import ioCritical, ioInfo
 from .utils import imageProp, img2path, path2url
+from .lang import _
 
 from .consts import SUPPORTED_EXTENSIONS
 
 # SVG-Edit configuration
-svg_edit_dir = os.path.join(os.path.dirname(__file__),
-                            'svg-edit',
-                            'editor')
-svg_edit_path = os.path.join(svg_edit_dir,
-                             'svg-editor.html')
+svg_edit_dir = os.path.join(os.path.dirname(__file__), "svg-edit", "editor")
+svg_edit_path = os.path.join(svg_edit_dir, "svg-editor.html")
 svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,\
 ext-markers.js,ext-shapes.js,ext-eyedropper.js,ext-panning.js,\
 ext-snapping.js"
 svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
-svg_edit_queryitems = [('initStroke[opacity]', '1'),
-                       ('showRulers', 'false'),
-                       ('extensions', svg_edit_ext)]
+svg_edit_queryitems = [
+    ("initStroke[opacity]", "1"),
+    ("showRulers", "false"),
+    ("extensions", svg_edit_ext),
+]
 
 
 class ImgOccAdd(object):
@@ -78,7 +78,7 @@ class ImgOccAdd(object):
     def occlude(self, image_path=None):
 
         note = self.ed.note
-        isIO = (note and note.model() == getOrCreateModel())
+        isIO = note and note.model() == getOrCreateModel()
 
         if not image_path:
             if self.origin == "addcards":
@@ -94,12 +94,19 @@ class ImgOccAdd(object):
             else:
                 image_path = self.getImageFromFields(note.fields)
                 if image_path:
-                    tooltip("Non-editable note.<br>"
-                            "Using image to create new IO note.")
+                    tooltip(
+                        _("Non-editable note.<br>" "Using image to create new IO note.")
+                    )
 
         if not image_path:
-            tooltip(("This note cannot be edited, nor is there<br>"
-                     "an image to use for an image occlusion."))
+            tooltip(
+                (
+                    _(
+                        "This note cannot be edited, nor is there<br>"
+                        "an image to use for an image occlusion."
+                    )
+                )
+            )
             return False
 
         self.setPreservedAttrs(note)
@@ -109,8 +116,11 @@ class ImgOccAdd(object):
             width, height = imageProp(image_path)
         except ValueError as e:
             showWarning(
-                f"<b>Unsupported image</b> in file <i>{image_path}</i>:"
-                f"<br><br>{str(e)}")
+                _(
+                    "<b>Unsupported image</b> in file <i>{image_path}</i>:"
+                    "<br><br>{error}"
+                ).format(image_path=image_path, error=str(e))
+            )
             return False
 
         self.callImgOccEdit(width, height)
@@ -121,23 +131,24 @@ class ImgOccAdd(object):
             self.opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
         else:
             self.opref["did"] = mw.col.db.scalar(
-                "select did from cards where id = ?", note.cards()[0].id)
+                "select did from cards where id = ?", note.cards()[0].id
+            )
 
     def getIONoteData(self, note):
         """Select image based on mode and set original field contents"""
 
-        note_id = note[self.ioflds['id']]
-        image_path = img2path(note[self.ioflds['im']])
-        omask = img2path(note[self.ioflds['om']])
+        note_id = note[self.ioflds["id"]]
+        image_path = img2path(note[self.ioflds["im"]])
+        omask = img2path(note[self.ioflds["om"]])
 
         if note_id is None or note_id.count("-") != 2:
-            msg = "Editing unavailable: Invalid image occlusion Note ID"
+            msg = _("Editing unavailable: Invalid image occlusion Note ID")
             return msg, None
         elif not omask or not image_path:
-            msg = "Editing unavailable: Missing image or original mask"
+            msg = _("Editing unavailable: Missing image or original mask")
             return msg, None
 
-        note_id_grps = note_id.split('-')
+        note_id_grps = note_id.split("-")
         self.opref["note_id"] = note_id
         self.opref["uniq_id"] = note_id_grps[0]
         self.opref["occl_tp"] = note_id_grps[1]
@@ -163,9 +174,9 @@ class ImgOccAdd(object):
             clip = QApplication.clipboard()
         if clip and clip.mimeData().imageData():
             if mw.pm.profile["pastePNG"]:
-                handle, image_path = tempfile.mkstemp(suffix='.png')
+                handle, image_path = tempfile.mkstemp(suffix=".png")
             else:
-                handle, image_path = tempfile.mkstemp(suffix='.jpg')
+                handle, image_path = tempfile.mkstemp(suffix=".jpg")
             clip.image().save(image_path)
             clip.clear()
             if os.stat(image_path).st_size == 0:
@@ -181,8 +192,11 @@ class ImgOccAdd(object):
 
         image_path = QFileDialog.getOpenFileName(
             parent,
-            "Select an Image", prev_image_dir,
-            f"""Image Files ({" ".join("*." + ext for ext in SUPPORTED_EXTENSIONS)})"""
+            _("Select an Image"),
+            prev_image_dir,
+            _("""Image Files ({file_glob_list})""").format(
+                file_glob_list=" ".join("*." + ext for ext in SUPPORTED_EXTENSIONS)
+            ),
         )
         if image_path:
             image_path = image_path[0]
@@ -190,7 +204,7 @@ class ImgOccAdd(object):
         if not image_path:
             return None
         elif not os.path.isfile(image_path):
-            tooltip("Invalid image file path")
+            tooltip(_("Invalid image file path"))
             return False
         else:
             self.lconf["dir"] = os.path.dirname(image_path)
@@ -198,11 +212,11 @@ class ImgOccAdd(object):
 
     def callImgOccEdit(self, width, height):
         """Set up variables, call and prepare ImgOccEdit"""
-        ofill = self.sconf['ofill']
-        scol = self.sconf['scol']
-        swidth = self.sconf['swidth']
-        fsize = self.sconf['fsize']
-        font = self.sconf['font']
+        ofill = self.sconf["ofill"]
+        scol = self.sconf["scol"]
+        swidth = self.sconf["swidth"]
+        fsize = self.sconf["fsize"]
+        font = self.sconf["font"]
 
         bkgd_url = path2url(self.image_path)
         opref = self.opref
@@ -214,32 +228,30 @@ class ImgOccAdd(object):
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
-        logging.debug("Launching new ImgOccEdit instance")
+        logging.debug(_("Launching new ImgOccEdit instance"))
 
         url = QUrl.fromLocalFile(svg_edit_path)
         items = QUrlQuery()
         items.setQueryItems(svg_edit_queryitems)
-        items.addQueryItem('initFill[color]', ofill)
-        items.addQueryItem('dimensions', '{0},{1}'.format(width, height))
-        items.addQueryItem('bkgd_url', bkgd_url)
-        items.addQueryItem('initStroke[color]', scol)
-        items.addQueryItem('initStroke[width]', str(swidth))
-        items.addQueryItem('text[font_size]', str(fsize))
-        items.addQueryItem('text[font_family]', "'%s', %s" %
-                           (font, svg_edit_fonts))
+        items.addQueryItem("initFill[color]", ofill)
+        items.addQueryItem("dimensions", "{0},{1}".format(width, height))
+        items.addQueryItem("bkgd_url", bkgd_url)
+        items.addQueryItem("initStroke[color]", scol)
+        items.addQueryItem("initStroke[width]", str(swidth))
+        items.addQueryItem("text[font_size]", str(fsize))
+        items.addQueryItem("text[font_family]", "'%s', %s" % (font, svg_edit_fonts))
 
         if self.mode != "add":
-            items.addQueryItem('initTool', 'select'),
+            items.addQueryItem("initTool", "select"),
             for i in flds:
                 fn = i["name"]
                 if fn in self.ioflds_priv:
                     continue
-                dialog.tedit[fn].setPlainText(
-                    onote[fn].replace('<br />', '\n'))
+                dialog.tedit[fn].setPlainText(onote[fn].replace("<br />", "\n"))
             svg_url = path2url(opref["omask"])
-            items.addQueryItem('url', svg_url)
+            items.addQueryItem("url", svg_url)
         else:
-            items.addQueryItem('initTool', 'rect'),
+            items.addQueryItem("initTool", "rect"),
 
         url.setQuery(items)
         dialog.svg_edit.setUrl(url)
@@ -258,6 +270,7 @@ class ImgOccAdd(object):
             def onSvgEditLoaded():
                 dialog.showSvgEdit(True)
                 dialog.fitImageCanvas()
+
         else:
             # modal dialog when editing
             dialog.setModal(True)
@@ -282,25 +295,34 @@ class ImgOccAdd(object):
             width, height = imageProp(image_path)
         except ValueError as e:
             showWarning(
-                f"<b>Unsupported image</b> in file <i>{image_path}</i>:"
-                f"<br><br>{str(e)}")
+                _(
+                    "<b>Unsupported image</b> in file <i>{image_path}</i>:"
+                    "<br><br>{error}"
+                ).format(image_path=image_path, error=str(e))
+            )
             return False
         bkgd_url = path2url(image_path)
-        self.imgoccedit.svg_edit.eval("""
+        self.imgoccedit.svg_edit.eval(
+            """
                         svgCanvas.setBackground('#FFF', '%s');
                         svgCanvas.setResolution(%s, %s);
-                    """ % (bkgd_url, width, height))
+                    """
+            % (bkgd_url, width, height)
+        )
         self.image_path = image_path
 
     def onAddNotesButton(self, choice, close):
         dialog = self.imgoccedit
-        # If the user is in in-group editing mode (i.e. editing a shape that 
-        # is grouped with other shapes) svgCanvasToString() doesn't work and 
+        # If the user is in in-group editing mode (i.e. editing a shape that
+        # is grouped with other shapes) svgCanvasToString() doesn't work and
         # the callback gets called with `None` (might be a bug in svg-edit).
         # Calling leaveContext() first fixes this.
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.leaveContext(); svgCanvas.svgCanvasToString();",
-            lambda val, choice=choice, close=close: self._onAddNotesButton(choice, close, val))
+            lambda val, choice=choice, close=close: self._onAddNotesButton(
+                choice, close, val
+            ),
+        )
 
     def _onAddNotesButton(self, choice, close, svg):
         """Get occlusion settings in and pass them to the note generator (add)"""
@@ -313,8 +335,9 @@ class ImgOccAdd(object):
         did = dialog.deckChooser.selectedId()
 
         noteGenerator = genByKey(choice)
-        gen = noteGenerator(self.ed, svg, self.image_path,
-                            self.opref, tags, fields, did)
+        gen = noteGenerator(
+            self.ed, svg, self.image_path, self.opref, tags, fields, did
+        )
         r = gen.generateNotes()
         if r is False:
             return False
@@ -337,11 +360,12 @@ class ImgOccAdd(object):
 
     def onEditNotesButton(self, choice):
         dialog = self.imgoccedit
-        # See the comment above in addNotesButton() about 
+        # See the comment above in addNotesButton() about
         # the call to `leaveContext()`.
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.leaveContext(); svgCanvas.svgCanvasToString();",
-            lambda val, choice=choice: self._onEditNotesButton(choice, val))
+            lambda val, choice=choice: self._onEditNotesButton(choice, val),
+        )
 
     def _onEditNotesButton(self, choice, svg):
         """Get occlusion settings and pass them to the note generator (edit)"""
@@ -355,8 +379,9 @@ class ImgOccAdd(object):
         old_occl_tp = self.opref["occl_tp"]
 
         noteGenerator = genByKey(choice, old_occl_tp)
-        gen = noteGenerator(self.ed, svg, self.image_path,
-                            self.opref, tags, fields, did)
+        gen = noteGenerator(
+            self.ed, svg, self.image_path, self.opref, tags, fields, did
+        )
         r = gen.updateNotes()
         if r is False:
             return False
@@ -373,11 +398,13 @@ class ImgOccAdd(object):
             # Force EditCurrent and Browser editor instances reload
             # in order to make use of refreshed image cache
             if not self.origin == "addcards":
+
                 def onToHtmlCallback(html):
                     if self.ed.web:
                         self.ed.web.reload()
                         self.ed.web.setHtml(html)
                         self.ed.loadNote()
+
                 self.ed.web.page().toHtml(onToHtmlCallback)  # async execution
 
             # write a dummy file to update collection.media modtime and
@@ -400,12 +427,12 @@ class ImgOccAdd(object):
             ioCritical("model_error", help="notetype", parent=dialog)
             return False
         for i in self.mflds:
-            fn = i['name']
+            fn = i["name"]
             if fn in self.ioflds_priv:
                 continue
             if edit and fn in self.sconf["skip"]:
                 continue
-            text = dialog.tedit[fn].toPlainText().replace('\n', '<br />')
+            text = dialog.tedit[fn].toPlainText().replace("\n", "<br />")
             fields[fn] = text
         tags = dialog.tags_edit.text().split()
         return (fields, tags)
