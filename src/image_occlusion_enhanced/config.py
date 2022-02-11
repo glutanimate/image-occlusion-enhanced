@@ -135,7 +135,7 @@ def getLocalConfig():
 
 
 def getOrCreateModel():
-    model = mw.col.models.byName(IO_MODEL_NAME)
+    model = mw.col.models.by_name(IO_MODEL_NAME)
     if not model:
         # create model and set up default field name config
         model = template.add_io_model(mw.col)
