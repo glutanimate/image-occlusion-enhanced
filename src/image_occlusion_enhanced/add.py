@@ -47,6 +47,7 @@ from .config import *
 
 from .editor import ImgOccEdit
 from .dialogs import ioCritical, ioInfo
+from .logger import logger
 from .utils import imageProp, img2path, path2url
 
 from .consts import SUPPORTED_EXTENSIONS
@@ -214,7 +215,7 @@ class ImgOccAdd(object):
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
-        logging.debug("Launching new ImgOccEdit instance")
+        logger.debug("Launching new ImgOccEdit instance")
 
         url = QUrl.fromLocalFile(svg_edit_path)
         items = QUrlQuery()
@@ -294,8 +295,8 @@ class ImgOccAdd(object):
 
     def onAddNotesButton(self, choice, close):
         dialog = self.imgoccedit
-        # If the user is in in-group editing mode (i.e. editing a shape that 
-        # is grouped with other shapes) svgCanvasToString() doesn't work and 
+        # If the user is in in-group editing mode (i.e. editing a shape that
+        # is grouped with other shapes) svgCanvasToString() doesn't work and
         # the callback gets called with `None` (might be a bug in svg-edit).
         # Calling leaveContext() first fixes this.
         dialog.svg_edit.evalWithCallback(
@@ -337,7 +338,7 @@ class ImgOccAdd(object):
 
     def onEditNotesButton(self, choice):
         dialog = self.imgoccedit
-        # See the comment above in addNotesButton() about 
+        # See the comment above in addNotesButton() about
         # the call to `leaveContext()`.
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.leaveContext(); svgCanvas.svgCanvasToString();",

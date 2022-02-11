@@ -56,8 +56,6 @@ from .add import ImgOccAdd
 from .options import ImgOccOpts
 from .dialogs import ioHelp, ioCritical
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
-
 
 def onIoSettings():
     """Call settings dialog if Editor not active"""
