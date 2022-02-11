@@ -29,21 +29,23 @@ show_error_codes = true
 ignore_missing_imports = true
 follow_imports = "silent"
 show_column_numbers = true
+exclude = "(_vendor|libaddon|svg-edit)"
 
 [tool.isort]
 multi_line_output = 3
 include_trailing_comma = true
 line_length=88
 ensure_newline_before_comments=true
-skip_glob = "**/_vendor,**/libaddon"
+skip_glob = "**/_vendor,**/libaddon,**/svg-edit"
 
 [tool.black]
-extend-exclude  = "(_vendor|libaddon)"
+extend-exclude  = "(_vendor|libaddon|svg-edit)"
 
 [tool.pyright]
 include = ["src"]
 exclude = [
     "src/image_occlusion_enhanced/_vendor",
     "src/image_occlusion_enhanced/libaddon",
+    "src/image_occlusion_enhanced/svg-edit",
 ]
 enableTypeIgnoreComments = true
