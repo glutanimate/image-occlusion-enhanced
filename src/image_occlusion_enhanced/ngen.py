@@ -46,7 +46,7 @@ from xml.dom import minidom
 import uuid
 
 from .dialogs import ioAskUser
-from .utils import fname2img
+from .utils import path_to_img_element
 from .config import *
 from .lang import _, ngettext
 
@@ -111,7 +111,7 @@ class ImgOccNoteGenerator(object):
         qmasks = self._generateMaskSVGsFor("Q")
         amasks = self._generateMaskSVGsFor("A")
         image_path = mw.col.media.addFile(self.image_path)
-        img = fname2img(image_path)
+        img = path_to_img_element(image_path)
 
         mw.checkpoint(_("Adding Image Occlusion Cards"))
         for nr, idx in enumerate(self.mnode_indexes):
@@ -162,7 +162,7 @@ class ImgOccNoteGenerator(object):
             state = "reset"
 
         image_path = mw.col.media.addFile(self.image_path)
-        img = fname2img(image_path)
+        img = path_to_img_element(image_path)
 
         logging.debug("mnode_indexes %s", self.mnode_indexes)
         for nr, idx in enumerate(self.mnode_indexes):
@@ -480,9 +480,9 @@ class ImgOccNoteGenerator(object):
             # Occlusions updated
             qmask_path = self._saveMask(qmask, note_id, "Q")
             amask_path = self._saveMask(amask, note_id, "A")
-            fields[self.ioflds["qm"]] = fname2img(qmask_path)
-            fields[self.ioflds["am"]] = fname2img(amask_path)
-            fields[self.ioflds["om"]] = fname2img(omask_path)
+            fields[self.ioflds["qm"]] = path_to_img_element(qmask_path)
+            fields[self.ioflds["am"]] = path_to_img_element(amask_path)
+            fields[self.ioflds["om"]] = path_to_img_element(omask_path)
             fields[self.ioflds["id"]] = note_id
 
         self.model["did"] = self.did

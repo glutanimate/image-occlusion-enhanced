@@ -47,7 +47,7 @@ from .config import *
 
 from .editor import ImgOccEdit
 from .dialogs import ioCritical, ioInfo
-from .utils import imageProp, img2path, path2url
+from .utils import get_image_dimensions, img_element_to_path, path_to_url
 from .lang import _
 
 from .consts import SUPPORTED_EXTENSIONS
@@ -113,7 +113,7 @@ class ImgOccAdd(object):
         self.image_path = image_path
 
         try:
-            width, height = imageProp(image_path)
+            width, height = get_image_dimensions(image_path)
         except ValueError as e:
             showWarning(
                 _(
@@ -138,8 +138,8 @@ class ImgOccAdd(object):
         """Select image based on mode and set original field contents"""
 
         note_id = note[self.ioflds["id"]]
-        image_path = img2path(note[self.ioflds["im"]])
-        omask = img2path(note[self.ioflds["om"]])
+        image_path = img_element_to_path(note[self.ioflds["im"]])
+        omask = img_element_to_path(note[self.ioflds["om"]])
 
         if note_id is None or note_id.count("-") != 2:
             msg = _("Editing unavailable: Invalid image occlusion Note ID")
@@ -161,7 +161,7 @@ class ImgOccAdd(object):
         """Parse fields for valid images"""
         image_path = None
         for fld in fields:
-            image_path = img2path(fld)
+            image_path = img_element_to_path(fld)
             if image_path:
                 break
         return image_path
@@ -218,7 +218,7 @@ class ImgOccAdd(object):
         fsize = self.sconf["fsize"]
         font = self.sconf["font"]
 
-        bkgd_url = path2url(self.image_path)
+        bkgd_url = path_to_url(self.image_path)
         opref = self.opref
         onote = self.ed.note
         flds = self.mflds
@@ -248,7 +248,7 @@ class ImgOccAdd(object):
                 if fn in self.ioflds_priv:
                     continue
                 dialog.tedit[fn].setPlainText(onote[fn].replace("<br />", "\n"))
-            svg_url = path2url(opref["omask"])
+            svg_url = path_to_url(opref["omask"])
             items.addQueryItem("url", svg_url)
         else:
             items.addQueryItem("initTool", "rect"),
@@ -292,7 +292,7 @@ class ImgOccAdd(object):
         if not image_path:
             return False
         try:
-            width, height = imageProp(image_path)
+            width, height = get_image_dimensions(image_path)
         except ValueError as e:
             showWarning(
                 _(
@@ -301,7 +301,7 @@ class ImgOccAdd(object):
                 ).format(image_path=image_path, error=str(e))
             )
             return False
-        bkgd_url = path2url(image_path)
+        bkgd_url = path_to_url(image_path)
         self.imgoccedit.svg_edit.eval(
             """
                         svgCanvas.setBackground('#FFF', '%s');

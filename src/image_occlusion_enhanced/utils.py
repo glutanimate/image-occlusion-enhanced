@@ -34,6 +34,7 @@ Common reusable utilities
 
 import os
 import re
+from typing import Optional, Tuple
 
 from aqt import mw
 
@@ -50,22 +51,22 @@ from .consts import *
 from .lang import _
 
 
-def path2url(path):
+def path_to_url(path: str) -> str:
     """URL-encode local path"""
     return urllib.parse.urljoin("file:", urllib.request.pathname2url(path))
 
 
-def fname2img(path):
+def path_to_img_element(path: str) -> str:
     """Return HTML img element for given path"""
     fname = os.path.split(path)[1]
     return '<img src="%s" />' % fname
 
 
-def img2path(img, nameonly=False):
+def img_element_to_path(img_element: str, nameonly: bool = False) -> Optional[str]:
     """Extract path or file name out of HTML img element"""
     imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
     imgregex = re.compile(imgpatt, flags=re.I | re.M | re.S)
-    fname = imgregex.search(img)
+    fname = imgregex.search(img_element)
     if not fname:
         return None
     if nameonly:
@@ -76,7 +77,7 @@ def img2path(img, nameonly=False):
     return fpath
 
 
-def imageProp(image_path):
+def get_image_dimensions(image_path: str) -> Tuple[int, int]:
     """Get image width and height"""
     # Vector graphics
     if image_path.endswith(".svg"):
@@ -91,8 +92,8 @@ def imageProp(image_path):
         svg_node = mask_doc.documentElement
         cheight = svg_node.attributes["height"].value
         cwidth = svg_node.attributes["width"].value
-        height = _svg_convert_size(cheight)
-        width = _svg_convert_size(cwidth)
+        height = _svg_convert_size_to_pixels(cheight)
+        width = _svg_convert_size_to_pixels(cwidth)
 
         return width, height
 
@@ -108,10 +109,9 @@ def imageProp(image_path):
     return width, height
 
 
-def _svg_convert_size(size):
+def _svg_convert_size_to_pixels(size: str) -> int:
     """
-    Convert svg size to the px version
-    :param size: String with the size
+    Convert SVG size in pt, pc, mm, cm, or in into pixels
     """
 
     # https://www.w3.org/TR/SVG/coords.html#Units

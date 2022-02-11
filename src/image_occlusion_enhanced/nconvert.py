@@ -44,7 +44,7 @@ from xml.dom import minidom
 
 from .config import *
 from .dialogs import ioAskUser
-from .utils import img2path, fname2img
+from .utils import img_element_to_path, path_to_img_element
 
 
 class ImgOccNoteConverter(object):
@@ -125,7 +125,7 @@ class ImgOccNoteConverter(object):
     def getDataFromNamingScheme(self, note):
         """Get unique ID and note nr from qmask path"""
         qmask = note[self.ioflds["qm"]]
-        path = img2path(qmask, True)
+        path = img_element_to_path(qmask, True)
         if not path:
             return (False, None)
         grps = path.split("_")
@@ -172,7 +172,7 @@ class ImgOccNoteConverter(object):
 
         for nid in list(nids_by_nr.values()):
             note = mw.col.getNote(nid)
-            note[self.ioflds["om"]] = fname2img(omask_path)
+            note[self.ioflds["om"]] = path_to_img_element(omask_path)
             note.addTag(".io-converted")
             note.flush()
             logging.debug(_("Setting om and tag for nid %s"), nid)
@@ -183,7 +183,7 @@ class ImgOccNoteConverter(object):
         mnode_idxs = {}
         svg_mlayer = {}
         for i in ["qm", "om"]:  # om second, so that end vars are correct
-            svg_file = img2path(note[self.ioflds[i]], True)
+            svg_file = img_element_to_path(note[self.ioflds[i]], True)
             svg_node = self.readSvg(svg_file)
             svg_mlayer = self.layerNodesFrom(svg_node)[-1]  # topmost layer
             mnode_idxs = self.getMaskNodes(svg_mlayer)
