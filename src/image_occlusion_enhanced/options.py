@@ -393,7 +393,7 @@ class ImgOccOpts(QDialog):
         try:
             (modified, flds) = self.renameFields()
         except AnkiError:
-            print(_("Field rename action aborted"))
+            print("Field rename action aborted")
             return
         if modified and hasattr(mw, "ImgOccEdit"):
             self.resetIoEditor(flds)

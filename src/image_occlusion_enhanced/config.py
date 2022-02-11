@@ -111,7 +111,7 @@ def getSyncedConfig():
         mw.col.setMod()
 
     elif mw.col.conf["imgocc"]["version"] < default_conf_syncd["version"]:
-        print(_("Updating config DB from earlier IO release"))
+        print("Updating config DB from earlier IO release")
         for key in list(default_conf_syncd.keys()):
             if key not in mw.col.conf["imgocc"]:
                 mw.col.conf["imgocc"][key] = default_conf_syncd[key]

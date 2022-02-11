@@ -113,7 +113,7 @@ class ImgOccNoteGenerator(object):
         image_path = mw.col.media.addFile(self.image_path)
         img = path_to_img_element(image_path)
 
-        mw.checkpoint(_("Adding Image Occlusion Cards"))
+        mw.checkpoint("Adding Image Occlusion Cards")
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
             self._saveMaskAndReturnNote(
@@ -144,7 +144,7 @@ class ImgOccNoteGenerator(object):
                 )
             )
             return False
-        mw.checkpoint(_("Editing Image Occlusion Cards"))
+        mw.checkpoint("Editing Image Occlusion Cards")
         ret = self._deleteAndIdNotes(mlayer_node)
         if not ret:
             # confirmation window rejected
@@ -501,10 +501,10 @@ class ImgOccNoteGenerator(object):
 
         if nid:
             note.flush()
-            logging.debug(_("!noteflush %s"), note)
+            logging.debug("!noteflush %s", note)
         else:
             mw.col.addNote(note)
-            logging.debug(_("!notecreate %s"), note)
+            logging.debug("!notecreate %s", note)
 
 
 # Different generator subclasses for different occlusion types:

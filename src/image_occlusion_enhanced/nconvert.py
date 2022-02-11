@@ -62,20 +62,20 @@ class ImgOccNoteConverter(object):
             note = mw.col.getNote(nid)
             (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
             if uniq_id == False:
-                logging.debug(_("Skipping note that couldn't be parsed: %s"), nid)
+                logging.debug("Skipping note that couldn't be parsed: %s", nid)
                 skipped += 1
                 continue
             occl_tp = self.getOcclTypeAndNodes(note)
             occl_id = uniq_id + "-" + occl_tp
             if occl_id == self.occl_id_last:
-                logging.debug(_("Skipping note that we've just converted: %s"), nid)
+                logging.debug("Skipping note that we've just converted: %s", nid)
                 continue
             self.occl_id_last = occl_id
             for nid in self.findByNoteId(uniq_id):
                 note = mw.col.getNote(nid)
                 (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
                 if uniq_id == False:
-                    logging.debug(_("Skipping note that couldn't be parsed: %s"), nid)
+                    logging.debug("Skipping note that couldn't be parsed: %s", nid)
                     skipped += 1
                     continue
                 nids_by_nr[int(note_nr)] = nid
@@ -99,18 +99,18 @@ class ImgOccNoteConverter(object):
         for nid in nids:
             note = mw.col.getNote(nid)
             if note.model() != self.model:
-                logging.debug(_("Skipping note with wrong note type: %s"), nid)
+                logging.debug("Skipping note with wrong note type: %s", nid)
                 filtered += 1
                 continue
             elif note[self.ioflds["id"]]:
-                logging.debug(_("Skipping IO note that is already editable: %s"), nid)
+                logging.debug("Skipping IO note that is already editable: %s", nid)
                 filtered += 1
                 continue
             elif not note[self.ioflds["om"]]:
-                logging.debug(_("Skipping IO note without original SVG mask: %s"), nid)
+                logging.debug("Skipping IO note without original SVG mask: %s", nid)
                 filtered += 1
                 continue
-            logging.debug(_("Found IO note in need of update: %s"), nid)
+            logging.debug("Found IO note in need of update: %s", nid)
             io_nids.append(nid)
         return (io_nids, filtered)
 
@@ -131,11 +131,11 @@ class ImgOccNoteConverter(object):
         grps = path.split("_")
         try:
             if len(grps) == 2:
-                logging.debug(_("Extracting data using IO 2.0 naming scheme"))
+                logging.debug("Extracting data using IO 2.0 naming scheme")
                 uniq_id = grps[0]
                 note_nr = path.split(" ")[1].split(".")[0]
             else:
-                logging.debug(_("Extracting data using IO Enhanced naming scheme"))
+                logging.debug("Extracting data using IO Enhanced naming scheme")
                 grps = path.split("-")
                 uniq_id = grps[0]
                 note_nr = int(grps[2]) - 1
@@ -160,7 +160,7 @@ class ImgOccNoteConverter(object):
             self.mnode.childNodes[midx].setAttribute("id", new_mnode_id)
             note[self.ioflds["id"]] = new_mnode_id
             note.flush()
-            logging.debug(_("Adding ID for note nr %s"), nr)
+            logging.debug("Adding ID for note nr %s", nr)
             logging.debug("midx %s", midx)
             logging.debug("nid %s", nid)
             logging.debug("note %s", note)
@@ -175,7 +175,7 @@ class ImgOccNoteConverter(object):
             note[self.ioflds["om"]] = path_to_img_element(omask_path)
             note.addTag(".io-converted")
             note.flush()
-            logging.debug(_("Setting om and tag for nid %s"), nid)
+            logging.debug("Setting om and tag for nid %s", nid)
 
     def getOcclTypeAndNodes(self, note):
         """Determine oclusion type and svg mask nodes"""
@@ -256,7 +256,7 @@ def onIoConvert(self):
     if not ret:
         return False
     mw.progress.start()
-    mw.checkpoint(_("Image Occlusion Note Conversions"))
+    mw.checkpoint("Image Occlusion Note Conversions")
     self.model.beginReset()
     conv = ImgOccNoteConverter(self)
     conv.convertNotes(selected)

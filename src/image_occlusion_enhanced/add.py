@@ -228,7 +228,7 @@ class ImgOccAdd(object):
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
-        logging.debug(_("Launching new ImgOccEdit instance"))
+        logging.debug("Launching new ImgOccEdit instance")
 
         url = QUrl.fromLocalFile(svg_edit_path)
         items = QUrlQuery()
