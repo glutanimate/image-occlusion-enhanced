@@ -35,7 +35,6 @@ Makes older IO notes editable.
 
 import logging
 
-from aqt.qt import *
 from anki.hooks import addHook
 from aqt.utils import tooltip
 from .lang import _
