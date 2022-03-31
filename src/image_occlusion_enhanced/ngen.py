@@ -37,7 +37,6 @@ the collection.
 
 import logging
 
-from aqt.qt import *
 from aqt import mw
 from aqt.utils import tooltip
 from anki.notes import Note
