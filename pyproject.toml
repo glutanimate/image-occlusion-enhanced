@@ -9,7 +9,7 @@ license = "AGPL-3.0-or-later-with-additional-terms"
 python = "^3.9.7"
 
 [tool.poetry.dev-dependencies]
-aqt = "2.1.50b3"
+aqt = "2.1.50rc2"
 PyQt6 = "6.2.3"
 PyQt6-WebEngine-Qt6 = "6.2.2"
 aab  = { git = "https://github.com/glutanimate/anki-addon-builder.git", tag = "v0.1.5-beta.6" }
