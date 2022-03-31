@@ -211,7 +211,7 @@ def get_js_to_inject(note) -> Optional[str]:
         # Should not happen
         return "\n".join(js)
 
-    js.append(f"""imageOcclusion.hideIdFieldByIndex({id_field_index})""")
+    js.append(f"""imageOcclusion.markIdField({id_field_index})""")
 
     return "\n".join(js)
 
