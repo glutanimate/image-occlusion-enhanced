@@ -36,15 +36,33 @@ Image Occlusion editor dialog
 
 import os
 
-from aqt.qt import *
-
-from aqt import mw, webview, deckchooser, tagedit, sip
-from aqt.utils import saveGeom, restoreGeom
 from anki.hooks import addHook, remHook
+from aqt import deckchooser, mw, tagedit, webview
+from aqt.qt import (
+    QApplication,
+    QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QHBoxLayout,
+    QIcon,
+    QKeySequence,
+    QLabel,
+    QMovie,
+    QPlainTextEdit,
+    QPushButton,
+    QShortcut,
+    QSize,
+    Qt,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+    sip,
+)
+from aqt.utils import restoreGeom, saveGeom
 
-from .dialogs import ioHelp
-from .consts import *
 from .config import *
+from .consts import *
+from .dialogs import ioHelp
 from .lang import _
 
 
@@ -100,7 +118,7 @@ class ImgOccEdit(QDialog):
     def __init__(self, imgoccadd, parent):
         QDialog.__init__(self)
         mw.setupDialogGC(self)
-        self.setWindowFlags(Qt.Window)
+        self.setWindowFlags(Qt.WindowType.Window)
         self.visible = False
         self.imgoccadd = imgoccadd
         self.parent = parent
@@ -161,21 +179,23 @@ class ImgOccEdit(QDialog):
                 try:
                     item = self.deck_container.layout().children()[0].itemAt(i)
                     # remove Tab focus manually:
-                    item.widget().setFocusPolicy(Qt.ClickFocus)
+                    item.widget().setFocusPolicy(Qt.FocusPolicy.ClickFocus)
                     item.widget().setAutoDefault(False)
                 except AttributeError:
                     pass
 
         # Button row widgets
         self.bottom_label = QLabel()
-        button_box = QDialogButtonBox(Qt.Horizontal, self)
+        button_box = QDialogButtonBox(Qt.Orientation.Horizontal, self)
         button_box.setCenterButtons(False)
 
-        image_btn = QPushButton(_("Change &Image"), clicked=self.changeImage)
+        image_btn = QPushButton(_("Change &Image"))
+        image_btn.clicked.connect(self.changeImage)
         image_btn.setIcon(QIcon(os.path.join(ICONS_PATH, "add.png")))
         image_btn.setIconSize(QSize(16, 16))
         image_btn.setAutoDefault(False)
-        help_btn = QPushButton(_("&Help"), clicked=self.onHelp)
+        help_btn = QPushButton(_("&Help"))
+        help_btn.clicked.connect(self.onHelp)
         help_btn.setAutoDefault(False)
 
         self.occl_tp_select = QComboBox()
@@ -184,18 +204,20 @@ class ImgOccEdit(QDialog):
         self.occl_tp_select.addItem(_("Hide One, Guess One"), "Hide One, Guess One")
 
         self.edit_btn = button_box.addButton(
-            _("&Edit Cards"), QDialogButtonBox.ActionRole
+            _("&Edit Cards"), QDialogButtonBox.ButtonRole.ActionRole
         )
         self.new_btn = button_box.addButton(
-            _("&Add New Cards"), QDialogButtonBox.ActionRole
+            _("&Add New Cards"), QDialogButtonBox.ButtonRole.ActionRole
         )
         self.ao_btn = button_box.addButton(
-            _("Hide &All, Guess One"), QDialogButtonBox.ActionRole
+            _("Hide &All, Guess One"), QDialogButtonBox.ButtonRole.ActionRole
         )
         self.oa_btn = button_box.addButton(
-            _("Hide &One, Guess One"), QDialogButtonBox.ActionRole
+            _("Hide &One, Guess One"), QDialogButtonBox.ButtonRole.ActionRole
         )
-        close_button = button_box.addButton(_("&Close"), QDialogButtonBox.RejectRole)
+        close_button = button_box.addButton(
+            _("&Close"), QDialogButtonBox.ButtonRole.RejectRole
+        )
 
         image_tt = _(
             "Switch to a different image while preserving all of "
@@ -221,9 +243,9 @@ class ImgOccEdit(QDialog):
         self.ao_btn.setToolTip(ao_tt)
         self.oa_btn.setToolTip(oa_tt)
         close_button.setToolTip(close_tt)
-        self.occl_tp_select.setItemData(0, dc_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(1, ao_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(2, oa_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(0, dc_tt, Qt.ItemDataRole.ToolTipRole)
+        self.occl_tp_select.setItemData(1, ao_tt, Qt.ItemDataRole.ToolTipRole)
+        self.occl_tp_select.setItemData(2, oa_tt, Qt.ItemDataRole.ToolTipRole)
 
         for btn in [
             image_btn,
@@ -233,7 +255,7 @@ class ImgOccEdit(QDialog):
             self.oa_btn,
             close_button,
         ]:
-            btn.setFocusPolicy(Qt.ClickFocus)
+            btn.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
         self.edit_btn.clicked.connect(self.editNote)
         self.new_btn.clicked.connect(self.new)
@@ -256,7 +278,7 @@ class ImgOccEdit(QDialog):
         vbox1 = QVBoxLayout()
 
         svg_edit_loader = QLabel(_("Loading..."))
-        svg_edit_loader.setAlignment(Qt.AlignCenter)
+        svg_edit_loader.setAlignment(Qt.AlignmentFlag.AlignCenter)
         loader_icon = os.path.join(ICONS_PATH, "loader.gif")
         anim = QMovie(loader_icon)
         svg_edit_loader.setMovie(anim)
@@ -277,7 +299,7 @@ class ImgOccEdit(QDialog):
         tab1.setLayout(vbox1)
         self.tab2.setLayout(self.vbox2)
         self.tab_widget = QTabWidget()
-        self.tab_widget.setFocusPolicy(Qt.ClickFocus)
+        self.tab_widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.tab_widget.addTab(tab1, _("&Masks Editor"))
         self.tab_widget.addTab(self.tab2, _("&Fields"))
         self.tab_widget.setTabToolTip(1, _("Include additional information (optional)"))
