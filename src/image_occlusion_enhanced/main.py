@@ -36,13 +36,14 @@ Sets up buttons and menus and calls other modules.
 
 import logging
 import sys
+from typing import Optional
 
-from anki.hooks import addHook, runHook, wrap
+from anki.hooks import runHook, wrap
 from anki.lang import _ as __
 from aqt import mw
 from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
-from aqt.editor import Editor, EditorWebView
+from aqt.editor import Editor
 from aqt.qt import QAction, QCursor, QDesktopServices, QMenu, QUrl
 from aqt.reviewer import Reviewer
 from aqt.utils import tooltip
@@ -154,6 +155,7 @@ def openImage(path):
 
 def maybe_add_image_menu(webview: AnkiWebView, menu: QMenu):
     # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
+    # FIXME
     context_data = webview.page().contextMenuData()
     url = context_data.mediaUrl()
     image_name = url.fileName()
@@ -184,55 +186,83 @@ def legacyEditorContextMenuEvent(self, evt):
     m.popup(QCursor.pos())
 
 
-io_editor_style = """
+name_components = __name__.split(".")
+
+MODULE_ADDON = name_components[0]
+
+io_editor_style = f"""
+<script src="/_addons/{MODULE_ADDON}/web/editor.js"></script>
 <style>
 /* I/O: limit image display height */
-.ionote img {
+.ionote img {{
     max-width: 90%;
     max-height: 160px;
-}
+}}
 /* I/O: hide first fname, field, and snowflake (FrozenFields add-on) */
-.ionote.ionote-id tr:first-child .fname, .ionote.ionote-id #f0, .ionote.ionote-id #i0 {
+.ionote .ionote-field-id {{
     display: none;
-}
+}}
 </style>
 """
 
 
-def js_note_loaded(note) -> str:
-    js = []
+def get_js_to_inject(note) -> Optional[str]:
+    note_type = note.note_type()
 
-    # Conditionally set body CSS  class
-    if not (note and note.note_type()["name"] == IO_MODEL_NAME):
-        js.append("""$("body").removeClass("ionote");""")
+    if note_type is None:
+        # invalid note?
+        return None
+
+    is_io_note_type = note and note_type["name"] == IO_MODEL_NAME
+
+    if not is_io_note_type:
+        return """document.body.classList.remove("ionote");"""
+
+    js = ["""document.body.classList.add("ionote");"""]
+
+    id_field_name = IO_FLDS["id"]
+    note_type_fields = note_type["flds"]
+
+    for id_field_index, field in enumerate(note_type_fields):
+        if field["name"] == id_field_name:
+            break
     else:
-        # Only hide first field if it's the ID field
-        # TODO? identify ID field HTML element automatically
-        if note.note_type()["flds"][0]["name"] == IO_FLDS["id"]:
-            js.append("""$("body").addClass("ionote-id");""")
-        else:
-            js.append("""$("body").removeClass("ionote-id");""")
-        js.append("""$("body").addClass("ionote");""")
+        # Should not happen
+        return "\n".join(js)
+
+    js.append(f"""imageOcclusion.hideIdFieldByIndex({id_field_index})""")
 
     return "\n".join(js)
 
 
-def on_editor_will_load_note(js: str, note, editor):
-    """Customize the editor when IO notes are active"""
-    if not editor.web:
-        # editor is in cleanup TODO: evaluate if check still necessary
-        return js
-    js_additions = js_note_loaded(note)
-    return "\n".join([js, js_additions])
+def on_editor_did_load_note(editor: Editor):
 
+    note = editor.note
 
-def legacyOnSetNote(self, note, hide=True, focus=False):
-    """Legacy: Monkey-patch Editor.onSetNote
-    when 'editor_will_load_note' hook unavailable"""
-    if self.web is None:  # editor is in cleanup
+    if note is None or editor.web is None:
         return
-    js = js_note_loaded(self.note)
-    self.web.eval(js)
+
+    js_to_inject = get_js_to_inject(note)
+
+    if js_to_inject is None:
+        return
+
+    editor.web.eval(
+        f"""
+require("anki/ui").loaded.then(() => {{
+        {js_to_inject}
+}}
+);
+"""
+    )
+
+def on_editor_will_load_note(js: str, note, editor: Editor) -> str:
+    js_to_inject = get_js_to_inject(note)
+    
+    if js_to_inject is None:
+        return js
+    
+    return js + js_to_inject
 
 
 def on_webview_will_set_content(web_content, context):
@@ -245,14 +275,9 @@ def on_main_window_did_init():
     """Add our custom user styles to the editor HTML
     Need to delay this to avoid interferences with other add-ons that might
     potentially overwrite editor HTML"""
-    try:  # 2.1.22+
-        from aqt.gui_hooks import webview_will_set_content
+    from aqt.gui_hooks import webview_will_set_content
 
-        webview_will_set_content.append(on_webview_will_set_content)
-    except (ImportError, ModuleNotFoundError):
-        from aqt import editor
-
-        editor._html = editor._html + io_editor_style.replace("%", "%%")
+    webview_will_set_content.append(on_webview_will_set_content)
 
 
 _profile_singleshot_run = False
@@ -321,67 +346,33 @@ def setup_menus():
 
 def setup_main():
     setup_menus()
+    from aqt.gui_hooks import (
+        editor_did_init_buttons,
+        editor_did_load_note,
+        editor_will_load_note,
+        editor_will_show_context_menu,
+        main_window_did_init,
+        profile_did_open,
+        state_shortcuts_will_change,
+    )
 
-    # Set up hooks and monkey patches
+    # Web assets
+    
+    mw.addonManager.setWebExports(__name__, r"web.*")
 
-    # Add-on setup at main window load time
+    # Main window and profile
 
-    try:  # 2.1.28+
-        from aqt.gui_hooks import main_window_did_init
+    main_window_did_init.append(on_main_window_did_init)
+    profile_did_open.append(on_profile_loaded)
 
-        main_window_did_init.append(on_main_window_did_init)
-    except (ImportError, ModuleNotFoundError):
-        try:  # 2.1.20+
-            from aqt.gui_hooks import profile_did_open
+    # Editor
 
-            profile_did_open.append(on_profile_loaded_singleshot)
-        except (ImportError, ModuleNotFoundError):
-            addHook("profileLoaded", on_profile_loaded_singleshot)
-
-    # Add-on setup at profile load time
-
-    try:  # 2.1.20+
-        from aqt.gui_hooks import profile_did_open
-
-        profile_did_open.append(on_profile_loaded)
-    except (ImportError, ModuleNotFoundError):
-        addHook("profileLoaded", on_profile_loaded)
-
-    # aqt.editor.Editor
-
-    try:  # 2.1.20+
-        from aqt.gui_hooks import editor_did_init_buttons
-
-        editor_did_init_buttons.append(onSetupEditorButtons)
-    except (ImportError, ModuleNotFoundError):
-        addHook("setupEditorButtons", onSetupEditorButtons)
-
-    try:  # 2.1.20+
-        from aqt.gui_hooks import editor_will_show_context_menu
-
-        editor_will_show_context_menu.append(maybe_add_image_menu)
-    except (ImportError, ModuleNotFoundError):
-        EditorWebView.contextMenuEvent = legacyEditorContextMenuEvent
-
-    try:  # 2.1.20+
-        from aqt.gui_hooks import editor_will_load_note
-
-        editor_will_load_note.append(on_editor_will_load_note)
-    except (ImportError, ModuleNotFoundError):
-        Editor.setNote = wrap(Editor.setNote, legacyOnSetNote, "after")
-
+    editor_did_init_buttons.append(onSetupEditorButtons)
+    editor_will_show_context_menu.append(maybe_add_image_menu)
+    editor_did_load_note.append(on_editor_did_load_note)
     Editor.onImgOccButton = onImgOccButton
 
-    # aqt.reviewer.Reviewer
+    # Reviewer
 
     Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
-
-    try:  # 2.1.20+
-        from aqt.gui_hooks import state_shortcuts_will_change
-
-        state_shortcuts_will_change.append(on_mw_state_shortcuts)
-    except (ImportError, ModuleNotFoundError):
-        addHook(
-            "reviewStateShortcuts",
-            lambda shortcuts: on_mw_state_shortcuts("review", shortcuts),
-        )
+    state_shortcuts_will_change.append(on_mw_state_shortcuts)
