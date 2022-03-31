@@ -34,12 +34,11 @@
 Handles all minor utility dialogs
 """
 
-from aqt.qt import *
-from aqt import mw
-
 from anki.hooks import addHook, remHook
+from aqt import mw
+from aqt.qt import QMessageBox, Qt, sip
 
-from .config import *
+# from .config import *
 from .lang import _
 
 # Help and support resource links
@@ -202,7 +201,7 @@ def ioCritical(
 ):
     msgfunc = QMessageBox.critical
     if help:
-        buttons = QMessageBox.Help | QMessageBox.Ok
+        buttons = QMessageBox.StandardButton.Help | QMessageBox.StandardButton.Ok
     else:
         buttons = None
     while 1:
@@ -214,7 +213,7 @@ def ioCritical(
             buttons=buttons,
             msgfunc=msgfunc,
         )
-        if r == QMessageBox.Help:
+        if r == QMessageBox.StandardButton.Help:
             ioHelp(help, parent=parent)
             return False
         else:
@@ -234,14 +233,14 @@ def ioAskUser(
     """Show a yes/no question. Return true if yes.
     based on askUser by Damien Elmes"""
     msgfunc = QMessageBox.question
-    buttons = QMessageBox.Yes | QMessageBox.No
+    buttons = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
     if help:
-        buttons |= QMessageBox.Help
+        buttons |= QMessageBox.StandardButton.Help
     while 1:
         if defaultno:
-            default = QMessageBox.No
+            default = QMessageBox.StandardButton.No
         else:
-            default = QMessageBox.Yes
+            default = QMessageBox.StandardButton.Yes
         r = ioInfo(
             msgkey,
             title=title,
@@ -251,12 +250,12 @@ def ioAskUser(
             default=default,
             msgfunc=msgfunc,
         )
-        if r == QMessageBox.Help:
+        if r == QMessageBox.StandardButton.Help:
             ioHelp(help, parent=parent)
             return False
         else:
             break
-    return r == QMessageBox.Yes
+    return r == QMessageBox.StandardButton.Yes
 
 
 def ioInfo(
@@ -271,9 +270,9 @@ def ioInfo(
     if not parent:
         parent = mw.app.activeWindow()
     if not buttons:
-        buttons = QMessageBox.Ok
+        buttons = QMessageBox.StandardButton.Ok
     if not default:
-        default = QMessageBox.Ok
+        default = QMessageBox.StandardButton.Ok
     if not msgfunc:
         msgfunc = QMessageBox.information
     if msgkey != "custom":
@@ -288,11 +287,11 @@ def ioHelp(msgkey, title=_("Image Occlusion Enhanced Help"), text="", parent=Non
     if msgkey != "custom":
         text = dialog_msg[msgkey]
     mbox = QMessageBox(parent)
-    mbox.setAttribute(Qt.WA_DeleteOnClose)
-    mbox.setStandardButtons(QMessageBox.Ok)
+    mbox.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+    mbox.setStandardButtons(QMessageBox.StandardButton.Ok)
     mbox.setWindowTitle(title)
     mbox.setText(text)
-    mbox.setWindowModality(Qt.NonModal)
+    mbox.setWindowModality(Qt.WindowModality.NonModal)
 
     def onProfileUnload():
         if not sip.isdeleted(mbox):
