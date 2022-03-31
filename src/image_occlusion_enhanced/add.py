@@ -37,20 +37,17 @@ Add notes.
 import os
 import tempfile
 
-from aqt.qt import *
-
 from aqt import mw
-from aqt.utils import tooltip, showWarning
+from aqt.qt import QApplication, QFileDialog, QUrl, QUrlQuery
+from aqt.utils import showWarning, tooltip
 
-from .ngen import *
 from .config import *
-
-from .editor import ImgOccEdit
-from .dialogs import ioCritical, ioInfo
-from .utils import get_image_dimensions, img_element_to_path, path_to_url
-from .lang import _
-
 from .consts import SUPPORTED_EXTENSIONS
+from .dialogs import ioCritical, ioInfo
+from .editor import ImgOccEdit
+from .lang import _
+from .ngen import *
+from .utils import get_image_dimensions, img_element_to_path, path_to_url
 
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__), "svg-edit", "editor")

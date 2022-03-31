@@ -41,8 +41,6 @@ import sys
 
 from aqt import mw
 
-from .lang import _
-
 global IO_FLDS, IO_FLDS_IDS
 global IO_MODEL_NAME, IO_CARD_NAME, IO_HOME, IO_HOTKEY
 
