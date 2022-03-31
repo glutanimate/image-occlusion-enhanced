@@ -2,7 +2,8 @@
 
 # Image Occlusion Enhanced Add-on for Anki
 #
-# Copyright (C) 2016-2020  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2016-2022  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2012-2015  Tiago Barroso <tmbb@campus.ul.pt>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -29,17 +30,34 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
+from .consts import MODULE_ADDON
+
+from aqt import mw
+from aqt.editor import Editor
+
+editor_html = f"""
+<link rel="stylesheet" href="/_addons/{MODULE_ADDON}/web/editor.css">
+<script src="/_addons/{MODULE_ADDON}/web/editor.js"></script>
 """
-Global variables
-"""
 
-import os
 
-ADDON_PATH = os.path.dirname(__file__)
-MODULE_ADDON = __name__.split(".")[0]
+def on_webview_will_set_content(web_content, context):
+    if not isinstance(context, Editor):
+        return
+    web_content.body += editor_html
 
-ICONS_PATH = os.path.join(ADDON_PATH, "icons")
 
-SUPPORTED_BITMAP_FORMATS = ("jpeg", "png", "gif")
-SUPPORTED_VECTOR_FORMATS = ("svg",)
-SUPPORTED_EXTENSIONS = ("jpg",) + SUPPORTED_BITMAP_FORMATS + SUPPORTED_VECTOR_FORMATS
+def on_main_window_did_init():
+    """Add our custom user styles to the editor HTML
+    Need to delay this to avoid interferences with other add-ons that might
+    potentially overwrite editor HTML"""
+    from aqt.gui_hooks import webview_will_set_content
+
+    webview_will_set_content.append(on_webview_will_set_content)
+
+
+def setup_webview_injections():
+    from aqt.gui_hooks import main_window_did_init
+
+    main_window_did_init.append(on_main_window_did_init)
+    mw.addonManager.setWebExports(__name__, r"web.*")

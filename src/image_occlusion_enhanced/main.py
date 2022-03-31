@@ -55,6 +55,7 @@ from .consts import *
 from .dialogs import ioCritical, ioHelp
 from .lang import _
 from .options import ImgOccOpts
+from .web import setup_webview_injections
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -186,26 +187,6 @@ def legacyEditorContextMenuEvent(self, evt):
     m.popup(QCursor.pos())
 
 
-name_components = __name__.split(".")
-
-MODULE_ADDON = name_components[0]
-
-io_editor_style = f"""
-<script src="/_addons/{MODULE_ADDON}/web/editor.js"></script>
-<style>
-/* I/O: limit image display height */
-.ionote img {{
-    max-width: 90%;
-    max-height: 160px;
-}}
-/* I/O: hide first fname, field, and snowflake (FrozenFields add-on) */
-.ionote .ionote-field-id {{
-    display: none;
-}}
-</style>
-"""
-
-
 def get_js_to_inject(note) -> Optional[str]:
     note_type = note.note_type()
 
@@ -250,47 +231,20 @@ def on_editor_did_load_note(editor: Editor):
     editor.web.eval(
         f"""
 require("anki/ui").loaded.then(() => {{
-        {js_to_inject}
+    {js_to_inject}
 }}
 );
 """
     )
 
+
 def on_editor_will_load_note(js: str, note, editor: Editor) -> str:
     js_to_inject = get_js_to_inject(note)
-    
+
     if js_to_inject is None:
         return js
-    
+
     return js + js_to_inject
-
-
-def on_webview_will_set_content(web_content, context):
-    if not isinstance(context, Editor):
-        return
-    web_content.body += io_editor_style
-
-
-def on_main_window_did_init():
-    """Add our custom user styles to the editor HTML
-    Need to delay this to avoid interferences with other add-ons that might
-    potentially overwrite editor HTML"""
-    from aqt.gui_hooks import webview_will_set_content
-
-    webview_will_set_content.append(on_webview_will_set_content)
-
-
-_profile_singleshot_run = False
-
-
-def on_profile_loaded_singleshot():
-    """Legacy single-shot function to delay execution of particular code paths
-    until Anki (and other add-ons) loaded"""
-    global _profile_singleshot_run
-    if _profile_singleshot_run:
-        return
-    on_main_window_did_init()
-    _profile_singleshot_run = True
 
 
 def on_profile_loaded():
@@ -345,24 +299,24 @@ def setup_menus():
 
 
 def setup_main():
-    setup_menus()
     from aqt.gui_hooks import (
         editor_did_init_buttons,
         editor_did_load_note,
-        editor_will_load_note,
         editor_will_show_context_menu,
-        main_window_did_init,
         profile_did_open,
         state_shortcuts_will_change,
     )
 
     # Web assets
-    
-    mw.addonManager.setWebExports(__name__, r"web.*")
 
-    # Main window and profile
+    setup_webview_injections()
 
-    main_window_did_init.append(on_main_window_did_init)
+    # Qt menus
+
+    setup_menus()
+
+    # Profile
+
     profile_did_open.append(on_profile_loaded)
 
     # Editor

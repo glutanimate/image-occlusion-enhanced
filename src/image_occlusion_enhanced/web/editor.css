@@ -1,0 +1,9 @@
+/* limit image display height */
+.ionote img {
+  max-width: 90%;
+  max-height: 160px;
+}
+/* hide ID field if marked as such via CSS class */
+.ionote .ionote-field-id {
+  display: none;
+}
