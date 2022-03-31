@@ -36,11 +36,28 @@ Main options dialog
 
 import logging
 
-from aqt.qt import *
-from aqt.utils import showInfo
-
-from aqt import mw
 from anki.errors import AnkiError
+from aqt import mw
+from aqt.qt import (
+    QColor,
+    QColorDialog,
+    QDialog,
+    QDialogButtonBox,
+    QFont,
+    QFontComboBox,
+    QFrame,
+    QGridLayout,
+    QIcon,
+    QLabel,
+    QLineEdit,
+    QPixmap,
+    QPushButton,
+    QSize,
+    QSpinBox,
+    Qt,
+    QVBoxLayout,
+)
+from aqt.utils import showInfo
 
 from .config import *
 from .lang import _
@@ -79,11 +96,11 @@ class GrabKey(QDialog):
         self.active += 1
         if evt.key() > 0 and evt.key() < 127:
             self.extra = chr(evt.key())
-        elif evt.key() == Qt.Key_Control:
+        elif evt.key() == Qt.Key.Key_Control:
             self.ctrl = True
-        elif evt.key() == Qt.Key_Alt:
+        elif evt.key() == Qt.Key.Key_Alt:
             self.alt = True
-        elif evt.key() == Qt.Key_Shift:
+        elif evt.key() == Qt.Key.Key_Shift:
             self.shift = True
 
     def keyReleaseEvent(self, evt):
@@ -242,7 +259,7 @@ class ImgOccOpts(QDialog):
             default_name = self.sconf_dflt["flds"][key]
             current_name = self.sconf["flds"][key]
             lb = QLabel(default_name)
-            lb.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            lb.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             t = QLineEdit()
             t.setText(current_name)
             grid.addWidget(lb, row, clm, 1, 2)
@@ -278,9 +295,11 @@ class ImgOccOpts(QDialog):
         grid.addWidget(key_grab_btn, row + 5, 3, 1, 3)
 
         # Main button box
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
         defaults_btn = button_box.addButton(
-            _("Restore &Defaults"), QDialogButtonBox.ResetRole
+            _("Restore &Defaults"), QDialogButtonBox.ButtonRole.ResetRole
         )
         defaults_btn.clicked.connect(self.restoreDefaults)
         button_box.accepted.connect(self.onAccept)
@@ -300,8 +319,8 @@ class ImgOccOpts(QDialog):
         Returns a QFrame that is a sunken, horizontal rule.
         """
         frame = QFrame()
-        frame.setFrameShape(QFrame.HLine)
-        frame.setFrameShadow(QFrame.Sunken)
+        frame.setFrameShape(QFrame.Shape.HLine)
+        frame.setFrameShadow(QFrame.Shadow.Sunken)
         return frame
 
     def updateHotkey(self, combo=None):
@@ -315,7 +334,7 @@ class ImgOccOpts(QDialog):
     def showGrabKey(self):
         """Invoke key grabber"""
         win = GrabKey(self)
-        win.exec_()
+        win.exec()
 
     def getNewColor(self, clrvar, clrbtn):
         """Set color via color selection dialog"""
