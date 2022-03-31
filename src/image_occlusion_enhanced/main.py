@@ -37,25 +37,23 @@ Sets up buttons and menus and calls other modules.
 import logging
 import sys
 
+from anki.hooks import addHook, runHook, wrap
 from anki.lang import _ as __
-from aqt.qt import *
-from aqt.qt import QMenu
-
 from aqt import mw
-from aqt.editor import Editor, EditorWebView
 from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
+from aqt.editor import Editor, EditorWebView
+from aqt.qt import QAction, QCursor, QDesktopServices, QMenu, QUrl
 from aqt.reviewer import Reviewer
 from aqt.utils import tooltip
 from aqt.webview import AnkiWebView
-from anki.hooks import wrap, addHook, runHook
 
-from .consts import *
-from .config import *
 from .add import ImgOccAdd
-from .options import ImgOccOpts
-from .dialogs import ioHelp, ioCritical
+from .config import *
+from .consts import *
+from .dialogs import ioCritical, ioHelp
 from .lang import _
+from .options import ImgOccOpts
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -67,7 +65,7 @@ def onIoSettings():
         tooltip(_("Please close Image Occlusion Editor" " to access the Options."))
         return
     dialog = ImgOccOpts()
-    dialog.exec_()
+    dialog.exec()
 
 
 def onIoHelp():
