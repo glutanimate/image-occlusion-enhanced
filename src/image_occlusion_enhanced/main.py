@@ -36,7 +36,7 @@ Sets up buttons and menus and calls other modules.
 
 import logging
 import sys
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from anki.hooks import runHook, wrap
 from anki.lang import _ as __
@@ -56,6 +56,10 @@ from .dialogs import ioCritical, ioHelp
 from .lang import _
 from .options import ImgOccOpts
 from .web import setup_webview_injections
+from .qt import qconnect
+
+if TYPE_CHECKING:
+    from aqt.main import AnkiQt
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -119,7 +123,7 @@ def onSetupEditorButtons(buttons, editor):
     b = editor.addButton(
         icon,
         _("I/O"),
-        lambda o=editor: onImgOccButton(o),
+        lambda editor=editor: onImgOccButton(editor),
         tip="{} ({})".format(tt, hotkey),
         keys=hotkey,
         disables=False,
@@ -164,7 +168,9 @@ def maybe_add_image_menu(webview: AnkiWebView, menu: QMenu):
     if url.isValid() and path:
         a = menu.addAction(_("Occlude Image"))
         a.triggered.connect(
-            lambda _, u=path, e=webview.editor: onImgOccButton(e, image_path=u)
+            lambda _, u=path, editor=webview.editor: onImgOccButton(
+                editor, image_path=u
+            )
         )
         a = menu.addAction(_("Open Image"))
         a.triggered.connect(lambda _, u=path: openImage(u))
@@ -288,17 +294,17 @@ def onShowAnswer(self, _old):
     return ret
 
 
-def setup_menus():
+def setup_menus(main_window: "AnkiQt"):
     options_action = QAction(_("Image &Occlusion Enhanced Options..."), mw)
+    qconnect(options_action.triggered, onIoSettings)
     help_action = QAction(_("Image &Occlusion Enhanced..."), mw)
-    options_action.triggered.connect(onIoSettings)
-    mw.addonManager.setConfigAction(__name__, onIoSettings)
-    help_action.triggered.connect(onIoHelp)
-    mw.form.menuTools.addAction(options_action)
-    mw.form.menuHelp.addAction(help_action)
+    qconnect(help_action.triggered, onIoHelp)
+    main_window.addonManager.setConfigAction(__name__, onIoSettings)
+    main_window.form.menuTools.addAction(options_action)
+    main_window.form.menuHelp.addAction(help_action)
 
 
-def setup_main():
+def setup_main(main_window: "AnkiQt"):
     from aqt.gui_hooks import (
         editor_did_init_buttons,
         editor_did_load_note,
@@ -313,7 +319,7 @@ def setup_main():
 
     # Qt menus
 
-    setup_menus()
+    setup_menus(main_window)
 
     # Profile
 
@@ -324,7 +330,6 @@ def setup_main():
     editor_did_init_buttons.append(onSetupEditorButtons)
     editor_will_show_context_menu.append(maybe_add_image_menu)
     editor_did_load_note.append(on_editor_did_load_note)
-    Editor.onImgOccButton = onImgOccButton
 
     # Reviewer
 
