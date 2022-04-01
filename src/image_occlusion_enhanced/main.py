@@ -60,6 +60,8 @@ from .qt import qconnect
 
 if TYPE_CHECKING:
     from aqt.main import AnkiQt
+    from aqt.qt import QWebEngineContextMenuRequest
+    from aqt.editor import EditorWebView
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -68,7 +70,7 @@ def onIoSettings():
     """Call settings dialog if Editor not active"""
     # TODO: fix ImgOccEdit detection
     if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
-        tooltip(_("Please close Image Occlusion Editor" " to access the Options."))
+        tooltip(_("Please close Image Occlusion Editor to access the Options."))
         return
     dialog = ImgOccOpts()
     dialog.exec()
@@ -158,22 +160,28 @@ def openImage(path):
         QDesktopServices.openUrl(QUrl("file://" + path))
 
 
-def maybe_add_image_menu(webview: AnkiWebView, menu: QMenu):
-    # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
-    # FIXME
-    context_data = webview.page().contextMenuData()
-    url = context_data.mediaUrl()
+def maybe_add_image_menu(webview: "EditorWebView", menu: QMenu):
+    try:  # Qt6
+        context_menu_request: "QWebEngineContextMenuRequest" = (
+            webview.lastContextMenuRequest()
+        )
+    except AttributeError:  # Qt5
+        context_menu_request = (
+            webview.page().contextMenuData()  # type: ignore[attr-defined]
+        )
+    url = context_menu_request.mediaUrl()
     image_name = url.fileName()
     path = os.path.join(mw.col.media.dir(), image_name)
     if url.isValid() and path:
         a = menu.addAction(_("Occlude Image"))
-        a.triggered.connect(
+        qconnect(
+            a.triggered,
             lambda _, u=path, editor=webview.editor: onImgOccButton(
                 editor, image_path=u
-            )
+            ),
         )
         a = menu.addAction(_("Open Image"))
-        a.triggered.connect(lambda _, u=path: openImage(u))
+        qconnect(a.triggered, lambda _, u=path: openImage(u))
 
 
 def legacyEditorContextMenuEvent(self, evt):
