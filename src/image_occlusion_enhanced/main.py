@@ -38,16 +38,14 @@ import logging
 import sys
 from typing import TYPE_CHECKING, Optional
 
-from anki.hooks import runHook, wrap
-from anki.lang import _ as __
+from anki.hooks import wrap
 from aqt import mw
 from aqt.addcards import AddCards
 from aqt.editcurrent import EditCurrent
 from aqt.editor import Editor
-from aqt.qt import QAction, QCursor, QDesktopServices, QMenu, QUrl
+from aqt.qt import QAction, QDesktopServices, QMenu, QUrl
 from aqt.reviewer import Reviewer
 from aqt.utils import tooltip
-from aqt.webview import AnkiWebView
 
 from .add import ImgOccAdd
 from .config import *
@@ -182,23 +180,6 @@ def maybe_add_image_menu(webview: "EditorWebView", menu: QMenu):
         )
         a = menu.addAction(_("Open Image"))
         qconnect(a.triggered, lambda _, u=path: openImage(u))
-
-
-def legacyEditorContextMenuEvent(self, evt):
-    """Legacy: Monkey-patch context menu to add our own entries on Anki releases
-    that do not support the 'EditorWebView.contextMenuEvent' hook"""
-    m = QMenu(self)
-    a = m.addAction(__("Cut"))
-    a.triggered.connect(self.onCut)
-    a = m.addAction(__("Copy"))
-    a.triggered.connect(self.onCopy)
-    a = m.addAction(__("Paste"))
-    a.triggered.connect(self.onPaste)
-    ##################################################
-    maybe_add_image_menu(self, m)
-    ##################################################
-    runHook("EditorWebView.contextMenuEvent", self, m)
-    m.popup(QCursor.pos())
 
 
 def get_js_to_inject(note) -> Optional[str]:
