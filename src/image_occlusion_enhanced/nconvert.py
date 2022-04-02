@@ -50,6 +50,7 @@ class ImgOccNoteConverter(object):
     def __init__(self, browser):
         self.browser = browser
         self.occl_id_last = None
+        self._media_path = mw.col.media.dir()
         loadConfig(self)
 
     def convertNotes(self, nids):
@@ -232,11 +233,14 @@ class ImgOccNoteConverter(object):
         logging.debug(
             _("!saving %(node_id)s, %(mtype)s"), {"node_id": node_id, "mtype": mtype}
         )
-        mask_path = "%s-%s.svg" % (note_id, mtype)
-        mask_file = open(mask_path, "w")
-        mask_file.write(mask.encode("utf-8"))
-        mask_file.close()
-        return mask_path
+        mask_filename = "%s-%s.svg" % (note_id, mtype)
+        mask_path = os.path.join(self._media_path, mask_filename)
+        mask_data = mask.encode("utf8")
+
+        with open(mask_path, "wb") as f:
+            f.write(mask_data)
+
+        return mask_filename
 
 
 def onIoConvert(self):

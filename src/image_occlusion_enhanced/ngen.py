@@ -87,6 +87,7 @@ class ImgOccNoteGenerator(object):
         self.fields = fields
         self.did = did
         self.qfill = "#" + mw.col.conf["imgocc"]["qfill"]
+        self._media_path = mw.col.media.dir()
         loadConfig(self)
 
     def generateNotes(self):
@@ -98,10 +99,7 @@ class ImgOccNoteGenerator(object):
         (svg_node, layer_node) = self._getMnodesAndSetIds()
         if not self.mnode_ids:
             tooltip(
-                _(
-                    "No cards to generate.<br>"
-                    "Are you sure you set your masks correctly?"
-                )
+                _("No cards to generate.<br>Are you sure you set your masks correctly?")
             )
             return False
 
@@ -109,7 +107,7 @@ class ImgOccNoteGenerator(object):
         omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
         qmasks = self._generateMaskSVGsFor("Q")
         amasks = self._generateMaskSVGsFor("A")
-        image_path = mw.col.media.addFile(self.image_path)
+        image_path = mw.col.media.add_file(self.image_path)
         img = path_to_img_element(image_path)
 
         mw.checkpoint("Adding Image Occlusion Cards")
@@ -160,7 +158,7 @@ class ImgOccNoteGenerator(object):
             amasks = self._generateMaskSVGsFor("A")
             state = "reset"
 
-        image_path = mw.col.media.addFile(self.image_path)
+        image_path = mw.col.media.add_file(self.image_path)
         img = path_to_img_element(image_path)
 
         logging.debug("mnode_indexes %s", self.mnode_indexes)
@@ -454,12 +452,14 @@ class ImgOccNoteGenerator(object):
         logging.debug(
             _("!saving %(note_id)s, %(mtype)s"), {"note_id": note_id, "mtype": mtype}
         )
-        # media collection is the working directory:
-        mask_path = "%s-%s.svg" % (note_id, mtype)
-        mask_file = open(mask_path, "wb")
-        mask_file.write(mask.encode("utf8"))
-        mask_file.close()
-        return mask_path
+        mask_filename = "%s-%s.svg" % (note_id, mtype)
+        mask_path = os.path.join(self._media_path, mask_filename)
+        mask_data = mask.encode("utf8")
+
+        with open(mask_path, "wb") as f:
+            f.write(mask_data)
+
+        return mask_filename
 
     def removeBlanks(self, node):
         for x in node.childNodes:
