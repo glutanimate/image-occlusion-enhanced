@@ -64,7 +64,7 @@ if TYPE_CHECKING:
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 
-def onIoSettings():
+def on_io_settings():
     """Call settings dialog if Editor not active"""
     # TODO: fix ImgOccEdit detection
     if hasattr(mw, "ImgOccEdit") and mw.ImgOccEdit.visible:
@@ -74,14 +74,14 @@ def onIoSettings():
     dialog.exec()
 
 
-def onIoHelp():
+def on_io_help():
     """Call main help dialog"""
     ioHelp("main", parent=mw)
 
 
-def onImgOccButton(self, origin=None, image_path=None):
+def on_image_occlusion_button(self, origin=None, image_path=None):
     """Launch Image Occlusion Enhanced"""
-    origin = origin or getEdParentInstance(self.parentWindow)
+    origin = origin or get_editor_parent_instance(self.parentWindow)
     io_model = getOrCreateModel()
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
@@ -101,7 +101,11 @@ def onImgOccButton(self, origin=None, image_path=None):
     self.imgoccadd.occlude(image_path)
 
 
-def onSetupEditorButtons(buttons, editor):
+# legacy alias for third-party add-ons calling IO
+onImgOccButton = on_image_occlusion_button
+
+
+def on_setup_editor_buttons(buttons, editor):
     """Add IO button to Editor"""
     conf = mw.pm.profile.get("imgocc")
     if not conf:
@@ -109,7 +113,7 @@ def onSetupEditorButtons(buttons, editor):
     else:
         hotkey = conf.get("hotkey", IO_HOTKEY)
 
-    origin = getEdParentInstance(editor.parentWindow)
+    origin = get_editor_parent_instance(editor.parentWindow)
 
     if origin == "addcards":
         tt = _("Add Image Occlusion")
@@ -133,7 +137,7 @@ def onSetupEditorButtons(buttons, editor):
     return buttons
 
 
-def getEdParentInstance(parent):
+def get_editor_parent_instance(parent):
     """Determine parent instance of editor widget"""
     if isinstance(parent, AddCards):
         return "addcards"
@@ -143,7 +147,7 @@ def getEdParentInstance(parent):
         return "browser"
 
 
-def openImage(path):
+def open_image(path):
     """Open path with default system app"""
     import subprocess
 
@@ -179,7 +183,7 @@ def maybe_add_image_menu(webview: "EditorWebView", menu: QMenu):
             ),
         )
         a = menu.addAction(_("Open Image"))
-        qconnect(a.triggered, lambda _, u=path: openImage(u))
+        qconnect(a.triggered, lambda _, u=path: open_image(u))
 
 
 def get_js_to_inject(note) -> Optional[str]:
@@ -253,7 +257,7 @@ def on_profile_loaded():
 
 
 def on_hint_hotkey():
-    mw.web.eval("imageOcclusion.toggleMasks;")
+    mw.web.eval("imageOcclusion.toggleMasks();")
 
 
 def on_mw_state_shortcuts(state: str, shortcuts: list):
@@ -268,7 +272,7 @@ def on_mw_state_shortcuts(state: str, shortcuts: list):
 # TODO: Handle in JS
 
 
-def onShowAnswer(self, _old):
+def on_show_answer(self, _old):
     """Retain scroll position across answering the card"""
     if not self.card or not self.card.note_type()["name"] == IO_MODEL_NAME:
         return _old(self)
@@ -280,10 +284,10 @@ def onShowAnswer(self, _old):
 
 def setup_menus(main_window: "AnkiQt"):
     options_action = QAction(_("Image &Occlusion Enhanced Options..."), mw)
-    qconnect(options_action.triggered, onIoSettings)
+    qconnect(options_action.triggered, on_io_settings)
     help_action = QAction(_("Image &Occlusion Enhanced..."), mw)
-    qconnect(help_action.triggered, onIoHelp)
-    main_window.addonManager.setConfigAction(__name__, onIoSettings)
+    qconnect(help_action.triggered, on_io_help)
+    main_window.addonManager.setConfigAction(__name__, on_io_settings)
     main_window.form.menuTools.addAction(options_action)
     main_window.form.menuHelp.addAction(help_action)
 
@@ -311,11 +315,12 @@ def setup_main(main_window: "AnkiQt"):
 
     # Editor
 
-    editor_did_init_buttons.append(onSetupEditorButtons)
+    editor_did_init_buttons.append(on_setup_editor_buttons)
     editor_will_show_context_menu.append(maybe_add_image_menu)
     editor_did_load_note.append(on_editor_did_load_note)
 
     # Reviewer
 
-    Reviewer._showAnswer = wrap(Reviewer._showAnswer, onShowAnswer, "around")
+    # TODO: drop monkey-patch
+    Reviewer._showAnswer = wrap(Reviewer._showAnswer, on_show_answer, "around")
     state_shortcuts_will_change.append(on_mw_state_shortcuts)
