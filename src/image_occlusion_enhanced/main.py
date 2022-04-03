@@ -252,20 +252,15 @@ def on_profile_loaded():
 # Mask toggle hotkey
 
 
-def onHintHotkey():
-    mw.web.eval(
-        """
-        var ioBtn = document.getElementById("io-revl-btn");
-        if (ioBtn) {ioBtn.click();}
-    """
-    )
+def on_hint_hotkey():
+    mw.web.eval("imageOcclusion.toggleMasks;")
 
 
 def on_mw_state_shortcuts(state: str, shortcuts: list):
     """Add hint hotkey when in Reviewer"""
     if state != "review":
         return
-    shortcuts.append(("G", onHintHotkey))
+    shortcuts.append(("G", on_hint_hotkey))
 
 
 # Retain scroll position when answering

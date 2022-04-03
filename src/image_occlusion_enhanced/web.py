@@ -34,17 +34,23 @@ from .consts import MODULE_ADDON
 
 from aqt import mw
 from aqt.editor import Editor
+from aqt.reviewer import Reviewer
 
 editor_html = f"""
 <link rel="stylesheet" href="/_addons/{MODULE_ADDON}/web/editor.css">
 <script src="/_addons/{MODULE_ADDON}/web/editor.js"></script>
 """
 
+reviewer_html = f"""
+<script src="/_addons/{MODULE_ADDON}/web/reviewer.js"></script>
+"""
+
 
 def on_webview_will_set_content(web_content, context):
-    if not isinstance(context, Editor):
-        return
-    web_content.body += editor_html
+    if isinstance(context, Editor):
+        web_content.body += editor_html
+    elif isinstance(context, Reviewer):
+        web_content.body += reviewer_html
 
 
 def on_main_window_did_init():

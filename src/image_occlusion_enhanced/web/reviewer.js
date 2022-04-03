@@ -30,12 +30,13 @@ listed here: <https://glutanimate.com/contact/>.
 Any modifications to this file must keep this entire header intact.
 */
 
-/* limit image display height */
-.ionote img {
-  max-width: 90%;
-  max-height: 160px;
+class ImageOcclusionReviewerAdapter {
+  toggleMasks() {
+    const ioButton = document.getElementById("io-revl-btn");
+    if (ioButton) {
+      ioButton.click();
+    }
+  }
 }
-/* hide ID field if marked as such via CSS class */
-.ionote .ionote-field-id {
-  display: none;
-}
+
+globalThis.imageOcclusion = new ImageOcclusionReviewerAdapter();
