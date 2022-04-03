@@ -52,9 +52,7 @@ from .utils import get_image_dimensions, img_element_to_path, path_to_url
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__), "svg-edit", "editor")
 svg_edit_path = os.path.join(svg_edit_dir, "svg-editor.html")
-svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,\
-ext-markers.js,ext-shapes.js,ext-eyedropper.js,ext-panning.js,\
-ext-snapping.js"
+svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,ext-markers.js,ext-shapes.js,ext-eyedropper.js,ext-panning.js,ext-snapping.js"
 svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [
     ("initStroke[opacity]", "1"),
@@ -92,7 +90,7 @@ class ImgOccAdd(object):
                 image_path = self.getImageFromFields(note.fields)
                 if image_path:
                     tooltip(
-                        _("Non-editable note.<br>" "Using image to create new IO note.")
+                        _("Non-editable note.<br>Using image to create new IO note.")
                     )
 
         if not image_path:
@@ -390,21 +388,12 @@ class ImgOccAdd(object):
             dialog.close()
 
         else:
-            # Refresh image cache
-            dialog.svg_edit.page().profile().clearHttpCache()
+            # Refresh image cache. We need to do this in order to refresh image
+            # display across all web views the images could be presented in.
+            # (i.e. cache-busting IO images in the reviewer alone via JS is not
+            # sufficient)
+            mw.web.page().profile().clearHttpCache()
             dialog.close()
-
-            # Force EditCurrent and Browser editor instances reload
-            # in order to make use of refreshed image cache
-            if not self.origin == "addcards":
-
-                def onToHtmlCallback(html):
-                    if self.ed.web:
-                        self.ed.web.reload()
-                        self.ed.web.setHtml(html)
-                        self.ed.loadNote()
-
-                self.ed.web.page().toHtml(onToHtmlCallback)  # async execution
 
             # write a dummy file to update collection.media modtime and
             # force sync
@@ -415,7 +404,28 @@ class ImgOccAdd(object):
                     f.write("io sync dummy")
             os.remove(fpath)
 
-        mw.reset()  # FIXME: causes glitches in editcurrent mode
+        def refresh_editor():
+            # FIXME: Incredibly ugly hack to refresh editor web view in order to make
+            # changes to images visible
+            self.ed.outerLayout.removeWidget(self.ed.web)
+            self.ed.web.reload()
+            self.ed.web.stdHtml("")
+            self.ed.setupWeb()
+            self.ed.loadNote()
+
+        refresh_editor()
+
+        def refresh_reviewer():
+            # FIXME: Incredibly ugly hack to refresh reviewer web view in  order to make
+            # changes to images visible. Other solutions like
+            # reviewer._initWeb(); reviewer._showQuestion() do not seem to work reliably
+            mw.moveToState("overview")
+            mw.progress.single_shot(100, lambda: mw.moveToState("review"))
+
+        mw.reset()
+
+        if mw.state == "review":
+            mw.progress.single_shot(100, refresh_reviewer)
 
     def getUserInputs(self, dialog, edit=False):
         """Get fields and tags from ImgOccEdit while checking note type"""
