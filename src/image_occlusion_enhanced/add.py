@@ -121,7 +121,8 @@ class ImgOccAdd(object):
         self.callImgOccEdit(width, height)
 
     def setPreservedAttrs(self, note):
-        self.opref["tags"] = ""  # FIXME
+        # FIXME: Not necessarily up-to-date with new tag edit contents
+        self.opref["tags"] = note.tags
         if self.origin == "addcards":
             self.opref["did"] = self.ed.parentWindow.deckChooser.selectedId()
         else:
@@ -252,7 +253,7 @@ class ImgOccAdd(object):
         dialog.svg_edit.setUrl(url)
         dialog.deckChooser.deck.setText(deck)
         dialog.tags_edit.setCol(mw.col)
-        dialog.tags_edit.setText(opref["tags"])
+        dialog.tags_edit.setText(" ".join(opref["tags"]))
 
         if onote:
             for i in self.ioflds_prsv:
@@ -342,8 +343,8 @@ class ImgOccAdd(object):
             for i in self.ioflds_prsv:
                 if i in self.ed.note:
                     self.ed.note[i] = fields[i]
+            self.ed.note.tags = tags
             self.ed.loadNote()
-            # self.ed.tags.setText(" ".join(tags))
             # self.ed.saveTags()
             # deck = mw.col.decks.nameOrNone(did)
             # self.ed.parentWindow.deckChooser.deck.setText(deck)
