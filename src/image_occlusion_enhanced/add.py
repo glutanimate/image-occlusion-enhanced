@@ -338,15 +338,13 @@ class ImgOccAdd(object):
             return False
 
         if self.origin == "addcards" and self.ed.note:
-            # FIXME
-            pass
             # Update Editor with modified tags and sources field
+            for i in self.ioflds_prsv:
+                if i in self.ed.note:
+                    self.ed.note[i] = fields[i]
+            self.ed.loadNote()
             # self.ed.tags.setText(" ".join(tags))
             # self.ed.saveTags()
-            # for i in self.ioflds_prsv:
-            #     if i in self.ed.note:
-            #         self.ed.note[i] = fields[i]
-            # self.ed.loadNote()
             # deck = mw.col.decks.nameOrNone(did)
             # self.ed.parentWindow.deckChooser.deck.setText(deck)
 
