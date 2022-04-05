@@ -218,7 +218,6 @@ class ImgOccAdd(object):
         opref = self.opref
         onote = self.ed.note
         flds = self.mflds
-        deck = mw.col.decks.nameOrNone(opref["did"])
 
         dialog = ImgOccEdit(self, self.ed.parentWindow)
         dialog.setupFields(flds)
@@ -251,7 +250,7 @@ class ImgOccAdd(object):
 
         url.setQuery(items)
         dialog.svg_edit.setUrl(url)
-        dialog.deckChooser.deck.setText(deck)
+        dialog.deckChooser.selected_deck_id = opref["did"]
         dialog.tags_edit.setCol(mw.col)
         dialog.tags_edit.setText(" ".join(opref["tags"]))
 
@@ -328,7 +327,7 @@ class ImgOccAdd(object):
         if r1 is False:
             return False
         (fields, tags) = r1
-        did = dialog.deckChooser.selectedId()
+        did = dialog.deckChooser.selected_deck_id
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(
@@ -345,7 +344,6 @@ class ImgOccAdd(object):
                     self.ed.note[i] = fields[i]
             self.ed.note.tags = tags
             self.ed.loadNote()
-            # self.ed.saveTags()
             # deck = mw.col.decks.nameOrNone(did)
             # self.ed.parentWindow.deckChooser.deck.setText(deck)
 
