@@ -38,7 +38,7 @@ import os
 import tempfile
 
 from aqt import mw
-from aqt.qt import QApplication, QFileDialog, QUrl, QUrlQuery
+from aqt.qt import QApplication, QFileDialog, Qt, QUrl, QUrlQuery
 from aqt.utils import showWarning, tooltip
 
 from .config import *
@@ -280,6 +280,9 @@ class ImgOccAdd(object):
         dialog.svg_edit.runOnLoaded(onSvgEditLoaded)
         dialog.visible = True
         dialog.show()
+        # Workaround for window intermittently spawning below AddCards on 2.1.50+:
+        dialog.activateWindow()
+        dialog.setWindowState(Qt.WindowState.WindowActive)
 
     def onChangeImage(self):
         """Change canvas background image"""
