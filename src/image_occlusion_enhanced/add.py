@@ -2,7 +2,7 @@
 
 # Image Occlusion Enhanced Add-on for Anki
 #
-# Copyright (C) 2016-2020  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2016-2022  Aristotelis P. <https://glutanimate.com/>
 # Copyright (C) 2012-2015  Tiago Barroso <tmbb@campus.ul.pt>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -40,6 +40,7 @@ import tempfile
 from aqt.qt import *
 
 from aqt import mw
+from aqt.tagedit import TagEdit
 from aqt.utils import tooltip, showWarning
 
 from .ngen import *
@@ -69,6 +70,7 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
 class ImgOccAdd(object):
     def __init__(self, editor, origin, oldimg=None):
         self.ed = editor
+        self.ed.tags = TagEdit(self.ed.widget)
         self.image_path = oldimg
         self.mode = "add"
         self.origin = origin
