@@ -2,7 +2,7 @@
 
 # Image Occlusion Enhanced Add-on for Anki
 #
-# Copyright (C) 2016-2020  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2016-2022  Aristotelis P. <https://glutanimate.com/>
 # Copyright (C) 2013 Steve AW <https://github.com/steveaw>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,10 +36,12 @@ the collection.
 """
 
 import logging
+import os
 
 from aqt.qt import *
 from aqt import mw
 from aqt.utils import tooltip
+from anki.media import media_paths_from_col_path
 from anki.notes import Note
 
 from xml.dom import minidom
@@ -88,6 +90,8 @@ class ImgOccNoteGenerator(object):
         self.did = did
         self.qfill = '#' + mw.col.conf['imgocc']['qfill']
         loadConfig(self)
+        # set working directory to collection.media
+        os.chdir(media_paths_from_col_path(mw.col.path)[0])
 
     def generateNotes(self):
         """Generate new notes"""
