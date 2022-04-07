@@ -37,6 +37,7 @@ Add notes.
 import os
 import tempfile
 
+from anki.config import Config
 from aqt import mw
 from aqt.qt import QApplication, QFileDialog, Qt, QUrl, QUrlQuery
 from aqt.utils import showWarning, tooltip
@@ -169,7 +170,7 @@ class ImgOccAdd(object):
         else:
             clip = QApplication.clipboard()
         if clip and clip.mimeData().imageData():
-            if mw.pm.profile["pastePNG"]:
+            if mw.col.get_config_bool(Config.Bool.PASTE_IMAGES_AS_PNG):
                 handle, image_path = tempfile.mkstemp(suffix=".png")
             else:
                 handle, image_path = tempfile.mkstemp(suffix=".jpg")
