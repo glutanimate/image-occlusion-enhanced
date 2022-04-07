@@ -2,7 +2,7 @@
 
 # Image Occlusion Enhanced Add-on for Anki
 #
-# Copyright (C) 2016-2020  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2016-2022  Aristotelis P. <https://glutanimate.com/>
 # Copyright (C) 2012-2015  Tiago Barroso <tmbb@campus.ul.pt>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -39,7 +39,7 @@ import sys
 
 from anki.lang import _
 from aqt.qt import *
-from aqt.qt import QMenu
+from aqt.qt import QMenu, qtmajor
 
 from aqt import mw
 from aqt.editor import Editor, EditorWebView
@@ -151,8 +151,12 @@ def openImage(path):
 
 
 def maybe_add_image_menu(webview: AnkiWebView, menu: QMenu):
-    # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
-    context_data = webview.page().contextMenuData()
+    if qtmajor == 5:
+        # cf. https://doc.qt.io/qt-5/qwebenginepage.html#contextMenuData
+        context_data = webview.page().contextMenuData()
+    else:
+        # https://doc.qt.io/qt-6/qwebenginecontextmenurequest.html
+        context_data = webview.lastContextMenuRequest()
     url = context_data.mediaUrl()
     image_name = url.fileName()
     path = os.path.join(mw.col.media.dir(), image_name)
