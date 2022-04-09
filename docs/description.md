@@ -34,7 +34,7 @@ The use of this add-on is detailed in the [Wiki](https://github.com/Glutanimate/
 
 *Copyright © 2012-2015 [Tiago Barroso](https://github.com/tmbb)*
 *Copyright © 2013 [Steve AW](https://github.com/steveaw)*
-*Copyright © 2016-2019 [Aristotelis P.](https://glutanimate.com/)  (Glutanimate)*
+*Copyright © 2016-2022 [Aristotelis P.](https://glutanimate.com/)  (Glutanimate)*
 
 With code contributions from: Damien Elmes, Kyle Mills, James Kraus, Matt Restko
 

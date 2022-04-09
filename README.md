@@ -84,7 +84,7 @@ Contributions are welcome! Please review the [contribution guidelines](./CONTRIB
 
 *Copyright © 2013 [Steve AW](https://github.com/steveaw)*
 
-*Copyright © 2016-2019 [Aristotelis P.](https://glutanimate.com/) (Glutanimate)*
+*Copyright © 2016-2022 [Aristotelis P.](https://glutanimate.com/) (Glutanimate)*
 
 With code contributions from: Damien Elmes, Kyle Mills, James Kraus, Matt Restko
 
