@@ -35,7 +35,6 @@ Image Occlusion editor dialog
 """
 
 import os
-from typing import Optional
 
 from anki.hooks import addHook, remHook
 from aqt import deckchooser, mw, tagedit, webview
@@ -58,8 +57,9 @@ from aqt.qt import (
     QVBoxLayout,
     QWidget,
     sip,
+    pyqtSignal,
 )
-from aqt.utils import restoreGeom, saveGeom
+from aqt.utils import restoreGeom, saveGeom, askUser
 
 from .config import *
 from .consts import *
@@ -73,6 +73,9 @@ class ImgOccWebPage(webview.AnkiWebPage):
 
 
 class ImgOccWebView(webview.AnkiWebView):
+
+    escape_pressed = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self._domDone = False
@@ -111,6 +114,9 @@ class ImgOccWebView(webview.AnkiWebView):
                 raise Exception(
                     _("unknown action: {action_name}").format(action_name=name)
                 )
+
+    def onEsc(self):
+        self.escape_pressed.emit()
 
 
 class ImgOccEdit(QDialog):
@@ -154,8 +160,27 @@ class ImgOccEdit(QDialog):
             self.close()
 
     def reject(self):
-        # Override QDialog Esc key reject
-        pass
+        if not self.svg_edit:
+            return super().reject()
+        self.svg_edit.evalWithCallback(
+            "svgCanvas.undoMgr.getUndoStackSize() == 0", self._on_reject_callback
+        )
+
+    def _on_reject_callback(self, undo_stack_empty: bool):
+        if (undo_stack_empty and not self._input_modified()) or askUser(
+            "Are you sure you want to close the window? This will discard any unsaved"
+            " changes.",
+            title="Exit Image Occlusion?",
+        ):
+            return super().reject()
+
+    def _input_modified(self) -> bool:
+        tags_modified = self.tags_edit.isModified()
+        fields_modified = any(
+            plain_text_edit.document().isModified()  # type: ignore
+            for plain_text_edit in self.findChildren(QPlainTextEdit)
+        )
+        return tags_modified or fields_modified
 
     def setupUi(self):
         """Set up ImgOccEdit UI"""
@@ -163,6 +188,8 @@ class ImgOccEdit(QDialog):
         self.svg_edit = ImgOccWebView(parent=self)
         self.svg_edit._page = ImgOccWebPage(self.svg_edit._onBridgeCmd)
         self.svg_edit.setPage(self.svg_edit._page)
+
+        self.svg_edit.escape_pressed.connect(self.reject)
 
         self.tags_hbox = QHBoxLayout()
         self.tags_edit = tagedit.TagEdit(self)

@@ -351,8 +351,6 @@ class ImgOccAdd(object):
                     self.ed.note[i] = fields[i]
             self.ed.note.tags = tags
             self.ed.loadNote()
-            # deck = mw.col.decks.nameOrNone(did)
-            # self.ed.parentWindow.deckChooser.deck.setText(deck)
 
         if close:
             dialog.close()
