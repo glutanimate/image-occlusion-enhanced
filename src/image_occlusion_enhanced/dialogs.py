@@ -130,7 +130,7 @@ dialog_msg["main"] = _(
 <a href="https://github.com/tmbb">Tiago Barroso</a></em></p>
 <p style="font-size:12pt;"><em>Copyright © 2013
 <a href="https://github.com/steveaw">Steve AW</a></em></p>
-<p style="font-size:12pt;"><em>Copyright © 2016-2017
+<p style="font-size:12pt;"><em>Copyright © 2016-2022
 <a href="https://github.com/Glutanimate">Aristotelis P.</a></em></p>
 <p><em>Image Occlusion Enhanced</em> is licensed under the GNU AGPLv3.</p>
 <p>Third-party open-source software shipped with <em>Image Occlusion Enhanced</em>:</p>
