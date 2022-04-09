@@ -12,6 +12,10 @@ If you enjoy Image Occlusion Enhanced, please consider supporting my work on Pat
 
 ## [Unreleased]
 
+## [1.4.0] - 2022-04-09
+
+### [Download](https://github.com/glutanimate/image-occlusion-enhanced/releases/tag/v1.4.0)
+
 **IMPORTANT**: This release is only compatible with Anki 2.1.50 and up. If you are on an earlier Anki release, copying the add-on code below into the app will automatically download a compatible version of the add-on for you, so there are no extra steps you have to take. Just be aware that going forward, new features and fixes will likely only be available for Anki 2.1.50 and up.
 
 Still, as of writing this changelog (2022-04-09), unless you have a strong reason to switch to 2.1.50, I would recommend to hold off from upgrading until things around the release have settled a bit more.

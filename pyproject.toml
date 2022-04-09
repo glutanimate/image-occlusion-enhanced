@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "image-occlusion-enhanced"
-version = "v1.4.0-dev.1"
+version = "v1.4.0"
 description = "Image Occlusion Enhanced Anki Add-on"
 authors = ["Glutanimate <glutanimate.com/contact>"]
 license = "AGPL-3.0-or-later-with-additional-terms"
