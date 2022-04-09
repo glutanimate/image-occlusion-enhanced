@@ -33,19 +33,13 @@
 Global variables
 """
 
-import sys
 import os
 
-SYS_ENCODING = sys.getfilesystemencoding()
-
 ADDON_PATH = os.path.dirname(__file__)
+MODULE_ADDON = __name__.split(".")[0]
 
 ICONS_PATH = os.path.join(ADDON_PATH, "icons")
 
 SUPPORTED_BITMAP_FORMATS = ("jpeg", "png", "gif")
-SUPPORTED_VECTOR_FORMATS = ("svg", )
-SUPPORTED_EXTENSIONS = (
-    ("jpg", ) +
-    SUPPORTED_BITMAP_FORMATS +
-    SUPPORTED_VECTOR_FORMATS
-)
+SUPPORTED_VECTOR_FORMATS = ("svg",)
+SUPPORTED_EXTENSIONS = ("jpg",) + SUPPORTED_BITMAP_FORMATS + SUPPORTED_VECTOR_FORMATS

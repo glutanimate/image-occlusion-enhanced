@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "image-occlusion-enhanced"
+version = "v1.4.0-dev.1"
+description = "Image Occlusion Enhanced Anki Add-on"
+authors = ["Glutanimate <glutanimate.com/contact>"]
+license = "AGPL-3.0-or-later-with-additional-terms"
+
+[tool.poetry.dependencies]
+python = "^3.9.7"
+
+[tool.poetry.dev-dependencies]
+aqt = "^2.1.50"
+PyQt6 = "6.2.3"
+PyQt6-WebEngine-Qt6 = "6.2.2"
+aab  = { git = "https://github.com/glutanimate/anki-addon-builder.git", tag = "v0.1.5-beta.6" }
+black = "^22.1.0"
+pylint = "^2.12.2"
+mypy = "^0.931"
+isort = "^5.10.1"
+flake8 = "^4.0.1"
+PyQt6-WebEngine = "^6.2.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+show_error_codes = true
+ignore_missing_imports = true
+follow_imports = "silent"
+show_column_numbers = true
+exclude = "(_vendor|libaddon|svg-edit)"
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+line_length=88
+ensure_newline_before_comments=true
+skip_glob = "**/_vendor,**/libaddon,**/svg-edit"
+
+[tool.black]
+extend-exclude  = "(_vendor|libaddon|svg-edit)"
+experimental-string-processing = true
+
+[tool.pyright]
+include = ["src"]
+exclude = [
+    "src/image_occlusion_enhanced/_vendor",
+    "src/image_occlusion_enhanced/libaddon",
+    "src/image_occlusion_enhanced/svg-edit",
+]
+enableTypeIgnoreComments = true

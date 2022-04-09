@@ -2,7 +2,9 @@
 
 # Image Occlusion Enhanced Add-on for Anki
 #
-# Copyright (C) 2016-2020  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2016-2022  Aristotelis P. <https://glutanimate.com/>
+# Copyright (C) 2012-2015  Tiago Barroso <tmbb@campus.ul.pt>
+# Copyright (C) 2022  Ankitects Pty Ltd and contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -29,14 +31,15 @@
 #
 # Any modifications to this file must keep this entire header intact.
 
-from typing import TYPE_CHECKING
+from typing import Callable, Union
 
-from aqt import mw
+from aqt.qt import pyqtBoundSignal, pyqtSignal
 
-from ._version import __version__  # noqa: F401
-from .main import setup_main
+# Copied from aqt.qt in order to lower API breakage surface
 
-if TYPE_CHECKING:
-    assert mw is not None
 
-setup_main(mw)
+def qconnect(
+    signal: Union[Callable, pyqtSignal, pyqtBoundSignal], func: Callable
+) -> None:
+    """Helper to work around type checking not working with signal.connect(func)."""
+    signal.connect(func)  # type: ignore

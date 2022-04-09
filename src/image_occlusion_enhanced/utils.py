@@ -34,39 +34,35 @@ Common reusable utilities
 
 import os
 import re
+import urllib.error
+import urllib.parse
+import urllib.request
+from typing import Optional, Tuple
+from xml.dom import minidom
 
 from aqt import mw
 
-from xml.dom import minidom
-import urllib.parse
-import urllib.request
-import urllib.parse
-import urllib.error
-
 from ._vendor import imghdr
 from ._vendor.imagesize import imagesize
-
-from .consts import *
-
+from .consts import SUPPORTED_BITMAP_FORMATS
 
 
-def path2url(path):
+def path_to_url(path: str) -> str:
     """URL-encode local path"""
-    return urllib.parse.urljoin(
-        'file:', urllib.request.pathname2url(path))
+    return urllib.parse.urljoin("file:", urllib.request.pathname2url(path))
 
 
-def fname2img(path):
+def path_to_img_element(path: str) -> str:
     """Return HTML img element for given path"""
     fname = os.path.split(path)[1]
     return '<img src="%s" />' % fname
 
 
-def img2path(img, nameonly=False):
+def img_element_to_path(img_element: str, nameonly: bool = False) -> Optional[str]:
     """Extract path or file name out of HTML img element"""
     imgpatt = r"""<img.*?src=(["'])(.*?)\1"""
     imgregex = re.compile(imgpatt, flags=re.I | re.M | re.S)
-    fname = imgregex.search(img)
+    fname = imgregex.search(img_element)
     if not fname:
         return None
     if nameonly:
@@ -77,31 +73,31 @@ def img2path(img, nameonly=False):
     return fpath
 
 
-def imageProp(image_path):
+def get_image_dimensions(image_path: str) -> Tuple[int, int]:
     """Get image width and height"""
     # Vector graphics
     if image_path.endswith(".svg"):
         try:
-            with open(image_path, 'r') as svg_file:
+            with open(image_path, "r") as svg_file:
                 doc = svg_file.read()
-                mask_doc = minidom.parseString(doc.encode('utf-8'))
+                mask_doc = minidom.parseString(doc.encode("utf-8"))
         except Exception as e:
             print(str(e))
             raise ValueError("Invalid SVG file.")
-        
+
         svg_node = mask_doc.documentElement
         cheight = svg_node.attributes["height"].value
         cwidth = svg_node.attributes["width"].value
-        height = _svg_convert_size(cheight)
-        width = _svg_convert_size(cwidth)
-        
+        height = _svg_convert_size_to_pixels(cheight)
+        width = _svg_convert_size_to_pixels(cwidth)
+
         return width, height
-    
+
     # Bitmap graphics
     img_fmt = imghdr.what(image_path)
     if img_fmt not in SUPPORTED_BITMAP_FORMATS:
         raise ValueError("Unrecognized raster image format.")
-    
+
     width, height = imagesize.get(image_path)
     if width < 0 or height < 0:
         raise ValueError("Image has invalid dimensions.")
@@ -109,20 +105,13 @@ def imageProp(image_path):
     return width, height
 
 
-def _svg_convert_size(size):
+def _svg_convert_size_to_pixels(size: str) -> int:
     """
-    Convert svg size to the px version
-    :param size: String with the size
+    Convert SVG size in pt, pc, mm, cm, or in into pixels
     """
 
     # https://www.w3.org/TR/SVG/coords.html#Units
-    conversion_table = {
-        "pt": 1.25,
-        "pc": 15,
-        "mm": 3.543307,
-        "cm": 35.43307,
-        "in": 90
-    }
+    conversion_table = {"pt": 1.25, "pc": 15, "mm": 3.543307, "cm": 35.43307, "in": 90}
     if len(size) > 3:
         if size[-2:] in conversion_table:
             return round(float(size[:-2]) * conversion_table[size[-2:]])

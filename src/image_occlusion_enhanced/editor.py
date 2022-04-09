@@ -36,15 +36,35 @@ Image Occlusion editor dialog
 
 import os
 
-from aqt.qt import *
-
-from aqt import mw, webview, deckchooser, tagedit, sip
-from aqt.utils import saveGeom, restoreGeom
 from anki.hooks import addHook, remHook
+from aqt import deckchooser, mw, tagedit, webview
+from aqt.qt import (
+    QApplication,
+    QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QHBoxLayout,
+    QIcon,
+    QKeySequence,
+    QLabel,
+    QMovie,
+    QPlainTextEdit,
+    QPushButton,
+    QShortcut,
+    QSize,
+    Qt,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+    sip,
+    pyqtSignal,
+)
+from aqt.utils import restoreGeom, saveGeom, askUser
 
-from .dialogs import ioHelp
-from .consts import *
 from .config import *
+from .consts import *
+from .dialogs import ioHelp
+from .lang import _
 
 
 class ImgOccWebPage(webview.AnkiWebPage):
@@ -53,6 +73,9 @@ class ImgOccWebPage(webview.AnkiWebPage):
 
 
 class ImgOccWebView(webview.AnkiWebView):
+
+    escape_pressed = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self._domDone = False
@@ -88,7 +111,12 @@ class ImgOccWebView(webview.AnkiWebView):
                 callback = args[0]
                 callback()
             else:
-                raise Exception("unknown action: {}".format(name))
+                raise Exception(
+                    _("unknown action: {action_name}").format(action_name=name)
+                )
+
+    def onEsc(self):
+        self.escape_pressed.emit()
 
 
 class ImgOccEdit(QDialog):
@@ -97,7 +125,7 @@ class ImgOccEdit(QDialog):
     def __init__(self, imgoccadd, parent):
         QDialog.__init__(self)
         mw.setupDialogGC(self)
-        self.setWindowFlags(Qt.Window)
+        self.setWindowFlags(Qt.WindowType.Window)
         self.visible = False
         self.imgoccadd = imgoccadd
         self.parent = parent
@@ -107,6 +135,7 @@ class ImgOccEdit(QDialog):
         restoreGeom(self, "imgoccedit")
         try:
             from aqt.gui_hooks import profile_will_close
+
             profile_will_close.append(self.onProfileUnload)
         except (ImportError, ModuleNotFoundError):
             addHook("unloadProfile", self.onProfileUnload)
@@ -117,9 +146,10 @@ class ImgOccEdit(QDialog):
             saveGeom(self, "imgoccedit")
         self.visible = False
         self.svg_edit = None
-        del(self.svg_edit_anim)  # might not be gc'd
+        del self.svg_edit_anim  # might not be gc'd
         try:
             from aqt.gui_hooks import profile_will_close
+
             profile_will_close.append(self.onProfileUnload)
         except (ImportError, ModuleNotFoundError):
             remHook("unloadProfile", self.onProfileUnload)
@@ -130,8 +160,27 @@ class ImgOccEdit(QDialog):
             self.close()
 
     def reject(self):
-        # Override QDialog Esc key reject
-        pass
+        if not self.svg_edit:
+            return super().reject()
+        self.svg_edit.evalWithCallback(
+            "svgCanvas.undoMgr.getUndoStackSize() == 0", self._on_reject_callback
+        )
+
+    def _on_reject_callback(self, undo_stack_empty: bool):
+        if (undo_stack_empty and not self._input_modified()) or askUser(
+            "Are you sure you want to close the window? This will discard any unsaved"
+            " changes.",
+            title="Exit Image Occlusion?",
+        ):
+            return super().reject()
+
+    def _input_modified(self) -> bool:
+        tags_modified = self.tags_edit.isModified()
+        fields_modified = any(
+            plain_text_edit.document().isModified()  # type: ignore
+            for plain_text_edit in self.findChildren(QPlainTextEdit)
+        )
+        return tags_modified or fields_modified
 
     def setupUi(self):
         """Set up ImgOccEdit UI"""
@@ -140,13 +189,14 @@ class ImgOccEdit(QDialog):
         self.svg_edit._page = ImgOccWebPage(self.svg_edit._onBridgeCmd)
         self.svg_edit.setPage(self.svg_edit._page)
 
+        self.svg_edit.escape_pressed.connect(self.reject)
+
         self.tags_hbox = QHBoxLayout()
         self.tags_edit = tagedit.TagEdit(self)
-        self.tags_label = QLabel("Tags")
+        self.tags_label = QLabel(_("Tags"))
         self.tags_label.setFixedWidth(70)
         self.deck_container = QWidget()
-        self.deckChooser = deckchooser.DeckChooser(mw,
-                                                   self.deck_container, label=True)
+        self.deckChooser = deckchooser.DeckChooser(mw, self.deck_container, label=True)
         self.deckChooser.deck.setAutoDefault(False)
 
         # workaround for tab focus order issue of the tags entry
@@ -157,48 +207,62 @@ class ImgOccEdit(QDialog):
                 try:
                     item = self.deck_container.layout().children()[0].itemAt(i)
                     # remove Tab focus manually:
-                    item.widget().setFocusPolicy(Qt.ClickFocus)
+                    item.widget().setFocusPolicy(Qt.FocusPolicy.ClickFocus)
                     item.widget().setAutoDefault(False)
                 except AttributeError:
                     pass
 
         # Button row widgets
         self.bottom_label = QLabel()
-        button_box = QDialogButtonBox(Qt.Horizontal, self)
+        button_box = QDialogButtonBox(Qt.Orientation.Horizontal, self)
         button_box.setCenterButtons(False)
 
-        image_btn = QPushButton("Change &Image", clicked=self.changeImage)
+        image_btn = QPushButton(_("Change &Image"))
+        image_btn.clicked.connect(self.changeImage)
         image_btn.setIcon(QIcon(os.path.join(ICONS_PATH, "add.png")))
         image_btn.setIconSize(QSize(16, 16))
         image_btn.setAutoDefault(False)
-        help_btn = QPushButton("&Help", clicked=self.onHelp)
+        help_btn = QPushButton(_("&Help"))
+        help_btn.clicked.connect(self.onHelp)
         help_btn.setAutoDefault(False)
 
         self.occl_tp_select = QComboBox()
-        self.occl_tp_select.addItems(["Don't Change", "Hide All, Guess One",
-                                      "Hide One, Guess One"])
+        self.occl_tp_select.addItem(_("Don't Change"), "Don't Change")
+        self.occl_tp_select.addItem(_("Hide All, Guess One"), "Hide All, Guess One")
+        self.occl_tp_select.addItem(_("Hide One, Guess One"), "Hide One, Guess One")
 
-        self.edit_btn = button_box.addButton("&Edit Cards",
-                                             QDialogButtonBox.ActionRole)
-        self.new_btn = button_box.addButton("&Add New Cards",
-                                            QDialogButtonBox.ActionRole)
-        self.ao_btn = button_box.addButton("Hide &All, Guess One",
-                                           QDialogButtonBox.ActionRole)
-        self.oa_btn = button_box.addButton("Hide &One, Guess One",
-                                           QDialogButtonBox.ActionRole)
-        close_button = button_box.addButton("&Close",
-                                            QDialogButtonBox.RejectRole)
+        self.edit_btn = button_box.addButton(
+            _("&Edit Cards"), QDialogButtonBox.ButtonRole.ActionRole
+        )
+        self.new_btn = button_box.addButton(
+            _("&Add New Cards"), QDialogButtonBox.ButtonRole.ActionRole
+        )
+        self.ao_btn = button_box.addButton(
+            _("Hide &All, Guess One"), QDialogButtonBox.ButtonRole.ActionRole
+        )
+        self.oa_btn = button_box.addButton(
+            _("Hide &One, Guess One"), QDialogButtonBox.ButtonRole.ActionRole
+        )
+        close_button = button_box.addButton(
+            _("&Close"), QDialogButtonBox.ButtonRole.RejectRole
+        )
 
-        image_tt = ("Switch to a different image while preserving all of "
-                    "the shapes and fields")
-        dc_tt = "Preserve existing occlusion type"
-        edit_tt = "Edit all cards using current mask shapes and field entries"
-        new_tt = "Create new batch of cards without editing existing ones"
-        ao_tt = ("Generate cards with nonoverlapping information, where all<br>"
-                 "labels are hidden on the front and one revealed on the back")
-        oa_tt = ("Generate cards with overlapping information, where one<br>"
-                 "label is hidden on the front and revealed on the back")
-        close_tt = "Close Image Occlusion Editor without generating cards"
+        image_tt = _(
+            "Switch to a different image while preserving all of the shapes and fields"
+        )
+        dc_tt = _("Preserve existing occlusion type")
+        edit_tt = _("Edit all cards using current mask shapes and field entries")
+        new_tt = _("Create new batch of cards without editing existing ones")
+        ao_tt = _(
+            "Generate cards with nonoverlapping information, where all"
+            "<br>labels are hidden on the front and one revealed on the"
+            " back"
+        )
+        oa_tt = _(
+            "Generate cards with overlapping information, where one<br>"
+            "label is hidden on the front and revealed on the back"
+        )
+        close_tt = _("Close Image Occlusion Editor without generating cards")
 
         image_btn.setToolTip(image_tt)
         self.edit_btn.setToolTip(edit_tt)
@@ -206,13 +270,19 @@ class ImgOccEdit(QDialog):
         self.ao_btn.setToolTip(ao_tt)
         self.oa_btn.setToolTip(oa_tt)
         close_button.setToolTip(close_tt)
-        self.occl_tp_select.setItemData(0, dc_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(1, ao_tt, Qt.ToolTipRole)
-        self.occl_tp_select.setItemData(2, oa_tt, Qt.ToolTipRole)
+        self.occl_tp_select.setItemData(0, dc_tt, Qt.ItemDataRole.ToolTipRole)
+        self.occl_tp_select.setItemData(1, ao_tt, Qt.ItemDataRole.ToolTipRole)
+        self.occl_tp_select.setItemData(2, oa_tt, Qt.ItemDataRole.ToolTipRole)
 
-        for btn in [image_btn, self.edit_btn, self.new_btn, self.ao_btn,
-                    self.oa_btn, close_button]:
-            btn.setFocusPolicy(Qt.ClickFocus)
+        for btn in [
+            image_btn,
+            self.edit_btn,
+            self.new_btn,
+            self.ao_btn,
+            self.oa_btn,
+            close_button,
+        ]:
+            btn.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
         self.edit_btn.clicked.connect(self.editNote)
         self.new_btn.clicked.connect(self.new)
@@ -234,8 +304,8 @@ class ImgOccEdit(QDialog):
         # Tab 1
         vbox1 = QVBoxLayout()
 
-        svg_edit_loader = QLabel("Loading...")
-        svg_edit_loader.setAlignment(Qt.AlignCenter)
+        svg_edit_loader = QLabel(_("Loading..."))
+        svg_edit_loader.setAlignment(Qt.AlignmentFlag.AlignCenter)
         loader_icon = os.path.join(ICONS_PATH, "loader.gif")
         anim = QMovie(loader_icon)
         svg_edit_loader.setMovie(anim)
@@ -256,13 +326,11 @@ class ImgOccEdit(QDialog):
         tab1.setLayout(vbox1)
         self.tab2.setLayout(self.vbox2)
         self.tab_widget = QTabWidget()
-        self.tab_widget.setFocusPolicy(Qt.ClickFocus)
-        self.tab_widget.addTab(tab1, "&Masks Editor")
-        self.tab_widget.addTab(self.tab2, "&Fields")
-        self.tab_widget.setTabToolTip(
-            1, "Include additional information (optional)")
-        self.tab_widget.setTabToolTip(
-            0, "Create image occlusion masks (required)")
+        self.tab_widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        self.tab_widget.addTab(tab1, _("&Masks Editor"))
+        self.tab_widget.addTab(self.tab2, _("&Fields"))
+        self.tab_widget.setTabToolTip(1, _("Include additional information (optional)"))
+        self.tab_widget.setTabToolTip(0, _("Create image occlusion masks (required)"))
 
         # Main Window
         vbox_main = QVBoxLayout()
@@ -278,23 +346,23 @@ class ImgOccEdit(QDialog):
 
         # Field focus hotkeys
         for i in range(1, 10):
-            QShortcut(QKeySequence("Ctrl+%i" % i),
-                      self).activated.connect(lambda f=i-1: self.focusField(f))
+            QShortcut(QKeySequence("Ctrl+%i" % i), self).activated.connect(
+                lambda f=i - 1: self.focusField(f)
+            )
         # Other hotkeys
-        QShortcut(QKeySequence("Ctrl+Return"),
-                  self).activated.connect(lambda: self.defaultAction(True))
-        QShortcut(QKeySequence("Ctrl+Shift+Return"),
-                  self).activated.connect(lambda: self.addOA(True))
-        QShortcut(QKeySequence("Ctrl+Tab"),
-                  self).activated.connect(self.switchTabs)
-        QShortcut(QKeySequence("Ctrl+r"),
-                  self).activated.connect(self.resetMainFields)
-        QShortcut(QKeySequence("Ctrl+Shift+r"),
-                  self).activated.connect(self.resetAllFields)
-        QShortcut(QKeySequence("Ctrl+Shift+t"),
-                  self).activated.connect(self.focusTags)
-        QShortcut(QKeySequence("Ctrl+f"),
-                  self).activated.connect(self.fitImageCanvas)
+        QShortcut(QKeySequence("Ctrl+Return"), self).activated.connect(
+            lambda: self.defaultAction(True)
+        )
+        QShortcut(QKeySequence("Ctrl+Shift+Return"), self).activated.connect(
+            lambda: self.addOA(True)
+        )
+        QShortcut(QKeySequence("Ctrl+Tab"), self).activated.connect(self.switchTabs)
+        QShortcut(QKeySequence("Ctrl+r"), self).activated.connect(self.resetMainFields)
+        QShortcut(QKeySequence("Ctrl+Shift+r"), self).activated.connect(
+            self.resetAllFields
+        )
+        QShortcut(QKeySequence("Ctrl+Shift+t"), self).activated.connect(self.focusTags)
+        QShortcut(QKeySequence("Ctrl+f"), self).activated.connect(self.fitImageCanvas)
 
     # Various actions that act on / interact with the ImgOccEdit UI:
 
@@ -303,6 +371,7 @@ class ImgOccEdit(QDialog):
     def changeImage(self):
         self.imgoccadd.onChangeImage()
         self.fitImageCanvas()
+        self.fitImageCanvas(delay=100)
 
     def defaultAction(self, close):
         if self.mode == "add":
@@ -317,11 +386,11 @@ class ImgOccEdit(QDialog):
         self.imgoccadd.onAddNotesButton("oa", close)
 
     def new(self, close=False):
-        choice = self.occl_tp_select.currentText()
+        choice = self.occl_tp_select.currentData()
         self.imgoccadd.onAddNotesButton(choice, close)
 
     def editNote(self):
-        choice = self.occl_tp_select.currentText()
+        choice = self.occl_tp_select.currentData()
         self.imgoccadd.onEditNotesButton(choice)
 
     def onHelp(self):
@@ -355,7 +424,7 @@ class ImgOccEdit(QDialog):
         self.tlabel = {}
         self.flds = flds
         for i in flds:
-            if i['name'] in self.ioflds_priv:
+            if i["name"] in self.ioflds_priv:
                 continue
             hbox = QHBoxLayout()
             tedit = QPlainTextEdit()
@@ -391,21 +460,21 @@ class ImgOccEdit(QDialog):
                 i.hide()
             for i in hide_on_edit:
                 i.show()
-            dl_txt = "Deck"
-            ttl = "Image Occlusion Enhanced - Add Mode"
-            bl_txt = "Add Cards:"
+            dl_txt = _("Deck")
+            ttl = _("Image Occlusion Enhanced - Add Mode")
+            bl_txt = _("Add Cards:")
         else:
             for i in hide_on_add:
                 i.show()
             for i in hide_on_edit:
                 i.hide()
-            for i in self.sconf['skip']:
+            for i in self.sconf["skip"]:
                 if i in list(self.tedit.keys()):
                     self.tedit[i].hide()
                     self.tlabel[i].hide()
-            dl_txt = "Deck for <i>Add new cards</i>"
-            ttl = "Image Occlusion Enhanced - Editing Mode"
-            bl_txt = "Type:"
+            dl_txt = _("Deck for <i>Add new cards</i>")
+            ttl = _("Image Occlusion Enhanced - Editing Mode")
+            bl_txt = _("Type:")
         self.deckChooser.deckLabel.setText(dl_txt)
         self.setWindowTitle(ttl)
         self.bottom_label.setText(bl_txt)
@@ -452,7 +521,7 @@ class ImgOccEdit(QDialog):
     def resetMainFields(self):
         """Reset all fields aside from sticky ones"""
         for i in self.flds:
-            fn = i['name']
+            fn = i["name"]
             if fn in self.ioflds_priv or fn in self.ioflds_prsv:
                 continue
             self.tedit[fn].setPlainText("")
@@ -463,9 +532,11 @@ class ImgOccEdit(QDialog):
         for i in self.ioflds_prsv:
             self.tedit[i].setPlainText("")
 
-    def fitImageCanvas(self):
-        self.svg_edit.eval("""
-                           setTimeout(function(){
-                               svgCanvas.zoomChanged('', 'canvas');
-                           }, 5)
-                           """)
+    def fitImageCanvas(self, delay: int = 5):
+        self.svg_edit.eval(
+            f"""
+setTimeout(function(){{
+    svgCanvas.zoomChanged('', 'canvas');
+}}, {delay})
+"""
+        )

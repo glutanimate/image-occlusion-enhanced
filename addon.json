@@ -11,5 +11,7 @@
     "conflicts": [],
     "targets": [
         "anki21"
-    ]
+    ],
+    "min_anki_version": "2.1.50",
+    "tested_anki_version": "2.1.50"
 }
