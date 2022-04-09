@@ -35,8 +35,6 @@ Generates the actual IO notes and writes them to
 the collection.
 """
 
-import logging
-
 from aqt import mw
 from aqt.utils import tooltip
 from anki.notes import Note
@@ -48,6 +46,7 @@ from .dialogs import ioAskUser
 from .utils import path_to_img_element
 from .config import *
 from .lang import _, ngettext
+from .logger import logger
 
 # Explanation of some of the variables:
 #
@@ -161,16 +160,16 @@ class ImgOccNoteGenerator(object):
         image_path = mw.col.media.add_file(self.image_path)
         img = path_to_img_element(image_path)
 
-        logging.debug("mnode_indexes %s", self.mnode_indexes)
+        logger.debug("mnode_indexes %s", self.mnode_indexes)
         for nr, idx in enumerate(self.mnode_indexes):
-            logging.debug("=====================")
-            logging.debug("nr %s", nr)
-            logging.debug("idx %s", idx)
+            logger.debug("=====================")
+            logger.debug("nr %s", nr)
+            logger.debug("idx %s", idx)
             note_id = self.mnode_ids[idx]
-            logging.debug("note_id %s", note_id)
-            logging.debug("self.nids %s", self.nids)
+            logger.debug("note_id %s", note_id)
+            logger.debug("self.nids %s", self.nids)
             nid = self.nids[note_id]
-            logging.debug("nid %s", nid)
+            logger.debug("nid %s", nid)
             if omask_path:
                 self._saveMaskAndReturnNote(
                     omask_path, qmasks[nr], amasks[nr], img, note_id, nid
@@ -280,7 +279,7 @@ class ImgOccNoteGenerator(object):
     def _findByNoteId(self, note_id):
         """Search collection for notes with given ID"""
         query = '"%s:%s*"' % (self.ioflds["id"], note_id)
-        logging.debug("query %s", query)
+        logger.debug("query %s", query)
         res = mw.col.findNotes(query)
         return res
 
@@ -292,9 +291,9 @@ class ImgOccNoteGenerator(object):
         for nid in res:
             note_id = mw.col.getNote(nid)[self.ioflds["id"]]
             self.nids[note_id] = nid
-        logging.debug("--------------------")
-        logging.debug("res %s", res)
-        logging.debug("nids %s", self.nids)
+        logger.debug("--------------------")
+        logger.debug("res %s", res)
+        logger.debug("nids %s", self.nids)
 
     def _deleteAndIdNotes(self, mlayer_node):
         """
@@ -337,16 +336,16 @@ class ImgOccNoteGenerator(object):
         # set notes of missing masks on svg to be deleted
         deleted_nids = [nids[x] for x in deleted_note_ids]
 
-        logging.debug("--------------------")
-        logging.debug("valid_mnode_note_ids %s", valid_mnode_note_ids)
-        logging.debug("exstg_mnode_note_nrs %s", exstg_mnode_note_nrs)
-        logging.debug("max_mnode_note_nr %s", max_mnode_note_nr)
-        logging.debug("full_range %s", full_range)
-        logging.debug("available_nrs %s", available_nrs)
-        logging.debug("--------------------")
-        logging.debug("valid_nid_note_ids %s", valid_nid_note_ids)
-        logging.debug("deleted_note_ids %s", deleted_note_ids)
-        logging.debug("deleted_nids %s", deleted_nids)
+        logger.debug("--------------------")
+        logger.debug("valid_mnode_note_ids %s", valid_mnode_note_ids)
+        logger.debug("exstg_mnode_note_nrs %s", exstg_mnode_note_nrs)
+        logger.debug("max_mnode_note_nr %s", max_mnode_note_nr)
+        logger.debug("full_range %s", full_range)
+        logger.debug("available_nrs %s", available_nrs)
+        logger.debug("--------------------")
+        logger.debug("valid_nid_note_ids %s", valid_nid_note_ids)
+        logger.debug("deleted_note_ids %s", deleted_note_ids)
+        logger.debug("deleted_nids %s", deleted_nids)
 
         # add note_id to missing shapes
         note_nr_max = max_mnode_note_nr
@@ -375,17 +374,17 @@ class ImgOccNoteGenerator(object):
                 mnode.setAttribute("id", new_mnode_id)
                 self.mnode_ids[idx] = new_mnode_id
 
-            logging.debug("=====================")
-            logging.debug("nr %s", nr)
-            logging.debug("idx %s", idx)
-            logging.debug("mnode_id %s", mnode_id)
-            logging.debug("available_nrs %s", available_nrs)
-            logging.debug("note_nr_max %s", note_nr_max)
-            logging.debug("new_mnode_id %s", new_mnode_id)
+            logger.debug("=====================")
+            logger.debug("nr %s", nr)
+            logger.debug("idx %s", idx)
+            logger.debug("mnode_id %s", mnode_id)
+            logger.debug("available_nrs %s", available_nrs)
+            logger.debug("note_nr_max %s", note_nr_max)
+            logger.debug("new_mnode_id %s", new_mnode_id)
 
-        logging.debug("--------------------")
-        logging.debug("edited nids %s", nids)
-        logging.debug("edited self.mnode_ids %s", self.mnode_ids)
+        logger.debug("--------------------")
+        logger.debug("edited nids %s", nids)
+        logger.debug("edited self.mnode_ids %s", self.mnode_ids)
 
         if del_count or new_count:
             q = _(
@@ -449,7 +448,7 @@ class ImgOccNoteGenerator(object):
 
     def _saveMask(self, mask, note_id, mtype):
         """Write mask to file in media collection"""
-        logging.debug(
+        logger.debug(
             _("!saving %(note_id)s, %(mtype)s"), {"note_id": note_id, "mtype": mtype}
         )
         mask_filename = "%s-%s.svg" % (note_id, mtype)
@@ -500,10 +499,10 @@ class ImgOccNoteGenerator(object):
 
         if nid:
             note.flush()
-            logging.debug("!noteflush %s", note)
+            logger.debug("!noteflush %s", note)
         else:
             mw.col.addNote(note)
-            logging.debug("!notecreate %s", note)
+            logger.debug("!notecreate %s", note)
 
 
 # Different generator subclasses for different occlusion types:

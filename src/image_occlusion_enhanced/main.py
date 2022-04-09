@@ -34,7 +34,6 @@
 Sets up buttons and menus and calls other modules.
 """
 
-import logging
 import sys
 from typing import TYPE_CHECKING, Optional
 
@@ -60,8 +59,6 @@ if TYPE_CHECKING:
     from aqt.main import AnkiQt
     from aqt.qt import QWebEngineContextMenuRequest
     from aqt.editor import EditorWebView
-
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 
 def on_io_settings():

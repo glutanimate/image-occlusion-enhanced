@@ -34,8 +34,6 @@
 Main options dialog
 """
 
-import logging
-
 from anki.errors import AnkiError
 from aqt import mw
 from aqt.qt import (
@@ -61,6 +59,7 @@ from aqt.utils import showInfo
 
 from .config import *
 from .lang import _
+from .logger import logger
 
 
 class GrabKey(QDialog):
@@ -397,7 +396,7 @@ class ImgOccOpts(QDialog):
                 # update imgocc field-id <-> field-name assignment
                 mw.col.conf["imgocc"]["flds"][key] = name
                 modified = True
-                logging.debug(
+                logger.debug(
                     _("Renamed %(old_name)s, %(new_name)s"),
                     {"old_name": oldname, "new_name": name},
                 )
