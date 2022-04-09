@@ -35,6 +35,7 @@ Image Occlusion editor dialog
 """
 
 import os
+from typing import Optional
 
 from anki.hooks import addHook, remHook
 from aqt import deckchooser, mw, tagedit, webview
@@ -220,11 +221,10 @@ class ImgOccEdit(QDialog):
         )
 
         image_tt = _(
-            "Switch to a different image while preserving all of "
-            "the shapes and fields"
+            "Switch to a different image while preserving all of the shapes and fields"
         )
         dc_tt = _("Preserve existing occlusion type")
-        edit_tt = _("Edit all cards using current mask shapes and field " "entries")
+        edit_tt = _("Edit all cards using current mask shapes and field entries")
         new_tt = _("Create new batch of cards without editing existing ones")
         ao_tt = _(
             "Generate cards with nonoverlapping information, where all"
@@ -343,7 +343,7 @@ class ImgOccEdit(QDialog):
 
     def changeImage(self):
         self.imgoccadd.onChangeImage()
-        self.fitImageCanvas()
+        self.fitImageCanvas(delay=100)
 
     def defaultAction(self, close):
         if self.mode == "add":
@@ -504,11 +504,12 @@ class ImgOccEdit(QDialog):
         for i in self.ioflds_prsv:
             self.tedit[i].setPlainText("")
 
-    def fitImageCanvas(self):
+    def fitImageCanvas(self, delay: int = 5):
         self.svg_edit.eval(
-            """
-                           setTimeout(function(){
-                               svgCanvas.zoomChanged('', 'canvas');
-                           }, 5)
-                           """
+            f"""
+console.log("fitting-to-canvas");
+setTimeout(function(){{
+    svgCanvas.zoomChanged('', 'canvas');
+}}, {delay})
+"""
         )
