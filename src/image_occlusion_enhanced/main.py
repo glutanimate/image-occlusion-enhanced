@@ -34,7 +34,6 @@
 Sets up buttons and menus and calls other modules.
 """
 
-import logging
 import sys
 from typing import TYPE_CHECKING, Optional
 

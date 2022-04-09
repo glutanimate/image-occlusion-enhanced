@@ -46,7 +46,7 @@ from .dialogs import ioAskUser
 from .utils import path_to_img_element
 from .config import *
 from .lang import _, ngettext
-from .logging import logger
+from .logger import logger
 
 # Explanation of some of the variables:
 #

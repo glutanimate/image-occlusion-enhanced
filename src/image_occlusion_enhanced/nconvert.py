@@ -42,7 +42,7 @@ from xml.dom import minidom
 from .config import *
 from .dialogs import ioAskUser
 from .utils import img_element_to_path, path_to_img_element
-from .logging import logger
+from .logger import logger
 
 class ImgOccNoteConverter(object):
     def __init__(self, browser):

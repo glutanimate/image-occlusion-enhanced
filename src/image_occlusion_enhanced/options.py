@@ -59,7 +59,7 @@ from aqt.utils import showInfo
 
 from .config import *
 from .lang import _
-from .logging import logger
+from .logger import logger
 
 
 class GrabKey(QDialog):
