@@ -35,7 +35,8 @@ Sets up logging.
 """
 
 import logging
-
+import sys
 
 logger = logging.getLogger("image_occlusion_enhanced")
+logger.addHandler(logging.StreamHandler(sys.stdout))
 logger.setLevel(logging.ERROR)
