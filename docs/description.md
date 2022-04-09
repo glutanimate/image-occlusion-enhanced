@@ -4,29 +4,21 @@ Image Occlusion lets you create cards that **hide parts of an image** to test yo
 
 ![](https://raw.githubusercontent.com/glutanimate/image-occlusion-enhanced/master/screenshots/ankiweb.png)
 
-### IMPORTANT
-
-This is a test release of Image Occlusion Enhanced for Anki 2.1. Please make sure to carefully read through this description and familiarize yourself with the official Anki 2.1 change notes notes before giving the add-on a try.
-
-The present AnkiWeb upload is temporary and will be removed in favor of the [regular add-on listing](https://ankiweb.net/shared/info/1111933094) once testing is complete.
-
 <!-- CHANGELOG -->
 
-### LIMITATIONS OF THIS ALPHA RELEASE
+### KNOWN ISSUES
 
-There are a number of known limitations to this alpha release that you need to be aware of:
-
-- Due to compatibility issues between SVG-Edit and the new Chromium renderer in Anki 2.1, some of the features in the masks editor no longer work correctly. My hope is to address these in the following beta release:
+- Due to compatibility issues between SVG-Edit and newer versions of Anki, some of the features in the masks editor no longer work correctly. My hope is to address these soon:
     + [Pointer not changing to selection mode when clicking on shape](https://github.com/glutanimate/image-occlusion-enhanced/issues/54)
     + [Path tool no longer working](https://github.com/glutanimate/image-occlusion-enhanced/issues/56)
-    + [https://github.com/glutanimate/image-occlusion-enhanced/issues/57](https://github.com/glutanimate/image-occlusion-enhanced/issues/57)
-- Please do not invoke the add-on's settings menu while the I/O Editor is running. There is currently no support for updating I/O editing sessions at runtime, and while most settings will simply only not be applied, others might cause the add-on to stop working correctly until the editor session is restarted. The same applies to modifications to the add-on's note type via Anki's built-in note type manager.
+    + [Shape library tool no longer working](https://github.com/glutanimate/image-occlusion-enhanced/issues/57)
+- Please do not invoke the add-on's settings menu while the IO Editor window is still open. The same applies to modifying the Image Occlusion note type while an IO session is open. Both can cause trouble.
 
-Of course there also bound to be some unforeseen bugs and regressions in the alpha. If you experience any of these please make sure to either report them on the add-on's [bug tracker](https://github.com/glutanimate/image-occlusion-enhanced/issues) or in the [official support thread](https://anki.tenderapp.com/discussions/add-ons/8295-image-occlusion-enhanced-official-thread). Any and all feedback is appreciated!
+For any other issues you encounter please don't hesitate to a file a bug report on the [official bug tracker](https://github.com/glutanimate/image-occlusion-enhanced/issues) (preferred) or post on the [official support thread](https://forums.ankiweb.net/t/image-occlusion-enhanced-official-support-thread/924/52). Your feedback is very much appreciated and welcome!
 
 ### USAGE
 
-The use of this add-on is detailed in the [Wiki](https://github.com/Glutanimate/image-occlusion-enhanced/wiki) and a [series of video tutorials on YouTube](https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o). Please note that most of these resources have yet to be updated for Anki 2.1, and as such might not cover recent releases of the add-on fully.
+The use of this add-on is detailed in the [Wiki](https://github.com/Glutanimate/image-occlusion-enhanced/wiki) and a [series of video tutorials on YouTube](https://www.youtube.com/playlist?list=PL3MozITKTz5YFHDGB19ypxcYfJ1ITk_6o). Some of the screencasts and screenshots here were recorded on older versions of Anki and the add-on, but all the key usage tips should still apply.
 
 <!-- SUPPORT -->
 
