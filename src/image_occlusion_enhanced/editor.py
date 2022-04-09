@@ -343,6 +343,7 @@ class ImgOccEdit(QDialog):
 
     def changeImage(self):
         self.imgoccadd.onChangeImage()
+        self.fitImageCanvas()
         self.fitImageCanvas(delay=100)
 
     def defaultAction(self, close):
@@ -507,7 +508,6 @@ class ImgOccEdit(QDialog):
     def fitImageCanvas(self, delay: int = 5):
         self.svg_edit.eval(
             f"""
-console.log("fitting-to-canvas");
 setTimeout(function(){{
     svgCanvas.zoomChanged('', 'canvas');
 }}, {delay})

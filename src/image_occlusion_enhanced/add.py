@@ -265,7 +265,9 @@ class ImgOccAdd(object):
 
             def onSvgEditLoaded():
                 dialog.showSvgEdit(True)
-                dialog.fitImageCanvas(200)
+                # TODO: find better solution
+                dialog.fitImageCanvas()
+                dialog.fitImageCanvas(delay=200)
 
         else:
             # modal dialog when editing
@@ -276,7 +278,8 @@ class ImgOccAdd(object):
                 if self.opref["occl_tp"] == "aa":
                     ioInfo("obsolete_aa", parent=dialog)
                 dialog.showSvgEdit(True)
-                dialog.fitImageCanvas(200)
+                dialog.fitImageCanvas()
+                dialog.fitImageCanvas(delay=200)
 
         dialog.svg_edit.runOnLoaded(onSvgEditLoaded)
         dialog.visible = True
