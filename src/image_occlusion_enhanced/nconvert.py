@@ -33,8 +33,6 @@
 Makes older IO notes editable.
 """
 
-import logging
-
 from anki.hooks import addHook
 from aqt.utils import tooltip
 from .lang import _
@@ -44,7 +42,7 @@ from xml.dom import minidom
 from .config import *
 from .dialogs import ioAskUser
 from .utils import img_element_to_path, path_to_img_element
-
+from .logging import logger
 
 class ImgOccNoteConverter(object):
     def __init__(self, browser):
@@ -62,20 +60,20 @@ class ImgOccNoteConverter(object):
             note = mw.col.getNote(nid)
             (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
             if uniq_id == False:
-                logging.debug("Skipping note that couldn't be parsed: %s", nid)
+                logger.debug("Skipping note that couldn't be parsed: %s", nid)
                 skipped += 1
                 continue
             occl_tp = self.getOcclTypeAndNodes(note)
             occl_id = uniq_id + "-" + occl_tp
             if occl_id == self.occl_id_last:
-                logging.debug("Skipping note that we've just converted: %s", nid)
+                logger.debug("Skipping note that we've just converted: %s", nid)
                 continue
             self.occl_id_last = occl_id
             for nid in self.findByNoteId(uniq_id):
                 note = mw.col.getNote(nid)
                 (uniq_id, note_nr) = self.getDataFromNamingScheme(note)
                 if uniq_id == False:
-                    logging.debug("Skipping note that couldn't be parsed: %s", nid)
+                    logger.debug("Skipping note that couldn't be parsed: %s", nid)
                     skipped += 1
                     continue
                 nids_by_nr[int(note_nr)] = nid
@@ -99,18 +97,18 @@ class ImgOccNoteConverter(object):
         for nid in nids:
             note = mw.col.getNote(nid)
             if note.model() != self.model:
-                logging.debug("Skipping note with wrong note type: %s", nid)
+                logger.debug("Skipping note with wrong note type: %s", nid)
                 filtered += 1
                 continue
             elif note[self.ioflds["id"]]:
-                logging.debug("Skipping IO note that is already editable: %s", nid)
+                logger.debug("Skipping IO note that is already editable: %s", nid)
                 filtered += 1
                 continue
             elif not note[self.ioflds["om"]]:
-                logging.debug("Skipping IO note without original SVG mask: %s", nid)
+                logger.debug("Skipping IO note without original SVG mask: %s", nid)
                 filtered += 1
                 continue
-            logging.debug("Found IO note in need of update: %s", nid)
+            logger.debug("Found IO note in need of update: %s", nid)
             io_nids.append(nid)
         return (io_nids, filtered)
 
@@ -118,7 +116,7 @@ class ImgOccNoteConverter(object):
         """Search collection for notes with given ID in their omask paths"""
         # need to use omask path because Note ID field is not yet set
         query = '"%s:*%s*"' % (self.ioflds["om"], note_id)
-        logging.debug("query: %s", query)
+        logger.debug("query: %s", query)
         res = mw.col.findNotes(query)
         return res
 
@@ -131,11 +129,11 @@ class ImgOccNoteConverter(object):
         grps = path.split("_")
         try:
             if len(grps) == 2:
-                logging.debug("Extracting data using IO 2.0 naming scheme")
+                logger.debug("Extracting data using IO 2.0 naming scheme")
                 uniq_id = grps[0]
                 note_nr = path.split(" ")[1].split(".")[0]
             else:
-                logging.debug("Extracting data using IO Enhanced naming scheme")
+                logger.debug("Extracting data using IO Enhanced naming scheme")
                 grps = path.split("-")
                 uniq_id = grps[0]
                 note_nr = int(grps[2]) - 1
@@ -145,9 +143,9 @@ class ImgOccNoteConverter(object):
 
     def idAndCorrelateNotes(self, nids_by_nr, occl_id):
         """Update Note ID fields and omasks of all occlusion session siblings"""
-        logging.debug("occl_id %s", occl_id)
-        logging.debug("nids_by_nr %s", nids_by_nr)
-        logging.debug("mnode_idxs %s", self.mnode_idxs)
+        logger.debug("occl_id %s", occl_id)
+        logger.debug("nids_by_nr %s", nids_by_nr)
+        logger.debug("mnode_idxs %s", self.mnode_idxs)
 
         for nr in sorted(nids_by_nr.keys()):
             try:
@@ -160,22 +158,22 @@ class ImgOccNoteConverter(object):
             self.mnode.childNodes[midx].setAttribute("id", new_mnode_id)
             note[self.ioflds["id"]] = new_mnode_id
             note.flush()
-            logging.debug("Adding ID for note nr %s", nr)
-            logging.debug("midx %s", midx)
-            logging.debug("nid %s", nid)
-            logging.debug("note %s", note)
-            logging.debug("new_mnode_id %s", new_mnode_id)
+            logger.debug("Adding ID for note nr %s", nr)
+            logger.debug("midx %s", midx)
+            logger.debug("nid %s", nid)
+            logger.debug("note %s", note)
+            logger.debug("new_mnode_id %s", new_mnode_id)
 
         new_svg = self.svg_node.toxml()
         omask_path = self._saveMask(new_svg, occl_id, "O")
-        logging.debug("omask_path %s", omask_path)
+        logger.debug("omask_path %s", omask_path)
 
         for nid in list(nids_by_nr.values()):
             note = mw.col.getNote(nid)
             note[self.ioflds["om"]] = path_to_img_element(omask_path)
             note.addTag(".io-converted")
             note.flush()
-            logging.debug("Setting om and tag for nid %s", nid)
+            logger.debug("Setting om and tag for nid %s", nid)
 
     def getOcclTypeAndNodes(self, note):
         """Determine oclusion type and svg mask nodes"""
@@ -230,7 +228,7 @@ class ImgOccNoteConverter(object):
 
     def _saveMask(self, mask, note_id, mtype):
         """Write mask to file in media collection"""
-        logging.debug(
+        logger.debug(
             _("!saving %(node_id)s, %(mtype)s"), {"node_id": node_id, "mtype": mtype}
         )
         mask_filename = "%s-%s.svg" % (note_id, mtype)

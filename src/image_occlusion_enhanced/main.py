@@ -61,8 +61,6 @@ if TYPE_CHECKING:
     from aqt.qt import QWebEngineContextMenuRequest
     from aqt.editor import EditorWebView
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
-
 
 def on_io_settings():
     """Call settings dialog if Editor not active"""

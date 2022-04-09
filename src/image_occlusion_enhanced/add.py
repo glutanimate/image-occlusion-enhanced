@@ -49,6 +49,7 @@ from .editor import ImgOccEdit
 from .lang import _
 from .ngen import *
 from .utils import get_image_dimensions, img_element_to_path, path_to_url
+from .logger import logger
 
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__), "svg-edit", "editor")
@@ -224,7 +225,7 @@ class ImgOccAdd(object):
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
-        logging.debug("Launching new ImgOccEdit instance")
+        logger.debug("Launching new ImgOccEdit instance")
 
         url = QUrl.fromLocalFile(svg_edit_path)
         items = QUrlQuery()
