@@ -12,6 +12,30 @@ If you enjoy Image Occlusion Enhanced, please consider supporting my work on Pat
 
 ## [Unreleased]
 
+**IMPORTANT**: This release is only compatible with Anki 2.1.50 and up. If you are on an earlier Anki release, copying the add-on code below into the app will automatically download a compatible version of the add-on for you, so there are no extra steps you have to take. Just be aware that going forward, new features and fixes will likely only be available for Anki 2.1.50 and up.
+
+Still, as of writing this changelog (2022-04-09), unless you have a strong reason to switch to 2.1.50, I would recommend to hold off from upgrading until things around the release have settled a bit more.
+
+### Added
+
+- Added support for Anki 2.1.50 and up. Both Qt6 and Qt5 builds are supported. On Apple silicon the add-on now benefits from the performance improvements that Anki's native Qt6 build provides.
+- Added a confirmation prompt when attempting to close the window via Escape when there are unsaved changes present.
+
+### Fixed
+
+- Fixed instances of cards being saved to the wrong deck (and thus seemingly going missing).
+- Fixed instances of images not being automatically resized to the canvas upon launching IO
+
+### Changes
+
+- When creating occlusions from images in the clipboard, the add-on will now follow Anki's preferences to determine whether to save images as PNG or JPG files (thanks to @zjosua), with JPG being the default. JPG files are smaller and thus make syncs quicker, but come with a small quality penalty. If you prefer using PNG files you can change the add-on's behavior by heading to Anki's main preferences under Tools → Preferences and setting the checkmark at "Paste clipboard images as PNG".
+
+### Other changes
+
+- [Development] Reworked project dependency management, making it easier to set Image Occlusion up for development
+- Set some of the foundations for potentially adding locale support in the future (thanks to @5hir0kur0 and @Polymehr!)
+- Other fixes and improvements thanks to @zjosua, @Arthur-Milchior, @telotortium, and @davidculley
+
 ## [1.3.0-alpha6] - 2020-04-28
 
 ### [Download](https://github.com/glutanimate/image-occlusion-enhanced/releases/tag/v1.3.0-alpha6)
