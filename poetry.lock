@@ -1,6 +1,6 @@
 [[package]]
 name = "aab"
-version = "1.0.0-dev.4"
+version = "1.0.0-dev.5"
 description = "Anki Add-on Builder"
 category = "dev"
 optional = false
@@ -18,8 +18,8 @@ qt5 = ["PyQt5 (>=5.12,<6.0)"]
 [package.source]
 type = "git"
 url = "https://github.com/glutanimate/anki-addon-builder.git"
-reference = "v1.0.0-dev.4"
-resolved_reference = "a4565ca8952ff14434c13e066752288c6b7935a7"
+reference = "v1.0.0-dev.5"
+resolved_reference = "edd4f8fc0d80cff0acb6ecfac0affabea307f8a9"
 
 [[package]]
 name = "anki"
@@ -675,7 +675,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9.7"
-content-hash = "ce0d1056388fa95dc8e734478972ab60e423dddd6adb4d6c32785651da939fc2"
+content-hash = "19cbd1a2366398592384a0adcd842ae405f1943311e5cdff183378dab5b81ed5"
 
 [metadata.files]
 aab = []
