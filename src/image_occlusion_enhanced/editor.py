@@ -141,6 +141,9 @@ class ImgOccEdit(QDialog):
             addHook("unloadProfile", self.onProfileUnload)
 
     def closeEvent(self, event):
+        self._on_close()
+
+    def _on_close(self):
         if mw.pm.profile is not None:
             self.deckChooser.cleanup()
             saveGeom(self, "imgoccedit")
@@ -172,7 +175,7 @@ class ImgOccEdit(QDialog):
             " changes.",
             title="Exit Image Occlusion?",
         ):
-            return super().reject()
+            self._on_close()
 
     def _input_modified(self) -> bool:
         tags_modified = self.tags_edit.isModified()
