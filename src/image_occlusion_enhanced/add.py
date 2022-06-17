@@ -339,7 +339,7 @@ class ImgOccAdd(object):
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(
-            self.ed, svg, self.image_path, self.opref, tags, fields, did
+            self.ed, self, svg, self.image_path, self.opref, tags, fields, did
         )
         r = gen.generateNotes()
         if r is False:
@@ -380,7 +380,7 @@ class ImgOccAdd(object):
 
         noteGenerator = genByKey(choice, old_occl_tp)
         gen = noteGenerator(
-            self.ed, svg, self.image_path, self.opref, tags, fields, did
+            self.ed, self, svg, self.image_path, self.opref, tags, fields, did
         )
         r = gen.updateNotes()
         if r is False:

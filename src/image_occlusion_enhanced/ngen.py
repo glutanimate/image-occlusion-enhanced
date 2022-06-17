@@ -77,8 +77,9 @@ class ImgOccNoteGenerator(object):
 
     stripattr = ["opacity", "stroke-opacity", "fill-opacity"]
 
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
+    def __init__(self, ed, imgoccadd, svg, image_path, opref, tags, fields, did):
         self.ed = ed
+        self.imgoccadd = imgoccadd
         self.new_svg = svg
         self.image_path = image_path
         self.opref = opref
@@ -112,9 +113,11 @@ class ImgOccNoteGenerator(object):
         mw.checkpoint("Adding Image Occlusion Cards")
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
-            self._saveMaskAndReturnNote(
+            note = self._saveMaskAndReturnNote(
                 omask_path, qmasks[nr], amasks[nr], img, note_id
             )
+            if self.imgoccadd.origin == "addcards":
+                self.ed.parentWindow.addHistory(note)
         tooltip(
             ngettext(
                 "One card <b>added</b>", "{card_count} cards <b>added</b>", len(qmasks)
@@ -504,6 +507,7 @@ class ImgOccNoteGenerator(object):
             mw.col.addNote(note)
             logger.debug("!notecreate %s", note)
 
+        return note
 
 # Different generator subclasses for different occlusion types:
 
@@ -515,11 +519,6 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
     """
 
     occl_tp = "ao"
-
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
-        ImgOccNoteGenerator.__init__(
-            self, ed, svg, image_path, opref, tags, fields, did
-        )
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         mask_node = mlayer_node.childNodes[mask_node_index]
@@ -536,11 +535,6 @@ class IoGenHideOneRevealAll(ImgOccNoteGenerator):
     """
 
     occl_tp = "oa"
-
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
-        ImgOccNoteGenerator.__init__(
-            self, ed, svg, image_path, opref, tags, fields, did
-        )
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         for i in reversed(self.mnode_indexes):
