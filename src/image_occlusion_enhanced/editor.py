@@ -297,6 +297,7 @@ class ImgOccEdit(QDialog):
 
         # Button row
         bottom_hbox = QHBoxLayout()
+        bottom_hbox.setContentsMargins(10, 0, 10, 10)
         bottom_hbox.addWidget(image_btn)
         bottom_hbox.addWidget(help_btn)
         bottom_hbox.insertStretch(2, stretch=1)
@@ -306,6 +307,7 @@ class ImgOccEdit(QDialog):
 
         # Tab 1
         vbox1 = QVBoxLayout()
+        vbox1.setContentsMargins(0, 0, 0, 0)
 
         svg_edit_loader = QLabel(_("Loading..."))
         svg_edit_loader.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -325,10 +327,12 @@ class ImgOccEdit(QDialog):
 
         # Main Tab Widget
         tab1 = QWidget()
+        tab1.setContentsMargins(0, 0, 0, 0)
         self.tab2 = QWidget()
         tab1.setLayout(vbox1)
         self.tab2.setLayout(self.vbox2)
         self.tab_widget = QTabWidget()
+        self.tab_widget.setContentsMargins(0, 0, 0, 0)
         self.tab_widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.tab_widget.addTab(tab1, _("&Masks Editor"))
         self.tab_widget.addTab(self.tab2, _("&Fields"))
@@ -337,6 +341,7 @@ class ImgOccEdit(QDialog):
 
         # Main Window
         vbox_main = QVBoxLayout()
+        vbox_main.setContentsMargins(0, 5, 0, 5)
         vbox_main.addWidget(self.tab_widget)
         vbox_main.addLayout(bottom_hbox)
         self.setLayout(vbox_main)
