@@ -1,6 +1,8 @@
 # Linux FM
 .hidden
 .directory
+# macOS FM
+.DS_Store
 # Byte-compiled / optimized / DLL files
 *.pyo
 *.pyc
