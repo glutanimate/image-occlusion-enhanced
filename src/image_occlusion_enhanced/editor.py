@@ -225,9 +225,6 @@ class ImgOccEdit(QDialog):
         image_btn.setIcon(QIcon(os.path.join(ICONS_PATH, "add.png")))
         image_btn.setIconSize(QSize(16, 16))
         image_btn.setAutoDefault(False)
-        help_btn = QPushButton(_("&Help"))
-        help_btn.clicked.connect(self.onHelp)
-        help_btn.setAutoDefault(False)
 
         self.occl_tp_select = QComboBox()
         self.occl_tp_select.addItem(_("Don't Change"), "Don't Change")
@@ -245,6 +242,9 @@ class ImgOccEdit(QDialog):
         )
         self.oa_btn = button_box.addButton(
             _("Hide &One, Guess One"), QDialogButtonBox.ButtonRole.ActionRole
+        )
+        help_button = button_box.addButton(
+            _("&?"), QDialogButtonBox.ButtonRole.ActionRole
         )
         close_button = button_box.addButton(
             _("&Close"), QDialogButtonBox.ButtonRole.RejectRole
@@ -283,14 +283,20 @@ class ImgOccEdit(QDialog):
             self.new_btn,
             self.ao_btn,
             self.oa_btn,
+            help_button,
             close_button,
         ]:
             btn.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+            btn.setDefault(False)
+            btn.setAutoDefault(False)
+
+        # self.ao_btn.setDefault(True)
 
         self.edit_btn.clicked.connect(self.editNote)
         self.new_btn.clicked.connect(self.new)
         self.ao_btn.clicked.connect(self.addAO)
         self.oa_btn.clicked.connect(self.addOA)
+        help_button.clicked.connect(self.onHelp)
         close_button.clicked.connect(self.close)
 
         # Set basic layout up
@@ -299,8 +305,7 @@ class ImgOccEdit(QDialog):
         bottom_hbox = QHBoxLayout()
         bottom_hbox.setContentsMargins(10, 0, 10, 10)
         bottom_hbox.addWidget(image_btn)
-        bottom_hbox.addWidget(help_btn)
-        bottom_hbox.insertStretch(2, stretch=1)
+        bottom_hbox.insertStretch(1, stretch=1)
         bottom_hbox.addWidget(self.bottom_label)
         bottom_hbox.addWidget(self.occl_tp_select)
         bottom_hbox.addWidget(button_box)
