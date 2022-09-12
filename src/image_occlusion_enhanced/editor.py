@@ -148,6 +148,8 @@ class ImgOccEdit(QDialog):
             self.deckChooser.cleanup()
             saveGeom(self, "imgoccedit")
         self.visible = False
+        if hasattr(self.svg_edit, "cleanup"):  # 2.1.50+
+            self.svg_edit.cleanup()  # type: ignore
         self.svg_edit = None
         del self.svg_edit_anim  # might not be gc'd
         try:
