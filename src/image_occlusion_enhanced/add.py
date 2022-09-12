@@ -341,17 +341,26 @@ class ImgOccAdd(object):
         gen = noteGenerator(
             self.ed, svg, self.image_path, self.opref, tags, fields, did
         )
-        r = gen.generateNotes()
-        if r is False:
+        result = gen.generateNotes()
+        if result is False:
             return False
+        notes: list = result  # type: ignore
 
-        if self.origin == "addcards" and self.ed.note:
-            # Update Editor with modified tags and sources field
-            for i in self.ioflds_prsv:
-                if i in self.ed.note:
-                    self.ed.note[i] = fields[i]
-            self.ed.note.tags = tags
-            self.ed.loadNote()
+        if self.origin == "addcards":
+            try:
+                for note in notes:
+                    self.ed.parentWindow.addHistory(note)
+            except Exception as e:
+                print(e)
+                pass
+
+            if self.ed.note:
+                # Update Editor with modified tags and sources field
+                for i in self.ioflds_prsv:
+                    if i in self.ed.note:
+                        self.ed.note[i] = fields[i]
+                self.ed.note.tags = tags
+                self.ed.loadNote()
 
         if close:
             dialog.close()

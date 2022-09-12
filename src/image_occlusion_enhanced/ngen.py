@@ -35,18 +35,19 @@ Generates the actual IO notes and writes them to
 the collection.
 """
 
+import uuid
+from typing import Union
+from xml.dom import minidom
+
+from anki.notes import Note
 from aqt import mw
 from aqt.utils import tooltip
-from anki.notes import Note
 
-from xml.dom import minidom
-import uuid
-
-from .dialogs import ioAskUser
-from .utils import path_to_img_element
 from .config import *
+from .dialogs import ioAskUser
 from .lang import _, ngettext
 from .logger import logger
+from .utils import path_to_img_element
 
 # Explanation of some of the variables:
 #
@@ -89,9 +90,8 @@ class ImgOccNoteGenerator(object):
         self._media_path = mw.col.media.dir()
         loadConfig(self)
 
-    def generateNotes(self):
+    def generateNotes(self) -> Union[list, bool]:
         """Generate new notes"""
-        state = "default"
         self.uniq_id = str(uuid.uuid4()).replace("-", "")
         self.occl_id = "%s-%s" % (self.uniq_id, self.occl_tp)
 
@@ -110,18 +110,20 @@ class ImgOccNoteGenerator(object):
         img = path_to_img_element(image_path)
 
         mw.checkpoint("Adding Image Occlusion Cards")
+        notes = []
         for nr, idx in enumerate(self.mnode_indexes):
             note_id = self.mnode_ids[idx]
-            self._saveMaskAndReturnNote(
+            note = self._saveMaskAndReturnNote(
                 omask_path, qmasks[nr], amasks[nr], img, note_id
             )
+            notes.append(note)
         tooltip(
             ngettext(
                 "One card <b>added</b>", "{card_count} cards <b>added</b>", len(qmasks)
             ).format(card_count=len(qmasks)),
             parent=None,
         )
-        return state
+        return notes
 
     def updateNotes(self):
         """Update existing notes"""
@@ -504,6 +506,7 @@ class ImgOccNoteGenerator(object):
             mw.col.addNote(note)
             logger.debug("!notecreate %s", note)
 
+        return note
 
 # Different generator subclasses for different occlusion types:
 
@@ -515,11 +518,6 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
     """
 
     occl_tp = "ao"
-
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
-        ImgOccNoteGenerator.__init__(
-            self, ed, svg, image_path, opref, tags, fields, did
-        )
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         mask_node = mlayer_node.childNodes[mask_node_index]
@@ -536,11 +534,6 @@ class IoGenHideOneRevealAll(ImgOccNoteGenerator):
     """
 
     occl_tp = "oa"
-
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
-        ImgOccNoteGenerator.__init__(
-            self, ed, svg, image_path, opref, tags, fields, did
-        )
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         for i in reversed(self.mnode_indexes):
