@@ -153,7 +153,7 @@ class ImgOccEdit(QDialog):
         try:
             from aqt.gui_hooks import profile_will_close
 
-            profile_will_close.append(self.onProfileUnload)
+            profile_will_close.remove(self.onProfileUnload)
         except (ImportError, ModuleNotFoundError):
             remHook("unloadProfile", self.onProfileUnload)
         QDialog.reject(self)
