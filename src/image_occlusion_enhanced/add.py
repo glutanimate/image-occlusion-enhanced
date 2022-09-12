@@ -54,7 +54,7 @@ from .logger import logger
 # SVG-Edit configuration
 svg_edit_dir = os.path.join(os.path.dirname(__file__), "svg-edit", "editor")
 svg_edit_path = os.path.join(svg_edit_dir, "svg-editor.html")
-svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,ext-markers.js,ext-shapes.js,ext-eyedropper.js,ext-panning.js,ext-snapping.js"
+svg_edit_ext = "ext-image-occlusion.js,ext-arrows.js,ext-markers.js,ext-eyedropper.js,ext-panning.js,ext-snapping.js"
 svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [
     ("initStroke[opacity]", "1"),
