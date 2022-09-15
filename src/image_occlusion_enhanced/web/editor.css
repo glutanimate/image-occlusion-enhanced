@@ -31,10 +31,10 @@ Any modifications to this file must keep this entire header intact.
 */
 
 /* limit image display height */
-.ionote img {
+/* .ionote img {
   max-width: 90%;
   max-height: 160px;
-}
+} */
 /* hide ID field if marked as such via CSS class */
 .ionote .ionote-field-id {
   display: none;
