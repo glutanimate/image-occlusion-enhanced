@@ -114,10 +114,10 @@ def on_setup_editor_buttons(buttons, editor):
 
     if origin == "addcards":
         tt = _("Add Image Occlusion")
-        icon_name = "add.png"
+        icon_name = "add.svg"
     else:
         tt = _("Edit Image Occlusion")
-        icon_name = "edit.png"
+        icon_name = "edit.svg"
 
     icon = os.path.join(ICONS_PATH, icon_name)
 

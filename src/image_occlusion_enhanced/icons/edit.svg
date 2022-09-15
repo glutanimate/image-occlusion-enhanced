@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<style type="text/css">
+	.st0{display:none;}
+	.st1{display:inline;}
+	.st2{fill:none;stroke:#000000;stroke-width:0.9;stroke-linecap:round;stroke-miterlimit:10;}
+	.st3{fill:none;stroke:#000000;stroke-width:0.9;stroke-miterlimit:10;}
+	.st4{fill:none;stroke:#00BDFF;stroke-miterlimit:10;}
+	.st5{fill:#FFFFFF;stroke:#000000;stroke-width:0.9;stroke-linecap:round;stroke-miterlimit:10;}
+</style>
+<g id="Merged">
+	<g id="Base_copy_2">
+		<rect x="2.6" y="7" width="4.7" height="1.9"/>
+		<rect x="4.5" y="3.2" width="5" height="1.9"/>
+	</g>
+	<g id="Edit_copy_2">
+	</g>
+	<g id="Edit_copy_3" class="st0">
+		<g class="st1">
+			<path class="st2" d="M6.3,15.5l2-0.3c0.3,0,0.5-0.2,0.7-0.3l5.3-5.3l0.5-0.5c0.5-0.5,0.5-1.3,0-1.7l-0.3-0.3l-0.3-0.3
+				c-0.5-0.5-1.3-0.5-1.7,0L12,7.2l-5.3,5.3c-0.2,0.2-0.3,0.4-0.3,0.7l-0.3,2.1C6.1,15.4,6.2,15.6,6.3,15.5z"/>
+			<line class="st3" x1="12" y1="7.2" x2="14.4" y2="9.6"/>
+		</g>
+	</g>
+	<path d="M0.1,0.9v12.5h5.8l-0.3,1.8c0,0.2,0,0.4,0.2,0.6C6,15.9,6.1,16,6.3,16h0.1l2-0.3c0.4-0.1,0.7-0.2,1-0.5l1.9-1.9l-0.1,0.1
+		H16V0.9H0.1z M5.9,13.2C6,13,6,12.9,6.1,12.7H0.8v-11h14.3V7l0,0l-0.6-0.6c-0.7-0.7-1.7-0.7-2.4,0l-5.8,5.8
+		C6.2,12.5,6,12.8,5.9,13.2z M14.5,8.8L14.3,9l-1.7-1.7l0.2-0.2c0.2-0.2,0.4-0.2,0.5-0.2s0.4,0.1,0.5,0.2l0.6,0.6
+		C14.8,8,14.8,8.5,14.5,8.8z M8.8,14.6c-0.1,0.1-0.3,0.2-0.4,0.2L6.6,15l0.2-1.7c0-0.2,0.1-0.3,0.2-0.4l5-5l1.7,1.7L8.8,14.6z
+		 M15.2,9.4v3.3h-3.3L15.2,9.4L15.2,9.4z"/>
+</g>
+<g id="Edit_x5F_This_copy" class="st0">
+	<g id="Base_copy" class="st1">
+		<path d="M15.9,13.4H0.1V0.9H16v12.5H15.9z M0.8,12.7h14.3v-11H0.8V12.7z"/>
+		<rect x="2.6" y="7" width="4.7" height="1.9"/>
+		<rect x="4.5" y="3.2" width="5" height="1.9"/>
+	</g>
+	<g id="Plus_copy" class="st1">
+		<circle cx="11.4" cy="12.2" r="3"/>
+		<rect x="10" y="6.3" width="3.8" height="1.9"/>
+		<line class="st4" x1="9.1" y1="12.2" x2="13.6" y2="12.2"/>
+		<line class="st4" x1="11.4" y1="14.4" x2="11.4" y2="10"/>
+	</g>
+	<g id="Edit_copy" class="st1">
+		<g>
+			<path class="st5" d="M6.3,15.5l2-0.3c0.3,0,0.5-0.2,0.7-0.3l5.3-5.3l0.5-0.5c0.5-0.5,0.5-1.3,0-1.7l-0.3-0.3l-0.3-0.3
+				c-0.5-0.5-1.3-0.5-1.7,0L12,7.2l-5.3,5.3c-0.2,0.2-0.3,0.4-0.3,0.7l-0.3,2.1C6.1,15.4,6.2,15.6,6.3,15.5z"/>
+			<line class="st3" x1="12" y1="7.2" x2="14.4" y2="9.6"/>
+		</g>
+	</g>
+</g>
+</svg>
