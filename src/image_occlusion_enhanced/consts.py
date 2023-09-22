@@ -40,6 +40,6 @@ MODULE_ADDON = __name__.split(".")[0]
 
 ICONS_PATH = os.path.join(ADDON_PATH, "icons")
 
-SUPPORTED_BITMAP_FORMATS = ("jpeg", "png", "gif")
+SUPPORTED_BITMAP_FORMATS = ("jpeg", "png", "gif", "webp")
 SUPPORTED_VECTOR_FORMATS = ("svg",)
 SUPPORTED_EXTENSIONS = ("jpg",) + SUPPORTED_BITMAP_FORMATS + SUPPORTED_VECTOR_FORMATS
